@@ -430,8 +430,7 @@ DEPENDENCIES
   tailwindcss-rails (~> 4.0)
   thruster
   turbo-rails
-  tzinfo-data
   web-console
 
 BUNDLED WITH
-   2.5.22
+   2.6.9
