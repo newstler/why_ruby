@@ -22,6 +22,8 @@ e.g use `rails generate model` instead of creating a model from scratch
 - Monitor development.log for errors and performance issues
 - Use `tail -f log/development.log` for real-time monitoring
 - Review logs before considering any change complete
+- Use modern Ruby 3.4 and Rails 8.1 syntax
+- Avoid using deprecated patterns, like OpenStruct
 
 1. **Modern Infrastructure**
    - Use Thruster for asset compression and caching

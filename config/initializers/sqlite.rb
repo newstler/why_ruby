@@ -8,8 +8,8 @@ module SQLite3
       # Convert extension names to actual paths
       extensions&.map! do |ext|
         case ext
-        when 'ulid'
-          require 'sqlite_ulid'
+        when "ulid"
+          require "sqlite_ulid"
           SqliteUlid.ulid_loadable_path
         else
           ext
