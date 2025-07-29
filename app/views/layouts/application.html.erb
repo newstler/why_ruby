@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "WhyRuby" %></title>
+    <title><%= content_for(:title) || "WhyRuby.info - Ruby Advocacy Community" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
@@ -23,9 +23,76 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <main class="container mx-auto mt-28 px-5 flex">
+  <body class="bg-gray-50">
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+          <div class="flex">
+            <div class="flex-shrink-0 flex items-center">
+              <%= link_to "WhyRuby.info", root_path, class: "text-xl font-bold text-red-600" %>
+            </div>
+            <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+              <%= link_to "Home", root_path, class: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium" %>
+              <% if user_signed_in? %>
+                <%= link_to "New Content", new_content_path, class: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium" %>
+              <% end %>
+            </div>
+          </div>
+          
+          <div class="flex items-center">
+            <% if user_signed_in? %>
+              <div class="flex items-center space-x-4">
+                <%= link_to user_path(current_user), class: "flex items-center space-x-2" do %>
+                  <% if current_user.avatar_url.present? %>
+                    <%= image_tag current_user.avatar_url, alt: current_user.username, class: "h-8 w-8 rounded-full" %>
+                  <% end %>
+                  <span class="text-sm font-medium text-gray-700"><%= current_user.username %></span>
+                <% end %>
+                
+                <% if current_user.admin? %>
+                  <%= link_to "Admin", "/admin", class: "text-sm text-gray-500 hover:text-gray-700" %>
+                <% end %>
+                
+                <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "text-sm text-gray-500 hover:text-gray-700" %>
+              </div>
+            <% else %>
+              <%= link_to "Sign in with GitHub", user_github_omniauth_authorize_path, method: :post, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gray-800 hover:bg-gray-700" %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <% if notice.present? %>
+      <div class="bg-green-50 border-l-4 border-green-400 p-4">
+        <div class="flex">
+          <div class="ml-3">
+            <p class="text-sm text-green-700"><%= notice %></p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+    
+    <% if alert.present? %>
+      <div class="bg-red-50 border-l-4 border-red-400 p-4">
+        <div class="flex">
+          <div class="ml-3">
+            <p class="text-sm text-red-700"><%= alert %></p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <%= yield %>
     </main>
+    
+    <footer class="bg-white mt-16">
+      <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <p class="text-center text-sm text-gray-500">
+          &copy; <%= Date.current.year %> WhyRuby.info - Built with Ruby on Rails <%= Rails.version %>
+        </p>
+      </div>
+    </footer>
   </body>
 </html>

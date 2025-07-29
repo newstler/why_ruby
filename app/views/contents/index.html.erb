@@ -1,0 +1,100 @@
+<div class="space-y-8">
+  <!-- Hero Section -->
+  <div class="bg-white shadow rounded-lg p-8">
+    <h1 class="text-4xl font-bold text-gray-900 mb-4">Why Ruby?</h1>
+    <p class="text-xl text-gray-600">
+      Discover why Ruby continues to be a beloved language for developers worldwide. 
+      Share articles, tutorials, and resources with our community.
+    </p>
+  </div>
+
+  <!-- Pinned Contents -->
+  <% if @pinned_contents.any? %>
+    <div class="space-y-4">
+      <h2 class="text-2xl font-bold text-gray-900">Featured Content</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% @pinned_contents.each do |content| %>
+          <div class="bg-white shadow rounded-lg p-6 border-2 border-red-200">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm text-red-600 font-medium">📌 Pinned</span>
+              <span class="text-sm text-gray-500"><%= content.category.name %></span>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">
+              <%= link_to content.title, content, class: "text-gray-900 hover:text-red-600" %>
+            </h3>
+            <% if content.summary.present? %>
+              <p class="text-gray-600 text-sm mb-4"><%= truncate(content.summary, length: 150) %></p>
+            <% end %>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <% if content.user.avatar_url.present? %>
+                  <%= image_tag content.user.avatar_url, alt: content.user.username, class: "h-6 w-6 rounded-full" %>
+                <% end %>
+                <span class="text-sm text-gray-500"><%= content.user.username %></span>
+              </div>
+              <span class="text-sm text-gray-500"><%= content.created_at.strftime("%b %d") %></span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Categories Filter -->
+  <div class="bg-white shadow rounded-lg p-4">
+    <div class="flex flex-wrap gap-2">
+      <%= link_to "All", root_path, class: "px-4 py-2 rounded-md text-sm font-medium #{params[:category_id].blank? ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
+      <% @categories.each do |category| %>
+        <%= link_to category.name, category_path(category), class: "px-4 py-2 rounded-md text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300" %>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Recent Contents -->
+  <div class="space-y-4">
+    <h2 class="text-2xl font-bold text-gray-900">Recent Content</h2>
+    <div class="space-y-4">
+      <% @contents.each do |content| %>
+        <div class="bg-white shadow rounded-lg p-6">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <div class="flex items-center space-x-3 mb-2">
+                <span class="text-sm text-gray-500"><%= content.category.name %></span>
+                <% if content.link? %>
+                  <span class="text-sm text-blue-600">🔗 External Link</span>
+                <% end %>
+              </div>
+              <h3 class="text-xl font-semibold mb-2">
+                <%= link_to content.title, content, class: "text-gray-900 hover:text-red-600" %>
+              </h3>
+              <% if content.summary.present? %>
+                <p class="text-gray-600 mb-4"><%= truncate(content.summary, length: 200) %></p>
+              <% end %>
+              <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                  <% if content.user.avatar_url.present? %>
+                    <%= image_tag content.user.avatar_url, alt: content.user.username, class: "h-6 w-6 rounded-full" %>
+                  <% end %>
+                  <%= link_to content.user.username, user_path(content.user), class: "text-sm text-gray-700 hover:text-gray-900" %>
+                </div>
+                <span class="text-sm text-gray-500"><%= content.created_at.strftime("%B %d, %Y") %></span>
+                <% if content.tags.any? %>
+                  <div class="flex flex-wrap gap-1">
+                    <% content.tags.each do |tag| %>
+                      <%= link_to tag.name, tag_path(tag), class: "text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded hover:bg-gray-300" %>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+            <% if content.title_image_url.present? %>
+              <div class="ml-6 flex-shrink-0">
+                <%= image_tag content.title_image_url, alt: content.title, class: "h-24 w-24 object-cover rounded-lg" %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div> 

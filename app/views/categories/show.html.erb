@@ -1,0 +1,57 @@
+<div class="space-y-8">
+  <div class="bg-white shadow rounded-lg p-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2"><%= @category.name %></h1>
+    <p class="text-gray-600">Browse all content in this category</p>
+  </div>
+
+  <div class="space-y-4">
+    <% if @contents.any? %>
+      <% @contents.each do |content| %>
+        <div class="bg-white shadow rounded-lg p-6">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <div class="flex items-center space-x-3 mb-2">
+                <% if content.link? %>
+                  <span class="text-sm text-blue-600">🔗 External Link</span>
+                <% end %>
+              </div>
+              <h3 class="text-xl font-semibold mb-2">
+                <%= link_to content.title, content, class: "text-gray-900 hover:text-red-600" %>
+              </h3>
+              <% if content.summary.present? %>
+                <p class="text-gray-600 mb-4"><%= truncate(content.summary, length: 200) %></p>
+              <% end %>
+              <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                  <% if content.user.avatar_url.present? %>
+                    <%= image_tag content.user.avatar_url, alt: content.user.username, class: "h-6 w-6 rounded-full" %>
+                  <% end %>
+                  <%= link_to content.user.username, user_path(content.user), class: "text-sm text-gray-700 hover:text-gray-900" %>
+                </div>
+                <span class="text-sm text-gray-500"><%= content.created_at.strftime("%B %d, %Y") %></span>
+                <% if content.tags.any? %>
+                  <div class="flex flex-wrap gap-1">
+                    <% content.tags.each do |tag| %>
+                      <%= link_to tag.name, tag_path(tag), class: "text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded hover:bg-gray-300" %>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+      
+      <div class="mt-8">
+        <%= paginate @contents %>
+      </div>
+    <% else %>
+      <div class="bg-white shadow rounded-lg p-8 text-center">
+        <p class="text-gray-600">No content in this category yet.</p>
+        <% if user_signed_in? %>
+          <%= link_to "Create the first one", new_content_path, class: "mt-4 inline-block text-red-600 hover:text-red-800" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div> 

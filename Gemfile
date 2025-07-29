@@ -40,6 +40,27 @@ gem "thruster", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
 
+# Authentication
+gem "devise", "~> 4.9"
+gem "omniauth-github", "~> 2.0"
+gem "omniauth-rails_csrf_protection", "~> 1.0"
+
+# Admin
+gem "avo", ">= 3.2"
+
+# Markdown and code syntax highlighting
+gem "redcarpet", "~> 3.6"
+gem "rouge", "~> 4.0"
+
+# AI integration for summaries
+gem "ruby-openai", "~> 7.0"
+
+# Pagination
+gem "kaminari", "~> 1.2"
+
+# HTML/XML parsing
+gem "nokogiri", "~> 1.16"
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
@@ -63,6 +84,3 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
-
-gem "devise", "~> 4.9"
-gem "avo", ">= 3.2"

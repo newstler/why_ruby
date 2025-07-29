@@ -2,12 +2,48 @@
 @plugin "@tailwindcss/forms";
 @plugin "@tailwindcss/typography";
 
-/*
-
 @layer components {
-  .btn-primary {
-    @apply py-2 px-4 bg-blue-200;
+  /* Prose styles for Markdown content */
+  .prose h1 {
+    @apply text-3xl font-bold mb-4 mt-8;
+  }
+  .prose h2 {
+    @apply text-2xl font-bold mb-3 mt-6;
+  }
+  .prose h3 {
+    @apply text-xl font-bold mb-2 mt-4;
+  }
+  .prose p {
+    @apply mb-4;
+  }
+  .prose ul {
+    @apply list-disc list-inside mb-4;
+  }
+  .prose ol {
+    @apply list-decimal list-inside mb-4;
+  }
+  .prose li {
+    @apply mb-1;
+  }
+  .prose code {
+    @apply bg-gray-100 px-1 py-0.5 rounded text-sm font-mono;
+  }
+  .prose pre {
+    @apply bg-gray-100 p-4 rounded overflow-x-auto mb-4;
+  }
+  .prose pre code {
+    @apply bg-transparent p-0;
+  }
+  .prose blockquote {
+    @apply border-l-4 border-gray-300 pl-4 italic mb-4;
+  }
+  .prose a {
+    @apply text-red-600 hover:text-red-800 underline;
+  }
+  .prose strong {
+    @apply font-bold;
+  }
+  .prose em {
+    @apply italic;
   }
 }
-
-*/

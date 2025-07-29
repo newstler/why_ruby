@@ -10,29 +10,122 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2024_12_07_205829) do
+ActiveRecord::Schema[8.1].define(version: 2025_07_29_164457) do
   create_table "admins", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
-    t.string "reset_password_token"
-    t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
-    t.datetime "created_at", null: false
+    t.datetime "reset_password_sent_at"
+    t.string "reset_password_token"
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_admins_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admins_on_reset_password_token", unique: true
   end
 
-  create_table "users", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
-    t.string "email", default: "", null: false
-    t.string "encrypted_password", default: "", null: false
-    t.string "reset_password_token"
-    t.datetime "reset_password_sent_at"
-    t.datetime "remember_created_at"
-    t.string "name"
+  create_table "categories", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
+    t.boolean "archived", default: false, null: false
     t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.integer "position", null: false
     t.datetime "updated_at", null: false
-    t.index ["email"], name: "index_users_on_email", unique: true
-    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["archived"], name: "index_categories_on_archived"
+    t.index ["name"], name: "index_categories_on_name", unique: true
+    t.index ["position"], name: "index_categories_on_position", unique: true
   end
+
+  create_table "comments", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
+    t.boolean "archived", default: false, null: false
+    t.text "body", null: false
+    t.string "content_id", null: false
+    t.datetime "created_at", null: false
+    t.boolean "published", default: false, null: false
+    t.datetime "updated_at", null: false
+    t.string "user_id", null: false
+    t.index ["archived"], name: "index_comments_on_archived"
+    t.index ["content_id"], name: "index_comments_on_content_id"
+    t.index ["created_at"], name: "index_comments_on_created_at"
+    t.index ["published"], name: "index_comments_on_published"
+    t.index ["user_id"], name: "index_comments_on_user_id"
+  end
+
+  create_table "contents", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
+    t.boolean "archived", default: false, null: false
+    t.string "category_id", null: false
+    t.text "content"
+    t.datetime "created_at", null: false
+    t.boolean "needs_admin_review", default: false, null: false
+    t.integer "pin_position"
+    t.boolean "published", default: false, null: false
+    t.integer "reports_count", default: 0, null: false
+    t.text "summary"
+    t.string "title", null: false
+    t.string "title_image_url"
+    t.datetime "updated_at", null: false
+    t.string "url"
+    t.string "user_id", null: false
+    t.index ["archived"], name: "index_contents_on_archived"
+    t.index ["category_id"], name: "index_contents_on_category_id"
+    t.index ["created_at"], name: "index_contents_on_created_at"
+    t.index ["needs_admin_review"], name: "index_contents_on_needs_admin_review"
+    t.index ["pin_position"], name: "index_contents_on_pin_position", unique: true, where: "pin_position IS NOT NULL"
+    t.index ["published"], name: "index_contents_on_published"
+    t.index ["user_id"], name: "index_contents_on_user_id"
+  end
+
+  create_table "contents_tags", id: false, force: :cascade do |t|
+    t.string "content_id", null: false
+    t.string "tag_id", null: false
+    t.index ["content_id", "tag_id"], name: "index_contents_tags_on_content_id_and_tag_id", unique: true
+    t.index ["content_id"], name: "index_contents_tags_on_content_id"
+    t.index ["tag_id", "content_id"], name: "index_contents_tags_on_tag_id_and_content_id"
+    t.index ["tag_id"], name: "index_contents_tags_on_tag_id"
+  end
+
+  create_table "reports", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
+    t.string "content_id", null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.integer "reason", null: false
+    t.datetime "updated_at", null: false
+    t.string "user_id", null: false
+    t.index ["content_id"], name: "index_reports_on_content_id"
+    t.index ["user_id", "content_id"], name: "index_reports_on_user_id_and_content_id", unique: true
+    t.index ["user_id"], name: "index_reports_on_user_id"
+  end
+
+  create_table "tags", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
+    t.boolean "archived", default: false, null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["archived"], name: "index_tags_on_archived"
+    t.index ["name"], name: "index_tags_on_name", unique: true
+  end
+
+  create_table "users", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
+    t.boolean "archived", default: false, null: false
+    t.string "avatar_url"
+    t.datetime "created_at", null: false
+    t.string "email", null: false
+    t.integer "github_id", null: false
+    t.integer "published_comments_count", default: 0, null: false
+    t.integer "published_contents_count", default: 0, null: false
+    t.integer "role", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.string "username", null: false
+    t.index ["archived"], name: "index_users_on_archived"
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["github_id"], name: "index_users_on_github_id", unique: true
+    t.index ["username"], name: "index_users_on_username", unique: true
+  end
+
+  add_foreign_key "comments", "contents"
+  add_foreign_key "comments", "users"
+  add_foreign_key "contents", "categories"
+  add_foreign_key "contents", "users"
+  add_foreign_key "contents_tags", "contents"
+  add_foreign_key "contents_tags", "tags"
+  add_foreign_key "reports", "contents"
+  add_foreign_key "reports", "users"
 end
