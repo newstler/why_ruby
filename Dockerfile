@@ -2,22 +2,26 @@
 # check=error=true
 
 # This Dockerfile is designed for production, not development. Use with Kamal or build'n'run by hand:
-# docker build -t why_ruby .
-# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name why_ruby why_ruby
+# docker build -t template .
+# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name template template
 
 # For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
-ARG RUBY_VERSION=3.4.0.preview2
+ARG RUBY_VERSION=3.4.4
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
 # Rails app lives here
 WORKDIR /rails
 
+RUN echo 'Acquire::http::Pipeline-Depth 0;\nAcquire::http::No-Cache true;\nAcquire::BrokenProxy true;\n' > /etc/apt/apt.conf.d/99fixbadproxy
+
+
 # Install base packages
-RUN apt-get update -qq && \
+RUN rm -rf /var/lib/apt/lists/* && \
+    apt-get update -qq --fix-missing && \
     apt-get install --no-install-recommends -y curl libjemalloc2 libvips sqlite3 && \
-    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+    rm -rf /var/lib/apt/lists/*
 
 # Set production environment
 ENV RAILS_ENV="production" \
@@ -30,7 +34,7 @@ FROM base AS build
 
 # Install packages needed to build gems
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git pkg-config && \
+    apt-get install --no-install-recommends -y build-essential git pkg-config libyaml-dev && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Install application gems
@@ -45,8 +49,10 @@ COPY . .
 # Precompile bootsnap code for faster boot times
 RUN bundle exec bootsnap precompile app/ lib/
 
-# Precompiling assets for production without requiring secret RAILS_MASTER_KEY
-RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
+# Precompiling assets for production with RAILS_MASTER_KEY from secrets
+RUN --mount=type=secret,id=RAILS_MASTER_KEY \
+    RAILS_MASTER_KEY="$(cat /run/secrets/RAILS_MASTER_KEY)" \
+    ./bin/rails assets:precompile
 
 
 
