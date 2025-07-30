@@ -29,7 +29,11 @@
           <div class="flex items-start justify-between">
             <div class="flex-1">
               <div class="flex items-center space-x-3 mb-2">
-                <span class="text-sm text-gray-500"><%= post.category.name %></span>
+                <% if post.category %>
+                  <span class="text-sm text-gray-500"><%= post.category.name %></span>
+                <% else %>
+                  <span class="text-sm text-gray-400 italic">Uncategorized</span>
+                <% end %>
                 <% if post.link? %>
                   <span class="text-sm text-blue-600">🔗 External Link</span>
                 <% end %>

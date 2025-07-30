@@ -24,6 +24,10 @@ Rails.application.routes.draw do
   resources :posts do
     resources :comments, only: [:create, :destroy]
     resources :reports, only: [:create]
+    
+    collection do
+      post :preview
+    end
   end
   
   resources :categories, only: [:show]

@@ -13,40 +13,19 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <% @pinned_posts.each do |post| %>
           <div class="bg-white shadow rounded-lg p-6 border-2 border-red-200">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-sm text-red-600 font-medium">📌 Pinned</span>
-              <span class="text-sm text-gray-500"><%= post.category.name %></span>
-            </div>
             <h3 class="text-lg font-semibold mb-2">
               <%= link_to post.title, post, class: "text-gray-900 hover:text-red-600" %>
             </h3>
             <% if post.summary.present? %>
               <p class="text-gray-600 text-sm mb-4"><%= truncate(post.summary, length: 150) %></p>
             <% end %>
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-2">
-                <% if post.user.avatar_url.present? %>
-                  <%= image_tag post.user.avatar_url, alt: post.user.username, class: "h-6 w-6 rounded-full" %>
-                <% end %>
-                <span class="text-sm text-gray-500"><%= post.user.username %></span>
-              </div>
-              <span class="text-sm text-gray-500"><%= post.created_at.strftime("%b %d") %></span>
-            </div>
           </div>
         <% end %>
       </div>
     </div>
   <% end %>
 
-  <!-- Categories Filter -->
-  <div class="bg-white shadow rounded-lg p-4">
-    <div class="flex flex-wrap gap-2">
-      <%= link_to "All", root_path, class: "px-4 py-2 rounded-md text-sm font-medium #{params[:category_id].blank? ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
-      <% @categories.each do |category| %>
-        <%= link_to category.name, category_path(category), class: "px-4 py-2 rounded-md text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300" %>
-      <% end %>
-    </div>
-  </div>
+
 
   <!-- Recent Posts -->
   <div class="space-y-4">
@@ -57,7 +36,11 @@
           <div class="flex items-start justify-between">
             <div class="flex-1">
               <div class="flex items-center space-x-3 mb-2">
-                <span class="text-sm text-gray-500"><%= post.category.name %></span>
+                <% if post.category %>
+                  <span class="text-sm text-gray-500"><%= post.category.name %></span>
+                <% else %>
+                  <span class="text-sm text-gray-400 italic">Uncategorized</span>
+                <% end %>
                 <% if post.link? %>
                   <span class="text-sm text-blue-600">🔗 External Link</span>
                 <% end %>

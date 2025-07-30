@@ -2,8 +2,12 @@ class Avo::Resources::Tag < Avo::BaseResource
   self.title = :name
   self.includes = []
   self.search = {
-    query: -> { query.ransack(name_cont: params[:q]).result(distinct: false) }
+    query: -> { Tag.unscoped.ransack(name_cont: params[:q]).result(distinct: false) }
   }
+  
+  def index_query
+    model_class.unscoped
+  end
 
   def fields
     field :id, as: :text, readonly: true

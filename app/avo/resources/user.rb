@@ -1,9 +1,13 @@
 class Avo::Resources::User < Avo::BaseResource
   self.title = :username
-  self.includes = [:contents, :comments]
+  self.includes = [:posts, :comments]
   self.search = {
-    query: -> { query.ransack(username_cont: params[:q], email_cont: params[:q], m: "or").result(distinct: false) }
+    query: -> { User.unscoped.ransack(username_cont: params[:q], email_cont: params[:q], m: "or").result(distinct: false) }
   }
+  
+  def index_query
+    model_class.unscoped
+  end
 
   def fields
     field :id, as: :text, readonly: true

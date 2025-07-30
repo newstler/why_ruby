@@ -4,7 +4,7 @@ class Post < ApplicationRecord
   
   # Associations
   belongs_to :user
-  belongs_to :category
+  belongs_to :category, -> { unscoped }
   has_and_belongs_to_many :tags
   has_many :comments, dependent: :destroy
   has_many :reports, dependent: :destroy

@@ -1,9 +1,13 @@
 class Avo::Resources::Comment < Avo::BaseResource
   self.title = :body
-  self.includes = [:user, :content]
+  self.includes = [:user, :post]
   self.search = {
-    query: -> { query.ransack(body_cont: params[:q]).result(distinct: false) }
+    query: -> { Comment.unscoped.ransack(body_cont: params[:q]).result(distinct: false) }
   }
+  
+  def index_query
+    model_class.unscoped
+  end
 
   def fields
     field :id, as: :text, readonly: true

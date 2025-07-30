@@ -28,16 +28,21 @@ module ApplicationHelper
     
     # Apply syntax highlighting to code blocks
     doc = Nokogiri::HTML::DocumentFragment.parse(html)
-    doc.css('code').each do |code_block|
-      if code_block.parent.name == 'pre'
-        language = code_block['class']&.gsub('language-', '') || 'text'
-        begin
-          highlighted = Rouge.highlight(code_block.text, language, 'html')
-          code_block.parent.replace(highlighted)
-        rescue => e
-          # If highlighting fails, keep the original code block
-          Rails.logger.error "Syntax highlighting failed: #{e.message}"
-        end
+    doc.css('pre code').each do |code_block|
+      language = code_block['class']&.gsub('language-', '') || 'text'
+      begin
+        lexer = Rouge::Lexer.find(language) || Rouge::Lexers::PlainText.new
+        formatter = Rouge::Formatters::HTML.new
+        highlighted_code = formatter.format(lexer.lex(code_block.text))
+        
+        # Replace the pre > code structure with highlighted version
+        new_pre = Nokogiri::HTML::DocumentFragment.parse(
+          %Q(<div class="highlight"><pre class="highlight #{language}"><code>#{highlighted_code}</code></pre></div>)
+        )
+        code_block.parent.parent.replace(new_pre)
+      rescue => e
+        # If highlighting fails, keep the original code block
+        Rails.logger.error "Syntax highlighting failed for language '#{language}': #{e.message}"
       end
     end
     

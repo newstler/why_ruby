@@ -1,6 +1,6 @@
 class Avo::Resources::Report < Avo::BaseResource
   self.title = :reason
-  self.includes = [:user, :content]
+  self.includes = [:user, :post]
   
   def fields
     field :id, as: :text, readonly: true

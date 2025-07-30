@@ -3,7 +3,11 @@
     <!-- Post Header -->
     <div class="mb-6">
       <div class="flex items-center space-x-3 mb-4">
-        <span class="text-sm font-medium text-gray-500"><%= @post.category.name %></span>
+        <% if @post.category %>
+          <span class="text-sm font-medium text-gray-500"><%= @post.category.name %></span>
+        <% else %>
+          <span class="text-sm text-gray-400 italic">Uncategorized</span>
+        <% end %>
         <% if @post.link? %>
           <span class="text-sm text-blue-600">🔗 External Link</span>
         <% end %>
@@ -18,7 +22,9 @@
         <div class="flex items-center space-x-4">
           <div class="flex items-center space-x-2">
             <% if @post.user.avatar_url.present? %>
-              <%= image_tag @post.user.avatar_url, alt: @post.user.username, class: "h-10 w-10 rounded-full" %>
+              <%= link_to user_path(@post.user), class: "text-sm font-medium text-gray-900 hover:text-gray-700" do %>
+                <%= image_tag @post.user.avatar_url, alt: @post.user.username, class: "h-10 w-10 rounded-full" %>
+              <% end %>
             <% end %>
             <div>
               <%= link_to @post.user.username, user_path(@post.user), class: "text-sm font-medium text-gray-900 hover:text-gray-700" %>

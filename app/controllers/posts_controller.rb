@@ -9,7 +9,6 @@ class PostsController < ApplicationController
                       .order(created_at: :desc)
                       .page(params[:page])
                       .per(20)
-    @categories = Category.ordered
   end
   
   def show
@@ -44,6 +43,11 @@ class PostsController < ApplicationController
   def destroy
     @post.update!(archived: true)
     redirect_to posts_url, notice: 'Post was successfully deleted.'
+  end
+  
+  def preview
+    html = helpers.markdown_to_html(params[:content])
+    render json: { html: html }
   end
   
   private

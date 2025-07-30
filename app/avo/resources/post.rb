@@ -3,8 +3,12 @@ class Avo::Resources::Post < Avo::BaseResource
   self.includes = [:user, :category, :tags]
   self.model_class = ::Post
   self.search = {
-    query: -> { query.ransack(title_cont: params[:q], content_cont: params[:q], m: "or").result(distinct: false) }
+    query: -> { Post.unscoped.ransack(title_cont: params[:q], content_cont: params[:q], m: "or").result(distinct: false) }
   }
+  
+  def index_query
+    model_class.unscoped
+  end
 
   def fields
     field :id, as: :text, readonly: true
