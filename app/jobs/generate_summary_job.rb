@@ -1,17 +1,17 @@
 class GenerateSummaryJob < ApplicationJob
   queue_as :default
   
-  def perform(content)
-    return unless content.published? && content.summary.blank?
+  def perform(post)
+    return unless post.published? && post.summary.blank?
     
     # Initialize OpenAI client
-    client = OpenAI::Client.new(access_token: ENV["OPENAI_API_KEY"])
+    client = OpenAI::Client.new(access_token: Rails.application.credentials.dig(:openai, :api_key))
     
     # Prepare the text for summarization
-    text_to_summarize = if content.article?
-      content.content
+    text_to_summarize = if post.article?
+      post.content
     else
-      "#{content.title} - #{content.url}"
+      "#{post.title} - #{post.url}"
     end
     
     # Truncate to reasonable length for API
@@ -37,9 +37,9 @@ class GenerateSummaryJob < ApplicationJob
       )
       
       summary = response.dig("choices", 0, "message", "content")
-      content.update!(summary: summary) if summary.present?
+      post.update!(summary: summary) if summary.present?
     rescue => e
-      Rails.logger.error "Failed to generate summary for content #{content.id}: #{e.message}"
+      Rails.logger.error "Failed to generate summary for post #{post.id}: #{e.message}"
     end
   end
 end 

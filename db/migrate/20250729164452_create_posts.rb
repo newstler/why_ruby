@@ -1,6 +1,6 @@
-class CreateContents < ActiveRecord::Migration[8.1]
+class CreatePosts < ActiveRecord::Migration[8.1]
   def change
-    create_table :contents, force: true, id: false do |t|
+    create_table :posts, force: true, id: false do |t|
       t.primary_key :id, :string, default: -> { "ULID()" }
       
       t.references :user, type: :string, null: false, foreign_key: true
@@ -23,10 +23,10 @@ class CreateContents < ActiveRecord::Migration[8.1]
       t.timestamps
     end
     
-    add_index :contents, :pin_position, unique: true, where: "pin_position IS NOT NULL"
-    add_index :contents, :published
-    add_index :contents, :archived
-    add_index :contents, :needs_admin_review
-    add_index :contents, :created_at
+    add_index :posts, :pin_position, unique: true, where: "pin_position IS NOT NULL"
+    add_index :posts, :published
+    add_index :posts, :archived
+    add_index :posts, :needs_admin_review
+    add_index :posts, :created_at
   end
 end

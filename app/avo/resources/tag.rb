@@ -13,7 +13,7 @@ class Avo::Resources::Tag < Avo::BaseResource
     field :updated_at, as: :date_time, readonly: true
     
     # Associations
-    field :contents, as: :has_and_belongs_to_many
+    field :posts, as: :has_and_belongs_to_many
   end
   
   def actions

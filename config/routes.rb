@@ -1,6 +1,11 @@
 Rails.application.routes.draw do
   devise_for :users, controllers: { omniauth_callbacks: 'users/omniauth_callbacks' }
   
+  # Add sign out route for OmniAuth-only authentication
+  devise_scope :user do
+    delete 'sign_out', to: 'users/sessions#destroy', as: :destroy_user_session
+  end
+  
   # Admin panel - only accessible to users with admin role
   authenticate :user, ->(user) { user.admin? } do
     mount Avo::Engine, at: Avo.configuration.root_path
@@ -16,7 +21,7 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  resources :contents do
+  resources :posts do
     resources :comments, only: [:create, :destroy]
     resources :reports, only: [:create]
   end
@@ -28,5 +33,5 @@ Rails.application.routes.draw do
   resources :users, only: [:show]
   
   # Defines the root path route ("/")
-  root "contents#index"
+  root "posts#index"
 end

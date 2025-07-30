@@ -1,6 +1,7 @@
-class Avo::Resources::Content < Avo::BaseResource
+class Avo::Resources::Post < Avo::BaseResource
   self.title = :title
   self.includes = [:user, :category, :tags]
+  self.model_class = ::Post
   self.search = {
     query: -> { query.ransack(title_cont: params[:q], content_cont: params[:q], m: "or").result(distinct: false) }
   }
@@ -31,13 +32,13 @@ class Avo::Resources::Content < Avo::BaseResource
   def actions
     action Avo::Actions::TogglePublished
     action Avo::Actions::ToggleArchived
-    action Avo::Actions::PinContent
-    action Avo::Actions::ClearReports
+    # action Avo::Actions::PinContent
+    # action Avo::Actions::ClearReports
   end
   
-  def filters
-    filter Avo::Filters::Published
-    filter Avo::Filters::NeedsReview
-    filter Avo::Filters::ContentType
-  end
+  # def filters
+  #   filter Avo::Filters::Published
+  #   filter Avo::Filters::NeedsReview
+  #   filter Avo::Filters::ContentType
+  # end
 end 

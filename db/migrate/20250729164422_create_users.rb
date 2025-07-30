@@ -16,7 +16,7 @@ class CreateUsers < ActiveRecord::Migration[8.1]
       t.boolean :archived, default: false, null: false
       
       # Counter caches
-      t.integer :published_contents_count, default: 0, null: false
+      t.integer :published_posts_count, default: 0, null: false
       t.integer :published_comments_count, default: 0, null: false
       
       t.timestamps

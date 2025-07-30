@@ -4,7 +4,7 @@ class CreateReports < ActiveRecord::Migration[8.1]
       t.primary_key :id, :string, default: -> { "ULID()" }
       
       t.references :user, type: :string, null: false, foreign_key: true
-      t.references :content, type: :string, null: false, foreign_key: true
+      t.references :post, type: :string, null: false, foreign_key: true
       
       t.integer :reason, null: false # enum: spam:0, inappropriate:1, off_topic:2, harassment:3, misinformation:4, other:5
       t.text :description
@@ -12,6 +12,6 @@ class CreateReports < ActiveRecord::Migration[8.1]
       t.timestamps
     end
     
-    add_index :reports, [:user_id, :content_id], unique: true
+    add_index :reports, [:user_id, :post_id], unique: true
   end
 end

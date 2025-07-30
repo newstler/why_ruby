@@ -13,14 +13,14 @@ class Avo::Resources::User < Avo::BaseResource
     field :github_id, as: :number, readonly: true
     field :role, as: :select, enum: ::User.roles
     field :archived, as: :boolean
-    field :published_contents_count, as: :number, readonly: true
+    field :published_posts_count, as: :number, readonly: true
     field :published_comments_count, as: :number, readonly: true
     field :trusted?, as: :boolean, readonly: true
     field :created_at, as: :date_time, readonly: true
     field :updated_at, as: :date_time, readonly: true
     
     # Associations
-    field :contents, as: :has_many
+    field :posts, as: :has_many
     field :comments, as: :has_many
     field :reports, as: :has_many
   end

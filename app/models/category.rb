@@ -3,7 +3,7 @@ class Category < ApplicationRecord
   default_scope { where(archived: false) }
   
   # Associations
-  has_many :contents, dependent: :nullify
+  has_many :posts, dependent: :nullify
   
   # Validations
   validates :name, presence: true, uniqueness: true

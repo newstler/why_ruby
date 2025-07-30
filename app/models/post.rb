@@ -1,4 +1,4 @@
-class Content < ApplicationRecord
+class Post < ApplicationRecord
   # Soft deletion
   default_scope { where(archived: false) }
   
@@ -65,8 +65,8 @@ class Content < ApplicationRecord
   
   def update_user_counter_caches
     if saved_change_to_published? || saved_change_to_archived?
-      count = user.contents.published.count
-      user.update_column(:published_contents_count, count)
+      count = user.posts.published.count
+      user.update_column(:published_posts_count, count)
     end
   end
 end 

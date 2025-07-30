@@ -14,7 +14,7 @@ class Avo::Resources::Category < Avo::BaseResource
     field :updated_at, as: :date_time, readonly: true
     
     # Associations
-    field :contents, as: :has_many
+    field :posts, as: :has_many
   end
   
   def actions

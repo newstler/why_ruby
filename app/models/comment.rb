@@ -3,7 +3,7 @@ class Comment < ApplicationRecord
   default_scope { where(archived: false) }
   
   # Associations
-  belongs_to :content
+  belongs_to :post
   belongs_to :user, counter_cache: :published_comments_count
   
   # Validations

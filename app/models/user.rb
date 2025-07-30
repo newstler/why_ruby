@@ -3,10 +3,10 @@ class User < ApplicationRecord
   default_scope { where(archived: false) }
   
   # Associations
-  has_many :contents, dependent: :nullify
+  has_many :posts, dependent: :nullify
   has_many :comments, dependent: :nullify
   has_many :reports, dependent: :nullify
-  has_many :published_contents, -> { published }, class_name: "Content"
+  has_many :published_posts, -> { published }, class_name: "Post"
   has_many :published_comments, -> { published }, class_name: "Comment"
   
   # Enums
@@ -19,16 +19,16 @@ class User < ApplicationRecord
   
   # Scopes
   scope :trusted, -> { 
-    where("published_contents_count >= ? AND published_comments_count >= ?", 3, 10)
+    where("published_posts_count >= ? AND published_comments_count >= ?", 3, 10)
   }
   scope :admins, -> { where(role: :admin) }
   
-  # Devise modules (removing database_authenticatable since we're using GitHub OAuth only)
+  # Devise modules for GitHub OAuth
   devise :omniauthable, omniauth_providers: [:github]
   
   # Instance methods
   def trusted?
-    published_contents_count >= 3 && published_comments_count >= 10
+    published_posts_count >= 3 && published_comments_count >= 10
   end
   
   def can_report?

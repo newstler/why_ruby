@@ -3,7 +3,7 @@ class CreateComments < ActiveRecord::Migration[8.1]
     create_table :comments, force: true, id: false do |t|
       t.primary_key :id, :string, default: -> { "ULID()" }
       
-      t.references :content, type: :string, null: false, foreign_key: true
+      t.references :post, type: :string, null: false, foreign_key: true
       t.references :user, type: :string, null: false, foreign_key: true
       
       t.text :body, null: false

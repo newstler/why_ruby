@@ -1,7 +1,7 @@
 class Report < ApplicationRecord
   # Associations
   belongs_to :user
-  belongs_to :content, counter_cache: true
+  belongs_to :post, counter_cache: true
   
   # Enums
   enum :reason, { 
@@ -15,21 +15,21 @@ class Report < ApplicationRecord
   
   # Validations
   validates :reason, presence: true
-  validates :user_id, uniqueness: { scope: :content_id, message: "can only report content once" }
+  validates :user_id, uniqueness: { scope: :post_id, message: "can only report post once" }
   validate :user_can_report
   
   # Callbacks
-  after_create :check_content_threshold
+  after_create :check_post_threshold
   
   private
   
   def user_can_report
     unless user&.can_report?
-      errors.add(:user, "must be a trusted user to report content")
+      errors.add(:user, "must be a trusted user to report posts")
     end
   end
   
-  def check_content_threshold
-    content.auto_hide_if_needed!
+  def check_post_threshold
+    post.auto_hide_if_needed!
   end
 end 

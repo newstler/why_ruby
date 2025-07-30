@@ -8,7 +8,7 @@
         <h1 class="text-3xl font-bold text-gray-900 mb-2"><%= @user.username %></h1>
         <div class="flex items-center space-x-6 text-sm text-gray-600">
           <span>Joined <%= @user.created_at.strftime("%B %Y") %></span>
-          <span><%= pluralize(@user.published_contents_count, "published content") %></span>
+          <span><%= pluralize(@user.published_posts_count, "published post") %></span>
           <span><%= pluralize(@user.published_comments_count, "comment") %></span>
           <% if @user.trusted? %>
             <span class="text-green-600 font-medium">✓ Trusted User</span>
@@ -22,29 +22,29 @@
   </div>
 
   <div class="space-y-4">
-    <h2 class="text-2xl font-bold text-gray-900">Published Content</h2>
-    <% if @contents.any? %>
-      <% @contents.each do |content| %>
+    <h2 class="text-2xl font-bold text-gray-900">Published Posts</h2>
+    <% if @posts.any? %>
+      <% @posts.each do |post| %>
         <div class="bg-white shadow rounded-lg p-6">
           <div class="flex items-start justify-between">
             <div class="flex-1">
               <div class="flex items-center space-x-3 mb-2">
-                <span class="text-sm text-gray-500"><%= content.category.name %></span>
-                <% if content.link? %>
+                <span class="text-sm text-gray-500"><%= post.category.name %></span>
+                <% if post.link? %>
                   <span class="text-sm text-blue-600">🔗 External Link</span>
                 <% end %>
               </div>
               <h3 class="text-xl font-semibold mb-2">
-                <%= link_to content.title, content, class: "text-gray-900 hover:text-red-600" %>
+                <%= link_to post.title, post, class: "text-gray-900 hover:text-red-600" %>
               </h3>
-              <% if content.summary.present? %>
-                <p class="text-gray-600 mb-4"><%= truncate(content.summary, length: 200) %></p>
+              <% if post.summary.present? %>
+                <p class="text-gray-600 mb-4"><%= truncate(post.summary, length: 200) %></p>
               <% end %>
               <div class="flex items-center space-x-4">
-                <span class="text-sm text-gray-500"><%= content.created_at.strftime("%B %d, %Y") %></span>
-                <% if content.tags.any? %>
+                <span class="text-sm text-gray-500"><%= post.created_at.strftime("%B %d, %Y") %></span>
+                <% if post.tags.any? %>
                   <div class="flex flex-wrap gap-1">
-                    <% content.tags.each do |tag| %>
+                    <% post.tags.each do |tag| %>
                       <%= link_to tag.name, tag_path(tag), class: "text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded hover:bg-gray-300" %>
                     <% end %>
                   </div>
@@ -56,11 +56,11 @@
       <% end %>
       
       <div class="mt-8">
-        <%= paginate @contents %>
+        <%= paginate @posts %>
       </div>
     <% else %>
       <div class="bg-white shadow rounded-lg p-8 text-center">
-        <p class="text-gray-600">No published content yet.</p>
+        <p class="text-gray-600">No published posts yet.</p>
       </div>
     <% end %>
   </div>

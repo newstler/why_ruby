@@ -47,14 +47,24 @@ rails db:migrate
 rails db:seed
 ```
 
-4. Set up environment variables:
+4. Set up Rails credentials for development:
 ```bash
-cp .env.example .env
+rails credentials:edit --environment development
 ```
 
-Edit `.env` and add your credentials:
-- `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`: Get from [GitHub OAuth Apps](https://github.com/settings/developers)
-- `OPENAI_API_KEY`: Get from [OpenAI](https://platform.openai.com/api-keys)
+Add your credentials:
+```yaml
+github:
+  client_id: your_github_client_id
+  client_secret: your_github_client_secret
+
+openai:
+  api_key: your_openai_api_key  # Optional
+```
+
+Get credentials from:
+- GitHub OAuth: [GitHub OAuth Apps](https://github.com/settings/developers)
+- OpenAI API: [OpenAI](https://platform.openai.com/api-keys)
 
 ### GitHub OAuth Setup
 
@@ -65,7 +75,7 @@ Edit `.env` and add your credentials:
    - Homepage URL: http://localhost:3000
    - Authorization callback URL: http://localhost:3000/users/auth/github/callback
 4. Click "Register application"
-5. Copy the Client ID and Client Secret to your `.env` file
+5. Copy the Client ID and Client Secret to your Rails credentials
 
 ## Running the Application
 

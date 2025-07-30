@@ -1,35 +1,35 @@
 <div class="space-y-8">
   <div class="bg-white shadow rounded-lg p-8">
     <h1 class="text-3xl font-bold text-gray-900 mb-2">#<%= @tag.name %></h1>
-    <p class="text-gray-600">Content tagged with <%= @tag.name %></p>
+    <p class="text-gray-600">Posts tagged with <%= @tag.name %></p>
   </div>
 
   <div class="space-y-4">
-    <% if @contents.any? %>
-      <% @contents.each do |content| %>
+    <% if @posts.any? %>
+      <% @posts.each do |post| %>
         <div class="bg-white shadow rounded-lg p-6">
           <div class="flex items-start justify-between">
             <div class="flex-1">
               <div class="flex items-center space-x-3 mb-2">
-                <span class="text-sm text-gray-500"><%= content.category.name %></span>
-                <% if content.link? %>
+                <span class="text-sm text-gray-500"><%= post.category.name %></span>
+                <% if post.link? %>
                   <span class="text-sm text-blue-600">🔗 External Link</span>
                 <% end %>
               </div>
               <h3 class="text-xl font-semibold mb-2">
-                <%= link_to content.title, content, class: "text-gray-900 hover:text-red-600" %>
+                <%= link_to post.title, post, class: "text-gray-900 hover:text-red-600" %>
               </h3>
-              <% if content.summary.present? %>
-                <p class="text-gray-600 mb-4"><%= truncate(content.summary, length: 200) %></p>
+              <% if post.summary.present? %>
+                <p class="text-gray-600 mb-4"><%= truncate(post.summary, length: 200) %></p>
               <% end %>
               <div class="flex items-center space-x-4">
                 <div class="flex items-center space-x-2">
-                  <% if content.user.avatar_url.present? %>
-                    <%= image_tag content.user.avatar_url, alt: content.user.username, class: "h-6 w-6 rounded-full" %>
+                  <% if post.user.avatar_url.present? %>
+                    <%= image_tag post.user.avatar_url, alt: post.user.username, class: "h-6 w-6 rounded-full" %>
                   <% end %>
-                  <%= link_to content.user.username, user_path(content.user), class: "text-sm text-gray-700 hover:text-gray-900" %>
+                  <%= link_to post.user.username, user_path(post.user), class: "text-sm text-gray-700 hover:text-gray-900" %>
                 </div>
-                <span class="text-sm text-gray-500"><%= content.created_at.strftime("%B %d, %Y") %></span>
+                <span class="text-sm text-gray-500"><%= post.created_at.strftime("%B %d, %Y") %></span>
               </div>
             </div>
           </div>
@@ -37,13 +37,13 @@
       <% end %>
       
       <div class="mt-8">
-        <%= paginate @contents %>
+        <%= paginate @posts %>
       </div>
     <% else %>
       <div class="bg-white shadow rounded-lg p-8 text-center">
-        <p class="text-gray-600">No content with this tag yet.</p>
+        <p class="text-gray-600">No posts with this tag yet.</p>
         <% if user_signed_in? %>
-          <%= link_to "Create the first one", new_content_path, class: "mt-4 inline-block text-red-600 hover:text-red-800" %>
+          <%= link_to "Create the first one", new_post_path, class: "mt-4 inline-block text-red-600 hover:text-red-800" %>
         <% end %>
       </div>
     <% end %>

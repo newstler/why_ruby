@@ -15,7 +15,7 @@ class Avo::Resources::Comment < Avo::BaseResource
     
     # Associations
     field :user, as: :belongs_to
-    field :content, as: :belongs_to
+    field :post, as: :belongs_to
   end
   
   def actions

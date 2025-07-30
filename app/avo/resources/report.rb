@@ -10,6 +10,6 @@ class Avo::Resources::Report < Avo::BaseResource
     
     # Associations
     field :user, as: :belongs_to
-    field :content, as: :belongs_to
+    field :post, as: :belongs_to
   end
 end 

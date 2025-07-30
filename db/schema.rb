@@ -37,19 +37,19 @@ ActiveRecord::Schema[8.1].define(version: 2025_07_29_164457) do
   create_table "comments", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
     t.boolean "archived", default: false, null: false
     t.text "body", null: false
-    t.string "content_id", null: false
     t.datetime "created_at", null: false
+    t.string "post_id", null: false
     t.boolean "published", default: false, null: false
     t.datetime "updated_at", null: false
     t.string "user_id", null: false
     t.index ["archived"], name: "index_comments_on_archived"
-    t.index ["content_id"], name: "index_comments_on_content_id"
     t.index ["created_at"], name: "index_comments_on_created_at"
+    t.index ["post_id"], name: "index_comments_on_post_id"
     t.index ["published"], name: "index_comments_on_published"
     t.index ["user_id"], name: "index_comments_on_user_id"
   end
 
-  create_table "contents", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
+  create_table "posts", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
     t.boolean "archived", default: false, null: false
     t.string "category_id", null: false
     t.text "content"
@@ -64,33 +64,33 @@ ActiveRecord::Schema[8.1].define(version: 2025_07_29_164457) do
     t.datetime "updated_at", null: false
     t.string "url"
     t.string "user_id", null: false
-    t.index ["archived"], name: "index_contents_on_archived"
-    t.index ["category_id"], name: "index_contents_on_category_id"
-    t.index ["created_at"], name: "index_contents_on_created_at"
-    t.index ["needs_admin_review"], name: "index_contents_on_needs_admin_review"
-    t.index ["pin_position"], name: "index_contents_on_pin_position", unique: true, where: "pin_position IS NOT NULL"
-    t.index ["published"], name: "index_contents_on_published"
-    t.index ["user_id"], name: "index_contents_on_user_id"
+    t.index ["archived"], name: "index_posts_on_archived"
+    t.index ["category_id"], name: "index_posts_on_category_id"
+    t.index ["created_at"], name: "index_posts_on_created_at"
+    t.index ["needs_admin_review"], name: "index_posts_on_needs_admin_review"
+    t.index ["pin_position"], name: "index_posts_on_pin_position", unique: true, where: "pin_position IS NOT NULL"
+    t.index ["published"], name: "index_posts_on_published"
+    t.index ["user_id"], name: "index_posts_on_user_id"
   end
 
-  create_table "contents_tags", id: false, force: :cascade do |t|
-    t.string "content_id", null: false
+  create_table "posts_tags", id: false, force: :cascade do |t|
+    t.string "post_id", null: false
     t.string "tag_id", null: false
-    t.index ["content_id", "tag_id"], name: "index_contents_tags_on_content_id_and_tag_id", unique: true
-    t.index ["content_id"], name: "index_contents_tags_on_content_id"
-    t.index ["tag_id", "content_id"], name: "index_contents_tags_on_tag_id_and_content_id"
-    t.index ["tag_id"], name: "index_contents_tags_on_tag_id"
+    t.index ["post_id", "tag_id"], name: "index_posts_tags_on_post_id_and_tag_id", unique: true
+    t.index ["post_id"], name: "index_posts_tags_on_post_id"
+    t.index ["tag_id", "post_id"], name: "index_posts_tags_on_tag_id_and_post_id"
+    t.index ["tag_id"], name: "index_posts_tags_on_tag_id"
   end
 
   create_table "reports", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
-    t.string "content_id", null: false
     t.datetime "created_at", null: false
     t.text "description"
+    t.string "post_id", null: false
     t.integer "reason", null: false
     t.datetime "updated_at", null: false
     t.string "user_id", null: false
-    t.index ["content_id"], name: "index_reports_on_content_id"
-    t.index ["user_id", "content_id"], name: "index_reports_on_user_id_and_content_id", unique: true
+    t.index ["post_id"], name: "index_reports_on_post_id"
+    t.index ["user_id", "post_id"], name: "index_reports_on_user_id_and_post_id", unique: true
     t.index ["user_id"], name: "index_reports_on_user_id"
   end
 
@@ -110,7 +110,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_07_29_164457) do
     t.string "email", null: false
     t.integer "github_id", null: false
     t.integer "published_comments_count", default: 0, null: false
-    t.integer "published_contents_count", default: 0, null: false
+    t.integer "published_posts_count", default: 0, null: false
     t.integer "role", default: 0, null: false
     t.datetime "updated_at", null: false
     t.string "username", null: false
@@ -120,12 +120,12 @@ ActiveRecord::Schema[8.1].define(version: 2025_07_29_164457) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
-  add_foreign_key "comments", "contents"
+  add_foreign_key "comments", "posts"
   add_foreign_key "comments", "users"
-  add_foreign_key "contents", "categories"
-  add_foreign_key "contents", "users"
-  add_foreign_key "contents_tags", "contents"
-  add_foreign_key "contents_tags", "tags"
-  add_foreign_key "reports", "contents"
+  add_foreign_key "posts", "categories"
+  add_foreign_key "posts", "users"
+  add_foreign_key "posts_tags", "posts"
+  add_foreign_key "posts_tags", "tags"
+  add_foreign_key "reports", "posts"
   add_foreign_key "reports", "users"
 end

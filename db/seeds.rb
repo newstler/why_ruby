@@ -46,9 +46,9 @@ end
 
 puts "Created admin user: #{admin.username}"
 
-# Create some sample content
-if Content.count < 5
-  content1 = Content.create!(
+# Create some sample posts
+if Post.count < 5
+  post1 = Post.create!(
     user: admin,
     category: Category.find_by(name: "Getting Started"),
     title: "Why Ruby? A Beginner's Perspective",
@@ -56,10 +56,10 @@ if Content.count < 5
     published: true,
     pin_position: 1
   )
-  content1.tags << Tag.find_by(name: "beginner")
-  content1.tags << Tag.find_by(name: "ruby")
+  post1.tags << Tag.find_by(name: "beginner")
+  post1.tags << Tag.find_by(name: "ruby")
   
-  content2 = Content.create!(
+  post2 = Post.create!(
     user: admin,
     category: Category.find_by(name: "Rails Framework"),
     title: "Rails 8.1: The Latest and Greatest",
@@ -67,18 +67,18 @@ if Content.count < 5
     published: true,
     pin_position: 2
   )
-  content2.tags << Tag.find_by(name: "rails")
-  content2.tags << Tag.find_by(name: "news")
+  post2.tags << Tag.find_by(name: "rails")
+  post2.tags << Tag.find_by(name: "news")
   
-  content3 = Content.create!(
+  post3 = Post.create!(
     user: admin,
     category: Category.find_by(name: "Best Practices"),
     title: "SOLID Principles in Ruby",
     content: "# SOLID Principles in Ruby\n\nSOLID is a mnemonic acronym for five design principles intended to make software designs more understandable, flexible, and maintainable.\n\n## Single Responsibility Principle\n\nA class should have one, and only one, reason to change.\n\n```ruby\n# Bad\nclass User\n  def initialize(name, email)\n    @name = name\n    @email = email\n  end\n  \n  def send_email(message)\n    # Email sending logic\n  end\n  \n  def save_to_database\n    # Database logic\n  end\nend\n\n# Good\nclass User\n  attr_reader :name, :email\n  \n  def initialize(name, email)\n    @name = name\n    @email = email\n  end\nend\n\nclass UserMailer\n  def send_email(user, message)\n    # Email sending logic\n  end\nend\n\nclass UserRepository\n  def save(user)\n    # Database logic\n  end\nend\n```",
     published: true
   )
-  content3.tags << Tag.find_by(name: "best-practices")
-  content3.tags << Tag.find_by(name: "design-patterns")
+  post3.tags << Tag.find_by(name: "best-practices")
+  post3.tags << Tag.find_by(name: "design-patterns")
   
-  puts "Created sample content"
+  puts "Created sample posts"
 end
