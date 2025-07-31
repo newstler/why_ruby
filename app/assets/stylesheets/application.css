@@ -11,32 +11,62 @@
 
 @import "rouge.css";
 
+/* Base code styling */
+pre {
+  background-color: #f6f8fa;
+  padding: 1rem;
+  border-radius: 0.375rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+pre code {
+  background-color: transparent;
+  padding: 0;
+  font-size: 0.875em;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+  line-height: 1.5;
+}
+
 /* Fix code highlighting within prose */
 .prose pre {
   background-color: #f6f8fa;
-  padding: 0;
-  margin: 0;
+  padding: 1rem;
+  margin: 1.5rem 0;
+  border-radius: 0.375rem;
 }
 
 .prose pre code {
   background-color: transparent;
   padding: 0;
   font-size: 0.875em;
-  color: #24292e !important; /* Base text color */
+  color: #24292e; /* Base text color */
+}
+
+/* Highlighted code blocks */
+.highlight {
+  background-color: #f6f8fa;
+  padding: 1rem;
+  border-radius: 0.375rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.highlight pre {
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
 }
 
 .prose .highlight {
   margin: 1.5rem 0;
-  border-radius: 0.375rem;
-  overflow: hidden;
-  background-color: #f6f8fa !important;
 }
 
 .prose .highlight pre {
   margin: 0;
-  padding: 1rem;
+  padding: 0;
   overflow-x: auto;
-  background-color: #f6f8fa !important;
+  background-color: transparent;
 }
 
 /* Force Rouge colors to override any defaults */
