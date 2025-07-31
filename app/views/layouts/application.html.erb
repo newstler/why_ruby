@@ -89,7 +89,12 @@
           
           <!-- Mobile menu button -->
           <div class="md:hidden">
-            <button type="button" class="text-gray-500 hover:text-gray-600 focus:outline-none focus:text-gray-600 p-2" data-action="click->mobile-menu#toggle">
+            <button type="button" 
+                    class="text-gray-500 hover:text-gray-600 focus:outline-none focus:text-gray-600 p-3 -mr-3 rounded-md touch-manipulation" 
+                    data-action="click->mobile-menu#toggle"
+                    aria-label="Toggle navigation menu"
+                    aria-expanded="false"
+                    data-mobile-menu-target="button">
               <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>

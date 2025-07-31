@@ -79,3 +79,17 @@ pre code {
 .highlight code span {
   color: inherit !important;
 }
+
+/* Touch handling for mobile devices */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Ensure mobile menu button has proper hit area */
+@media (max-width: 768px) {
+  button[aria-label="Toggle navigation menu"] {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
