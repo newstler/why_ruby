@@ -1,15 +1,20 @@
 <div class="space-y-16">
   <!-- Hero Section -->
-    <p class="text-3xl text-gray-600 text-center mt-8">
-      Discover why Ruby continues to be a beloved language for developers worldwide.
-      <br />
-      Share articles, tutorials, and resources with our community.
+  <div class="max-w-4xl  mx-auto flex flex-col items-center">
+    <%= image_tag "heart.png", class: "w-48 h-48" %>
+    <p class="text-6xl text-gray-600 font-bold text-center mt-8">
+      Discover why <span class="text-red-600">Ruby</span> continues to be a <span class="text-red-600">beloved language</span> for developers worldwide.
     </p>
+
+    <p class="text-3xl/12 text-gray-600 font-bold text-center mt-8">
+      And share articles, tutorials, and resources with our community.
+    </p>
+  </div>
 
   <!-- Pinned Posts -->
   <% if @pinned_posts.any? %>
     <div class="space-y-4">
-      <h2 class="text-2xl font-bold text-gray-900">Featured Posts</h2>
+<!--      <h2 class="text-2xl font-bold text-gray-900">Featured Posts</h2>-->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <% @pinned_posts.each do |post| %>
           <div class="bg-white shadow rounded-lg p-6 border-2 border-red-200">
@@ -29,7 +34,7 @@
 
   <!-- Recent Posts -->
   <div class="space-y-4">
-    <h2 class="text-2xl font-bold text-gray-900">Recent Posts</h2>
+    <h2 class="text-2xl font-bold text-gray-900">Recent</h2>
     <div class="space-y-4">
       <% @posts.each do |post| %>
         <div class="bg-white shadow rounded-lg p-6">
