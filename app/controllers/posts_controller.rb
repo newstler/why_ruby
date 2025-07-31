@@ -50,6 +50,7 @@ class PostsController < ApplicationController
     render json: { html: html }
   end
   
+
   private
   
   def set_post

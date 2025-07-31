@@ -17,14 +17,16 @@
 <!--      <h2 class="text-2xl font-bold text-gray-900">Featured Posts</h2>-->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <% @pinned_posts.each do |post| %>
-          <div class="bg-white shadow rounded-lg p-6 border-2 border-red-200">
-            <h3 class="text-lg font-semibold mb-2">
-              <%= link_to post.title, post, class: "text-gray-900 hover:text-red-600" %>
+          <%= link_to post, class: "block bg-white shadow rounded-lg p-6 border-2 border-red-200 hover:shadow-lg transition-shadow" do %>
+            <h3 class="text-lg font-semibold mb-2 text-gray-900 hover:text-red-600">
+              <%= post.title %>
             </h3>
             <% if post.summary.present? %>
-              <p class="text-gray-600 text-sm mb-4"><%= truncate(post.summary, length: 150) %></p>
+              <div class="text-gray-600 text-sm mb-4 prose prose-sm max-w-none">
+                <%= raw markdown_to_html(post.summary) %>
+              </div>
             <% end %>
-          </div>
+          <% end %>
         <% end %>
       </div>
     </div>
@@ -37,7 +39,7 @@
     <h2 class="text-2xl font-bold text-gray-900">Recent</h2>
     <div class="space-y-4">
       <% @posts.each do |post| %>
-        <div class="bg-white shadow rounded-lg p-6">
+        <%= link_to post, class: "block bg-white shadow rounded-lg p-6 hover:shadow-lg transition-shadow" do %>
           <div class="flex items-start justify-between">
             <div class="flex-1">
               <div class="flex items-center space-x-3 mb-2">
@@ -50,24 +52,26 @@
                   <span class="text-sm text-blue-600">🔗 External Link</span>
                 <% end %>
               </div>
-              <h3 class="text-xl font-semibold mb-2">
-                <%= link_to post.title, post, class: "text-gray-900 hover:text-red-600" %>
+              <h3 class="text-xl font-semibold mb-2 text-gray-900 hover:text-red-600">
+                <%= post.title %>
               </h3>
               <% if post.summary.present? %>
-                <p class="text-gray-600 mb-4"><%= truncate(post.summary, length: 200) %></p>
+                <div class="text-gray-600 mb-4 prose prose-sm max-w-none">
+                  <%= raw markdown_to_html(post.summary) %>
+                </div>
               <% end %>
               <div class="flex items-center space-x-4">
                 <div class="flex items-center space-x-2">
                   <% if post.user.avatar_url.present? %>
                     <%= image_tag post.user.avatar_url, alt: post.user.username, class: "h-6 w-6 rounded-full" %>
                   <% end %>
-                  <%= link_to post.user.username, user_path(post.user), class: "text-sm text-gray-700 hover:text-gray-900" %>
+                  <span class="text-sm text-gray-700"><%= post.user.username %></span>
                 </div>
                 <span class="text-sm text-gray-500"><%= post.created_at.strftime("%B %d, %Y") %></span>
                 <% if post.tags.any? %>
                   <div class="flex flex-wrap gap-1">
                     <% post.tags.each do |tag| %>
-                      <%= link_to tag.name, tag_path(tag), class: "text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded hover:bg-gray-300" %>
+                      <span class="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded"><%= tag.name %></span>
                     <% end %>
                   </div>
                 <% end %>
@@ -79,7 +83,7 @@
               </div>
             <% end %>
           </div>
-        </div>
+        <% end %>
       <% end %>
     </div>
   </div>

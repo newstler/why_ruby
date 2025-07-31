@@ -25,6 +25,7 @@ class Post < ApplicationRecord
   
   # Callbacks
   after_create :generate_summary_job
+  after_update :regenerate_summary_if_needed
   after_update :check_reports_threshold
   after_save :update_user_counter_caches
   after_destroy :update_user_counter_caches
@@ -57,6 +58,15 @@ class Post < ApplicationRecord
   
   def generate_summary_job
     GenerateSummaryJob.perform_later(self) if published?
+  end
+  
+  def regenerate_summary_if_needed
+    # Regenerate summary if content or title changed and post is published
+    if published? && (saved_change_to_content? || saved_change_to_title? || saved_change_to_url?)
+      # Clear existing summary to force regeneration
+      update_column(:summary, nil)
+      GenerateSummaryJob.perform_later(self)
+    end
   end
   
   def check_reports_threshold

@@ -18,7 +18,7 @@ class Avo::Resources::Post < Avo::BaseResource
     field :title, as: :text, required: true
     field :content, as: :trix
     field :url, as: :text, format_using: -> { link_to(value, value, target: "_blank") if value.present? }
-    field :summary, as: :textarea, readonly: true
+    field :summary, as: :trix, readonly: true
     field :title_image_url, as: :text
     field :pin_position, as: :number
     field :published, as: :boolean
@@ -39,6 +39,7 @@ class Avo::Resources::Post < Avo::BaseResource
   def actions
     action Avo::Actions::TogglePublished
     action Avo::Actions::ToggleArchived
+    action Avo::Actions::RegenerateSummary
     # action Avo::Actions::PinContent
     # action Avo::Actions::ClearReports
   end
