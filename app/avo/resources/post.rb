@@ -2,12 +2,15 @@ class Avo::Resources::Post < Avo::BaseResource
   self.title = :title
   self.includes = [:user, :category, :tags]
   self.model_class = ::Post
+  self.index_query = -> { query.unscoped }
+  
   self.search = {
     query: -> { Post.unscoped.ransack(title_cont: params[:q], content_cont: params[:q], m: "or").result(distinct: false) }
   }
   
-  def index_query
-    model_class.unscoped
+  # Override to find records without default scope
+  def self.find_record(id, **kwargs)
+    ::Post.unscoped.find(id)
   end
 
   def fields

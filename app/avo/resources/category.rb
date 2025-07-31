@@ -2,13 +2,18 @@ class Avo::Resources::Category < Avo::BaseResource
   self.title = :name
   self.includes = []
   self.model_class = ::Category
+  self.default_view_type = :table
+  self.index_query = -> { query.unscoped }
+  
+
   
   self.search = {
-    query: -> { Category.unscoped.ransack(name_cont: params[:q]).result(distinct: false) }
+    query: -> { ::Category.unscoped.ransack(name_cont: params[:q]).result(distinct: false) }
   }
   
-  def index_query
-    model_class.unscoped
+  # Override to find records without default scope
+  def self.find_record(id, **kwargs)
+    ::Category.unscoped.find(id)
   end
 
   def fields

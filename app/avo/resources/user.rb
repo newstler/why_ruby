@@ -1,12 +1,15 @@
 class Avo::Resources::User < Avo::BaseResource
   self.title = :username
   self.includes = [:posts, :comments]
+  self.index_query = -> { query.unscoped }
+  
   self.search = {
     query: -> { User.unscoped.ransack(username_cont: params[:q], email_cont: params[:q], m: "or").result(distinct: false) }
   }
   
-  def index_query
-    model_class.unscoped
+  # Override to find records without default scope
+  def self.find_record(id, **kwargs)
+    ::User.unscoped.find(id)
   end
 
   def fields

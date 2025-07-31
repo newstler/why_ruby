@@ -1,12 +1,15 @@
 class Avo::Resources::Comment < Avo::BaseResource
   self.title = :body
   self.includes = [:user, :post]
+  self.index_query = -> { query.unscoped }
+  
   self.search = {
     query: -> { Comment.unscoped.ransack(body_cont: params[:q]).result(distinct: false) }
   }
   
-  def index_query
-    model_class.unscoped
+  # Override to find records without default scope
+  def self.find_record(id, **kwargs)
+    ::Comment.unscoped.find(id)
   end
 
   def fields

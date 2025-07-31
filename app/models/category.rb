@@ -21,4 +21,6 @@ class Category < ApplicationRecord
   def set_position
     self.position ||= (Category.unscoped.maximum(:position) || 0) + 1
   end
+  
+
 end 

@@ -13,7 +13,7 @@
 
 /* Fix code highlighting within prose */
 .prose pre {
-  background-color: #f8f8f8;
+  background-color: #f6f8fa;
   padding: 0;
   margin: 0;
 }
@@ -22,16 +22,30 @@
   background-color: transparent;
   padding: 0;
   font-size: 0.875em;
+  color: #24292e !important; /* Base text color */
 }
 
 .prose .highlight {
   margin: 1.5rem 0;
   border-radius: 0.375rem;
   overflow: hidden;
+  background-color: #f6f8fa !important;
 }
 
 .prose .highlight pre {
   margin: 0;
   padding: 1rem;
   overflow-x: auto;
+  background-color: #f6f8fa !important;
+}
+
+/* Force Rouge colors to override any defaults */
+.highlight code {
+  color: #24292e !important; /* Base text color */
+}
+
+/* Ensure spans in highlighted code use their assigned colors */
+.highlight pre code span,
+.highlight code span {
+  color: inherit !important;
 }

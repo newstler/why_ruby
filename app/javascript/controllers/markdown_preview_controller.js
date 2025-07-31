@@ -5,6 +5,46 @@ export default class extends Controller {
 
   connect() {
     this.updatePreview()
+    this.syncHeights()
+    this.setupScrollSync()
+  }
+
+  syncHeights() {
+    // Match the heights of textarea and preview
+    const textareaHeight = this.inputTarget.offsetHeight
+    this.previewTarget.style.height = `${textareaHeight}px`
+  }
+
+  setupScrollSync() {
+    let syncing = false
+    
+    // Sync scroll from textarea to preview
+    this.inputTarget.addEventListener('scroll', () => {
+      if (syncing) return
+      syncing = true
+      
+      const scrollPercentage = this.inputTarget.scrollTop / 
+        (this.inputTarget.scrollHeight - this.inputTarget.clientHeight)
+      
+      this.previewTarget.scrollTop = scrollPercentage * 
+        (this.previewTarget.scrollHeight - this.previewTarget.clientHeight)
+      
+      setTimeout(() => { syncing = false }, 10)
+    })
+    
+    // Sync scroll from preview to textarea
+    this.previewTarget.addEventListener('scroll', () => {
+      if (syncing) return
+      syncing = true
+      
+      const scrollPercentage = this.previewTarget.scrollTop / 
+        (this.previewTarget.scrollHeight - this.previewTarget.clientHeight)
+      
+      this.inputTarget.scrollTop = scrollPercentage * 
+        (this.inputTarget.scrollHeight - this.inputTarget.clientHeight)
+      
+      setTimeout(() => { syncing = false }, 10)
+    })
   }
 
   updatePreview() {

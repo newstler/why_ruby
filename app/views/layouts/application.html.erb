@@ -29,7 +29,10 @@
         <div class="flex justify-between h-16">
           <div class="flex">
             <div class="flex-shrink-0 flex items-center p5-4">
-              <%= link_to "Why Ruby?", root_path, class: "text-4xl font-black text-red-600" %>
+              <%= link_to root_path, class: "text-4xl font-black text-red-600 whitespace-nowrap" do %>
+                <%= image_tag "heart.png", class: "w-12 h-12" %>
+                Why Ruby?
+              <% end %>
             </div>
             <div class="hidden md:ml-6 md:flex md:space-x-4">
               <%#= link_to "All", root_path, class: "#{request.path == root_path ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} px-3 py-2 rounded-md text-sm font-medium" %>
@@ -70,12 +73,12 @@
                     <div class="px-4 py-2 text-sm font-medium text-gray-900 border-b">
                       <%= current_user.username %>
                     </div>
-                    <%= link_to "Your Profile", user_path(current_user), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
-                    <% if current_user.admin? %>
-                      <%= link_to "Admin Panel", "/avo", class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
-                    <% end %>
-                    <hr class="my-1">
-                    <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
+                                              <%= link_to "Your Profile", user_path(current_user), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
+                          <% if current_user.admin? %>
+                            <%= link_to "Admin Panel", "/avo", class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
+                          <% end %>
+                          <hr class="my-1">
+                          <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
                   </div>
                 </div>
               </div>

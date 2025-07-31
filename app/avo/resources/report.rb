@@ -2,6 +2,8 @@ class Avo::Resources::Report < Avo::BaseResource
   self.title = :reason
   self.includes = [:user, :post]
   
+  # Reports don't have archived field, so no need for unscoped
+  
   def fields
     field :id, as: :text, readonly: true
     field :reason, as: :select, enum: ::Report.reasons
