@@ -52,4 +52,24 @@ module ApplicationHelper
     
     doc.to_html
   end
+  
+  def format_post_date(date)
+    if date.year == Date.current.year
+      date.strftime("%B %d")
+    else
+      date.strftime("%B %d, %Y")
+    end
+  end
+  
+  def format_comment_date(date)
+    time_ago_in_words(date) + " ago"
+  end
+  
+  def format_short_date(date)
+    if date.year == Date.current.year
+      date.strftime("%b %d")
+    else
+      date.strftime("%b %d, %Y")
+    end
+  end
 end
