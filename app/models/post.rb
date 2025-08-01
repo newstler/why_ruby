@@ -2,6 +2,9 @@ class Post < ApplicationRecord
   # Soft deletion
   default_scope { where(archived: false) }
   
+  # Virtual attributes
+  attr_accessor :duplicate_post
+  
   # Associations
   belongs_to :user
   belongs_to :category, -> { unscoped }
@@ -12,6 +15,7 @@ class Post < ApplicationRecord
   # Validations
   validates :title, presence: true
   validate :content_or_url_present
+  validate :url_uniqueness
   validates :url, format: URI::DEFAULT_PARSER.make_regexp(%w[http https]), allow_blank: true
   validates :pin_position, uniqueness: true, allow_nil: true, numericality: { only_integer: true }
   
@@ -24,6 +28,7 @@ class Post < ApplicationRecord
   scope :needing_review, -> { where(needs_admin_review: true) }
   
   # Callbacks
+  before_validation :normalize_url
   after_create :generate_summary_job
   after_update :regenerate_summary_if_needed
   after_update :check_reports_threshold
@@ -77,6 +82,29 @@ class Post < ApplicationRecord
     if saved_change_to_published? || saved_change_to_archived?
       count = user.posts.published.count
       user.update_column(:published_posts_count, count)
+    end
+  end
+  
+  def url_uniqueness
+    return unless url.present?
+    
+    existing_post = Post.where(url: url).where.not(id: id).first
+    if existing_post
+      self.duplicate_post = existing_post
+      errors.add(:url, "has already been posted")
+    end
+  end
+  
+  def normalize_url
+    return unless url.present?
+    
+    # Remove trailing slashes
+    self.url = url.strip.gsub(/\/+$/, '')
+    
+    # Normalize common URL variations
+    # Convert http to https for common domains that support it
+    if url.match?(/^http:\/\/(www\.)?(github\.com|twitter\.com|youtube\.com|linkedin\.com|stackoverflow\.com)/i)
+      self.url = url.sub(/^http:/, 'https:')
     end
   end
 end 

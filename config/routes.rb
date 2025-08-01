@@ -27,6 +27,8 @@ Rails.application.routes.draw do
     
     collection do
       post :preview
+      post :fetch_metadata
+      post :check_duplicate_url
     end
   end
   

@@ -50,11 +50,80 @@ class PostsController < ApplicationController
     render json: { html: html }
   end
   
+  def fetch_metadata
+    url = params[:url]
+    
+    # Normalize URL for duplicate checking
+    normalized_url = normalize_url_for_checking(url)
+    
+    # Check for existing post
+    existing_post = Post.where(url: normalized_url).first
+    if existing_post
+      render json: { 
+        success: false, 
+        duplicate: true, 
+        existing_post: {
+          id: existing_post.id,
+          title: existing_post.title,
+          url: post_path(existing_post)
+        }
+      }
+      return
+    end
+    
+    begin
+      page = MetaInspector.new(url)
+      
+      metadata = {
+        title: page.best_title || page.title,
+        summary: page.best_description || page.description,
+        image_url: page.images.best || page.images.first
+      }
+      
+      render json: { success: true, metadata: metadata }
+    rescue => e
+      render json: { success: false, error: e.message }
+    end
+  end
+  
+  def check_duplicate_url
+    url = params[:url]
+    normalized_url = normalize_url_for_checking(url)
+    
+    existing_post = Post.where(url: normalized_url).where.not(id: params[:exclude_id]).first
+    
+    if existing_post
+      render json: { 
+        duplicate: true, 
+        existing_post: {
+          id: existing_post.id,
+          title: existing_post.title,
+          url: post_path(existing_post)
+        }
+      }
+    else
+      render json: { duplicate: false }
+    end
+  end
 
   private
   
   def set_post
     @post = Post.find(params[:id])
+  end
+  
+  def normalize_url_for_checking(url)
+    return nil unless url.present?
+    
+    # Strip and remove trailing slashes
+    normalized = url.strip.gsub(/\/+$/, '')
+    
+    # Convert http to https for common domains
+    if normalized.match?(/^http:\/\/(www\.)?(github\.com|twitter\.com|youtube\.com|linkedin\.com|stackoverflow\.com)/i)
+      normalized = normalized.sub(/^http:/, 'https:')
+    end
+    
+    normalized
   end
   
   def authorize_user!
@@ -64,6 +133,6 @@ class PostsController < ApplicationController
   end
   
   def post_params
-    params.require(:post).permit(:title, :content, :url, :category_id, :title_image_url, :published, tag_ids: [])
+    params.require(:post).permit(:title, :content, :url, :summary, :category_id, :title_image_url, :published, tag_ids: [])
   end
 end 

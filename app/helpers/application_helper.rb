@@ -72,4 +72,12 @@ module ApplicationHelper
       date.strftime("%b %d, %Y")
     end
   end
+  
+  def post_link_url(post)
+    post.link? ? post.url : post_path(post)
+  end
+  
+  def post_link_options(post)
+    post.link? ? { target: "_blank", rel: "noopener" } : {}
+  end
 end
