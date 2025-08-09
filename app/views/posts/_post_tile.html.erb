@@ -4,7 +4,7 @@
     - post: the post to display
 %>
 
-<div class="bg-white shadow-md rounded-lg p-6 hover:shadow-2xl hover:scale-[1.02] transform transition-all duration-300 ease-out relative cursor-pointer">
+<div class="group bg-white shadow-md rounded-lg p-6 hover:shadow-2xl hover:scale-[1.02] transform transition-all duration-300 ease-out relative cursor-pointer">
   <% if user_signed_in? && (post.user == current_user || current_user.admin?) %>
     <div class="absolute top-4 right-4 flex items-center space-x-2 z-10">
       <%= link_to edit_post_path(post), class: "text-gray-400 hover:text-gray-600 transition-colors p-1 bg-white rounded-full shadow-sm hover:shadow", title: "Edit" do %>
@@ -18,17 +18,19 @@
   
   <%= link_to post_link_url(post), post_link_options(post).merge(class: "block cursor-pointer") do %>
     <% if post.title_image_url.present? %>
-      <div class="mb-4">
-        <%= image_tag post.title_image_url, alt: post.title, class: "w-full object-cover rounded-lg", style: "height: auto;" %>
+      <div class="mb-4 aspect-video overflow-hidden rounded-lg">
+        <%= image_tag post.title_image_url, alt: post.title, class: "w-full h-full object-cover" %>
       </div>
     <% end %>
     
-    <div class="flex items-center space-x-3 mb-2">
-      <% if post.category %>
-        <span class="text-sm text-gray-500"><%= post.category.name %></span>
-      <% else %>
-        <span class="text-sm text-gray-400 italic">Uncategorized</span>
-      <% end %>
+    <div class="flex items-center justify-between mb-2">
+      <div>
+        <% if post.category %>
+          <span class="text-sm text-gray-500"><%= post.category.name %></span>
+        <% else %>
+          <span class="text-sm text-gray-400 italic">Uncategorized</span>
+        <% end %>
+      </div>
       <% if post.link? && (domain = extract_domain(post.url)) %>
         <span class="text-xs text-gray-400 underline inline-flex items-center gap-1">
           <%= domain %>
@@ -37,7 +39,7 @@
       <% end %>
     </div>
     
-    <h3 class="text-xl font-semibold mb-2 text-gray-900 hover:text-red-600">
+    <h3 class="text-xl font-semibold mb-2 text-gray-900 group-hover:text-red-600 transition-colors">
       <%= post.title %>
     </h3>
     
