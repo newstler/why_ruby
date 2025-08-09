@@ -28,6 +28,8 @@ class GenerateSummaryJob < ApplicationJob
     end
     
     if summary.present?
+      # Clean up any meta-language and enforce length
+      summary = clean_summary(summary)
       post.update!(summary: summary)
       broadcast_update(post)
     else
@@ -153,8 +155,8 @@ class GenerateSummaryJob < ApplicationJob
       response = client.messages(
         parameters: {
           model: "claude-3-haiku-20240307",
-          max_tokens: 250,
-          temperature: 0.5,
+          max_tokens: 50,
+          temperature: 0.3,
           system: system_prompt,
           messages: [
             {
@@ -194,8 +196,8 @@ class GenerateSummaryJob < ApplicationJob
               content: user_prompt
             }
           ],
-          temperature: 0.5,
-          max_tokens: 250
+          temperature: 0.3,
+          max_tokens: 50
         }
       )
       
@@ -207,11 +209,22 @@ class GenerateSummaryJob < ApplicationJob
   end
   
   def build_system_prompt(context)
-    "CRITICAL: Output ONLY 2-3 content sentences. NO introductions like 'Here are' or 'The key insights'. Start directly with a fact. Focus on surprising or advanced points that distinguish THIS specific content. Minimal **bold** for technical terms."
+    "Output ONLY a single teaser sentence. No preamble. Maximum 80 characters. Hook the reader with the most intriguing aspect."
   end
   
   def build_user_prompt(text, context)
-    "Output 2-3 sentences of unique facts from this content. Start directly with the content:\n\n#{text}"
+    "Teaser:\n\n#{text}"
+  end
+  
+  def clean_summary(summary)
+    # Remove common meta-language prefixes
+    cleaned = summary.gsub(/^(Here is a |Here's a |Here are |Teaser: |The teaser: |One-sentence teaser: )/i, '')
+    cleaned = cleaned.gsub(/^(This article |This page |This resource |Learn about |Discover |Explore )/i, '')
+    
+    # Remove quotes if the entire summary is quoted
+    cleaned = cleaned.gsub(/^["'](.+)["']$/, '\1')
+    
+    cleaned.strip
   end
   
   def broadcast_update(post)

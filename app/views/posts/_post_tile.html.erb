@@ -1,0 +1,88 @@
+<%# 
+  Post tile partial - displays a post in a card format
+  Locals:
+    - post: the post to display
+    - pinned: boolean, whether to show pinned styling (optional, defaults to false)
+%>
+<% pinned ||= false %>
+
+<div class="bg-white shadow rounded-lg p-6 <%= pinned ? 'border-2 border-red-200' : '' %> hover:shadow-lg transition-shadow relative">
+  <% if user_signed_in? && (post.user == current_user || current_user.admin?) %>
+    <div class="absolute top-4 right-4 flex items-center space-x-2 z-10">
+      <%= link_to edit_post_path(post), class: "text-gray-400 hover:text-gray-600 transition-colors p-1 bg-white rounded-full shadow-sm hover:shadow", title: "Edit" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+        </svg>
+      <% end %>
+      <%= link_to post_path(post), method: :delete, data: { confirm: "Are you sure you want to delete this post?" }, class: "text-gray-400 hover:text-red-600 transition-colors p-1 bg-white rounded-full shadow-sm hover:shadow", title: "Delete" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+        </svg>
+      <% end %>
+    </div>
+  <% end %>
+  
+  <%= link_to post_link_url(post), post_link_options(post).merge(class: "block") do %>
+    <% if post.title_image_url.present? %>
+      <div class="mb-4">
+        <%= image_tag post.title_image_url, alt: post.title, class: "w-full object-cover rounded-lg", style: "height: auto;" %>
+      </div>
+    <% end %>
+    
+    <div class="flex items-center space-x-3 mb-2">
+      <% if post.category %>
+        <span class="text-sm text-gray-500"><%= post.category.name %></span>
+      <% else %>
+        <span class="text-sm text-gray-400 italic">Uncategorized</span>
+      <% end %>
+      <% if post.link? %>
+        <span class="text-sm text-blue-600">🔗 External Link</span>
+      <% end %>
+    </div>
+    
+    <h3 class="text-xl font-semibold mb-2 text-gray-900 hover:text-red-600">
+      <%= post.title %>
+    </h3>
+    
+    <% if post.summary.present? %>
+      <div class="text-gray-600 mb-4 prose prose-sm max-w-none">
+        <%= raw markdown_to_html(post.summary) %>
+      </div>
+    <% end %>
+    
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+      <div class="flex items-center space-x-2">
+        <% if post.user.present? %>
+          <% if post.user.avatar_url.present? %>
+            <%= image_tag post.user.avatar_url, alt: post.user.username, class: "h-6 w-6 rounded-full" %>
+          <% end %>
+          <span class="text-sm text-gray-700"><%= post.user.username %></span>
+        <% else %>
+          <span class="text-sm text-gray-400 italic">[Deleted User]</span>
+        <% end %>
+      </div>
+      
+      <span class="text-sm text-gray-500"><%= format_post_date(post.created_at) %></span>
+      
+      <% if post.comments.any? %>
+        <div class="flex items-center space-x-1 text-sm text-gray-500">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+          </svg>
+          <span><%= post.comments.count %></span>
+        </div>
+      <% end %>
+      
+      <% if post.tags.any? %>
+        <div class="flex flex-wrap gap-1">
+          <% post.tags.take(3).each do |tag| %>
+            <span class="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded"><%= tag.name %></span>
+          <% end %>
+          <% if post.tags.size > 3 %>
+            <span class="text-xs text-gray-500">+<%= post.tags.size - 3 %></span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
