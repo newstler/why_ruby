@@ -195,22 +195,24 @@
       <%= yield %>
     </main>
 
-    <footer class="max-w-7xl mx-auto my-12">
+    <footer class="max-w-7xl mx-auto my-12 px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-3 items-center">
         <!-- Cookie notice (left) -->
         <div class="text-left text-xs text-gray-400">
-          &copy; <%= Date.current.year %> WhyRuby.info — Built with
-          <%= link_to "Ruby", "https://www.ruby-lang.org/", class: "underline hover:text-gray-600 transition" %>
-          on
+          &copy; <%= Date.current.year %>
+          <%= link_to "WhyRuby.info", "https://whyruby.info", class: "underline hover:text-gray-600 transition" %>.
+          Built with
+          <%= link_to "Ruby #{RUBY_VERSION}", "https://www.ruby-lang.org/", class: "underline hover:text-gray-600 transition" %>
+          &
           <%= link_to "Rails #{Rails.version}", "https://rubyonrails.org", class: "underline hover:text-gray-600 transition" %>.
           <br />
-          Open-sourced on GithHub.
+          This project is open source — <%= link_to "contribute on GitHub", "https://github.com/newstler/why_ruby", class: "underline hover:text-gray-600 transition", target: "_blank", rel: "noopener" %>.
         </div>
 
         <!-- Logo (center) -->
         <div class="flex justify-center">
-          <%= link_to "https://yurisidorov.com", class: "logo-container" do %>
-            <%= inline_svg_tag "capedbot-logo.svg", alt: t(:copyright, year: Date.today.year), title: t(:copyright, year: Date.today.year), class: "h-8 w-auto fill-robot opacity-30 transition-opacity duration-600 hover:opacity-100", style:"fill: var(--text-color4);" %>
+          <%= link_to "https://yurisidorov.com", class: "group" do %>
+            <%= inline_svg_tag "capedbot-logo.svg", class: "h-8 w-auto fill-[#8DA0AE] group-hover:fill-red-600 transition-colors duration-300" %>
           <% end %>
         </div>
 
