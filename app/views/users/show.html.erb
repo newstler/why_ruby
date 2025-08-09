@@ -123,17 +123,27 @@
 
   <!-- Recent Comments Section -->
   <% if @recent_comments && @recent_comments.any? %>
-    <div class="bg-white shadow rounded-lg p-8">
-      <h2 class="text-2xl font-bold text-gray-900 mb-6">Recent Comments</h2>
-      <div class="space-y-4">
+    <div class="space-y-4">
+      <h2 class="text-2xl font-bold text-gray-900">Recent Comments</h2>
+      
+      <% # Desktop: 3 columns %>
+      <div class="hidden lg:grid lg:grid-cols-3 gap-6">
         <% @recent_comments.each do |comment| %>
-          <div class="border-l-4 border-gray-200 pl-4">
-            <div class="text-sm text-gray-500 mb-1">
-              On <%= link_to comment.post.title, post_path(comment.post), class: "font-medium text-blue-600 hover:text-blue-800" %>
-            </div>
-            <p class="text-gray-700"><%= truncate(comment.body, length: 200) %></p>
-            <p class="text-xs text-gray-500 mt-1"><%= time_ago_in_words(comment.created_at) %> ago</p>
-          </div>
+          <%= render 'comments/comment_tile', comment: comment %>
+        <% end %>
+      </div>
+      
+      <% # Tablet: 2 columns %>
+      <div class="hidden md:grid md:grid-cols-2 lg:hidden gap-6">
+        <% @recent_comments.each do |comment| %>
+          <%= render 'comments/comment_tile', comment: comment %>
+        <% end %>
+      </div>
+      
+      <% # Mobile: 1 column %>
+      <div class="md:hidden space-y-6">
+        <% @recent_comments.each do |comment| %>
+          <%= render 'comments/comment_tile', comment: comment %>
         <% end %>
       </div>
     </div>
@@ -143,46 +153,61 @@
   <div class="space-y-4">
     <h2 class="text-2xl font-bold text-gray-900">Published Posts</h2>
     <% if @posts.any? %>
-      <% @posts.each do |post| %>
-        <div class="bg-white shadow rounded-lg p-6">
-          <div class="flex items-start justify-between">
-            <div class="flex-1">
-              <div class="flex items-center space-x-3 mb-2">
-                <% if post.category %>
-                  <span class="text-sm text-gray-500"><%= post.category.name %></span>
-                <% else %>
-                  <span class="text-sm text-gray-400 italic">Uncategorized</span>
-                <% end %>
-                <% if post.link? %>
-                  <span class="text-sm text-blue-600">🔗 External Link</span>
-                <% end %>
-              </div>
-              <h3 class="text-xl font-semibold mb-2">
-                <%= link_to post.title, post_link_url(post), post_link_options(post).merge(class: "text-gray-900 hover:text-red-600") %>
-              </h3>
-              <% if post.summary.present? %>
-                <p class="text-gray-600 mb-4"><%= truncate(post.summary, length: 200) %></p>
-              <% end %>
-              <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
-                <span class="text-sm text-gray-500"><%= format_post_date(post.created_at) %></span>
-                <div class="flex items-center space-x-1 text-sm text-gray-500">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-                  </svg>
-                  <span><%= post.comments.published.count %></span>
-                </div>
-                <% if post.tags.any? %>
-                  <div class="hidden md:flex flex-wrap gap-1">
-                    <% post.tags.each do |tag| %>
-                      <%= link_to tag.name, tag_path(tag), class: "text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded hover:bg-gray-300" %>
-                    <% end %>
-                  </div>
-                <% end %>
-              </div>
-            </div>
+      <div class="hidden lg:flex gap-6">
+        <% # Split posts into 3 columns for desktop, maintaining left-to-right reading order %>
+        <% column1_posts = [] %>
+        <% column2_posts = [] %>
+        <% column3_posts = [] %>
+        
+        <% @posts.each_with_index do |post, index| %>
+          <% case index % 3 %>
+          <% when 0 %>
+            <% column1_posts << post %>
+          <% when 1 %>
+            <% column2_posts << post %>
+          <% when 2 %>
+            <% column3_posts << post %>
+          <% end %>
+        <% end %>
+        
+        <% # Desktop: 3 columns %>
+        <% [column1_posts, column2_posts, column3_posts].each do |column_posts| %>
+          <div class="flex-1 space-y-6">
+            <% column_posts.each do |post| %>
+              <%= render 'posts/post_tile', post: post %>
+            <% end %>
           </div>
-        </div>
-      <% end %>
+        <% end %>
+      </div>
+      
+      <% # Tablet: 2 columns %>
+      <div class="hidden md:flex lg:hidden gap-6">
+        <% column1_posts = [] %>
+        <% column2_posts = [] %>
+        
+        <% @posts.each_with_index do |post, index| %>
+          <% if index % 2 == 0 %>
+            <% column1_posts << post %>
+          <% else %>
+            <% column2_posts << post %>
+          <% end %>
+        <% end %>
+        
+        <% [column1_posts, column2_posts].each do |column_posts| %>
+          <div class="flex-1 space-y-6">
+            <% column_posts.each do |post| %>
+              <%= render 'posts/post_tile', post: post %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+      
+      <% # Mobile: 1 column %>
+      <div class="md:hidden space-y-6">
+        <% @posts.each do |post| %>
+          <%= render 'posts/post_tile', post: post %>
+        <% end %>
+      </div>
       
       <div class="mt-8">
         <%= paginate @posts %>

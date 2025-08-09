@@ -1,0 +1,26 @@
+<%= link_to post_path(comment.post, anchor: "comment-#{comment.id}"), class: "block" do %>
+  <div class="bg-white shadow rounded-lg p-6 hover:shadow-md transition-shadow">
+    <div class="space-y-3">
+      <!-- Post Title -->
+      <div class="text-sm text-gray-500">
+        On <span class="font-medium text-blue-600 hover:text-blue-800"><%= comment.post.title %></span>
+      </div>
+      
+      <!-- Comment Body -->
+      <div class="text-gray-700">
+        <%= truncate(comment.body, length: 200) %>
+      </div>
+      
+      <!-- Meta Information -->
+      <div class="flex items-center justify-between text-xs text-gray-500">
+        <span><%= time_ago_in_words(comment.created_at) %> ago</span>
+        <% if comment.post.comments.published.count > 1 %>
+          <span class="flex items-center space-x-1">
+            <%= inline_svg_tag "comment.svg", class: "w-3 h-3" %>
+            <span><%= comment.post.comments.published.count %> comments</span>
+          </span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
