@@ -133,8 +133,8 @@ class Avo::Resources::Post < Avo::BaseResource
       end
     
     # Long content fields - hide from index
-    field :content, as: :trix, hide_on: [:index]
-    field :summary, as: :trix, hide_on: [:index]
+    field :content, as: :textarea, hide_on: [:index], rows: 20
+    field :summary, as: :textarea, hide_on: [:index], rows: 5
     field :title_image_url, as: :text, hide_on: [:index]
     
     # Counts and metadata
