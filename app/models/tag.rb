@@ -1,6 +1,4 @@
 class Tag < ApplicationRecord
-  # Soft deletion
-  default_scope { where(archived: false) }
   
   # Associations
   has_and_belongs_to_many :posts
@@ -9,9 +7,8 @@ class Tag < ApplicationRecord
   validates :name, presence: true, uniqueness: true
   
   # Scopes
-  scope :active, -> { where(archived: false) }
   scope :with_published_posts, -> {
-    joins(:posts).where(posts: { published: true, archived: false }).distinct
+    joins(:posts).where(posts: { published: true }).distinct
   }
   
   # Instance methods

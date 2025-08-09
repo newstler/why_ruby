@@ -28,10 +28,14 @@
             <% end %>
             <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
               <div class="flex items-center space-x-2">
-                <% if post.user.avatar_url.present? %>
-                  <%= image_tag post.user.avatar_url, alt: post.user.username, class: "h-5 w-5 rounded-full" %>
+                <% if post.user.present? %>
+                  <% if post.user.avatar_url.present? %>
+                    <%= image_tag post.user.avatar_url, alt: post.user.username, class: "h-5 w-5 rounded-full" %>
+                  <% end %>
+                  <span class="text-gray-700"><%= post.user.username %></span>
+                <% else %>
+                  <span class="text-gray-400 italic">[Deleted User]</span>
                 <% end %>
-                <span class="text-gray-700"><%= post.user.username %></span>
               </div>
               <span class="text-gray-500"><%= format_short_date(post.created_at) %></span>
               <% if post.comments.any? %>
@@ -79,10 +83,14 @@
               <% end %>
               <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <div class="flex items-center space-x-2">
-                  <% if post.user.avatar_url.present? %>
-                    <%= image_tag post.user.avatar_url, alt: post.user.username, class: "h-6 w-6 rounded-full" %>
+                  <% if post.user.present? %>
+                    <% if post.user.avatar_url.present? %>
+                      <%= image_tag post.user.avatar_url, alt: post.user.username, class: "h-6 w-6 rounded-full" %>
+                    <% end %>
+                    <span class="text-sm text-gray-700"><%= post.user.username %></span>
+                  <% else %>
+                    <span class="text-sm text-gray-400 italic">[Deleted User]</span>
                   <% end %>
-                  <span class="text-sm text-gray-700"><%= post.user.username %></span>
                 </div>
                 <span class="text-sm text-gray-500"><%= format_post_date(post.created_at) %></span>
                 <% if post.comments.any? %>

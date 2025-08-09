@@ -15,7 +15,6 @@ class Avo::Resources::Tag < Avo::BaseResource
   def fields
     field :id, as: :text, readonly: true
     field :name, as: :text, required: true
-    field :archived, as: :boolean
     field :created_at, as: :date_time, readonly: true
     field :updated_at, as: :date_time, readonly: true
     
@@ -24,6 +23,5 @@ class Avo::Resources::Tag < Avo::BaseResource
   end
   
   def actions
-    action Avo::Actions::ToggleArchived
   end
 end 

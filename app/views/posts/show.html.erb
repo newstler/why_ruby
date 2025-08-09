@@ -20,7 +20,7 @@
         </div>
         
         <div class="flex items-center space-x-2">
-          <% if user_signed_in? && (@post.user == current_user || current_user.admin?) %>
+          <% if user_signed_in? && (@post.user.present? && @post.user == current_user || current_user.admin?) %>
             <%= link_to "Edit", edit_post_path(@post), class: "text-sm text-gray-600 hover:text-gray-900" %>
             <%= link_to "Delete", post_path(@post), method: :delete, data: { confirm: "Are you sure?" }, class: "text-sm text-red-600 hover:text-red-900" %>
           <% end %>
@@ -64,19 +64,26 @@
       <div class="flex items-center justify-between mb-6">
         <div class="flex items-center space-x-4">
           <div class="flex items-center space-x-2">
-            <% if @post.user.avatar_url.present? %>
-              <%= link_to user_path(@post.user), class: "text-sm font-medium text-gray-900 hover:text-gray-700" do %>
-                <%= image_tag @post.user.avatar_url, alt: @post.user.username, class: "h-10 w-10 rounded-full" %>
+            <% if @post.user.present? %>
+              <% if @post.user.avatar_url.present? %>
+                <%= link_to user_path(@post.user), class: "text-sm font-medium text-gray-900 hover:text-gray-700" do %>
+                  <%= image_tag @post.user.avatar_url, alt: @post.user.username, class: "h-10 w-10 rounded-full" %>
+                <% end %>
               <% end %>
+              <div>
+                <%= link_to @post.user.username, user_path(@post.user), class: "text-sm font-medium text-gray-900 hover:text-gray-700" %>
+                <p class="text-xs text-gray-500"><%= format_post_date(@post.created_at) %></p>
+              </div>
+            <% else %>
+              <div>
+                <span class="text-sm font-medium text-gray-400 italic">[Deleted User]</span>
+                <p class="text-xs text-gray-500"><%= format_post_date(@post.created_at) %></p>
+              </div>
             <% end %>
-            <div>
-              <%= link_to @post.user.username, user_path(@post.user), class: "text-sm font-medium text-gray-900 hover:text-gray-700" %>
-              <p class="text-xs text-gray-500"><%= format_post_date(@post.created_at) %></p>
-            </div>
           </div>
         </div>
         
-        <% if user_signed_in? && current_user.trusted? && current_user != @post.user %>
+        <% if user_signed_in? && current_user.trusted? && (@post.user.nil? || current_user != @post.user) %>
           <button type="button" onclick="document.getElementById('report-modal').classList.remove('hidden')" class="text-sm text-gray-600 hover:text-gray-900">
             Report
           </button>
@@ -113,14 +120,18 @@
     <div class="space-y-4 md:space-y-6">
       <% @comments.each do |comment| %>
         <div class="flex space-x-2 md:space-x-3">
-          <% if comment.user.avatar_url.present? %>
+          <% if comment.user.present? && comment.user.avatar_url.present? %>
             <%= image_tag comment.user.avatar_url, alt: comment.user.username, class: "h-8 w-8 md:h-10 md:w-10 rounded-full flex-shrink-0" %>
           <% end %>
           <div class="flex-1">
             <div class="bg-gray-50 rounded-lg px-3 py-2 md:px-4 md:py-3">
               <div class="flex flex-wrap items-start justify-between gap-x-2 gap-y-1 mb-2">
                 <h4 class="text-sm font-medium text-gray-900">
-                  <%= link_to comment.user.username, user_path(comment.user), class: "hover:text-gray-700" %>
+                  <% if comment.user.present? %>
+                    <%= link_to comment.user.username, user_path(comment.user), class: "hover:text-gray-700" %>
+                  <% else %>
+                    <span class="text-gray-400 italic">[Deleted User]</span>
+                  <% end %>
                 </h4>
                 <div class="flex items-center space-x-2 text-xs">
                   <span class="text-gray-500">

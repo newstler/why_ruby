@@ -22,7 +22,6 @@ class Avo::Resources::Post < Avo::BaseResource
     field :title_image_url, as: :text
     field :pin_position, as: :number
     field :published, as: :boolean
-    field :archived, as: :boolean
     field :reports_count, as: :number, readonly: true
     field :needs_admin_review, as: :boolean
     field :created_at, as: :date_time, readonly: true
@@ -38,7 +37,6 @@ class Avo::Resources::Post < Avo::BaseResource
   
   def actions
     action Avo::Actions::TogglePublished
-    action Avo::Actions::ToggleArchived
     action Avo::Actions::RegenerateSummary
     # action Avo::Actions::PinContent
     # action Avo::Actions::ClearReports

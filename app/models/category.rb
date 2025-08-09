@@ -1,6 +1,4 @@
 class Category < ApplicationRecord
-  # Soft deletion
-  default_scope { where(archived: false) }
   
   # Associations
   has_many :posts, dependent: :nullify
@@ -11,7 +9,6 @@ class Category < ApplicationRecord
   
   # Scopes
   scope :ordered, -> { order(:position) }
-  scope :active, -> { where(archived: false) }
   
   # Callbacks
   before_validation :set_position, on: :create

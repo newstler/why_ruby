@@ -35,9 +35,16 @@ Rails.application.routes.draw do
   resources :categories, only: [:show]
   resources :tags, only: [:show]
   
-  # User profile
-  resources :users, only: [:show]
-  
+  # User profiles and community
+  resources :users, only: [:index, :show]
+
+
+  # Legal pages
+  get 'legal/privacy', to: 'legal#show', defaults: { page: 'privacy_policy' }, as: :privacy_policy
+  get 'legal/terms', to: 'legal#show', defaults: { page: 'terms_of_service' }, as: :terms_of_service
+  get 'legal/cookies', to: 'legal#show', defaults: { page: 'cookie_policy' }, as: :cookie_policy
+  get 'legal', to: 'legal#show', defaults: { page: 'legal_notice' }, as: :legal_notice
+
   # Defines the root path route ("/")
   root "posts#index"
 end

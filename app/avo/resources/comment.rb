@@ -16,7 +16,6 @@ class Avo::Resources::Comment < Avo::BaseResource
     field :id, as: :text, readonly: true
     field :body, as: :textarea, required: true
     field :published, as: :boolean
-    field :archived, as: :boolean
     field :created_at, as: :date_time, readonly: true
     field :updated_at, as: :date_time, readonly: true
     
@@ -27,6 +26,5 @@ class Avo::Resources::Comment < Avo::BaseResource
   
   def actions
     action Avo::Actions::TogglePublished
-    action Avo::Actions::ToggleArchived
   end
 end 

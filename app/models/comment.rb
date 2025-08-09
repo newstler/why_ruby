@@ -1,6 +1,4 @@
 class Comment < ApplicationRecord
-  # Soft deletion
-  default_scope { where(archived: false) }
   
   # Associations
   belongs_to :post
@@ -10,7 +8,7 @@ class Comment < ApplicationRecord
   validates :body, presence: true
   
   # Scopes
-  scope :published, -> { where(published: true, archived: false) }
+  scope :published, -> { where(published: true) }
   scope :recent, -> { order(created_at: :desc) }
   
   # Callbacks
@@ -19,9 +17,9 @@ class Comment < ApplicationRecord
   private
   
   def update_counter_caches
-    if saved_change_to_published? || saved_change_to_archived?
+    if saved_change_to_published?
       count = user.comments.published.count
-      user.update_column(:published_comments_count, count)
+      user.update_column(:published_comments_count, count) if user.present?
     end
   end
 end 

@@ -21,6 +21,16 @@
 
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-55VPDFY7NM"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-55VPDFY7NM');
+    </script>
   </head>
 
   <body class="bg-gray-50">
@@ -36,10 +46,13 @@
           
           <!-- Desktop navigation - hidden on mobile -->
           <div class="hidden md:flex-1 md:flex justify-center items-center space-x-4">
-            <% Category.ordered.limit(8).each do |category| %>
+            <% Category.ordered.each do |category| %>
               <%= link_to category.name, category_path(category), 
                   class: "#{current_page?(category_path(category)) ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
             <% end %>
+            
+            <%= link_to "Community", users_path, 
+                class: "#{current_page?(users_path) ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
             
             <% if user_signed_in? %>
               <%= link_to new_post_path, class: "p-2 text-gray-400 hover:text-gray-500 rounded-full hover:bg-gray-100" do %>
@@ -107,10 +120,12 @@
           <div class="pt-4 pb-3 border-t border-gray-200">
             <!-- Categories -->
             <div class="space-y-1 px-2">
-              <% Category.ordered.limit(8).each do |category| %>
+              <% Category.ordered.limit(7).each do |category| %>
                 <%= link_to category.name, category_path(category), 
                     class: "#{current_page?(category_path(category)) ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} block px-3 py-2 rounded-md text-base font-medium" %>
               <% end %>
+              <%= link_to "Community", users_path, 
+                  class: "#{current_page?(users_path) ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} block px-3 py-2 rounded-md text-base font-medium" %>
             </div>
             
             <% if user_signed_in? %>
@@ -179,12 +194,35 @@
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <%= yield %>
     </main>
-    
-    <footer class="bg-white mt-16">
-      <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <p class="text-center text-sm text-gray-500">
-          &copy; <%= Date.current.year %> WhyRuby.info - Built with Ruby on Rails <%= Rails.version %>
-        </p>
+
+    <footer class="max-w-7xl mx-auto my-12">
+      <div class="grid grid-cols-3 items-center">
+        <!-- Cookie notice (left) -->
+        <div class="text-left text-xs text-gray-400">
+          &copy; <%= Date.current.year %> WhyRuby.info — Built with
+          <%= link_to "Ruby", "https://www.ruby-lang.org/", class: "underline hover:text-gray-600 transition" %>
+          on
+          <%= link_to "Rails #{Rails.version}", "https://rubyonrails.org", class: "underline hover:text-gray-600 transition" %>.
+          <br />
+          Open-sourced on GithHub.
+        </div>
+
+        <!-- Logo (center) -->
+        <div class="flex justify-center">
+          <%= link_to "https://yurisidorov.com", class: "logo-container" do %>
+            <%= inline_svg_tag "capedbot-logo.svg", alt: t(:copyright, year: Date.today.year), title: t(:copyright, year: Date.today.year), class: "h-8 w-auto fill-robot opacity-30 transition-opacity duration-600 hover:opacity-100", style:"fill: var(--text-color4);" %>
+          <% end %>
+        </div>
+
+        <!-- Legal links (right) -->
+        <div class="text-xs text-right text-gray-400">
+          By using this site you agree with our
+          <%= link_to "cookie policy", cookie_policy_path, class: "underline hover:text-gray-600 transition" %>.
+          <br />
+          <%= link_to "Privacy", privacy_policy_path, class: "underline hover:text-gray-600 transition ml-2" %>
+          <%= link_to "Terms", terms_of_service_path, class: "underline hover:text-gray-600 transition ml-2" %>
+          <%= link_to "Legal", legal_notice_path, class: "underline hover:text-gray-600 transition ml-2" %>
+        </div>
       </div>
     </footer>
   </body>

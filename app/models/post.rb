@@ -1,6 +1,4 @@
 class Post < ApplicationRecord
-  # Soft deletion
-  default_scope { where(archived: false) }
   
   # Virtual attributes
   attr_accessor :duplicate_post
@@ -20,7 +18,7 @@ class Post < ApplicationRecord
   validates :pin_position, uniqueness: true, allow_nil: true, numericality: { only_integer: true }
   
   # Scopes
-  scope :published, -> { where(published: true, archived: false) }
+  scope :published, -> { where(published: true) }
   scope :pinned, -> { where.not(pin_position: nil) }
   scope :articles, -> { where(url: [nil, ""]) }
   scope :links, -> { where.not(url: [nil, ""]) }
@@ -79,9 +77,9 @@ class Post < ApplicationRecord
   end
   
   def update_user_counter_caches
-    if saved_change_to_published? || saved_change_to_archived?
+    if saved_change_to_published?
       count = user.posts.published.count
-      user.update_column(:published_posts_count, count)
+      user.update_column(:published_posts_count, count) if user.present?
     end
   end
   

@@ -17,7 +17,7 @@ class CommentsController < ApplicationController
   end
   
   def destroy
-    @comment.update!(archived: true)
+    @comment.destroy!
     redirect_to @post, notice: 'Comment was deleted.'
   end
   

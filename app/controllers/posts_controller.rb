@@ -41,7 +41,7 @@ class PostsController < ApplicationController
   end
   
   def destroy
-    @post.update!(archived: true)
+    @post.destroy!
     redirect_to posts_url, notice: 'Post was successfully deleted.'
   end
   
