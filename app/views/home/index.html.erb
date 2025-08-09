@@ -25,7 +25,7 @@
         <% pinned_cols.each do |column_posts| %>
           <div class="flex-1 space-y-6">
             <% column_posts.each do |post| %>
-              <%= render 'posts/post_tile', post: post, pinned: true %>
+              <%= render 'posts/post_tile', post: post %>
             <% end %>
           </div>
         <% end %>
@@ -34,7 +34,7 @@
       <% # Mobile view for pinned posts - simple grid %>
       <div class="lg:hidden grid grid-cols-1 md:grid-cols-2 gap-6">
         <% @pinned_posts.each do |post| %>
-          <%= render 'posts/post_tile', post: post, pinned: true %>
+          <%= render 'posts/post_tile', post: post %>
         <% end %>
       </div>
     </div>

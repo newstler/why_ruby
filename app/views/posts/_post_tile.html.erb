@@ -2,11 +2,9 @@
   Post tile partial - displays a post in a card format
   Locals:
     - post: the post to display
-    - pinned: boolean, whether to show pinned styling (optional, defaults to false)
 %>
-<% pinned ||= false %>
 
-<div class="bg-white shadow rounded-lg p-6 <%= pinned ? 'border-2 border-red-200' : '' %> hover:shadow-lg transition-shadow relative">
+<div class="bg-white shadow-md rounded-lg p-6 hover:shadow-2xl hover:scale-[1.02] transform transition-all duration-300 ease-out relative cursor-pointer">
   <% if user_signed_in? && (post.user == current_user || current_user.admin?) %>
     <div class="absolute top-4 right-4 flex items-center space-x-2 z-10">
       <%= link_to edit_post_path(post), class: "text-gray-400 hover:text-gray-600 transition-colors p-1 bg-white rounded-full shadow-sm hover:shadow", title: "Edit" do %>
@@ -22,7 +20,7 @@
     </div>
   <% end %>
   
-  <%= link_to post_link_url(post), post_link_options(post).merge(class: "block") do %>
+  <%= link_to post_link_url(post), post_link_options(post).merge(class: "block cursor-pointer") do %>
     <% if post.title_image_url.present? %>
       <div class="mb-4">
         <%= image_tag post.title_image_url, alt: post.title, class: "w-full object-cover rounded-lg", style: "height: auto;" %>
