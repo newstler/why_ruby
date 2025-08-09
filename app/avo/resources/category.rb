@@ -28,5 +28,6 @@ class Avo::Resources::Category < Avo::BaseResource
   end
   
   def actions
+    action Avo::Actions::BulkDelete
   end
 end 

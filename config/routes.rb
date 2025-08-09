@@ -46,5 +46,5 @@ Rails.application.routes.draw do
   get 'legal', to: 'legal#show', defaults: { page: 'legal_notice' }, as: :legal_notice
 
   # Defines the root path route ("/")
-  root "posts#index"
+  root "home#index"
 end

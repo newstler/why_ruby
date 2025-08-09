@@ -14,4 +14,8 @@ class Avo::Resources::Report < Avo::BaseResource
     field :user, as: :belongs_to
     field :post, as: :belongs_to
   end
+  
+  def actions
+    action Avo::Actions::BulkDelete
+  end
 end 

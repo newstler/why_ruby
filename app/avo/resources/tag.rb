@@ -23,5 +23,6 @@ class Avo::Resources::Tag < Avo::BaseResource
   end
   
   def actions
+    action Avo::Actions::BulkDelete
   end
 end 

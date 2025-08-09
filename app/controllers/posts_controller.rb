@@ -1,14 +1,14 @@
 class PostsController < ApplicationController
-  before_action :authenticate_user!, except: [:index, :show]
+  before_action :authenticate_user!, except: [:show]
   before_action :set_post, only: [:show, :edit, :update, :destroy]
   before_action :authorize_user!, only: [:edit, :update, :destroy]
   
   def index
-    @pinned_posts = Post.published.pinned.includes(:user, :category, :tags)
-    @posts = Post.published.includes(:user, :category, :tags)
-                      .order(created_at: :desc)
-                      .page(params[:page])
-                      .per(20)
+    @posts = current_user.posts
+                         .includes(:category, :tags, :comments)
+                         .order(created_at: :desc)
+                         .page(params[:page])
+                         .per(20)
   end
   
   def show
