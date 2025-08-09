@@ -60,14 +60,17 @@ class Post < ApplicationRecord
   end
   
   def generate_summary_job
-    GenerateSummaryJob.perform_later(self) if published?
+    # Only generate summary if published and summary is blank
+    GenerateSummaryJob.perform_later(self) if published? && summary.blank?
   end
   
   def regenerate_summary_if_needed
-    # Regenerate summary if content or title changed and post is published
-    if published? && (saved_change_to_content? || saved_change_to_title? || saved_change_to_url?)
-      # Clear existing summary to force regeneration
-      update_column(:summary, nil)
+    # Only regenerate summary if content/title/url changed and summary wasn't manually changed
+    # This prevents overwriting manually edited summaries
+    if published? && 
+       (saved_change_to_content? || saved_change_to_title? || saved_change_to_url?) &&
+       !saved_change_to_summary? &&
+       summary.blank?
       GenerateSummaryJob.perform_later(self)
     end
   end

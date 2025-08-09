@@ -141,8 +141,6 @@
             </div>
           <% end %>
         </div>
-        
-        <%= form.hidden_field :summary, data: { "link-metadata-target": "summary" } %>
       </div>
     </div>
 
@@ -155,6 +153,34 @@
             <span class="text-sm"><%= b.text %></span>
           </label>
         <% end %>
+      </div>
+    </div>
+
+    <div data-controller="markdown-preview">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <%= form.label :summary, "Summary (Markdown supported)", class: "block text-sm font-medium text-gray-700" %>
+            <button type="button" class="lg:hidden text-sm text-red-600 hover:text-red-800" data-action="click->markdown-preview#togglePreview">
+              Toggle Preview
+            </button>
+          </div>
+          <%= form.text_area :summary, rows: 5,
+              class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 font-mono text-sm", 
+              placeholder: "Enter a brief summary of your post (optional). If left blank, an AI-generated summary will be created.",
+              data: { 
+                "markdown-preview-target": "input",
+                "action": "input->markdown-preview#updatePreview"
+              } %>
+          <p class="mt-1 text-sm text-gray-500">A 2-3 sentence summary that captures the key points. Leave blank to auto-generate.</p>
+        </div>
+        
+        <div class="hidden lg:block" data-markdown-preview-target="previewContainer">
+          <h4 class="text-sm font-medium text-gray-700 mb-2">Preview</h4>
+          <div class="prose prose-sm max-w-none border border-gray-300 rounded-md p-4 bg-white overflow-y-auto min-h-[120px]" data-markdown-preview-target="preview" style="height: 120px;">
+            <p class="text-gray-500">Preview will appear here as you type...</p>
+          </div>
+        </div>
       </div>
     </div>
 
