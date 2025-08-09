@@ -33,8 +33,11 @@
       <% else %>
         <span class="text-sm text-gray-400 italic">Uncategorized</span>
       <% end %>
-      <% if post.link? %>
-        <span class="text-sm text-blue-600">🔗 External Link</span>
+      <% if post.link? && (domain = extract_domain(post.url)) %>
+        <span class="text-xs text-gray-400 underline inline-flex items-center gap-1">
+          <%= domain %>
+          <%= inline_svg_tag "external-link.svg", class: "w-3 h-3 text-gray-400" %>
+        </span>
       <% end %>
     </div>
     

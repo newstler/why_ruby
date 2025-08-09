@@ -80,4 +80,17 @@ module ApplicationHelper
   def post_link_options(post)
     post.link? ? { target: "_blank", rel: "noopener" } : {}
   end
+  
+  def extract_domain(url)
+    return nil if url.blank?
+    
+    begin
+      uri = URI.parse(url)
+      host = uri.host || ""
+      # Remove www. prefix if present
+      host.sub(/^www\./, '')
+    rescue URI::InvalidURIError
+      nil
+    end
+  end
 end
