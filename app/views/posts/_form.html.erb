@@ -149,7 +149,7 @@
     <div>
       <%= form.label :tag_ids, "Tags", class: "block text-sm font-medium text-gray-700 mb-2" %>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-        <%= form.collection_check_boxes :tag_ids, Tag.active, :id, :name do |b| %>
+        <%= form.collection_check_boxes :tag_ids, Tag.all, :id, :name do |b| %>
           <label class="flex items-center space-x-2">
             <%= b.check_box(class: "rounded border-gray-300 text-red-600 focus:ring-red-500") %>
             <span class="text-sm"><%= b.text %></span>
