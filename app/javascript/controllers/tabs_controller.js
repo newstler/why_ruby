@@ -2,8 +2,8 @@ import { Controller } from "@hotwired/stimulus"
 
 // Connects to data-controller="tabs"
 export default class extends Controller {
-  static targets = ["tab", "panel", "header", "userInfo"]
-  static values = { active: String, scrolled: Boolean }
+  static targets = ["tab", "panel"]
+  static values = { active: String }
   
   connect() {
     // Check URL hash first
@@ -22,27 +22,11 @@ export default class extends Controller {
     // Listen for hash changes (browser back/forward)
     this.handleHashChange = this.handleHashChange.bind(this)
     window.addEventListener('hashchange', this.handleHashChange)
-    
-    // Listen for scroll events to show/hide user info
-    this.handleScroll = this.handleScroll.bind(this)
-    window.addEventListener('scroll', this.handleScroll)
-    
-    // Initialize scroll state
-    this.scrolledValue = false
-    
-    // Check initial scroll position
-    this.handleScroll()
   }
   
   disconnect() {
     // Clean up event listeners
     window.removeEventListener('hashchange', this.handleHashChange)
-    window.removeEventListener('scroll', this.handleScroll)
-    
-    // Clear any pending timeouts
-    if (this.scrollTimeout) {
-      clearTimeout(this.scrollTimeout)
-    }
   }
   
   handleHashChange() {
@@ -52,43 +36,6 @@ export default class extends Controller {
     if (hash && validTabs.includes(hash)) {
       this.activeValue = hash
       this.updateDisplay()
-    }
-  }
-  
-  handleScroll() {
-    // Debounce scroll handling for performance
-    if (this.scrollTimeout) {
-      clearTimeout(this.scrollTimeout)
-    }
-    
-    this.scrollTimeout = setTimeout(() => {
-      // Get the tabs position relative to viewport
-      if (this.hasHeaderTarget) {
-        const tabsRect = this.headerTarget.getBoundingClientRect()
-        
-        // Show user info when tabs are close to the top
-        // 150px threshold gives a nice transition before tabs reach the sticky nav header
-        const shouldShowUserInfo = tabsRect.top < 150
-        
-        if (shouldShowUserInfo !== this.scrolledValue) {
-          this.scrolledValue = shouldShowUserInfo
-          this.updateUserInfoVisibility()
-        }
-      }
-    }, 10)
-  }
-  
-  updateUserInfoVisibility() {
-    if (this.hasUserInfoTarget) {
-      if (this.scrolledValue) {
-        // Fade in user info
-        this.userInfoTarget.classList.remove('opacity-0')
-        this.userInfoTarget.classList.add('opacity-100')
-      } else {
-        // Fade out user info
-        this.userInfoTarget.classList.add('opacity-0')
-        this.userInfoTarget.classList.remove('opacity-100')
-      }
     }
   }
   
@@ -106,42 +53,6 @@ export default class extends Controller {
     }
     
     this.updateDisplay()
-    
-    // Small delay to ensure display is updated before measuring
-    setTimeout(() => {
-      // Find the active panel to check if its content extends below viewport
-      const activePanel = this.panelTargets.find(panel => panel.dataset.tabsName === tabName)
-      const tabsRect = this.element.getBoundingClientRect()
-      
-      if (activePanel) {
-        const panelRect = activePanel.getBoundingClientRect()
-        const viewportHeight = window.innerHeight
-        
-        // Check if either:
-        // 1. Tabs are above viewport (scrolled past them)
-        // 2. Panel content extends below viewport
-        const tabsAboveViewport = tabsRect.top < 0
-        const contentBelowViewport = panelRect.bottom > viewportHeight
-        
-        if (tabsAboveViewport || contentBelowViewport) {
-          // Calculate scroll position to show tabs with some padding
-          const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-          const tabsTop = scrollTop + tabsRect.top
-          const offset = 100 // Offset from top to keep tabs visible with some padding
-          const scrollTarget = Math.max(0, tabsTop - offset)
-          
-          window.scrollTo({
-            top: scrollTarget,
-            behavior: 'smooth'
-          })
-          
-          // Trigger user info visibility check after scrolling
-          setTimeout(() => {
-            this.handleScroll()
-          }, 300)
-        }
-      }
-    }, 50) // Small delay to ensure DOM updates are complete
   }
   
   updateDisplay() {
