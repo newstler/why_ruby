@@ -43,8 +43,8 @@
 
 <!-- Success Stories Floating Logos (Full Width) -->
 <% if @success_stories.any? %>
-  <div class="py-16 bg-gray-50 my-16">
-    <h2 class="text-center text-sm font-semibold text-gray-600 tracking-wide uppercase mb-12">
+  <div class="py-8 md:py-16 bg-gray-50 my-8 md:my-16">
+    <h2 class="text-center text-sm font-semibold text-gray-600 tracking-wide uppercase mb-6 md:mb-12">
       Success powered by Ruby
     </h2>
     <div class="relative logo-carousel-container" data-controller="logo-carousel">
@@ -55,8 +55,8 @@
           <% # Create multiple sets for seamless looping %>
           <% 2.times do |set_index| %>
             <% shuffled_stories.each_with_index do |story, index| %>
-          <%= link_to post_path(story), 
-              class: "logo-item flex-shrink-0 transition-all duration-300 group relative mx-10",
+                      <%= link_to post_path(story), 
+                class: "logo-item flex-shrink-0 transition-all duration-300 group relative mx-3 md:mx-10",
               data: { 
                 action: "mouseenter->logo-carousel#pause mouseleave->logo-carousel#resume mousemove->logo-carousel#showTooltip mouseleave->logo-carousel#hideTooltip",
                 story_id: story.id,
@@ -82,7 +82,7 @@
              data-story-id="<%= story.id %>"
              data-story-url="<%= post_path(story) %>"
              style="display: none; z-index: 9999;">
-          <div class="bg-white rounded-lg shadow-xl p-5 w-80 border border-gray-100 hover:shadow-2xl transition-shadow cursor-pointer">
+          <div class="bg-white rounded-lg shadow-xl p-4 md:p-5 w-72 md:w-80 border border-gray-100 hover:shadow-2xl transition-shadow cursor-pointer">
             <h3 class="text-lg font-bold text-gray-900 mb-2 leading-tight"><%= story.title %></h3>
             <div class="text-sm text-gray-600 mb-3">
               <%= strip_tags(story.summary.presence || story.content) %>
@@ -106,7 +106,7 @@
 
   <!-- Recent Posts -->
   <div class="space-y-4">
-    <h2 class="text-center text-sm font-semibold text-gray-600 tracking-wide uppercase mb-8">Latest wisdom to explore</h2>
+    <h2 class="text-center text-sm font-semibold text-gray-600 tracking-wide uppercase my-8 md:my-16">Latest wisdom to explore</h2>
     <div class="hidden lg:flex gap-6">
       <% # Split posts into 3 columns for desktop, maintaining left-to-right reading order %>
       <% column1_posts = [] %>

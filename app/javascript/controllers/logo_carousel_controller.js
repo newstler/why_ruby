@@ -7,13 +7,34 @@ export default class extends Controller {
     console.log("Logo carousel controller connected")
     this.hideTimeout = null
     this.scrollPosition = 0
-    this.scrollSpeed = 2.5 // pixels per frame (adjust for desired speed)
+    
+    // Detect mobile and adjust speed accordingly
+    this.isMobile = window.innerWidth < 768
+    this.baseScrollSpeed = 2.5 // Base speed for desktop
+    this.scrollSpeed = this.isMobile ? this.baseScrollSpeed / 4 : this.baseScrollSpeed // 4x slower on mobile
+    
     this.isPaused = false
     this.animationFrame = null
     this.currentTooltip = null
     this.currentLogo = null
     this.mouseX = 0
     this.mouseY = 0
+    
+    // Listen for window resize to update mobile detection
+    this.handleResize = () => {
+      const wasMobile = this.isMobile
+      this.isMobile = window.innerWidth < 768
+      this.scrollSpeed = this.isMobile ? this.baseScrollSpeed / 4 : this.baseScrollSpeed
+      
+      // If switching between mobile/desktop, update logo wrapper heights
+      if (wasMobile !== this.isMobile) {
+        this.updateLogoWrapperHeights()
+      }
+    }
+    window.addEventListener('resize', this.handleResize)
+    
+    // Set initial logo wrapper heights
+    this.updateLogoWrapperHeights()
     
     // Start the smooth scroll animation
     this.startSmoothScroll()
@@ -23,6 +44,9 @@ export default class extends Controller {
     if (this.animationFrame) {
       cancelAnimationFrame(this.animationFrame)
     }
+    // Remove resize listener
+    window.removeEventListener('resize', this.handleResize)
+    
     // Clean up any visible tooltips and logo highlights
     if (this.currentTooltip) {
       this.hideTooltipImmediately(this.currentTooltip)
@@ -30,6 +54,19 @@ export default class extends Controller {
     if (this.currentLogo) {
       this.removeLogoHighlight(this.currentLogo)
     }
+  }
+  
+  updateLogoWrapperHeights() {
+    const logoWrappers = this.element.querySelectorAll('.logo-wrapper')
+    logoWrappers.forEach(wrapper => {
+      if (this.isMobile) {
+        wrapper.classList.remove('h-24')
+        wrapper.classList.add('h-9') // 36px height on mobile
+      } else {
+        wrapper.classList.remove('h-9')
+        wrapper.classList.add('h-24')
+      }
+    })
   }
   
   startSmoothScroll() {
@@ -181,7 +218,7 @@ export default class extends Controller {
   
   positionTooltip(tooltip) {
     const tooltipRect = tooltip.getBoundingClientRect()
-    const tooltipWidth = 320 // w-80
+    const tooltipWidth = this.isMobile ? 288 : 320 // w-72 on mobile, w-80 on desktop
     const tooltipHeight = tooltipRect.height || 250 // Estimate if not yet rendered
     
     // Offset from cursor

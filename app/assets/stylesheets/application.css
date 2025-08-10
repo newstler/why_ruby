@@ -1,172 +1,166 @@
-/*
- * This is a manifest file that'll be compiled into application.css.
- *
- * With Propshaft, assets are served efficiently without preprocessing steps. You can still include
- * application-wide styles in this file, but keep in mind that CSS precedence will follow the standard
- * cascading order, meaning styles declared later in the document or manifest will override earlier ones,
- * depending on specificity.
- *
- * Consider organizing styles into separate files for maintainability.
- */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Rouge Syntax Highlighting - GitHub Style */
-.highlight .c { color: #6a737d !important; font-style: italic } /* Comment */
-.highlight .err { color: #a61717 !important; background-color: #e3d2d2 } /* Error */
-.highlight .k { color: #d73a49 !important; font-weight: bold } /* Keyword */
-.highlight .o { color: #d73a49 !important; font-weight: bold } /* Operator */
-.highlight .cm { color: #6a737d !important; font-style: italic } /* Comment.Multiline */
-.highlight .cp { color: #6a737d !important; font-weight: bold } /* Comment.Preproc */
-.highlight .c1 { color: #6a737d !important; font-style: italic } /* Comment.Single */
-.highlight .cs { color: #6a737d !important; font-weight: bold; font-style: italic } /* Comment.Special */
-.highlight .gd { color: #000000; background-color: #ffdddd } /* Generic.Deleted */
-.highlight .gd .x { color: #000000; background-color: #ffaaaa } /* Generic.Deleted.Specific */
-.highlight .ge { font-style: italic } /* Generic.Emph */
-.highlight .gr { color: #aa0000 } /* Generic.Error */
-.highlight .gh { color: #999999 } /* Generic.Heading */
-.highlight .gi { color: #000000; background-color: #ddffdd } /* Generic.Inserted */
-.highlight .gi .x { color: #000000; background-color: #aaffaa } /* Generic.Inserted.Specific */
-.highlight .go { color: #888888 } /* Generic.Output */
-.highlight .gp { color: #555555 } /* Generic.Prompt */
-.highlight .gs { font-weight: bold } /* Generic.Strong */
-.highlight .gu { color: #aaaaaa } /* Generic.Subheading */
-.highlight .gt { color: #aa0000 } /* Generic.Traceback */
-.highlight .kc { color: #d73a49 !important; font-weight: bold } /* Keyword.Constant */
-.highlight .kd { color: #d73a49 !important; font-weight: bold } /* Keyword.Declaration */
-.highlight .kp { color: #d73a49 !important; font-weight: bold } /* Keyword.Pseudo */
-.highlight .kr { color: #d73a49 !important; font-weight: bold } /* Keyword.Reserved */
-.highlight .kt { color: #d73a49 !important; font-weight: bold } /* Keyword.Type */
-.highlight .m { color: #005cc5 !important } /* Literal.Number */
-.highlight .s { color: #032f62 !important } /* Literal.String */
-.highlight .na { color: #6f42c1 !important } /* Name.Attribute */
-.highlight .nb { color: #005cc5 !important } /* Name.Builtin */
-.highlight .nc { color: #6f42c1 !important; font-weight: bold } /* Name.Class */
-.highlight .no { color: #005cc5 !important } /* Name.Constant */
-.highlight .ni { color: #6f42c1 !important } /* Name.Entity */
-.highlight .ne { color: #6f42c1 !important; font-weight: bold } /* Name.Exception */
-.highlight .nf { color: #6f42c1 !important; font-weight: bold } /* Name.Function */
-.highlight .nn { color: #6f42c1 !important } /* Name.Namespace */
-.highlight .nt { color: #22863a !important } /* Name.Tag */
-.highlight .nv { color: #e36209 !important } /* Name.Variable */
-.highlight .ow { font-weight: bold } /* Operator.Word */
-.highlight .w { color: #bbbbbb } /* Text.Whitespace */
-.highlight .mf { color: #005cc5 !important } /* Literal.Number.Float */
-.highlight .mh { color: #005cc5 !important } /* Literal.Number.Hex */
-.highlight .mi { color: #005cc5 !important } /* Literal.Number.Integer */
-.highlight .mo { color: #005cc5 !important } /* Literal.Number.Oct */
-.highlight .sb { color: #032f62 !important } /* Literal.String.Backtick */
-.highlight .sc { color: #032f62 !important } /* Literal.String.Char */
-.highlight .sd { color: #032f62 !important } /* Literal.String.Doc */
-.highlight .s2 { color: #032f62 !important } /* Literal.String.Double */
-.highlight .se { color: #032f62 !important } /* Literal.String.Escape */
-.highlight .sh { color: #032f62 !important } /* Literal.String.Heredoc */
-.highlight .si { color: #032f62 !important } /* Literal.String.Interpol */
-.highlight .sx { color: #032f62 !important } /* Literal.String.Other */
-.highlight .sr { color: #032f62 !important } /* Literal.String.Regex */
-.highlight .s1 { color: #032f62 !important } /* Literal.String.Single */
-.highlight .ss { color: #005cc5 !important } /* Literal.String.Symbol */
-.highlight .bp { color: #005cc5 !important } /* Name.Builtin.Pseudo */
-.highlight .vc { color: #e36209 !important } /* Name.Variable.Class */
-.highlight .vg { color: #e36209 !important } /* Name.Variable.Global */
-.highlight .vi { color: #e36209 !important } /* Name.Variable.Instance */
-.highlight .il { color: #005cc5 !important } /* Literal.Number.Integer.Long */
+@layer components {
+  .btn {
+    @apply px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors;
+  }
+  
+  .btn-secondary {
+    @apply px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors;
+  }
+  
+  .btn-outline {
+    @apply px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors;
+  }
+}
 
-/* Base code styling */
-pre {
-  background-color: #f6f8fa;
-  padding: 1rem;
+/* Typography */
+.prose {
+  color: #374151;
+  max-width: 65ch;
+}
+
+.prose h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-top: 0;
+  margin-bottom: 0.8888889em;
+  line-height: 1.1111111;
+}
+
+.prose h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 2em;
+  margin-bottom: 1em;
+  line-height: 1.3333333;
+}
+
+.prose h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1.6em;
+  margin-bottom: 0.6em;
+  line-height: 1.6;
+}
+
+.prose p {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+  line-height: 1.75;
+}
+
+.prose ul {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+  list-style-type: disc;
+  padding-left: 1.625em;
+}
+
+.prose ol {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+  list-style-type: decimal;
+  padding-left: 1.625em;
+}
+
+.prose li {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose a {
+  color: #dc2626;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.prose a:hover {
+  color: #991b1b;
+}
+
+.prose strong {
+  font-weight: 600;
+}
+
+.prose blockquote {
+  font-style: italic;
+  border-left-width: 0.25rem;
+  border-left-color: #e5e7eb;
+  padding-left: 1em;
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: 1.6em;
+  margin-bottom: 1.6em;
+}
+
+.prose code {
+  font-family: 'Courier New', monospace;
+  font-size: 0.875em;
+  background-color: #f3f4f6;
+  padding: 0.125em 0.25em;
+  border-radius: 0.25rem;
+}
+
+.prose pre {
+  background-color: #1f2937;
+  color: #f9fafb;
+  padding: 1em;
   border-radius: 0.375rem;
   overflow-x: auto;
-  margin: 1rem 0;
-}
-
-pre code {
-  background-color: transparent;
-  padding: 0;
-  font-size: 0.875em;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
-  line-height: 1.5;
-}
-
-/* Fix code highlighting within prose */
-.prose pre {
-  background-color: #f6f8fa;
-  padding: 1rem;
-  margin: 1.5rem 0;
-  border-radius: 0.375rem;
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
 }
 
 .prose pre code {
   background-color: transparent;
   padding: 0;
   font-size: 0.875em;
-  color: #24292e; /* Base text color */
 }
 
-/* Highlighted code blocks */
-.highlight {
-  background-color: #f6f8fa;
-  padding: 1rem;
-  border-radius: 0.375rem;
-  overflow-x: auto;
-  margin: 1rem 0;
+/* Focus styles */
+*:focus-visible {
+  outline: 2px solid #dc2626;
+  outline-offset: 2px;
 }
 
-.highlight pre {
-  margin: 0;
-  padding: 0;
-  background-color: transparent;
+/* Form styles */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent;
 }
 
-.prose .highlight {
-  margin: 1.5rem 0;
-}
-
-.prose .highlight pre {
-  margin: 0;
-  padding: 0;
-  overflow-x: auto;
-  background-color: transparent;
-}
-
-/* Force Rouge colors to override any defaults */
-.highlight code {
-  color: #24292e !important; /* Base text color */
-}
-
-/* Ensure spans in highlighted code use their assigned colors */
-.highlight pre code span,
-.highlight code span {
-  color: inherit !important;
-}
-
-/* Touch handling for mobile devices */
-.touch-manipulation {
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Ensure mobile menu button has proper hit area */
-@media (max-width: 768px) {
-  button[aria-label="Toggle navigation menu"] {
-    min-width: 44px;
-    min-height: 44px;
+/* Animation utilities */
+@keyframes slide-in {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
 }
 
-/* Success Story SVG Logo Styling */
-[data-content-type-target="logoPreview"] svg,
-.success-story-logo svg {
-  max-width: 100%;
-  max-height: 8rem;
-  width: auto;
-  height: auto;
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
 }
 
-/* Ensure SVG logos in tiles are properly sized */
+/* Custom checkbox styles */
+input[type="checkbox"] {
+  @apply w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500 focus:ring-2;
+}
+
+/* Success story tile logo styles */
 .success-story-tile-logo svg {
-  max-width: 100%;
   max-height: 100%;
   width: auto;
+  max-width: 100%;
   height: auto;
 }
 
@@ -185,11 +179,19 @@ pre code {
 }
 
 .logo-wrapper svg {
-  height: 6rem; /* 96px - matches h-24 */
+  height: 2.25rem; /* 36px - mobile size */
   width: auto;
-  max-width: 300px;
+  max-width: 112px;
   filter: grayscale(100%) opacity(0.4);
   transition: filter 0.3s ease;
+}
+
+/* Tablet and desktop logo sizes */
+@media (min-width: 768px) {
+  .logo-wrapper svg {
+    height: 6rem; /* 96px - matches h-24 */
+    max-width: 300px;
+  }
 }
 
 .logo-item:hover .logo-wrapper svg,
@@ -225,10 +227,16 @@ pre code {
 /* Logo tooltip styles */
 .logo-tooltip {
   white-space: normal;
-  max-width: 320px; /* w-80 */
+  max-width: 288px; /* w-72 on mobile */
   position: fixed !important;
   z-index: 9999 !important;
   cursor: pointer;
+}
+
+@media (min-width: 768px) {
+  .logo-tooltip {
+    max-width: 320px; /* w-80 on desktop */
+  }
 }
 
 /* Tooltip content scrolling */
