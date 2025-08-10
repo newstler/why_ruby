@@ -4,10 +4,8 @@
 <% content_for :meta_keywords, t('meta.tags.show.keywords', tag_name: @tag.name) %>
 
 <div class="space-y-8">
-  <div class="bg-white shadow rounded-lg p-8">
-    <h1 class="text-3xl font-bold text-gray-900 mb-2">#<%= @tag.name %></h1>
-    <p class="text-gray-600">Posts tagged with <%= @tag.name %></p>
-  </div>
+  <h1 class="text-3xl font-bold text-gray-900 mb-2">#<%= @tag.name %></h1>
+  <p class="text-gray-600">Posts tagged with #<%= @tag.name %></p>
 
   <div class="space-y-4">
     <% if @posts.any? %>

@@ -44,7 +44,17 @@ class PostsController < ApplicationController
   
   def destroy
     @post.destroy!
-    redirect_to user_path(current_user), notice: 'Post was successfully deleted.'
+    
+    respond_to do |format|
+      format.html { 
+        # Regular HTML request (from post show page with Turbo disabled)
+        redirect_to "#{user_path(current_user)}#posts", notice: 'Post was successfully deleted.', status: :see_other 
+      }
+      format.turbo_stream {
+        # Turbo request (from tile grid)
+        render :destroy
+      }
+    end
   end
   
   def preview

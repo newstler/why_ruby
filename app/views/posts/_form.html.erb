@@ -46,55 +46,6 @@
       </div>
     </div>
 
-    <div id="title-field" class="<%= 'hidden' if post.link? %>" data-content-type-target="titleField">
-      <%= form.label :title, class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%= form.text_field :title, 
-          class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500", 
-          placeholder: "Enter a descriptive title",
-          data: { "link-metadata-target": "title" } %>
-    </div>
-
-    <div>
-      <%= form.label :category_id, "Category", class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%= form.select :category_id, options_for_select(Category.ordered.pluck(:name, :id), post.category_id), { prompt: "Select a category" }, class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" %>
-    </div>
-
-    <div id="article-fields" class="<%= 'hidden' if post.link? %>" data-controller="markdown-preview" data-content-type-target="articleFields">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div>
-          <div class="flex items-center justify-between mb-2">
-            <%= form.label :content, "Content (Markdown supported)", class: "block text-sm font-medium text-gray-700" %>
-            <button type="button" class="lg:hidden text-sm text-red-600 hover:text-red-800" data-action="click->markdown-preview#togglePreview">
-              Toggle Preview
-            </button>
-          </div>
-          <%= form.text_area :content, rows: 20, 
-              class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 font-mono text-sm", 
-              placeholder: "Write your content here...",
-              data: { 
-                "markdown-preview-target": "input",
-                "action": "input->markdown-preview#updatePreview"
-              } %>
-        </div>
-        
-        <div class="hidden lg:block" data-markdown-preview-target="previewContainer">
-          <h4 class="text-sm font-medium text-gray-700 mb-2">Preview</h4>
-          <div class="prose prose-sm max-w-none border border-gray-300 rounded-md p-4 bg-white overflow-y-auto" data-markdown-preview-target="preview">
-            <p class="text-gray-500">Preview will appear here as you type...</p>
-          </div>
-        </div>
-      </div>
-      <p class="mt-2 text-sm text-gray-500">You can use Markdown formatting. Code blocks are supported with syntax highlighting.</p>
-      
-      <div class="mt-4">
-        <%= form.label :title_image_url, "Title Image URL (optional)", class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <%= form.text_field :title_image_url, 
-            class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500", 
-            placeholder: "https://example.com/image.jpg",
-            data: { "link-metadata-target": "image" } %>
-      </div>
-    </div>
-
     <div id="link-fields" class="<%= 'hidden' unless post.link? %>" data-controller="link-metadata" data-content-type-target="linkFields">
       <div class="space-y-4">
         <div>
@@ -138,6 +89,56 @@
             </div>
           <% end %>
         </div>
+      </div>
+    </div>
+
+    <div id="title-field" data-content-type-target="titleField">
+      <%= form.label :title, class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.text_field :title, 
+          class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500", 
+          placeholder: "Enter a descriptive title",
+          data: { "link-metadata-target": "title" } %>
+      <p class="mt-1 text-sm text-gray-500 hidden" data-content-type-target="linkTitleHint">Title will auto-populate from the link, but you can edit it</p>
+    </div>
+
+    <div>
+      <%= form.label :category_id, "Category", class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.select :category_id, options_for_select(Category.ordered.pluck(:name, :id), post.category_id), { prompt: "Select a category" }, class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" %>
+    </div>
+
+    <div id="article-fields" class="<%= 'hidden' if post.link? %>" data-controller="markdown-preview" data-content-type-target="articleFields">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <%= form.label :content, "Content (Markdown supported)", class: "block text-sm font-medium text-gray-700" %>
+            <button type="button" class="lg:hidden text-sm text-red-600 hover:text-red-800" data-action="click->markdown-preview#togglePreview">
+              Toggle Preview
+            </button>
+          </div>
+          <%= form.text_area :content, rows: 20, 
+              class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 font-mono text-sm", 
+              placeholder: "Write your content here...",
+              data: { 
+                "markdown-preview-target": "input",
+                "action": "input->markdown-preview#updatePreview"
+              } %>
+        </div>
+        
+        <div class="hidden lg:block" data-markdown-preview-target="previewContainer">
+          <h4 class="text-sm font-medium text-gray-700 mb-2">Preview</h4>
+          <div class="prose prose-sm max-w-none border border-gray-300 rounded-md p-4 bg-white overflow-y-auto" data-markdown-preview-target="preview">
+            <p class="text-gray-500">Preview will appear here as you type...</p>
+          </div>
+        </div>
+      </div>
+      <p class="mt-2 text-sm text-gray-500">You can use Markdown formatting. Code blocks are supported with syntax highlighting.</p>
+      
+      <div class="mt-4">
+        <%= form.label :title_image_url, "Title Image URL (optional)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= form.text_field :title_image_url, 
+            class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500", 
+            placeholder: "https://example.com/image.jpg",
+            data: { "link-metadata-target": "image" } %>
       </div>
     </div>
 
@@ -194,7 +195,8 @@
               placeholder: "Enter a brief summary of your post (optional). If left blank, an AI-generated summary will be created.",
               data: { 
                 "markdown-preview-target": "input",
-                "action": "input->markdown-preview#updatePreview"
+                "action": "input->markdown-preview#updatePreview",
+                "link-metadata-target": "summary"
               } %>
           <p class="mt-1 text-sm text-gray-500">A 2-3 sentence summary that captures the key points. Leave blank to auto-generate.</p>
         </div>

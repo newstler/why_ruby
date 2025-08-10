@@ -1,0 +1,25 @@
+<%# 
+  Shared partial for displaying a tag with consistent styling
+  
+  Parameters:
+  - tag: the tag object to display
+  - link: whether to make the tag a link (default: true)
+  - light: use lighter color for tiles (default: false)
+  - class: additional CSS classes (optional)
+%>
+<% 
+  link = local_assigns.fetch(:link, true)
+  light = local_assigns.fetch(:light, false)
+  additional_classes = local_assigns.fetch(:class, '')
+  
+  base_color = light ? "text-gray-400" : "text-gray-700"
+  hover_color = light ? "" : "hover:text-gray-900"
+  tag_classes = "font-semibold #{base_color} #{hover_color} #{additional_classes}".strip
+  tag_text = "##{tag.name}"
+%>
+
+<% if link %>
+  <%= link_to tag_text, tag_path(tag), class: tag_classes %>
+<% else %>
+  <span class="<%= tag_classes %>"><%= tag_text %></span>
+<% end %>

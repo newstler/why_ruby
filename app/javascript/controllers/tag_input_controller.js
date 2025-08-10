@@ -247,7 +247,7 @@ export default class extends Controller {
       tagElement.innerHTML = `
         <span>${this.escapeHtml(tag.name)}</span>
         <button type="button" 
-                class="ml-0.5 text-gray-500 hover:text-gray-700 focus:outline-none" 
+                class="ml-0.5 text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer" 
                 data-action="click->tag-input#removeTag"
                 data-tag-name="${this.escapeHtml(tag.name)}">
           <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">

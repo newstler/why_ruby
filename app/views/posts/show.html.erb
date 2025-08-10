@@ -39,7 +39,7 @@
         <div class="flex items-center space-x-2">
           <% if user_signed_in? && (@post.user.present? && @post.user == current_user || current_user.admin?) %>
             <%= link_to "Edit", edit_post_path(@post), class: "text-sm text-gray-600 hover:text-gray-900" %>
-            <%= link_to "Delete", post_path(@post), method: :delete, data: { confirm: "Are you sure?" }, class: "text-sm text-red-600 hover:text-red-900" %>
+            <%= button_to "Delete", post_path(@post), method: :delete, data: { turbo: false }, form: { class: "inline", onsubmit: "return confirm('Are you sure?')" }, class: "text-sm text-red-600 hover:text-red-900 border-0 bg-transparent cursor-pointer p-0" %>
           <% end %>
         </div>
       </div>
@@ -115,9 +115,9 @@
       </div>
       
       <% if @post.tags.any? %>
-        <div class="flex flex-wrap gap-1 md:gap-2 mb-2 md:mb-0">
+        <div class="flex flex-wrap gap-2 md:gap-3 mb-2 md:mb-0">
           <% @post.tags.each do |tag| %>
-            <%= link_to tag.name, tag_path(tag), class: "text-xs md:text-sm bg-gray-200 text-gray-700 px-2 md:px-3 py-1 rounded-full hover:bg-gray-300" %>
+            <%= render 'shared/tag', tag: tag, light: true, class: 'text-xs' %>
           <% end %>
         </div>
       <% end %>

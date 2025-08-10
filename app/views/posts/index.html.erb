@@ -91,11 +91,9 @@
                 
                 <!-- Tags -->
                 <% if post.tags.any? %>
-                  <div class="flex flex-wrap gap-1">
+                  <div class="flex flex-wrap gap-2">
                     <% post.tags.each do |tag| %>
-                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700">
-                        <%= tag.name %>
-                      </span>
+                      <%= render 'shared/tag', tag: tag, link: false, light: true, class: 'text-xs' %>
                     <% end %>
                   </div>
                 <% end %>
