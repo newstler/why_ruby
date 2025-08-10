@@ -106,6 +106,18 @@ module ApplicationHelper
     false
   end
   
+  def success_stories_menu_active?
+    # Highlight if on the success stories page
+    return true if controller_name == 'posts' && action_name == 'success_stories'
+    
+    # Highlight if viewing a success story post
+    if controller_name == 'posts' && action_name == 'show' && @post.present?
+      return @post.success_story?
+    end
+    
+    false
+  end
+  
   def community_menu_active?
     # Highlight if on the users index page
     return true if current_page?(users_path)

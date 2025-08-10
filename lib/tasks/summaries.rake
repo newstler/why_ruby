@@ -61,10 +61,8 @@ namespace :summaries do
       print "\rProcessing post #{index + 1}/#{total_count}: '#{post.title.truncate(50)}'"
       
       begin
-        # Clear existing summary
-        post.update_column(:summary, nil)
-        
-        GenerateSummaryJob.perform_now(post)
+        # Regenerate summary with force flag
+        GenerateSummaryJob.perform_now(post, force: true)
         post.reload
         
         if post.summary.present?

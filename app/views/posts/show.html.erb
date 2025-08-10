@@ -8,9 +8,11 @@
 <% content_for :meta_url, post_url(@post) %>
 <% content_for :meta_type, "article" %>
 <% if @post.user.present? %>
-  <% content_for :meta_author, @post.user.username %>
+  <% content_for :meta_author, @post.user.display_name %>
 <% end %>
-<% if @post.title_image_url.present? %>
+<% if @post.success_story? && @post.logo_svg.present? %>
+  <%# Success stories don't have meta images %>
+<% elsif @post.title_image_url.present? %>
   <% content_for :meta_image, @post.title_image_url %>
 <% end %>
 <% content_for :twitter_card, @post.title_image_url.present? ? "summary_large_image" : "summary" %>
@@ -23,10 +25,12 @@
     <div class="mb-6">
       <div class="flex items-center justify-between mb-4">
         <div class="flex items-center space-x-3">
-          <% if @post.category %>
-            <span class="text-sm font-medium text-gray-500"><%= @post.category.name %></span>
-          <% else %>
-            <span class="text-sm text-gray-400 italic">Uncategorized</span>
+          <% unless @post.success_story? %>
+            <% if @post.category %>
+              <span class="text-sm font-medium text-gray-500"><%= @post.category.name %></span>
+            <% else %>
+              <span class="text-sm text-gray-400 italic">Uncategorized</span>
+            <% end %>
           <% end %>
           <% if @post.link? %>
             <span class="text-sm text-blue-600">🔗 External Link</span>
@@ -47,15 +51,25 @@
       <h1 class="text-4xl md:text-6xl font-black text-gray-900 mb-8"><%= @post.title %></h1>
     </div>
 
-    <!-- Post Image -->
-    <% if @post.title_image_url.present? && !@post.link? %>
+    <!-- Post Image or Logo -->
+    <% if @post.success_story? && @post.logo_svg.present? %>
+      <div class="mb-8 flex justify-center items-center p-8">
+        <div class="max-w-md w-full success-story-logo">
+          <%= raw @post.logo_svg %>
+        </div>
+      </div>
+    <% elsif @post.title_image_url.present? && !@post.link? %>
       <div class="mb-8 rounded-lg overflow-hidden">
         <%= image_tag @post.title_image_url, alt: @post.title, class: "w-full h-auto object-cover rounded-lg" %>
       </div>
     <% end %>
 
     <!-- Post Body -->
-    <% if @post.link? %>
+    <% if @post.success_story? %>
+      <div class="prose prose-sm md:prose-lg max-w-none mb-8">
+        <%= raw markdown_to_html(@post.content) %>
+      </div>
+    <% elsif @post.link? %>
       <div class="mb-8">
         <div class="bg-white border border-gray-300 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
           <% if @post.title_image_url.present? %>
@@ -85,42 +99,44 @@
     <hr class="mt-8 mb-6 -mx-4 md:-mx-8 border-gray-100">
     
     <div class="pt-0">
-      <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center justify-between">
         <div class="flex items-center space-x-4">
-          <div class="flex items-center space-x-2">
+          <div class="flex items-center space-x-3">
             <% if @post.user.present? %>
               <% if @post.user.avatar_url.present? %>
-                <%= link_to user_path(@post.user), class: "text-sm font-medium text-gray-900 hover:text-gray-700" do %>
-                  <%= image_tag @post.user.avatar_url, alt: @post.user.username, class: "h-10 w-10 rounded-full" %>
+                <%= link_to user_path(@post.user), class: "text-base font-medium text-gray-900 hover:text-gray-700" do %>
+                  <%= image_tag @post.user.avatar_url, alt: @post.user.display_name, class: "h-10 w-10 rounded-full" %>
                 <% end %>
               <% end %>
               <div>
-                <%= link_to @post.user.username, user_path(@post.user), class: "text-sm font-medium text-gray-900 hover:text-gray-700" %>
-                <p class="text-xs text-gray-500"><%= format_post_date(@post.created_at) %></p>
+                <%= link_to @post.user.display_name, user_path(@post.user), class: "text-base font-medium text-gray-900 hover:text-gray-700" %>
+                <p class="text-sm text-gray-500"><%= format_post_date(@post.created_at) %></p>
               </div>
             <% else %>
               <div>
-                <span class="text-sm font-medium text-gray-400 italic">[Deleted User]</span>
-                <p class="text-xs text-gray-500"><%= format_post_date(@post.created_at) %></p>
+                <span class="text-base font-medium text-gray-400 italic">[Deleted User]</span>
+                <p class="text-sm text-gray-500"><%= format_post_date(@post.created_at) %></p>
               </div>
             <% end %>
           </div>
         </div>
         
-        <% if user_signed_in? && current_user.trusted? && (@post.user.nil? || current_user != @post.user) %>
-          <button type="button" onclick="document.getElementById('report-modal').classList.remove('hidden')" class="text-sm text-gray-600 hover:text-gray-900">
-            Report
-          </button>
-        <% end %>
-      </div>
-      
-      <% if @post.tags.any? %>
-        <div class="flex flex-wrap gap-2 md:gap-3 mb-2 md:mb-0">
-          <% @post.tags.each do |tag| %>
-            <%= render 'shared/tag', tag: tag, light: true, class: 'text-xs' %>
+        <div class="flex items-center gap-4">
+          <% if !@post.success_story? && @post.tags.any? %>
+            <div class="flex flex-wrap gap-2 justify-end">
+              <% @post.tags.each do |tag| %>
+                <%= render 'shared/tag', tag: tag, light: true, class: 'text-sm' %>
+              <% end %>
+            </div>
+          <% end %>
+          
+          <% if user_signed_in? && current_user.trusted? && (@post.user.nil? || current_user != @post.user) %>
+            <button type="button" onclick="document.getElementById('report-modal').classList.remove('hidden')" class="text-sm text-gray-600 hover:text-gray-900">
+              Report
+            </button>
           <% end %>
         </div>
-      <% end %>
+      </div>
     </div>
   </article>
 

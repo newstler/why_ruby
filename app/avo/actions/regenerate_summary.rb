@@ -15,10 +15,8 @@ class Avo::Actions::RegenerateSummary < Avo::BaseAction
             end
     
     posts.each do |post|
-      # Clear existing summary
-      post.update_column(:summary, nil)
-      # Queue summary regeneration
-      GenerateSummaryJob.perform_later(post)
+      # Queue summary regeneration with force flag to override existing summary
+      GenerateSummaryJob.perform_later(post, force: true)
     end
     
     count = posts.is_a?(Array) ? posts.size : posts.count

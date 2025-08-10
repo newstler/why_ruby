@@ -1,8 +1,12 @@
 class GenerateSummaryJob < ApplicationJob
   queue_as :default
   
-  def perform(post)
-    return unless post.published? && post.summary.blank?
+  def perform(post, force: false)
+    # Skip if not published
+    return unless post.published?
+    
+    # Skip if summary exists and we're not forcing regeneration
+    return if post.summary.present? && !force
     
     # Prepare the text and context for summarization
     text_to_summarize, context = prepare_text_with_context(post)
@@ -40,13 +44,13 @@ class GenerateSummaryJob < ApplicationJob
   private
   
   def prepare_text_with_context(post)
-    if post.article?
-      # For articles, use the actual content
+    if post.article? || post.success_story?
+      # For articles and success stories, use the actual content
       text = post.content
       # Remove markdown formatting for cleaner summaries
       text = ActionView::Base.full_sanitizer.sanitize(text)
       context = {
-        type: 'article',
+        type: post.post_type,
         title: post.title,
         has_code: post.content.include?('```')
       }

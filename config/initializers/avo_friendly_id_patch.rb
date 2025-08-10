@@ -1,6 +1,6 @@
 # Patch Avo controllers to handle FriendlyId slugs properly
 Rails.application.config.after_initialize do
-  # Patch ActionsController for bulk actions
+  # Patch ActionsController for bulk actions and single-record actions
   if defined?(Avo::ActionsController)
     Avo::ActionsController.class_eval do
       # Store original methods - check both public and private
@@ -68,30 +68,41 @@ Rails.application.config.after_initialize do
         @query = []
       end
       
-      # Override set_record to handle our modified @query
+      # Override set_record to handle our modified @query AND single-record actions with slugs
       def set_record
-        Rails.logger.info "[Avo Patch] set_record called" if Rails.env.development?
+        Rails.logger.info "[Avo Patch] set_record called with params[:id]=#{params[:id].inspect}" if Rails.env.development?
         
         if params[:fields] && params[:fields][:avo_resource_ids].present? && !params[:id].present?
           # For bulk actions, don't try to set a single record
           # @query should already be an array from our set_query
           Rails.logger.info "[Avo Patch] Bulk action detected, skipping single record logic" if Rails.env.development?
           @record = nil
-        elsif respond_to?(:original_set_record, true)
-          # Use original behavior for non-bulk actions
-          original_set_record
         elsif params[:id].present?
-          # Fallback: find single record
+          # For single record actions, ALWAYS use our custom find_record
+          # This handles both regular navigation and single-record actions
+          Rails.logger.info "[Avo Patch] Single record action, using custom find_record" if Rails.env.development?
+          
           if @resource && @resource.class.respond_to?(:find_record)
             @record = @resource.class.find_record(params[:id], params: params)
+            Rails.logger.info "[Avo Patch] Found record: #{@record.class}##{@record.id}" if Rails.env.development? && @record
           elsif @resource && @resource.model_class
+            # Fallback to model with friendly finders
             @record = @resource.model_class.find(params[:id])
+          else
+            # Call original if no resource available
+            original_set_record if respond_to?(:original_set_record, true)
           end
         elsif @query.respond_to?(:size) && @query.size == 1
+          # ActionsController's special case: single item in query
           @record = @query.first
+          Rails.logger.info "[Avo Patch] Set record from single-item query" if Rails.env.development?
         else
           @record = nil
         end
+      rescue ActiveRecord::RecordNotFound => e
+        Rails.logger.error "[Avo Patch] Record not found: #{e.message}"
+        flash[:error] = e.message
+        @record = nil
       rescue => e
         Rails.logger.error "[Avo Patch] Error in set_record: #{e.message}"
         @record = nil

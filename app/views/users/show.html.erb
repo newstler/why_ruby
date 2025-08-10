@@ -1,5 +1,5 @@
 <%# Set meta tags for user profile %>
-<% content_for :meta_title, t('meta.users.show.title', display_name: @user.display_name, username: @user.username) %>
+<% content_for :meta_title, t('meta.users.show.title', display_name: @user.display_name, username: @user.display_name) %>
 <% 
   if @user.bio.present?
     content_for :meta_summary, t('meta.users.show.summary_with_bio', bio: @user.bio)
@@ -7,7 +7,7 @@
     content_for :meta_summary, t('meta.users.show.summary_without_bio', display_name: @user.display_name)
   end
 %>
-<% content_for :meta_keywords, t('meta.users.show.keywords', username: @user.username) %>
+<% content_for :meta_keywords, t('meta.users.show.keywords', username: @user.display_name) %>
 <% if @user.avatar_url.present? %>
   <% content_for :meta_image, @user.avatar_url %>
 <% end %>
@@ -23,10 +23,10 @@
         <!-- User info on the left -->
         <div class="flex items-center gap-6">
           <% if @user.avatar_url.present? %>
-            <%= image_tag @user.avatar_url, alt: @user.username, class: "h-32 w-32 rounded-full flex-shrink-0" %>
+            <%= image_tag @user.avatar_url, alt: @user.display_name, class: "h-32 w-32 rounded-full flex-shrink-0" %>
           <% else %>
             <span class="h-32 w-32 rounded-full bg-gray-300 flex items-center justify-center text-5xl font-bold flex-shrink-0">
-              <%= @user.username.first.upcase %>
+              <%= @user.display_name.first.upcase %>
             </span>
           <% end %>
           
@@ -132,10 +132,10 @@
         <div class="mb-6">
           <div class="flex items-center gap-4 mb-4">
             <% if @user.avatar_url.present? %>
-              <%= image_tag @user.avatar_url, alt: @user.username, class: "h-24 w-24 rounded-full flex-shrink-0" %>
+              <%= image_tag @user.avatar_url, alt: @user.display_name, class: "h-24 w-24 rounded-full flex-shrink-0" %>
             <% else %>
               <span class="h-24 w-24 rounded-full bg-gray-300 flex items-center justify-center text-4xl font-bold flex-shrink-0">
-                <%= @user.username.first.upcase %>
+                <%= @user.display_name.first.upcase %>
               </span>
             <% end %>
             

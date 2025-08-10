@@ -26,24 +26,57 @@
   <% end %>
 
   <div class="space-y-6">
-    <div>
-      <p class="text-sm font-medium text-gray-700 mb-2">Post Type</p>
-      <div class="space-y-4">
-        <label class="flex items-start">
-          <%= radio_button_tag 'content_type', 'article', post.article? || post.new_record?, class: "mt-1 mr-2", data: { action: "change->content-type#toggle" } %>
-          <div>
-            <span class="font-medium">Article</span>
-            <p class="text-sm text-gray-500">Write original content with markdown support</p>
-          </div>
-        </label>
-        <label class="flex items-start">
-          <%= radio_button_tag 'content_type', 'link', post.link?, class: "mt-1 mr-2", data: { action: "change->content-type#toggle" } %>
-          <div>
-            <span class="font-medium">External Link</span>
-            <p class="text-sm text-gray-500">Share a link to external content</p>
-          </div>
-        </label>
+    <% if post.persisted? %>
+      <div class="bg-gray-100 rounded-lg p-4 mb-6">
+        <p class="text-sm text-gray-600">
+          <span class="font-medium">Post Type:</span> 
+          <span class="capitalize"><%= post.post_type.humanize %></span>
+          <span class="text-xs text-gray-500 ml-2">(cannot be changed)</span>
+        </p>
       </div>
+      <%= form.hidden_field :post_type, value: post.post_type %>
+    <% else %>
+      <div>
+        <p class="text-sm font-medium text-gray-700 mb-2">Post Type</p>
+        <div class="grid grid-cols-3 gap-2 w-full" role="group">
+        <button type="button"
+                data-type="article"
+                data-action="click->content-type#selectType"
+                data-content-type-target="typeButton"
+                class="<%= post.article? || (post.new_record? && !post.success_story?) ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %> px-4 py-3 text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer">
+          <div class="flex flex-col items-center">
+            <span class="font-medium">Article</span>
+            <span class="text-xs mt-0.5 opacity-75">Original content</span>
+          </div>
+        </button>
+        <button type="button"
+                data-type="link"
+                data-action="click->content-type#selectType"
+                data-content-type-target="typeButton"
+                class="<%= post.link? ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %> px-4 py-3 text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer">
+          <div class="flex flex-col items-center">
+            <span class="font-medium">External Link</span>
+            <span class="text-xs mt-0.5 opacity-75">Share a link</span>
+          </div>
+        </button>
+        <button type="button"
+                data-type="success_story"
+                data-action="click->content-type#selectType"
+                data-content-type-target="typeButton"
+                class="<%= post.success_story? ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %> px-4 py-3 text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer">
+          <div class="flex flex-col items-center">
+            <span class="font-medium">Success Story</span>
+            <span class="text-xs mt-0.5 opacity-75">With logo</span>
+          </div>
+        </button>
+        </div>
+        <%= form.hidden_field :post_type, value: post.post_type.presence || 'article' %>
+      </div>
+    <% end %>
+
+    <div id="category-field" class="<%= 'hidden' if post.success_story? %>" data-content-type-target="categoryField">
+      <%= form.label :category_id, "Category", class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.select :category_id, options_for_select(Category.ordered.pluck(:name, :id), post.category_id), { prompt: "Select a category" }, class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500", data: { "content-type-target": "categorySelect" } %>
     </div>
 
     <div id="link-fields" class="<%= 'hidden' unless post.link? %>" data-controller="link-metadata" data-content-type-target="linkFields">
@@ -55,6 +88,7 @@
               placeholder: "https://example.com/article",
               data: { 
                 "link-metadata-target": "url",
+                "content-type-target": "urlInput",
                 "action": "paste->link-metadata#onUrlPaste input->link-metadata#onUrlInput"
               } %>
                   </div>
@@ -96,14 +130,73 @@
       <%= form.label :title, class: "block text-sm font-medium text-gray-700 mb-2" %>
       <%= form.text_field :title, 
           class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500", 
-          placeholder: "Enter a descriptive title",
-          data: { "link-metadata-target": "title" } %>
+          placeholder: post.success_story? ? "Enter company name" : "Enter a descriptive title",
+          data: { "link-metadata-target": "title", "content-type-target": "titleInput" } %>
       <p class="mt-1 text-sm text-gray-500 hidden" data-content-type-target="linkTitleHint">Title will auto-populate from the link, but you can edit it</p>
     </div>
+    
+    <div id="logo-field" class="<%= 'hidden' unless post.success_story? %>" data-content-type-target="logoField">
+      <%= form.label :logo_svg, "Company Logo (SVG)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <div class="space-y-4">
+        <div class="w-full cursor-pointer" 
+             data-content-type-target="uploadArea"
+             data-action="click->content-type#triggerFileUpload dragover->content-type#handleDragOver drop->content-type#handleDrop dragleave->content-type#handleDragLeave">
+          <div class="w-full py-8 px-4 bg-white border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-red-400 hover:text-red-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500">
+            <div class="flex flex-col items-center space-y-2">
+              <%= inline_svg_tag "plus.svg", class: "w-8 h-8" %>
+              <span class="text-base font-medium">Upload SVG Logo</span>
+              <span class="text-sm text-gray-500">Click to browse or drag and drop</span>
+            </div>
+          </div>
+        </div>
+        
+        <input type="file"
+               accept="image/svg+xml,.svg"
+               class="hidden"
+               data-content-type-target="logoInput"
+               data-action="change->content-type#handleSvgUpload">
+        <%= form.hidden_field :logo_svg, data: { "content-type-target": "svgContent" } %>
+        
+        <div class="hidden" data-content-type-target="logoPreviewWrapper">
+          <div class="relative bg-gray-50 p-6 rounded-lg border border-gray-200">
+            <button type="button"
+                    data-action="click->content-type#removeLogo"
+                    class="absolute top-2 right-2 p-1 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+              <svg class="w-5 h-5 text-gray-600 hover:text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+            <div class="flex justify-center items-center" data-content-type-target="logoPreview">
+              <!-- SVG preview will be inserted here -->
+            </div>
+          </div>
+        </div>
+        
+        <% if post.persisted? && post.logo_svg.present? %>
+          <div data-content-type-target="logoPreviewWrapper">
+            <div class="relative bg-gray-50 p-6 rounded-lg border border-gray-200">
+              <button type="button"
+                      data-action="click->content-type#removeLogo"
+                      class="absolute top-2 right-2 p-1 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+                <svg class="w-5 h-5 text-gray-600 hover:text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+              <div class="flex justify-center items-center" data-content-type-target="logoPreview">
+                <%= raw post.logo_svg %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
 
-    <div>
-      <%= form.label :category_id, "Category", class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%= form.select :category_id, options_for_select(Category.ordered.pluck(:name, :id), post.category_id), { prompt: "Select a category" }, class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" %>
+    <div id="image-field" class="<%= 'hidden' if post.link? || post.success_story? %>" data-content-type-target="imageField">
+      <%= form.label :title_image_url, "Title Image URL (optional)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.text_field :title_image_url, 
+          class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500", 
+          placeholder: "https://example.com/image.jpg",
+          data: { "link-metadata-target": "image", "content-type-target": "imageInput" } %>
     </div>
 
     <div id="article-fields" class="<%= 'hidden' if post.link? %>" data-controller="markdown-preview" data-content-type-target="articleFields">
@@ -120,6 +213,7 @@
               placeholder: "Write your content here...",
               data: { 
                 "markdown-preview-target": "input",
+                "content-type-target": "contentInput",
                 "action": "input->markdown-preview#updatePreview"
               } %>
         </div>
@@ -132,14 +226,6 @@
         </div>
       </div>
       <p class="mt-2 text-sm text-gray-500">You can use Markdown formatting. Code blocks are supported with syntax highlighting.</p>
-      
-      <div class="mt-4">
-        <%= form.label :title_image_url, "Title Image URL (optional)", class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <%= form.text_field :title_image_url, 
-            class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500", 
-            placeholder: "https://example.com/image.jpg",
-            data: { "link-metadata-target": "image" } %>
-      </div>
     </div>
 
     <% 
@@ -151,7 +237,7 @@
       end
     %>
 
-    <div data-controller="tag-input" 
+    <div id="tags-field" class="<%= 'hidden' if post.success_story? %>" data-controller="tag-input" data-content-type-target="tagsField" data-content-type-target="tagsInput" 
          data-tag-input-existing-tags-value='<%= existing_tags.to_json %>'
          data-tag-input-create-new-text-value="<%= t('posts.form.tags.create_new') %>"
          data-tag-input-placeholder-value="<%= t('posts.form.tags.placeholder') %>"
@@ -195,6 +281,7 @@
               placeholder: "Enter a brief summary of your post (optional). If left blank, an AI-generated summary will be created.",
               data: { 
                 "markdown-preview-target": "input",
+                "content-type-target": "summaryInput",
                 "action": "input->markdown-preview#updatePreview",
                 "link-metadata-target": "summary"
               } %>

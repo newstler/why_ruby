@@ -8,10 +8,10 @@
   <div class="flex items-center gap-4">
     <!-- Avatar -->
     <% if user.avatar_url.present? %>
-      <%= image_tag user.avatar_url, alt: user.username, class: "h-20 w-20 rounded-full flex-shrink-0" %>
+      <%= image_tag user.avatar_url, alt: user.display_name, class: "h-20 w-20 rounded-full flex-shrink-0" %>
     <% else %>
       <span class="h-20 w-20 rounded-full bg-gray-300 flex items-center justify-center text-3xl font-bold flex-shrink-0">
-        <%= user.username.first.upcase %>
+        <%= user.display_name.first.upcase %>
       </span>
     <% end %>
     

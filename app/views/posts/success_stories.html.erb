@@ -1,0 +1,37 @@
+<%# Set meta tags for this page %>
+<% content_for :meta_title, "Success Stories - Why Ruby?" %>
+<% content_for :meta_summary, "Real-world success stories from companies using Ruby and Rails" %>
+<% content_for :meta_keywords, "ruby success stories, rails case studies, ruby companies, rails startups" %>
+
+<div class="max-w-7xl mx-auto">
+  <div class="mb-8">
+    <h1 class="text-4xl font-black text-gray-900 mb-4">Success Stories</h1>
+    <p class="text-lg text-gray-600">Discover how Ruby empowers teams to build amazing things and change the world.</p>
+  </div>
+
+  <% if @posts.any? %>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% @posts.each do |post| %>
+        <%= render 'posts/post_tile', post: post %>
+      <% end %>
+    </div>
+    
+    <div class="mt-12 flex justify-center">
+      <%= paginate @posts %>
+    </div>
+  <% else %>
+    <div class="bg-white rounded-lg shadow-sm p-8 text-center">
+      <div class="mb-4">
+        <%= inline_svg_tag "document.svg", class: "w-16 h-16 mx-auto text-gray-400" %>
+      </div>
+      <h2 class="text-xl font-semibold text-gray-900 mb-2">No success stories yet</h2>
+      <p class="text-gray-600 mb-6">Be the first to share a success story!</p>
+      <% if user_signed_in? %>
+        <%= link_to "Share Your Success Story", new_post_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+      <% else %>
+        <p class="text-gray-500">Sign in to share your success story</p>
+        <%= render "shared/github_signin_button" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

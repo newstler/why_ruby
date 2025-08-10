@@ -1,5 +1,5 @@
 class PostsController < ApplicationController
-  before_action :authenticate_user!, except: [:show]
+  before_action :authenticate_user!, except: [:show, :success_stories]
   before_action :set_post, only: [:show, :edit, :update, :destroy]
   before_action :authorize_user!, only: [:edit, :update, :destroy]
   
@@ -8,6 +8,14 @@ class PostsController < ApplicationController
                          .includes(:category, :tags, :comments)
                          .page(params[:page])
                          .per(20)
+  end
+  
+  def success_stories
+    @posts = Post.success_stories
+                 .published
+                 .includes(:user, :comments)
+                 .page(params[:page])
+                 .per(20)
   end
   
   def show
@@ -20,6 +28,7 @@ class PostsController < ApplicationController
   
   def create
     @post = current_user.posts.build(post_params.except(:tag_names))
+    clean_post_params
     process_tags
     
     if @post.save
@@ -35,7 +44,11 @@ class PostsController < ApplicationController
   def update
     process_tags
     
-    if @post.update(post_params.except(:tag_names))
+    # Clean params before update
+    cleaned_params = post_params.except(:tag_names)
+    cleaned_params[:category_id] = nil if cleaned_params[:category_id] == '' && @post.success_story?
+    
+    if @post.update(cleaned_params)
       redirect_to @post, notice: 'Post was successfully updated.'
     else
       render :edit, status: :unprocessable_entity
@@ -150,7 +163,14 @@ class PostsController < ApplicationController
   end
   
   def post_params
-    params.require(:post).permit(:title, :content, :url, :summary, :category_id, :title_image_url, :published, :tag_names, tag_ids: [])
+    params.require(:post).permit(:title, :content, :url, :summary, :category_id, :title_image_url, :published, :tag_names, :post_type, :logo_svg, tag_ids: [])
+  end
+  
+  def clean_post_params
+    # Convert empty string category_id to nil for success stories
+    if @post.post_type == 'success_story' && @post.category_id == ''
+      @post.category_id = nil
+    end
   end
   
   def process_tags

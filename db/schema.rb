@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_08_10_142035) do
+ActiveRecord::Schema[8.1].define(version: 2025_08_10_193916) do
   create_table "admins", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
@@ -60,11 +60,13 @@ ActiveRecord::Schema[8.1].define(version: 2025_08_10_142035) do
   end
 
   create_table "posts", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
-    t.string "category_id", null: false
+    t.string "category_id"
     t.text "content"
     t.datetime "created_at", null: false
+    t.text "logo_svg"
     t.boolean "needs_admin_review", default: false, null: false
     t.integer "pin_position"
+    t.string "post_type", default: "article", null: false
     t.boolean "published", default: false, null: false
     t.integer "reports_count", default: 0, null: false
     t.string "slug"
@@ -78,6 +80,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_08_10_142035) do
     t.index ["created_at"], name: "index_posts_on_created_at"
     t.index ["needs_admin_review"], name: "index_posts_on_needs_admin_review"
     t.index ["pin_position"], name: "index_posts_on_pin_position", unique: true, where: "pin_position IS NOT NULL"
+    t.index ["post_type"], name: "index_posts_on_post_type"
     t.index ["published"], name: "index_posts_on_published"
     t.index ["slug"], name: "index_posts_on_slug"
     t.index ["user_id"], name: "index_posts_on_user_id"

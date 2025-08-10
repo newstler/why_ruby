@@ -13,7 +13,7 @@
   additional_classes = local_assigns.fetch(:class, '')
   
   base_color = light ? "text-gray-400" : "text-gray-700"
-  hover_color = light ? "" : "hover:text-gray-900"
+  hover_color = "hover:text-gray-900"
   tag_classes = "font-semibold #{base_color} #{hover_color} #{additional_classes}".strip
   tag_text = "##{tag.name}"
 %>

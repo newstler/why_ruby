@@ -26,6 +26,7 @@ Rails.application.routes.draw do
     resources :reports, only: [:create]
     
     collection do
+      get :success_stories
       post :preview
       post :fetch_metadata
       post :check_duplicate_url

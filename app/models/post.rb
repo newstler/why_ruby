@@ -5,9 +5,12 @@ class Post < ApplicationRecord
   # Virtual attributes
   attr_accessor :duplicate_post
   
+  # Constants
+  POST_TYPES = %w[article link success_story].freeze
+  
   # Associations
   belongs_to :user
-  belongs_to :category, -> { unscoped }
+  belongs_to :category, -> { unscoped }, optional: true
   has_and_belongs_to_many :tags
   has_many :comments, dependent: :destroy
   has_many :reports, dependent: :destroy
@@ -15,10 +18,13 @@ class Post < ApplicationRecord
   # Validations
   validates :title, presence: true
   validates :slug, uniqueness: true, allow_blank: true
-  validate :content_or_url_present
+  validates :post_type, inclusion: { in: POST_TYPES }
+  validate :content_or_url_or_logo_present
   validate :url_uniqueness
   validates :url, format: URI::DEFAULT_PARSER.make_regexp(%w[http https]), allow_blank: true
   validates :pin_position, uniqueness: true, allow_nil: true, numericality: { only_integer: true }
+  validates :category_id, presence: true, unless: :success_story?
+  validate :logo_svg_valid_if_present
   
   # Default scope
   default_scope { order(created_at: :desc) }
@@ -26,13 +32,16 @@ class Post < ApplicationRecord
   # Scopes
   scope :published, -> { where(published: true) }
   scope :pinned, -> { where.not(pin_position: nil) }
-  scope :articles, -> { where(url: [nil, ""]) }
-  scope :links, -> { where.not(url: [nil, ""]) }
+  scope :articles, -> { where(post_type: 'article') }
+  scope :links, -> { where(post_type: 'link') }
+  scope :success_stories, -> { where(post_type: 'success_story') }
   scope :homepage_order, -> { reorder(:pin_position, created_at: :desc) }
   scope :needing_review, -> { where(needs_admin_review: true) }
   
   # Callbacks
   before_validation :normalize_url
+  before_validation :set_post_type
+  before_validation :clean_category_for_success_stories
   after_create :generate_summary_job
   after_update :regenerate_summary_if_needed
   after_update :check_reports_threshold
@@ -42,11 +51,15 @@ class Post < ApplicationRecord
   
   # Instance methods
   def article?
-    url.blank?
+    post_type == 'article'
   end
   
   def link?
-    url.present?
+    post_type == 'link'
+  end
+  
+  def success_story?
+    post_type == 'success_story'
   end
   
   def should_generate_new_friendly_id?
@@ -75,11 +88,59 @@ class Post < ApplicationRecord
   
   private
   
-  def content_or_url_present
-    if content.blank? && url.blank?
-      errors.add(:base, "Either content or URL must be present")
-    elsif content.present? && url.present?
-      errors.add(:base, "Cannot have both content and URL")
+  def content_or_url_or_logo_present
+    if success_story?
+      if logo_svg.blank?
+        errors.add(:logo_svg, "is required for success stories")
+      end
+      if content.blank?
+        errors.add(:content, "is required for success stories")
+      end
+      if url.present?
+        errors.add(:url, "must be blank for success stories")
+      end
+    elsif article?
+      if content.blank?
+        errors.add(:content, "is required for articles")
+      end
+      if url.present?
+        errors.add(:url, "must be blank for articles")
+      end
+    elsif link?
+      if url.blank?
+        errors.add(:url, "is required for external links")
+      end
+      if content.present?
+        errors.add(:content, "must be blank for external links")
+      end
+    end
+  end
+  
+  def logo_svg_valid_if_present
+    return unless logo_svg.present?
+    
+    unless logo_svg.include?('<svg') && logo_svg.include?('</svg>')
+      errors.add(:logo_svg, "must be valid SVG content")
+    end
+  end
+  
+  def set_post_type
+    # Only set post_type if it's blank (for backward compatibility)
+    if post_type.blank?
+      self.post_type = if logo_svg.present?
+                         'success_story'
+                       elsif url.present?
+                         'link'
+                       else
+                         'article'
+                       end
+    end
+  end
+  
+  def clean_category_for_success_stories
+    # Convert empty string category_id to nil for success stories
+    if post_type == 'success_story' && category_id == ''
+      self.category_id = nil
     end
   end
   
@@ -93,9 +154,8 @@ class Post < ApplicationRecord
     # This prevents overwriting manually edited summaries
     if published? && 
        (saved_change_to_content? || saved_change_to_title? || saved_change_to_url?) &&
-       !saved_change_to_summary? &&
-       summary.blank?
-      GenerateSummaryJob.perform_later(self)
+       !saved_change_to_summary?
+      GenerateSummaryJob.perform_later(self, force: true)
     end
   end
   

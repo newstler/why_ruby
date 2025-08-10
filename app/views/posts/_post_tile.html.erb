@@ -17,7 +17,11 @@
   <% end %>
   
   <%= link_to post_link_url(post), post_link_options(post).merge(class: "block cursor-pointer") do %>
-    <% if post.title_image_url.present? %>
+    <% if post.success_story? && post.logo_svg.present? %>
+      <div class="mb-4 flex justify-center items-center h-32 p-4 success-story-tile-logo">
+        <%= raw post.logo_svg %>
+      </div>
+    <% elsif post.title_image_url.present? %>
       <div class="mb-4 aspect-video overflow-hidden rounded-lg">
         <%= image_tag post.title_image_url, alt: post.title, class: "w-full h-full object-cover" %>
       </div>
@@ -25,10 +29,12 @@
     
     <div class="flex items-center justify-between mb-2">
       <div>
-        <% if post.category %>
-          <span class="text-sm text-gray-500"><%= post.category.name %></span>
-        <% else %>
-          <span class="text-sm text-gray-400 italic">Uncategorized</span>
+        <% unless post.success_story? %>
+          <% if post.category %>
+            <span class="text-sm text-gray-500"><%= post.category.name %></span>
+          <% else %>
+            <span class="text-sm text-gray-400 italic">Uncategorized</span>
+          <% end %>
         <% end %>
       </div>
       <% if post.link? && (domain = extract_domain(post.url)) %>
@@ -39,9 +45,17 @@
       <% end %>
     </div>
     
-    <h3 class="text-xl font-semibold mb-2 text-gray-900 group-hover:text-red-600 transition-colors">
-      <%= post.title %>
-    </h3>
+    <div class="flex items-start justify-between mb-2 gap-3">
+      <h3 class="text-xl font-semibold text-gray-900 group-hover:text-red-600 transition-colors">
+        <%= post.title %>
+      </h3>
+      <% if post.comments.any? %>
+        <div class="flex items-center space-x-1 text-sm text-gray-500 flex-shrink-0">
+          <%= inline_svg_tag "comment.svg", class: "w-4 h-4" %>
+          <span><%= post.comments.count %></span>
+        </div>
+      <% end %>
+    </div>
     
     <% if post.summary.present? %>
       <div class="text-gray-600 mb-4 prose prose-sm max-w-none">
@@ -49,39 +63,21 @@
       </div>
     <% end %>
     
-    <div class="flex flex-wrap items-center justify-between gap-y-2">
-      <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+    <div class="space-y-2">
+      <div class="flex items-center justify-between">
         <div class="flex items-center space-x-2">
           <% if post.user.present? %>
             <% if post.user.avatar_url.present? %>
-              <%= image_tag post.user.avatar_url, alt: post.user.username, class: "h-6 w-6 rounded-full" %>
+              <%= image_tag post.user.avatar_url, alt: post.user.display_name, class: "h-6 w-6 rounded-full" %>
             <% end %>
-            <span class="text-sm text-gray-700"><%= post.user.username %></span>
+            <span class="text-sm text-gray-700"><%= post.user.display_name %></span>
           <% else %>
             <span class="text-sm text-gray-400 italic">[Deleted User]</span>
           <% end %>
         </div>
         
-        <span class="text-sm text-gray-500"><%= format_post_date(post.created_at) %></span>
-        
-        <% if post.comments.any? %>
-          <div class="flex items-center space-x-1 text-sm text-gray-500">
-            <%= inline_svg_tag "comment.svg", class: "w-4 h-4" %>
-            <span><%= post.comments.count %></span>
-          </div>
-        <% end %>
+        <span class="text-xs text-gray-400"><%= format_post_date(post.created_at) %></span>
       </div>
-      
-      <% if post.tags.any? %>
-        <div class="flex flex-wrap gap-2 ml-auto">
-          <% post.tags.take(3).each do |tag| %>
-            <%= render 'shared/tag', tag: tag, link: false, light: true, class: 'text-xs' %>
-          <% end %>
-          <% if post.tags.size > 3 %>
-            <span class="text-xs text-gray-400">+<%= post.tags.size - 3 %></span>
-          <% end %>
-        </div>
-      <% end %>
     </div>
   <% end %>
 </div>

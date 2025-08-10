@@ -5,9 +5,9 @@
       <% if comment.user.present? %>
         <%= link_to user_path(comment.user), class: "flex items-center space-x-2" do %>
           <% if comment.user.avatar_url.present? %>
-            <%= image_tag comment.user.avatar_url, alt: comment.user.username, class: "h-8 w-8 md:h-10 md:w-10 rounded-full" %>
+            <%= image_tag comment.user.avatar_url, alt: comment.user.display_name, class: "h-8 w-8 md:h-10 md:w-10 rounded-full" %>
           <% end %>
-          <span class="text-sm font-semibold text-gray-900"><%= comment.user.username %></span>
+          <span class="text-sm font-semibold text-gray-900"><%= comment.user.display_name %></span>
         <% end %>
         <span class="text-xs text-gray-500"><%= format_comment_date(comment.created_at) %></span>
       <% else %>
