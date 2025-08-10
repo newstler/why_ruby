@@ -52,11 +52,11 @@
   @keyframes highlight-blink {
     0% { 
       background-color: theme(colors.red.200);
-      color: theme(colors.white);
+      color: theme(colors.gray.900);
     }
     50% { 
       background-color: theme(colors.red.200);
-      color: theme(colors.white);
+      color: theme(colors.gray.900);
     }
     100% { 
       background-color: theme(colors.gray.50);
@@ -64,7 +64,8 @@
     }
   }
   
-  .comment-highlight:target .comment-content {
+  .comment-highlight:target .comment-content,
+  .comment-highlighting {
     animation: highlight-blink 1s ease-in-out;
   }
 }
