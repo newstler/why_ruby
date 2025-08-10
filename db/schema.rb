@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_08_10_004804) do
+ActiveRecord::Schema[8.1].define(version: 2025_08_10_005000) do
   create_table "admins", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
@@ -51,7 +51,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_08_10_004804) do
     t.datetime "created_at"
     t.string "scope"
     t.string "slug", null: false
-    t.integer "sluggable_id", null: false
+    t.string "sluggable_id", null: false
     t.string "sluggable_type", limit: 50
     t.index ["slug", "sluggable_type", "scope"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope", unique: true
     t.index ["slug", "sluggable_type"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type"

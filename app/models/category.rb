@@ -1,6 +1,6 @@
 class Category < ApplicationRecord
   extend FriendlyId
-  friendly_id :name, use: [:slugged, :history]
+  friendly_id :name, use: [:slugged, :history, :finders]
   
   # Associations
   has_many :posts, dependent: :nullify

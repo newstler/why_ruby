@@ -1,6 +1,6 @@
 class Tag < ApplicationRecord
   extend FriendlyId
-  friendly_id :name, use: [:slugged, :history]
+  friendly_id :name, use: [:slugged, :history, :finders]
   
   # Associations
   has_and_belongs_to_many :posts

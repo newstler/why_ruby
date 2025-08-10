@@ -3,10 +3,14 @@ class Avo::Actions::TogglePublished < Avo::BaseAction
   self.visible = -> { true }
 
   def handle(query:, fields:, current_user:, resource:, **args)
-    query.each do |record|
+    # Ensure query is always a collection
+    records = query.is_a?(ActiveRecord::Relation) ? query : [query]
+    
+    records.each do |record|
       record.update!(published: !record.published)
     end
 
-    succeed "Successfully toggled published status for #{query.count} #{'record'.pluralize(query.count)}."
+    count = records.is_a?(Array) ? records.size : records.count
+    succeed "Successfully toggled published status for #{count} #{'record'.pluralize(count)}."
   end
 end 

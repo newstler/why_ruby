@@ -1,6 +1,6 @@
 class User < ApplicationRecord
   extend FriendlyId
-  friendly_id :username, use: [:slugged, :history]
+  friendly_id :username, use: [:slugged, :history, :finders]
   
   # Associations
   has_many :posts, dependent: :destroy

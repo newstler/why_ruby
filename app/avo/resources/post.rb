@@ -5,14 +5,24 @@ class Avo::Resources::Post < Avo::BaseResource
   self.index_query = -> { query.unscoped }
   self.description = "Manage all posts in the system"
   self.default_view_type = :table
+  self.record_selector = -> { record.slug.presence || record.id }
   
   self.search = {
     query: -> { Post.unscoped.ransack(title_cont: params[:q], content_cont: params[:q], m: "or").result(distinct: false) }
   }
   
-  # Override to find records without default scope and use FriendlyId
+  # Override to find records without default scope and use FriendlyId with history support
   def self.find_record(id, **kwargs)
+    # First try to find by current slug or ID
     ::Post.unscoped.friendly.find(id)
+  rescue ActiveRecord::RecordNotFound
+    # If not found, try to find by historical slug
+    slug_record = FriendlyId::Slug.where(sluggable_type: 'Post', slug: id).first
+    if slug_record
+      ::Post.unscoped.find(slug_record.sluggable_id)
+    else
+      raise ActiveRecord::RecordNotFound
+    end
   end
 
   def fields
