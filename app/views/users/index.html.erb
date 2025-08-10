@@ -1,160 +1,67 @@
 <div class="space-y-8">
   <!-- Header -->
-  <div class="bg-white shadow rounded-lg p-8">
-    <h1 class="text-4xl font-bold text-gray-900 mb-4">Ruby Community</h1>
-    <p class="text-lg text-gray-600">
-      Connect with passionate Ruby developers from around the world. Explore their projects, contributions, and insights.
-    </p>
-    <div class="mt-4 flex items-center space-x-8 text-sm text-gray-500">
-      <span class="flex items-center">
-        <svg class="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
-        </svg>
-        <%= pluralize(@users.total_count, 'member') %>
-      </span>
-      <span class="flex items-center">
-        <svg class="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
-        </svg>
-        <%= User.joins(:posts).where(posts: { published: true }).distinct.count %> contributors
-      </span>
-    </div>
-  </div>
+  <h1 class="text-4xl font-bold text-gray-900 mb-4">Ruby Community</h1>
+  <p class="text-lg text-gray-600">
+    Connect with passionate Ruby developers from around the world. Explore their projects, contributions, and insights.
+  </p>
 
   <!-- Community Members Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <% @users.each do |user| %>
-      <div class="bg-white shadow rounded-lg p-6 hover:shadow-lg transition-shadow">
-        <!-- User Header -->
-        <div class="flex items-start space-x-4 mb-4">
-          <% if user.avatar_url.present? %>
-            <%= link_to user_path(user) do %>
-              <%= image_tag user.avatar_url, alt: user.username, class: "h-16 w-16 rounded-full" %>
-            <% end %>
-          <% else %>
-            <%= link_to user_path(user) do %>
-              <span class="h-16 w-16 rounded-full bg-gray-300 flex items-center justify-center text-xl font-bold">
-                <%= user.username.first.upcase %>
-              </span>
-            <% end %>
-          <% end %>
-          
-          <div class="flex-1">
-            <h3 class="text-xl font-semibold">
-              <%= link_to user.display_name, user_path(user), class: "text-gray-900 hover:text-red-600" %>
-            </h3>
-            <p class="text-sm text-gray-500">@<%= user.username %></p>
-            
-            <% if user.location.present? %>
-              <p class="text-sm text-gray-500 mt-1 flex items-center">
-                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
-                </svg>
-                <%= user.location %>
-              </p>
-            <% end %>
-            
-            <% if user.company.present? %>
-              <p class="text-sm text-gray-500 flex items-center">
-                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clip-rule="evenodd"/>
-                </svg>
-                <%= user.company %>
-              </p>
-            <% end %>
-          </div>
-        </div>
-
-        <!-- Bio -->
-        <% if user.bio.present? %>
-          <p class="text-sm text-gray-600 mb-4 line-clamp-2"><%= user.bio %></p>
+  <div class="space-y-6">
+    <!-- Desktop: 3 columns -->
+    <div class="hidden lg:flex gap-6">
+      <% # Split users into 3 columns for desktop, maintaining left-to-right reading order %>
+      <% column1_users = [] %>
+      <% column2_users = [] %>
+      <% column3_users = [] %>
+      
+      <% @users.each_with_index do |user, index| %>
+        <% case index % 3 %>
+        <% when 0 %>
+          <% column1_users << user %>
+        <% when 1 %>
+          <% column2_users << user %>
+        <% when 2 %>
+          <% column3_users << user %>
         <% end %>
-
-        <!-- Stats -->
-        <div class="flex items-center space-x-4 mb-4 text-sm">
-          <span class="flex items-center text-gray-600">
-            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-            </svg>
-            <%= pluralize(user.published_posts_count, 'post') %>
-          </span>
-          <span class="flex items-center text-gray-600">
-            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-            </svg>
-            <%= pluralize(user.published_comments_count, 'comment') %>
-          </span>
-          <% if user.trusted? %>
-            <span class="text-green-600 font-medium">✓ Trusted</span>
-          <% end %>
-          <% if user.admin? %>
-            <span class="text-red-600 font-medium">Admin</span>
+      <% end %>
+      
+      <% [column1_users, column2_users, column3_users].each do |column_users| %>
+        <div class="flex-1 space-y-6">
+          <% column_users.each do |user| %>
+            <%= render 'users/user_tile', user: user %>
           <% end %>
         </div>
-
-        <!-- Social Links -->
-        <% if user.social_links.any? %>
-          <div class="flex items-center space-x-3 mb-4">
-            <% user.social_links.each do |platform, url| %>
-              <% next unless url.present? %>
-              <%= link_to url, target: "_blank", rel: "noopener", class: "text-gray-400 hover:text-gray-600" do %>
-                <% case platform %>
-                <% when :github %>
-                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                  </svg>
-                <% when :twitter %>
-                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                  </svg>
-                <% when :website %>
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
-                  </svg>
-                <% when :linkedin %>
-                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                  </svg>
-                <% end %>
-              <% end %>
-            <% end %>
-          </div>
+      <% end %>
+    </div>
+    
+    <!-- Tablet: 2 columns -->
+    <div class="hidden md:flex lg:hidden gap-6">
+      <% column1_users = [] %>
+      <% column2_users = [] %>
+      
+      <% @users.each_with_index do |user, index| %>
+        <% if index % 2 == 0 %>
+          <% column1_users << user %>
+        <% else %>
+          <% column2_users << user %>
         <% end %>
-
-        <!-- Ruby Repositories -->
-        <% ruby_repos = user.ruby_repositories.first(3) %>
-        <% if ruby_repos.any? %>
-          <div class="border-t pt-4">
-            <h4 class="text-sm font-medium text-gray-700 mb-2">Ruby Projects</h4>
-            <div class="space-y-2">
-              <% ruby_repos.each do |repo| %>
-                <div class="text-xs">
-                  <%= link_to repo[:url], target: "_blank", rel: "noopener", class: "font-medium text-blue-600 hover:text-blue-800" do %>
-                    <%= repo[:name] %>
-                    <% if repo[:stars] > 0 %>
-                      <span class="text-gray-500 ml-1">⭐ <%= repo[:stars] %></span>
-                    <% end %>
-                  <% end %>
-                  <% if repo[:description].present? %>
-                    <p class="text-gray-500 truncate"><%= repo[:description] %></p>
-                  <% end %>
-                </div>
-              <% end %>
-            </div>
-          </div>
-        <% end %>
-
-        <!-- Recent Activity -->
-        <% recent_post = user.posts.published.order(created_at: :desc).first %>
-        <% if recent_post %>
-          <div class="border-t pt-4 mt-4">
-            <h4 class="text-sm font-medium text-gray-700 mb-2">Latest Post</h4>
-            <%= link_to recent_post.title, post_path(recent_post), class: "text-sm text-blue-600 hover:text-blue-800 line-clamp-1" %>
-            <p class="text-xs text-gray-500 mt-1"><%= time_ago_in_words(recent_post.created_at) %> ago</p>
-          </div>
-        <% end %>
-      </div>
-    <% end %>
+      <% end %>
+      
+      <% [column1_users, column2_users].each do |column_users| %>
+        <div class="flex-1 space-y-6">
+          <% column_users.each do |user| %>
+            <%= render 'users/user_tile', user: user %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+    
+    <!-- Mobile: 1 column -->
+    <div class="md:hidden space-y-6">
+      <% @users.each do |user| %>
+        <%= render 'users/user_tile', user: user %>
+      <% end %>
+    </div>
   </div>
 
   <!-- Pagination -->

@@ -4,19 +4,57 @@
 
 # Create categories
 categories = [
-  { name: "Getting Started", position: 1 },
-  { name: "Ruby Language", position: 2 },
-  { name: "Rails Framework", position: 3 },
-  { name: "Best Practices", position: 4 },
-  { name: "Community", position: 5 },
-  { name: "Tools & Libraries", position: 6 },
-  { name: "Success Stories", position: 7 },
-  { name: "Performance", position: 8 }
+  { 
+    name: "Getting Started", 
+    position: 1,
+    description: "Begin your Ruby journey here. Find tutorials, setup guides, and beginner-friendly resources to help you write your first Ruby code."
+  },
+  { 
+    name: "Ruby Language", 
+    position: 2,
+    description: "Explore the beauty and power of Ruby. Learn about syntax, idioms, and language features that make Ruby a joy to write."
+  },
+  { 
+    name: "Rails Framework", 
+    position: 3,
+    description: "Master Ruby on Rails, the framework that revolutionized web development. Discover tips, patterns, and best practices for building modern web applications."
+  },
+  { 
+    name: "Best Practices", 
+    position: 4,
+    description: "Write clean, maintainable, and elegant Ruby code. Learn from experienced developers about testing, refactoring, and design patterns."
+  },
+  { 
+    name: "Community", 
+    position: 5,
+    description: "Connect with passionate Ruby developers from around the world. Explore their projects, contributions, and insights."
+  },
+  { 
+    name: "Tools & Libraries", 
+    position: 6,
+    description: "Discover powerful gems, development tools, and libraries that enhance your Ruby development experience and productivity."
+  },
+  { 
+    name: "Success Stories", 
+    position: 7,
+    description: "Read inspiring stories from companies and developers who chose Ruby. Learn how Ruby powered their growth and success."
+  },
+  { 
+    name: "Performance", 
+    position: 8,
+    description: "Optimize your Ruby applications for speed and efficiency. Learn profiling techniques, performance tips, and scaling strategies."
+  }
 ]
 
 categories.each do |cat|
-  Category.find_or_create_by(name: cat[:name]) do |c|
+  category = Category.find_or_create_by(name: cat[:name]) do |c|
     c.position = cat[:position]
+    c.description = cat[:description]
+  end
+  
+  # Update description if it doesn't exist
+  if category.description.blank? && cat[:description].present?
+    category.update(description: cat[:description])
   end
 end
 

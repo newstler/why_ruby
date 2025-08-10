@@ -41,6 +41,7 @@ class Avo::Resources::Category < Avo::BaseResource
   def fields
     field :id, as: :text, readonly: true
     field :name, as: :text, required: true
+    field :description, as: :textarea, rows: 3, placeholder: "Describe what this category is about..."
     field :position, as: :number, required: true
     field :created_at, as: :date_time, readonly: true
     field :updated_at, as: :date_time, readonly: true

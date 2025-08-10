@@ -18,7 +18,8 @@
   <div data-controller="tabs">
     <!-- Tab Navigation with User Info -->
     <div>
-      <div class="flex items-end justify-between gap-8 ">
+      <!-- Desktop layout: side by side -->
+      <div class="hidden md:flex items-end justify-between gap-8">
         <!-- User info on the left -->
         <div class="flex items-center gap-6">
           <% if @user.avatar_url.present? %>
@@ -84,44 +85,152 @@
         
         <!-- Tabs on the right, aligned to bottom -->
         <nav class="flex flex-wrap gap-x-8 gap-y-2 flex-shrink-0" aria-label="Tabs">
-        <a href="#"
-           data-tabs-target="tab"
-           data-tabs-name="projects"
-           data-action="click->tabs#switch"
-           class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-4 px-1 border-b-4 border-transparent font-semibold text-lg md:text-xl lg:text-2xl transition-all duration-200 flex items-center gap-2"
-           role="tab"
-           aria-selected="false">
-          <span>Projects</span>
-          <span class="bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full text-sm md:text-base font-semibold">
-            <%= @ruby_repos.size %>
-          </span>
-        </a>
+          <a href="#"
+             data-tabs-target="tab"
+             data-tabs-name="projects"
+             data-action="click->tabs#switch"
+             class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-4 px-1 border-b-4 border-transparent font-semibold text-lg md:text-xl lg:text-2xl transition-all duration-200 flex items-center gap-2"
+             role="tab"
+             aria-selected="false">
+            <span>Projects</span>
+            <span class="bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full text-sm md:text-base font-semibold">
+              <%= @ruby_repos.size %>
+            </span>
+          </a>
+          
+          <a href="#"
+             data-tabs-target="tab"
+             data-tabs-name="posts"
+             data-action="click->tabs#switch"
+             class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-4 px-1 border-b-4 border-transparent font-semibold text-lg md:text-xl lg:text-2xl transition-all duration-200 flex items-center gap-2"
+             role="tab"
+             aria-selected="false">
+            <span>Posts</span>
+            <span class="bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full text-sm md:text-base font-semibold">
+              <%= @user.published_posts_count %>
+            </span>
+          </a>
+          
+          <a href="#"
+             data-tabs-target="tab"
+             data-tabs-name="comments"
+             data-action="click->tabs#switch"
+             class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-4 px-1 border-b-4 border-transparent font-semibold text-lg md:text-xl lg:text-2xl transition-all duration-200 flex items-center gap-2"
+             role="tab"
+             aria-selected="false">
+            <span>Comments</span>
+            <span class="bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full text-sm md:text-base font-semibold">
+              <%= @user.published_comments_count %>
+            </span>
+          </a>
+        </nav>
+      </div>
+      
+      <!-- Mobile layout: stacked -->
+      <div class="md:hidden">
+        <!-- User info full width on top -->
+        <div class="mb-6">
+          <div class="flex items-center gap-4 mb-4">
+            <% if @user.avatar_url.present? %>
+              <%= image_tag @user.avatar_url, alt: @user.username, class: "h-24 w-24 rounded-full flex-shrink-0" %>
+            <% else %>
+              <span class="h-24 w-24 rounded-full bg-gray-300 flex items-center justify-center text-4xl font-bold flex-shrink-0">
+                <%= @user.username.first.upcase %>
+              </span>
+            <% end %>
+            
+            <div class="flex-1">
+              <!-- Name and social links -->
+              <h1 class="text-3xl font-bold text-gray-900 mb-1"><%= @user.display_name %></h1>
+              
+              <!-- Social Links -->
+              <% if @user.social_links.any? %>
+                <div class="flex items-center gap-2">
+                  <% @user.social_links.each do |platform, url| %>
+                    <% next unless url.present? %>
+                    <%= link_to url, target: "_blank", rel: "noopener", class: "text-gray-400 hover:text-gray-600" do %>
+                      <% case platform %>
+                      <% when :github %>
+                        <%= inline_svg_tag "github.svg", class: "w-5 h-5" %>
+                      <% when :twitter %>
+                        <%= inline_svg_tag "twitter.svg", class: "w-5 h-5" %>
+                      <% when :website %>
+                        <%= inline_svg_tag "globe.svg", class: "w-5 h-5" %>
+                      <% when :linkedin %>
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                      <% end %>
+                    <% end %>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+          
+          <!-- Bio -->
+          <% if @user.bio.present? %>
+            <p class="text-gray-700 mb-3"><%= @user.bio %></p>
+          <% end %>
+          
+          <!-- Location and Company -->
+          <div class="flex items-center gap-4 text-sm text-gray-400">
+            <% if @user.location.present? %>
+              <span class="flex items-center">
+                <%= inline_svg_tag "location.svg", class: "w-4 h-4 mr-1" %>
+                <%= @user.location %>
+              </span>
+            <% end %>
+            
+            <% if @user.company.present? %>
+              <span class="flex items-center">
+                <%= inline_svg_tag "building.svg", class: "w-4 h-4 mr-1" %>
+                <%= @user.company %>
+              </span>
+            <% end %>
+          </div>
+        </div>
         
-        <a href="#"
-           data-tabs-target="tab"
-           data-tabs-name="posts"
-           data-action="click->tabs#switch"
-           class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-4 px-1 border-b-4 border-transparent font-semibold text-lg md:text-xl lg:text-2xl transition-all duration-200 flex items-center gap-2"
-           role="tab"
-           aria-selected="false">
-          <span>Posts</span>
-          <span class="bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full text-sm md:text-base font-semibold">
-            <%= @user.published_posts_count %>
-          </span>
-        </a>
-        
-        <a href="#"
-           data-tabs-target="tab"
-           data-tabs-name="comments"
-           data-action="click->tabs#switch"
-           class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-4 px-1 border-b-4 border-transparent font-semibold text-lg md:text-xl lg:text-2xl transition-all duration-200 flex items-center gap-2"
-           role="tab"
-           aria-selected="false">
-          <span>Comments</span>
-          <span class="bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full text-sm md:text-base font-semibold">
-            <%= @user.published_comments_count %>
-          </span>
-        </a>
+        <!-- Tabs left-aligned below -->
+        <nav class="flex gap-x-6" aria-label="Tabs">
+          <a href="#"
+             data-tabs-target="tab"
+             data-tabs-name="projects"
+             data-action="click->tabs#switch"
+             class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-3 px-1 border-b-2 border-transparent font-semibold text-base transition-all duration-200 flex items-center gap-2"
+             role="tab"
+             aria-selected="false">
+            <span>Projects</span>
+            <span class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full text-xs font-semibold">
+              <%= @ruby_repos.size %>
+            </span>
+          </a>
+          
+          <a href="#"
+             data-tabs-target="tab"
+             data-tabs-name="posts"
+             data-action="click->tabs#switch"
+             class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-3 px-1 border-b-2 border-transparent font-semibold text-base transition-all duration-200 flex items-center gap-2"
+             role="tab"
+             aria-selected="false">
+            <span>Posts</span>
+            <span class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full text-xs font-semibold">
+              <%= @user.published_posts_count %>
+            </span>
+          </a>
+          
+          <a href="#"
+             data-tabs-target="tab"
+             data-tabs-name="comments"
+             data-action="click->tabs#switch"
+             class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-3 px-1 border-b-2 border-transparent font-semibold text-base transition-all duration-200 flex items-center gap-2"
+             role="tab"
+             aria-selected="false">
+            <span>Comments</span>
+            <span class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full text-xs font-semibold">
+              <%= @user.published_comments_count %>
+            </span>
+          </a>
         </nav>
       </div>
     </div>

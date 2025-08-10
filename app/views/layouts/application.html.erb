@@ -79,7 +79,7 @@
     </script>
   </head>
 
-  <body class="bg-gray-50">
+  <body class="bg-gray-50 min-h-screen flex flex-col">
     <nav class="bg-white shadow-sm sticky top-0 z-50 py-4" data-controller="mobile-menu" data-action="click@window->mobile-menu#hide">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
@@ -231,11 +231,11 @@
       </div>
     <% end %>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
       <%= yield %>
     </main>
 
-    <footer class="max-w-7xl mx-auto my-12 px-4 sm:px-6 lg:px-8">
+    <footer class="max-w-7xl mx-auto mt-auto mb-12 px-4 sm:px-6 lg:px-8 w-full">
       <div class="grid grid-cols-3 items-center">
         <!-- Cookie notice (left) -->
         <div class="text-left text-xs text-gray-400">

@@ -1,0 +1,67 @@
+<%# 
+  User tile partial - displays a user in a card format
+  Locals:
+    - user: the user to display
+%>
+
+<%= link_to user_path(user), class: "group block bg-white shadow rounded-lg p-6 hover:shadow-lg transition-shadow" do %>
+  <div class="flex items-center gap-4">
+    <!-- Avatar -->
+    <% if user.avatar_url.present? %>
+      <%= image_tag user.avatar_url, alt: user.username, class: "h-20 w-20 rounded-full flex-shrink-0" %>
+    <% else %>
+      <span class="h-20 w-20 rounded-full bg-gray-300 flex items-center justify-center text-3xl font-bold flex-shrink-0">
+        <%= user.username.first.upcase %>
+      </span>
+    <% end %>
+    
+    <div class="flex flex-col justify-center">
+      <!-- First line: Name -->
+      <h2 class="text-2xl font-bold text-gray-900 group-hover:text-red-600 transition-colors mb-1">
+        <%= user.display_name %>
+      </h2>
+      
+      <!-- Second line: Location and Company -->
+      <div class="flex items-center gap-3 text-xs text-gray-400 mb-1">
+        <% if user.location.present? %>
+          <span class="flex items-center">
+            <%= inline_svg_tag "location.svg", class: "w-3 h-3 mr-1" %>
+            <%= user.location %>
+          </span>
+        <% end %>
+        
+        <% if user.company.present? %>
+          <span class="flex items-center">
+            <%= inline_svg_tag "building.svg", class: "w-3 h-3 mr-1" %>
+            <%= user.company %>
+          </span>
+        <% end %>
+      </div>
+      
+      <!-- Third line: Stats -->
+      <div class="flex items-center gap-3 text-xs">
+        <% ruby_repos_count = user.ruby_repositories.size %>
+        <% if ruby_repos_count > 0 %>
+          <span class="text-gray-600">
+            <span class="font-semibold"><%= ruby_repos_count %></span> 
+            <span class="text-gray-500"><%= 'Project'.pluralize(ruby_repos_count) %></span>
+          </span>
+        <% end %>
+        
+        <% if user.published_posts_count > 0 %>
+          <span class="text-gray-600">
+            <span class="font-semibold"><%= user.published_posts_count %></span> 
+            <span class="text-gray-500"><%= 'Post'.pluralize(user.published_posts_count) %></span>
+          </span>
+        <% end %>
+        
+        <% if user.published_comments_count > 0 %>
+          <span class="text-gray-600">
+            <span class="font-semibold"><%= user.published_comments_count %></span> 
+            <span class="text-gray-500"><%= 'Comment'.pluralize(user.published_comments_count) %></span>
+          </span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

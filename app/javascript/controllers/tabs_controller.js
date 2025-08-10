@@ -68,7 +68,7 @@ export default class extends Controller {
         tab.setAttribute("aria-selected", "true")
         
         // Update badge styling for active tab
-        if (badge) {
+        if (badge && badge.classList.contains('rounded-full')) {
           badge.classList.remove("bg-gray-100", "text-gray-700")
           badge.classList.add("bg-red-100", "text-red-700")
         }
@@ -79,7 +79,7 @@ export default class extends Controller {
         tab.setAttribute("aria-selected", "false")
         
         // Update badge styling for inactive tab
-        if (badge) {
+        if (badge && badge.classList.contains('rounded-full')) {
           badge.classList.remove("bg-red-100", "text-red-700")
           badge.classList.add("bg-gray-100", "text-gray-700")
         }

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_08_10_005000) do
+ActiveRecord::Schema[8.1].define(version: 2025_08_10_142035) do
   create_table "admins", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
@@ -25,6 +25,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_08_10_005000) do
 
   create_table "categories", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.text "description"
     t.string "name", null: false
     t.integer "position", null: false
     t.string "slug"
