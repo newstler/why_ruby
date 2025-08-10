@@ -4,7 +4,14 @@ class Avo::Actions::TogglePublished < Avo::BaseAction
 
   def handle(query:, fields:, current_user:, resource:, **args)
     # Ensure query is always a collection
-    records = query.is_a?(ActiveRecord::Relation) ? query : [query]
+    records = case query
+              when ActiveRecord::Relation
+                query
+              when Array
+                query  # Already a collection from our patch
+              else
+                [query]  # Single record, wrap in array
+              end
     
     records.each do |record|
       record.update!(published: !record.published)

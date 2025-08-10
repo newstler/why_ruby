@@ -5,7 +5,14 @@ class Avo::Actions::RegenerateSummary < Avo::BaseAction
   
   def handle(query:, fields:, current_user:, resource:, **args)
     # Ensure query is always a collection
-    posts = query.is_a?(ActiveRecord::Relation) ? query : [query]
+    posts = case query
+            when ActiveRecord::Relation
+              query
+            when Array
+              query  # Already a collection from our patch
+            else
+              [query]  # Single record, wrap in array
+            end
     
     posts.each do |post|
       # Clear existing summary

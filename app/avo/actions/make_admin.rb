@@ -5,7 +5,14 @@ class Avo::Actions::MakeAdmin < Avo::BaseAction
 
   def handle(query:, fields:, current_user:, resource:, **args)
     # Ensure query is always a collection
-    users = query.is_a?(ActiveRecord::Relation) ? query : [query]
+    users = case query
+            when ActiveRecord::Relation
+              query
+            when Array
+              query  # Already a collection from our patch
+            else
+              [query]  # Single record, wrap in array
+            end
     
     users.each do |user|
       user.update!(role: :admin)

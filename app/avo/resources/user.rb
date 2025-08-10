@@ -22,6 +22,17 @@ class Avo::Resources::User < Avo::BaseResource
       raise ActiveRecord::RecordNotFound
     end
   end
+  
+  # Handle finding multiple records for bulk actions
+  def self.find_records(ids, **kwargs)
+    return [] if ids.blank?
+    
+    # Handle both comma-separated string and array
+    id_list = ids.is_a?(String) ? ids.split(',').map(&:strip) : ids
+    
+    # Find each record individually to support slugs
+    id_list.map { |id| find_record(id, **kwargs) rescue nil }.compact
+  end
 
   def fields
     # Compact display for index
