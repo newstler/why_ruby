@@ -1,3 +1,18 @@
+<%# Set meta tags for user profile %>
+<% content_for :meta_title, t('meta.users.show.title', display_name: @user.display_name, username: @user.username) %>
+<% 
+  if @user.bio.present?
+    content_for :meta_summary, t('meta.users.show.summary_with_bio', bio: @user.bio)
+  else
+    content_for :meta_summary, t('meta.users.show.summary_without_bio', display_name: @user.display_name)
+  end
+%>
+<% content_for :meta_keywords, t('meta.users.show.keywords', username: @user.username) %>
+<% if @user.avatar_url.present? %>
+  <% content_for :meta_image, @user.avatar_url %>
+<% end %>
+<% content_for :meta_type, "profile" %>
+
 <div class="space-y-8">
   <!-- Profile Header -->
   <div class="bg-white shadow rounded-lg p-8">

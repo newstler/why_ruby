@@ -1,0 +1,16 @@
+<%= form_with model: [post, comment], id: "new_comment_form", class: "mt-8" do |form| %>
+  <% if comment.errors.any? %>
+    <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+      <ul class="text-sm text-red-600">
+        <% comment.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  
+  <div class="mb-4">
+    <%= form.text_area :body, rows: 4, class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500", placeholder: "Write a comment...", required: true %>
+  </div>
+  <%= form.submit "Post Comment", class: "px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 cursor-pointer" %>
+<% end %>

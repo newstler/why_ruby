@@ -12,7 +12,7 @@ class PostsController < ApplicationController
   end
   
   def show
-    @comments = @post.comments.published.includes(:user).recent
+    @comments = @post.comments.published.includes(:user).order(created_at: :asc)
   end
   
   def new

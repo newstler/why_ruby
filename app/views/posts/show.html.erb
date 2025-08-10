@@ -1,3 +1,20 @@
+<%# Set meta tags for this post %>
+<% content_for :meta_title, t('meta.posts.show.title', post_title: @post.title) %>
+<% content_for :meta_summary, @post.summary if @post.summary.present? %>
+<% 
+  categories_and_tags = [@post.category&.name, @post.tags.pluck(:name)].compact.flatten.join(", ")
+  content_for :meta_keywords, t('meta.posts.show.keywords', categories_and_tags: categories_and_tags)
+%>
+<% content_for :meta_url, post_url(@post) %>
+<% content_for :meta_type, "article" %>
+<% if @post.user.present? %>
+  <% content_for :meta_author, @post.user.username %>
+<% end %>
+<% if @post.title_image_url.present? %>
+  <% content_for :meta_image, @post.title_image_url %>
+<% end %>
+<% content_for :twitter_card, @post.title_image_url.present? ? "summary_large_image" : "summary" %>
+
 <%= turbo_stream_from "post_#{@post.id}" %>
 
 <div class="max-w-4xl mx-auto">
@@ -104,52 +121,20 @@
   <section class="bg-white shadow rounded-lg p-4 md:p-8">
     <h2 class="text-xl md:text-2xl font-bold text-gray-900 mb-6">Comments</h2>
     
-    <% if user_signed_in? %>
-      <%= form_with model: [@post, Comment.new], local: true, class: "mb-8" do |form| %>
-        <div class="mb-4">
-          <%= form.text_area :body, rows: 4, class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500", placeholder: "Write a comment..." %>
-        </div>
-        <%= form.submit "Post Comment", class: "px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 cursor-pointer" %>
+    <div id="comments" class="space-y-4 md:space-y-6">
+      <% @comments.each do |comment| %>
+        <%= render "comments/comment", comment: comment %>
       <% end %>
+    </div>
+    
+    <!-- New Comment Form -->
+    <% if user_signed_in? %>
+      <%= render "comments/form", post: @post, comment: Comment.new %>
     <% else %>
-      <p class="text-gray-600 mb-8">
+      <p class="text-gray-600 mt-8">
         <%= button_to "Sign in", user_github_omniauth_authorize_path, method: :post, data: { turbo: false }, class: "text-red-600 hover:text-red-800 underline bg-transparent border-0 p-0 cursor-pointer" %> to leave a comment.
       </p>
     <% end %>
-    
-    <div class="space-y-4 md:space-y-6">
-      <% @comments.each do |comment| %>
-        <div id="comment-<%= comment.id %>" class="scroll-mt-20">
-          <!-- User info header -->
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-              <% if comment.user.present? %>
-                <%= link_to user_path(comment.user), class: "flex items-center space-x-2" do %>
-                  <% if comment.user.avatar_url.present? %>
-                    <%= image_tag comment.user.avatar_url, alt: comment.user.username, class: "h-8 w-8 md:h-10 md:w-10 rounded-full" %>
-                  <% end %>
-                  <span class="text-sm font-semibold text-gray-900"><%= comment.user.username %></span>
-                <% end %>
-                <span class="text-xs text-gray-500"><%= format_comment_date(comment.created_at) %></span>
-              <% else %>
-                <span class="text-sm text-gray-400 italic">[Deleted User]</span>
-                <span class="text-xs text-gray-500"><%= format_comment_date(comment.created_at) %></span>
-              <% end %>
-            </div>
-            <% if user_signed_in? && (comment.user == current_user || current_user.admin?) %>
-              <%= link_to "Delete", post_comment_path(@post, comment), method: :delete, data: { confirm: "Are you sure?" }, class: "text-xs text-gray-500 hover:text-red-600" %>
-            <% end %>
-          </div>
-          
-          <!-- Comment content with left padding to align with username -->
-          <div class="ml-10 md:ml-12">
-            <div class="bg-gray-50 rounded-lg rounded-tl-none px-3 py-2 md:px-4 md:py-3">
-              <p class="text-sm md:text-base text-gray-700 whitespace-pre-wrap"><%= comment.body %></p>
-            </div>
-          </div>
-        </div>
-      <% end %>
-    </div>
   </section>
 </div>
 

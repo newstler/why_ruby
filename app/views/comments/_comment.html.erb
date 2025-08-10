@@ -1,0 +1,29 @@
+<div id="comment-<%= comment.id %>" class="scroll-mt-28 comment-highlight">
+  <!-- User info header -->
+  <div class="flex items-center justify-between">
+    <div class="flex items-center space-x-2">
+      <% if comment.user.present? %>
+        <%= link_to user_path(comment.user), class: "flex items-center space-x-2" do %>
+          <% if comment.user.avatar_url.present? %>
+            <%= image_tag comment.user.avatar_url, alt: comment.user.username, class: "h-8 w-8 md:h-10 md:w-10 rounded-full" %>
+          <% end %>
+          <span class="text-sm font-semibold text-gray-900"><%= comment.user.username %></span>
+        <% end %>
+        <span class="text-xs text-gray-500"><%= format_comment_date(comment.created_at) %></span>
+      <% else %>
+        <span class="text-sm text-gray-400 italic">[Deleted User]</span>
+        <span class="text-xs text-gray-500"><%= format_comment_date(comment.created_at) %></span>
+      <% end %>
+    </div>
+    <% if user_signed_in? && (comment.user == current_user || current_user.admin?) %>
+      <%= link_to "Delete", post_comment_path(comment.post, comment), data: { turbo_method: :delete, turbo_confirm: "Are you sure?" }, class: "text-xs text-gray-500 hover:text-red-600" %>
+    <% end %>
+  </div>
+  
+  <!-- Comment content with left padding to align with username -->
+  <div class="ml-10 md:ml-12">
+    <div class="bg-gray-50 rounded-lg rounded-tl-none px-3 py-2 md:px-4 md:py-3 comment-content">
+      <p class="text-sm md:text-base text-gray-700 whitespace-pre-wrap"><%= comment.body %></p>
+    </div>
+  </div>
+</div>

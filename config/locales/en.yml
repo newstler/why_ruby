@@ -29,3 +29,37 @@
 
 en:
   hello: "Hello world"
+  
+  meta:
+    default:
+      title: "Why Ruby? - Ruby Advocacy Community"
+      summary: "Join the Ruby community! Discover why developers love Ruby, share your experiences, and explore resources for learning and mastering Ruby and Rails."
+      keywords: "Ruby, Ruby on Rails, Rails, programming, web development, Ruby community, Ruby tutorials, Ruby resources, Ruby advocacy, why Ruby"
+      author: "Yuri Sidorov"
+    site:
+      name: "WhyRuby.info"
+      application_name: "Why Ruby?"
+      apple_app_title: "WhyRuby"
+    social:
+      twitter_site: "@yurisidorov"
+      twitter_creator: "@yurisidorov"
+    posts:
+      show:
+        title: "%{post_title} | WhyRuby.info"
+        keywords: "%{categories_and_tags}, Ruby, Rails"
+    categories:
+      show:
+        title: "%{category_name} | WhyRuby.info"
+        summary: "Browse all Ruby %{category_name_lower} posts, articles, and resources shared by the WhyRuby community."
+        keywords: "%{category_name}, Ruby, Ruby on Rails, programming, web development"
+    tags:
+      show:
+        title: "#%{tag_name} | WhyRuby.info"
+        summary: "Explore Ruby posts and resources tagged with #%{tag_name} on WhyRuby.info"
+        keywords: "%{tag_name}, Ruby, Ruby on Rails, programming, tags"
+    users:
+      show:
+        title: "%{display_name} (@%{username}) | WhyRuby.info"
+        summary_with_bio: "%{bio}"
+        summary_without_bio: "View %{display_name}'s profile and contributions to the Ruby community on WhyRuby.info"
+        keywords: "%{username}, Ruby developer, Ruby community, profile"

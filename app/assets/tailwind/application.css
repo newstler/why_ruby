@@ -47,3 +47,24 @@
     @apply italic;
   }
 }
+
+@layer utilities {
+  @keyframes highlight-blink {
+    0% { 
+      background-color: theme(colors.red.200);
+      color: theme(colors.white);
+    }
+    50% { 
+      background-color: theme(colors.red.200);
+      color: theme(colors.white);
+    }
+    100% { 
+      background-color: theme(colors.gray.50);
+      color: inherit;
+    }
+  }
+  
+  .comment-highlight:target .comment-content {
+    animation: highlight-blink 1s ease-in-out;
+  }
+}

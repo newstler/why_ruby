@@ -1,0 +1,13 @@
+<%= turbo_stream.append "comments" do %>
+  <%= render "comments/comment", comment: @comment %>
+<% end %>
+
+<%= turbo_stream.replace "new_comment_form" do %>
+  <%= render "comments/form", post: @post, comment: Comment.new %>
+<% end %>
+
+<%= turbo_stream.after "comments" do %>
+  <script>
+    document.getElementById('comment-<%= @comment.id %>').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  </script>
+<% end %>

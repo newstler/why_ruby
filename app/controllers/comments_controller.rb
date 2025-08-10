@@ -10,15 +10,25 @@ class CommentsController < ApplicationController
     @comment.published = true # Auto-publish for now
     
     if @comment.save
-      redirect_to @post, notice: 'Comment was successfully posted.'
+      respond_to do |format|
+        format.turbo_stream
+        format.html { redirect_to @post, notice: 'Comment was successfully posted.' }
+      end
     else
-      redirect_to @post, alert: 'Error posting comment.'
+      respond_to do |format|
+        format.turbo_stream { render turbo_stream: turbo_stream.replace("new_comment_form", partial: "comments/form", locals: { post: @post, comment: @comment }) }
+        format.html { redirect_to @post, alert: 'Error posting comment.' }
+      end
     end
   end
   
   def destroy
     @comment.destroy!
-    redirect_to @post, notice: 'Comment was deleted.'
+    
+    respond_to do |format|
+      format.turbo_stream { render turbo_stream: turbo_stream.remove("comment-#{@comment.id}") }
+      format.html { redirect_to @post, notice: 'Comment was deleted.' }
+    end
   end
   
   private
