@@ -6,7 +6,6 @@ class PostsController < ApplicationController
   def index
     @posts = current_user.posts
                          .includes(:category, :tags, :comments)
-                         .order(created_at: :desc)
                          .page(params[:page])
                          .per(20)
   end

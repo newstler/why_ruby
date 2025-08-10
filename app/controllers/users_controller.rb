@@ -9,7 +9,6 @@ class UsersController < ApplicationController
   def show
     @user = User.find(params[:id])
     @posts = @user.posts.published.includes(:category, :tags)
-                     .order(created_at: :desc)
                      .page(params[:page])
     @recent_comments = @user.comments.published.includes(:post)
                             .order(created_at: :desc)

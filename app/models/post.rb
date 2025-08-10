@@ -17,12 +17,15 @@ class Post < ApplicationRecord
   validates :url, format: URI::DEFAULT_PARSER.make_regexp(%w[http https]), allow_blank: true
   validates :pin_position, uniqueness: true, allow_nil: true, numericality: { only_integer: true }
   
+  # Default scope
+  default_scope { order(created_at: :desc) }
+  
   # Scopes
   scope :published, -> { where(published: true) }
   scope :pinned, -> { where.not(pin_position: nil) }
   scope :articles, -> { where(url: [nil, ""]) }
   scope :links, -> { where.not(url: [nil, ""]) }
-  scope :homepage_order, -> { order(:pin_position, created_at: :desc) }
+  scope :homepage_order, -> { reorder(:pin_position, created_at: :desc) }
   scope :needing_review, -> { where(needs_admin_review: true) }
   
   # Callbacks
