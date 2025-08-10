@@ -42,6 +42,7 @@ class Post < ApplicationRecord
   before_validation :normalize_url
   before_validation :set_post_type
   before_validation :clean_category_for_success_stories
+  before_validation :clean_logo_svg
   after_create :generate_summary_job
   after_update :regenerate_summary_if_needed
   after_update :check_reports_threshold
@@ -141,6 +142,23 @@ class Post < ApplicationRecord
     # Convert empty string category_id to nil for success stories
     if post_type == 'success_story' && category_id == ''
       self.category_id = nil
+    end
+  end
+  
+  def clean_logo_svg
+    return unless logo_svg.present?
+    
+    # Remove XML declarations, DOCTYPE, and comments
+    cleaned = logo_svg
+      .gsub(/<\?xml[^>]*\?>/i, '')
+      .gsub(/<!DOCTYPE[^>]*>/i, '')
+      .gsub(/<!--[\s\S]*?-->/m, '')
+      .strip
+    
+    # Extract just the SVG element if it exists
+    svg_match = cleaned.match(/<svg[^>]*>[\s\S]*<\/svg>/i)
+    if svg_match
+      self.logo_svg = svg_match[0].strip
     end
   end
   

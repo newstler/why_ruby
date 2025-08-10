@@ -39,12 +39,66 @@
       </div>
     </div>
   <% end %>
+</div>
 
+<!-- Success Stories Floating Logos (Full Width) -->
+<% if @success_stories.any? %>
+  <div class="py-16 bg-gray-50 my-16">
+    <h2 class="text-center text-sm font-semibold text-gray-600 tracking-wide uppercase mb-12">
+      Success powered by Ruby
+    </h2>
+    <div class="relative logo-carousel-container" data-controller="logo-carousel">
+      <div class="overflow-hidden relative">
+        <div class="logo-carousel-track flex" data-logo-carousel-target="track">
+          <!-- Duplicate the logos for seamless infinite scroll with random order -->
+          <% shuffled_stories = @success_stories.to_a.shuffle %>
+          <% # Create multiple sets for seamless looping %>
+          <% 2.times do |set_index| %>
+            <% shuffled_stories.each_with_index do |story, index| %>
+          <%= link_to post_path(story), 
+              class: "logo-item flex-shrink-0 transition-all duration-300 group relative mx-10",
+              data: { 
+                action: "mouseenter->logo-carousel#pause mouseleave->logo-carousel#resume mouseenter->logo-carousel#showTooltip mouseleave->logo-carousel#hideTooltip",
+                story_id: story.id
+              } do %>
+            <div class="logo-wrapper h-24 flex items-center justify-center">
+              <%= raw story.logo_svg %>
+            </div>
+            <!-- Tooltip -->
+            <div class="logo-tooltip fixed opacity-0 pointer-events-none transition-opacity duration-200 z-50" 
+                 data-logo-carousel-target="tooltip" 
+                 data-story-id="<%= story.id %>"
+                 style="display: none;">
+              <div class="bg-white rounded-lg shadow-2xl p-4 w-80 border border-gray-200">
+                <h3 class="text-lg font-bold text-gray-900 mb-2"><%= story.title %></h3>
+                <div class="text-sm text-gray-600 mb-3 max-h-96 overflow-y-auto pr-2">
+                  <%= strip_tags(story.summary.presence || story.content) %>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-red-600 font-semibold text-sm">Read more →</span>
+                </div>
+              </div>
+              <div class="absolute left-1/2 transform -translate-x-1/2 -bottom-2">
+                <div class="w-4 h-4 bg-white border-r border-b border-gray-200 transform rotate-45"></div>
+              </div>
+            </div>
+            <% end %>
+            <% end %>
+          <% end %>
+        </div>
+        <!-- Fade gradients on edges -->
+        <div class="logo-carousel-fade-left"></div>
+        <div class="logo-carousel-fade-right"></div>
+      </div>
+    </div>
+  </div>
+<% end %>
 
+<div class="space-y-16">
 
   <!-- Recent Posts -->
   <div class="space-y-4">
-    <h2 class="text-2xl font-bold text-gray-900">Recent</h2>
+    <h2 class="text-center text-sm font-semibold text-gray-600 tracking-wide uppercase mb-8">Recent</h2>
     <div class="hidden lg:flex gap-6">
       <% # Split posts into 3 columns for desktop, maintaining left-to-right reading order %>
       <% column1_posts = [] %>

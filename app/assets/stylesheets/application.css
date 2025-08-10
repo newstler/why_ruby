@@ -169,3 +169,88 @@ pre code {
   width: auto;
   height: auto;
 }
+
+/* Logo carousel styles */
+.logo-carousel-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translateZ(0); /* Force GPU acceleration */
+}
+
+/* Logo item styles */
+.logo-item {
+  cursor: pointer;
+}
+
+.logo-wrapper svg {
+  height: 6rem; /* 96px - matches h-24 */
+  width: auto;
+  max-width: 300px;
+  filter: grayscale(100%) opacity(0.4);
+  transition: filter 0.3s ease;
+}
+
+.logo-item:hover .logo-wrapper svg {
+  filter: grayscale(0%) opacity(1);
+}
+
+/* Logo carousel fade effects */
+.logo-carousel-container {
+  position: relative;
+}
+
+.logo-carousel-fade-left,
+.logo-carousel-fade-right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 150px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.logo-carousel-fade-left {
+  left: 0;
+  background: linear-gradient(to right, rgb(249 250 251), transparent);
+}
+
+.logo-carousel-fade-right {
+  right: 0;
+  background: linear-gradient(to left, rgb(249 250 251), transparent);
+}
+
+/* Logo tooltip styles */
+.logo-tooltip {
+  white-space: normal;
+}
+
+/* Custom scrollbar for tooltip content */
+.logo-tooltip .max-h-96::-webkit-scrollbar {
+  width: 6px;
+}
+
+.logo-tooltip .max-h-96::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 3px;
+}
+
+.logo-tooltip .max-h-96::-webkit-scrollbar-thumb {
+  background: #9ca3af;
+  border-radius: 3px;
+}
+
+.logo-tooltip .max-h-96::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Ensure tooltip appears above fade layers */
+.logo-item {
+  position: relative;
+  z-index: 1;
+}
+
+.logo-item:hover {
+  z-index: 15;
+}
