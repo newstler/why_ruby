@@ -43,7 +43,12 @@ class PostsController < ApplicationController
   end
   
   def destroy
+    # Store the user before destroying the post
+    @user = @post.user
     @post.destroy!
+    
+    # Reload user to get updated counter cache
+    @user.reload if @user
     
     respond_to do |format|
       format.html { 

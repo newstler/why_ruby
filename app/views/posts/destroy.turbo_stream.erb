@@ -1,2 +1,14 @@
-<%# Just remove the tile - redirect logic is handled in controller %>
+<%# Remove the post tile %>
 <%= turbo_stream.remove dom_id(@post) %>
+
+<%# Update the posts count if we have a user %>
+<% if @user %>
+  <%# Update just the text content to preserve existing classes %>
+  <%= turbo_stream.update "posts-count-desktop" do %>
+    <%= @user.published_posts_count %>
+  <% end %>
+  
+  <%= turbo_stream.update "posts-count-mobile" do %>
+    <%= @user.published_posts_count %>
+  <% end %>
+<% end %>

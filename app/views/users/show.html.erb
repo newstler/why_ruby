@@ -106,7 +106,7 @@
              role="tab"
              aria-selected="false">
             <span>Posts</span>
-            <span class="bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full text-sm md:text-base font-semibold">
+            <span id="posts-count-desktop" class="bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full text-sm md:text-base font-semibold">
               <%= @user.published_posts_count %>
             </span>
           </a>
@@ -214,7 +214,7 @@
              role="tab"
              aria-selected="false">
             <span>Posts</span>
-            <span class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full text-xs font-semibold">
+            <span id="posts-count-mobile" class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full text-xs font-semibold">
               <%= @user.published_posts_count %>
             </span>
           </a>
