@@ -67,17 +67,17 @@
             <!-- Third line: Location and Company -->
             <div class="flex items-center gap-4 text-sm text-gray-400">
               <% if @user.location.present? %>
-                <span class="flex items-center">
+                <%= link_to users_path(location: @user.location), class: "flex items-center hover:text-gray-600 transition-colors" do %>
                   <%= inline_svg_tag "location.svg", class: "w-4 h-4 mr-1" %>
                   <%= @user.location %>
-                </span>
+                <% end %>
               <% end %>
               
               <% if @user.company.present? %>
-                <span class="flex items-center">
+                <%= link_to users_path(company: @user.company), class: "flex items-center hover:text-gray-600 transition-colors" do %>
                   <%= inline_svg_tag "building.svg", class: "w-4 h-4 mr-1" %>
                   <%= @user.company %>
-                </span>
+                <% end %>
               <% end %>
             </div>
           </div>
@@ -176,17 +176,17 @@
           <!-- Location and Company -->
           <div class="flex items-center gap-4 text-sm text-gray-400">
             <% if @user.location.present? %>
-              <span class="flex items-center">
+              <%= link_to users_path(location: @user.location), class: "flex items-center hover:text-gray-600 transition-colors" do %>
                 <%= inline_svg_tag "location.svg", class: "w-4 h-4 mr-1" %>
                 <%= @user.location %>
-              </span>
+              <% end %>
             <% end %>
             
             <% if @user.company.present? %>
-              <span class="flex items-center">
+              <%= link_to users_path(company: @user.company), class: "flex items-center hover:text-gray-600 transition-colors" do %>
                 <%= inline_svg_tag "building.svg", class: "w-4 h-4 mr-1" %>
                 <%= @user.company %>
-              </span>
+              <% end %>
             <% end %>
           </div>
         </div>

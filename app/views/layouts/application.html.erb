@@ -125,8 +125,7 @@
                 
                 <div class="hidden origin-top-right absolute right-0 mt-2 w-56 divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none" data-dropdown-target="menu">
                   <div class="py-1">
-                    <%= link_to "Your Profile", user_path(current_user), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none cursor-pointer" %>
-                    <%= link_to "Your Posts", posts_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none cursor-pointer" %>
+                    <%= link_to "Profile", user_path(current_user), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none cursor-pointer" %>
                   </div>
                   <% if current_user.admin? %>
                     <div class="py-1">
@@ -139,7 +138,7 @@
                 </div>
               </div>
             <% else %>
-              <%= button_to "Sign in with GitHub", user_github_omniauth_authorize_path, method: :post, data: { turbo: false }, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gray-800 hover:bg-gray-700" %>
+              <%= render "shared/github_signin_button" %>
             <% end %>
           </div>
           
@@ -193,8 +192,7 @@
                   </div>
                 </div>
                 <div class="mt-3 space-y-1 px-2">
-                  <%= link_to "Your Profile", user_path(current_user), class: "block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-100" %>
-                  <%= link_to "Your Posts", posts_path, class: "block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-100" %>
+                  <%= link_to "Profile", user_path(current_user), class: "block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-100" %>
                   <% if current_user.admin? %>
                     <%= link_to "Admin Panel", "/avo", class: "block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-100" %>
                   <% end %>
@@ -203,7 +201,7 @@
               </div>
             <% else %>
               <div class="mt-3 px-2">
-                <%= button_to "Sign in with GitHub", user_github_omniauth_authorize_path, method: :post, data: { turbo: false }, class: "w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-gray-800 hover:bg-gray-700" %>
+                <%= render "shared/github_signin_button", mobile: true %>
               </div>
             <% end %>
           </div>
@@ -212,16 +210,16 @@
     </nav>
 
     <% if notice.present? %>
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-md w-full">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-md">
           <p class="text-sm text-green-700 text-center"><%= notice %></p>
         </div>
       </div>
     <% end %>
     
     <% if alert.present? %>
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-md w-full">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-md">
           <p class="text-sm text-red-700 text-center"><%= alert %></p>
         </div>
       </div>

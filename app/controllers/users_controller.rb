@@ -1,9 +1,21 @@
 class UsersController < ApplicationController
   def index
     @users = User.includes(:posts, :comments)
-                 .order(published_posts_count: :desc, published_comments_count: :desc)
-                 .page(params[:page])
-                 .per(20)
+    
+    # Apply filters if present
+    if params[:location].present?
+      @users = @users.where(location: params[:location])
+      @filter_location = params[:location]
+    end
+    
+    if params[:company].present?
+      @users = @users.where(company: params[:company])
+      @filter_company = params[:company]
+    end
+    
+    @users = @users.order(published_posts_count: :desc, published_comments_count: :desc)
+                   .page(params[:page])
+                   .per(20)
   end
   
   def show

@@ -19,7 +19,8 @@ class PostsController < ApplicationController
   end
   
   def create
-    @post = current_user.posts.build(post_params)
+    @post = current_user.posts.build(post_params.except(:tag_names))
+    process_tags
     
     if @post.save
       redirect_to @post, notice: 'Post was successfully created.'
@@ -32,7 +33,9 @@ class PostsController < ApplicationController
   end
   
   def update
-    if @post.update(post_params)
+    process_tags
+    
+    if @post.update(post_params.except(:tag_names))
       redirect_to @post, notice: 'Post was successfully updated.'
     else
       render :edit, status: :unprocessable_entity
@@ -41,7 +44,7 @@ class PostsController < ApplicationController
   
   def destroy
     @post.destroy!
-    redirect_to posts_url, notice: 'Post was successfully deleted.'
+    redirect_to user_path(current_user), notice: 'Post was successfully deleted.'
   end
   
   def preview
@@ -108,7 +111,7 @@ class PostsController < ApplicationController
   private
   
   def set_post
-    @post = Post.friendly.find(params[:id])
+    @post = Post.includes(:tags).friendly.find(params[:id])
   end
   
   def normalize_url_for_checking(url)
@@ -132,6 +135,24 @@ class PostsController < ApplicationController
   end
   
   def post_params
-    params.require(:post).permit(:title, :content, :url, :summary, :category_id, :title_image_url, :published, tag_ids: [])
+    params.require(:post).permit(:title, :content, :url, :summary, :category_id, :title_image_url, :published, :tag_names, tag_ids: [])
+  end
+  
+  def process_tags
+    return unless params[:post][:tag_names]
+    
+    tag_names = params[:post][:tag_names].to_s.split(',').map(&:strip).reject(&:blank?).uniq
+    
+    if tag_names.empty?
+      @post.tags = []
+    else
+      tags = []
+      tag_names.each do |name|
+        # Find or create tag by name
+        tag = Tag.find_or_create_by(name: name)
+        tags << tag
+      end
+      @post.tags = tags
+    end
   end
 end 

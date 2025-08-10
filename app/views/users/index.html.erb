@@ -5,6 +5,31 @@
     Connect with passionate Ruby developers from around the world. Explore their projects, contributions, and insights.
   </p>
 
+  <!-- Active Filters -->
+  <% if @filter_location.present? || @filter_company.present? %>
+    <div class="bg-gray-50 rounded-lg py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-gray-600">Filtering by:</span>
+          <% if @filter_location.present? %>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white border border-gray-300">
+              <%= inline_svg_tag "location.svg", class: "w-3.5 h-3.5 mr-1 text-gray-500" %>
+              <%= @filter_location %>
+              <%= link_to "×", users_path(company: @filter_company), class: "ml-2 text-gray-400 hover:text-gray-600 text-lg leading-none" %>
+            </span>
+          <% end %>
+          <% if @filter_company.present? %>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white border border-gray-300">
+              <%= inline_svg_tag "building.svg", class: "w-3.5 h-3.5 mr-1 text-gray-500" %>
+              <%= @filter_company %>
+              <%= link_to "×", users_path(location: @filter_location), class: "ml-2 text-gray-400 hover:text-gray-600 text-lg leading-none" %>
+            </span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
   <!-- Community Members Grid -->
   <div class="space-y-6">
     <!-- Desktop: 3 columns -->

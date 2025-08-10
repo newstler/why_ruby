@@ -141,16 +141,43 @@
       </div>
     </div>
 
-    <div>
-      <%= form.label :tag_ids, "Tags", class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-        <%= form.collection_check_boxes :tag_ids, Tag.all, :id, :name do |b| %>
-          <label class="flex items-center space-x-2">
-            <%= b.check_box(class: "rounded border-gray-300 text-red-600 focus:ring-red-500") %>
-            <span class="text-sm"><%= b.text %></span>
-          </label>
-        <% end %>
+    <% 
+      # Load tags for existing posts
+      existing_tags = if post.persisted? && post.tags.any?
+        post.tags.to_a.map { |t| { id: t.id, name: t.name } }
+      else
+        []
+      end
+    %>
+
+    <div data-controller="tag-input" 
+         data-tag-input-existing-tags-value='<%= existing_tags.to_json %>'
+         data-tag-input-create-new-text-value="<%= t('posts.form.tags.create_new') %>"
+         data-tag-input-placeholder-value="<%= t('posts.form.tags.placeholder') %>"
+         data-tag-input-placeholder-with-tags-value="<%= t('posts.form.tags.placeholder_with_tags') %>">
+      <%= form.label :tag_names, t('posts.form.tags.label'), class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <div class="relative">
+        <div class="flex flex-wrap items-center gap-1 min-h-[42px] px-3 py-1.5 border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-red-500 focus-within:border-red-500 cursor-text bg-white"
+             data-tag-input-target="container">
+          <!-- Tags will be rendered here inline with the input -->
+          <div class="tag-input-wrapper flex-1 min-w-[150px]">
+            <input type="text" 
+                   class="w-full outline-none border-0 p-0 focus:ring-0 text-sm bg-transparent"
+                   placeholder="<%= post.tags.empty? ? t('posts.form.tags.placeholder') : t('posts.form.tags.placeholder_with_tags') %>"
+                   data-tag-input-target="input"
+                   data-action="input->tag-input#handleInput keydown->tag-input#handleKeydown">
+          </div>
+        </div>
+        <%= form.hidden_field :tag_names, 
+                              value: post.persisted? ? post.tags.to_a.map(&:name).join(',') : '', 
+                              data: { "tag-input-target": "hiddenField" } %>
+        
+        <div class="hidden absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto"
+             data-tag-input-target="suggestions">
+          <!-- Suggestions will be rendered here -->
+        </div>
       </div>
+      <p class="text-sm text-gray-500 mt-2"><%= t('posts.form.tags.help_text') %></p>
     </div>
 
     <div data-controller="markdown-preview">

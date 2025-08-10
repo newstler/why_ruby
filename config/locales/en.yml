@@ -30,6 +30,21 @@
 en:
   hello: "Hello world"
   
+  auth:
+    sign_in_with_github: "Sign in with GitHub"
+  
+  comments:
+    sign_in_to_comment: "Sign in to leave a comment."
+  
+  posts:
+    form:
+      tags:
+        label: "Tags"
+        placeholder: "Type to search tags or create new ones (separate with commas)"
+        placeholder_with_tags: "Add more tags..."
+        help_text: "Press Enter or comma to add a tag. Start typing to see suggestions."
+        create_new: "Create new tag:"
+  
   meta:
     default:
       title: "Why Ruby? - Ruby Advocacy Community"

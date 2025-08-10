@@ -47,6 +47,13 @@
       <h1 class="text-4xl md:text-6xl font-black text-gray-900 mb-8"><%= @post.title %></h1>
     </div>
 
+    <!-- Post Image -->
+    <% if @post.title_image_url.present? && !@post.link? %>
+      <div class="mb-8 rounded-lg overflow-hidden">
+        <%= image_tag @post.title_image_url, alt: @post.title, class: "w-full h-auto object-cover rounded-lg" %>
+      </div>
+    <% end %>
+
     <!-- Post Body -->
     <% if @post.link? %>
       <div class="mb-8">
@@ -131,9 +138,10 @@
     <% if user_signed_in? %>
       <%= render "comments/form", post: @post, comment: Comment.new %>
     <% else %>
-      <p class="text-gray-600 mt-8">
-        <%= button_to "Sign in", user_github_omniauth_authorize_path, method: :post, data: { turbo: false }, class: "text-red-600 hover:text-red-800 underline bg-transparent border-0 p-0 cursor-pointer" %> to leave a comment.
-      </p>
+      <div class="mt-8 space-y-4">
+        <p class="text-gray-600"><%= t('comments.sign_in_to_comment') %></p>
+        <%= render "shared/github_signin_button" %>
+      </div>
     <% end %>
   </section>
 </div>

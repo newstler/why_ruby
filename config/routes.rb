@@ -33,7 +33,11 @@ Rails.application.routes.draw do
   end
   
   resources :categories, only: [:show]
-  resources :tags, only: [:show]
+  resources :tags, only: [:show] do
+    collection do
+      get :search
+    end
+  end
   
   # User profiles and community
   resources :users, only: [:index, :show]
