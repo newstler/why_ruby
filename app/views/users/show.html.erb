@@ -142,16 +142,51 @@
       <h2 class="text-2xl font-bold text-gray-900">Recent Comments</h2>
       
       <% # Desktop: 3 columns %>
-      <div class="hidden lg:grid lg:grid-cols-3 gap-6">
-        <% @recent_comments.each do |comment| %>
-          <%= render 'comments/comment_tile', comment: comment %>
+      <div class="hidden lg:flex gap-6">
+        <% # Split comments into 3 columns for desktop, maintaining left-to-right reading order %>
+        <% column1_comments = [] %>
+        <% column2_comments = [] %>
+        <% column3_comments = [] %>
+        
+        <% @recent_comments.each_with_index do |comment, index| %>
+          <% case index % 3 %>
+          <% when 0 %>
+            <% column1_comments << comment %>
+          <% when 1 %>
+            <% column2_comments << comment %>
+          <% when 2 %>
+            <% column3_comments << comment %>
+          <% end %>
+        <% end %>
+        
+        <% [column1_comments, column2_comments, column3_comments].each do |column_comments| %>
+          <div class="flex-1 space-y-6">
+            <% column_comments.each do |comment| %>
+              <%= render 'comments/comment_tile', comment: comment %>
+            <% end %>
+          </div>
         <% end %>
       </div>
       
       <% # Tablet: 2 columns %>
-      <div class="hidden md:grid md:grid-cols-2 lg:hidden gap-6">
-        <% @recent_comments.each do |comment| %>
-          <%= render 'comments/comment_tile', comment: comment %>
+      <div class="hidden md:flex lg:hidden gap-6">
+        <% column1_comments = [] %>
+        <% column2_comments = [] %>
+        
+        <% @recent_comments.each_with_index do |comment, index| %>
+          <% if index % 2 == 0 %>
+            <% column1_comments << comment %>
+          <% else %>
+            <% column2_comments << comment %>
+          <% end %>
+        <% end %>
+        
+        <% [column1_comments, column2_comments].each do |column_comments| %>
+          <div class="flex-1 space-y-6">
+            <% column_comments.each do |comment| %>
+              <%= render 'comments/comment_tile', comment: comment %>
+            <% end %>
+          </div>
         <% end %>
       </div>
       
