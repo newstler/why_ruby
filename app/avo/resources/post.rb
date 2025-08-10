@@ -10,9 +10,9 @@ class Avo::Resources::Post < Avo::BaseResource
     query: -> { Post.unscoped.ransack(title_cont: params[:q], content_cont: params[:q], m: "or").result(distinct: false) }
   }
   
-  # Override to find records without default scope
+  # Override to find records without default scope and use FriendlyId
   def self.find_record(id, **kwargs)
-    ::Post.unscoped.find(id)
+    ::Post.unscoped.friendly.find(id)
   end
 
   def fields

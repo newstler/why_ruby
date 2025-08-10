@@ -11,9 +11,9 @@ class Avo::Resources::Category < Avo::BaseResource
     query: -> { ::Category.unscoped.ransack(name_cont: params[:q]).result(distinct: false) }
   }
   
-  # Override to find records without default scope
+  # Override to find records without default scope and use FriendlyId
   def self.find_record(id, **kwargs)
-    ::Category.unscoped.find(id)
+    ::Category.unscoped.friendly.find(id)
   end
 
   def fields

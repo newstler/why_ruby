@@ -8,9 +8,9 @@ class Avo::Resources::User < Avo::BaseResource
     query: -> { User.unscoped.ransack(username_cont: params[:q], email_cont: params[:q], m: "or").result(distinct: false) }
   }
   
-  # Override to find records without default scope
+  # Override to find records without default scope and use FriendlyId
   def self.find_record(id, **kwargs)
-    ::User.unscoped.find(id)
+    ::User.unscoped.friendly.find(id)
   end
 
   def fields
