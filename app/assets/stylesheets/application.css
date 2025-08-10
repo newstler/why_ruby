@@ -192,7 +192,8 @@ pre code {
   transition: filter 0.3s ease;
 }
 
-.logo-item:hover .logo-wrapper svg {
+.logo-item:hover .logo-wrapper svg,
+.logo-item.logo-highlighted .logo-wrapper svg {
   filter: grayscale(0%) opacity(1);
 }
 
@@ -224,24 +225,44 @@ pre code {
 /* Logo tooltip styles */
 .logo-tooltip {
   white-space: normal;
+  max-width: 320px; /* w-80 */
+  position: fixed !important;
+  z-index: 9999 !important;
+  cursor: pointer;
+}
+
+/* Tooltip content scrolling */
+.logo-tooltip .text-sm {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Line clamp for tooltip summary (optional, keeping for other uses) */
+.line-clamp-4 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Custom scrollbar for tooltip content */
-.logo-tooltip .max-h-96::-webkit-scrollbar {
+.logo-tooltip .text-sm::-webkit-scrollbar {
   width: 6px;
 }
 
-.logo-tooltip .max-h-96::-webkit-scrollbar-track {
+.logo-tooltip .text-sm::-webkit-scrollbar-track {
   background: #f3f4f6;
   border-radius: 3px;
 }
 
-.logo-tooltip .max-h-96::-webkit-scrollbar-thumb {
+.logo-tooltip .text-sm::-webkit-scrollbar-thumb {
   background: #9ca3af;
   border-radius: 3px;
 }
 
-.logo-tooltip .max-h-96::-webkit-scrollbar-thumb:hover {
+.logo-tooltip .text-sm::-webkit-scrollbar-thumb:hover {
   background: #6b7280;
 }
 

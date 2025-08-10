@@ -58,29 +58,13 @@
           <%= link_to post_path(story), 
               class: "logo-item flex-shrink-0 transition-all duration-300 group relative mx-10",
               data: { 
-                action: "mouseenter->logo-carousel#pause mouseleave->logo-carousel#resume mouseenter->logo-carousel#showTooltip mouseleave->logo-carousel#hideTooltip",
-                story_id: story.id
+                action: "mouseenter->logo-carousel#pause mouseleave->logo-carousel#resume mousemove->logo-carousel#showTooltip mouseleave->logo-carousel#hideTooltip",
+                story_id: story.id,
+                story_title: story.title,
+                story_summary: strip_tags(story.summary.presence || story.content)
               } do %>
             <div class="logo-wrapper h-24 flex items-center justify-center">
               <%= raw story.logo_svg %>
-            </div>
-            <!-- Tooltip -->
-            <div class="logo-tooltip fixed opacity-0 pointer-events-none transition-opacity duration-200 z-50" 
-                 data-logo-carousel-target="tooltip" 
-                 data-story-id="<%= story.id %>"
-                 style="display: none;">
-              <div class="bg-white rounded-lg shadow-2xl p-4 w-80 border border-gray-200">
-                <h3 class="text-lg font-bold text-gray-900 mb-2"><%= story.title %></h3>
-                <div class="text-sm text-gray-600 mb-3 max-h-96 overflow-y-auto pr-2">
-                  <%= strip_tags(story.summary.presence || story.content) %>
-                </div>
-                <div class="flex items-center justify-between">
-                  <span class="text-red-600 font-semibold text-sm">Read more →</span>
-                </div>
-              </div>
-              <div class="absolute left-1/2 transform -translate-x-1/2 -bottom-2">
-                <div class="w-4 h-4 bg-white border-r border-b border-gray-200 transform rotate-45"></div>
-              </div>
             </div>
             <% end %>
             <% end %>
@@ -90,6 +74,30 @@
         <div class="logo-carousel-fade-left"></div>
         <div class="logo-carousel-fade-right"></div>
       </div>
+      
+      <!-- Tooltips container - outside overflow hidden -->
+      <% shuffled_stories.each do |story| %>
+        <div class="logo-tooltip fixed opacity-0 pointer-events-none transition-all duration-200" 
+             data-logo-carousel-target="tooltip" 
+             data-story-id="<%= story.id %>"
+             data-story-url="<%= post_path(story) %>"
+             style="display: none; z-index: 9999;">
+          <div class="bg-white rounded-lg shadow-xl p-5 w-80 border border-gray-100 hover:shadow-2xl transition-shadow cursor-pointer">
+            <h3 class="text-lg font-bold text-gray-900 mb-2 leading-tight"><%= story.title %></h3>
+            <div class="text-sm text-gray-600 mb-3">
+              <%= strip_tags(story.summary.presence || story.content) %>
+            </div>
+            <div class="flex items-center justify-end">
+              <span class="text-red-600 hover:text-red-700 font-semibold text-sm inline-flex items-center gap-1 transition-colors">
+                Read more 
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </span>
+            </div>
+          </div>
+        </div>
+      <% end %>
     </div>
   </div>
 <% end %>
@@ -98,7 +106,7 @@
 
   <!-- Recent Posts -->
   <div class="space-y-4">
-    <h2 class="text-center text-sm font-semibold text-gray-600 tracking-wide uppercase mb-8">Recent</h2>
+    <h2 class="text-center text-sm font-semibold text-gray-600 tracking-wide uppercase mb-8">Latest wisdom to explore</h2>
     <div class="hidden lg:flex gap-6">
       <% # Split posts into 3 columns for desktop, maintaining left-to-right reading order %>
       <% column1_posts = [] %>
