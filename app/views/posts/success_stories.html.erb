@@ -10,11 +10,68 @@
   </div>
 
   <% if @posts.any? %>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Desktop: 3 columns -->
+    <div class="hidden lg:flex gap-6">
+      <% # Split posts into 3 columns for desktop, maintaining left-to-right reading order %>
+      <% column1_posts = [] %>
+      <% column2_posts = [] %>
+      <% column3_posts = [] %>
+      
+      <% @posts.each_with_index do |post, index| %>
+        <% case index % 3 %>
+        <% when 0 %>
+          <% column1_posts << post %>
+        <% when 1 %>
+          <% column2_posts << post %>
+        <% when 2 %>
+          <% column3_posts << post %>
+        <% end %>
+      <% end %>
+      
+      <% [column1_posts, column2_posts, column3_posts].each do |column_posts| %>
+        <div class="flex-1 space-y-6">
+          <% column_posts.each do |post| %>
+            <%= render 'posts/post_tile', post: post %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+    
+    <!-- Tablet: 2 columns -->
+    <div class="hidden md:flex lg:hidden gap-6">
+      <% column1_posts = [] %>
+      <% column2_posts = [] %>
+      
+      <% @posts.each_with_index do |post, index| %>
+        <% if index % 2 == 0 %>
+          <% column1_posts << post %>
+        <% else %>
+          <% column2_posts << post %>
+        <% end %>
+      <% end %>
+      
+      <% [column1_posts, column2_posts].each do |column_posts| %>
+        <div class="flex-1 space-y-6">
+          <% column_posts.each do |post| %>
+            <%= render 'posts/post_tile', post: post %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+    
+    <!-- Mobile: 1 column -->
+    <div class="md:hidden space-y-6">
       <% @posts.each do |post| %>
         <%= render 'posts/post_tile', post: post %>
       <% end %>
     </div>
+    
+    <% if user_signed_in? %>
+      <div class="mt-8 text-center">
+        <%= link_to "Share your success story →", new_post_path(type: 'success_story'), 
+            class: "text-gray-400 hover:text-gray-600" %>
+      </div>
+    <% end %>
     
     <div class="mt-12 flex justify-center">
       <%= paginate @posts %>

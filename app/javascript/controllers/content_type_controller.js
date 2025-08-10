@@ -27,7 +27,20 @@ export default class extends Controller {
   
   connect() {
     console.log("Content type controller connected")
-    this.toggleFields()
+    
+    // Check URL parameters for pre-selecting type
+    const urlParams = new URLSearchParams(window.location.search)
+    const typeParam = urlParams.get('type')
+    
+    if (typeParam === 'success_story') {
+      // Find and click the success story button
+      const successButton = this.typeButtonTargets.find(btn => btn.dataset.type === 'success_story')
+      if (successButton) {
+        successButton.click()
+      }
+    } else {
+      this.toggleFields()
+    }
   }
   
   selectType(event) {
@@ -287,16 +300,28 @@ export default class extends Controller {
     // Read file contents
     const reader = new FileReader()
     reader.onload = (e) => {
-      const svgContent = e.target.result
+      let svgContent = e.target.result
       
-      // Validate it's actually SVG
-      if (!svgContent.includes('<svg') || !svgContent.includes('</svg>')) {
-        alert('Invalid SVG file')
+      // Clean up SVG content - remove XML declarations, DOCTYPE, comments, etc.
+      // Remove XML declaration
+      svgContent = svgContent.replace(/<\?xml[^>]*\?>/gi, '')
+      // Remove DOCTYPE
+      svgContent = svgContent.replace(/<!DOCTYPE[^>]*>/gi, '')
+      // Remove comments
+      svgContent = svgContent.replace(/<!--[\s\S]*?-->/g, '')
+      // Extract just the SVG element and its contents
+      const svgMatch = svgContent.match(/<svg[^>]*>[\s\S]*<\/svg>/i)
+      
+      if (!svgMatch) {
+        alert('Invalid SVG file - no SVG element found')
         if (this.hasLogoInputTarget) {
           this.logoInputTarget.value = ''
         }
         return
       }
+      
+      // Use the cleaned SVG content
+      svgContent = svgMatch[0].trim()
       
       // Store SVG content in hidden field
       if (this.hasSvgContentTarget) {
