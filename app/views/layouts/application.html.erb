@@ -235,34 +235,83 @@
     </main>
 
     <footer class="max-w-7xl mx-auto mt-auto mb-12 px-4 sm:px-6 lg:px-8 w-full">
-      <div class="grid grid-cols-3 items-center">
-        <!-- Cookie notice (left) -->
+      <!-- Desktop layout with custom grid -->
+      <div class="hidden md:grid items-center" style="grid-template-columns: 1fr auto 1fr; gap: 2rem;">
+        <!-- Left column -->
         <div class="text-left text-xs text-gray-400">
           &copy; <%= Date.current.year %>
-          <%= link_to "WhyRuby.info", "https://whyruby.info", class: "underline hover:text-gray-600 transition" %>.
-          Built with
+          <%= link_to "WhyRuby.info", "https://whyruby.info", class: "underline hover:text-gray-600 transition" %>.<br class="hidden md:block lg:hidden" />
+          Built with ❤️ in
           <%= link_to "Ruby #{RUBY_VERSION}", "https://www.ruby-lang.org/", class: "underline hover:text-gray-600 transition" %>
-          &
+          on
           <%= link_to "Rails #{Rails.version}", "https://rubyonrails.org", class: "underline hover:text-gray-600 transition" %>.
           <br />
           This project is open source — <%= link_to "contribute on GitHub", "https://github.com/newstler/why_ruby", class: "underline hover:text-gray-600 transition", target: "_blank", rel: "noopener" %>.
         </div>
 
-        <!-- Logo (center) -->
+        <!-- Center column - narrower for logo -->
+        <div class="flex justify-center px-4">
+          <%= link_to "https://yurisidorov.com", class: "group" do %>
+            <%= inline_svg_tag "capedbot-logo.svg", class: "h-8 w-auto fill-[#8DA0AE] group-hover:fill-red-600 transition-colors duration-300" %>
+          <% end %>
+        </div>
+
+        <!-- Right column -->
+        <div class="text-xs text-right text-gray-400">
+          By using this site you agree with our
+          <%= link_to "cookie policy", cookie_policy_path, class: "underline hover:text-gray-600 transition" %>.
+          <br />
+          <%= link_to "Privacy", privacy_policy_path, class: "underline hover:text-gray-600 transition" %>
+          <span class="mx-1">•</span>
+          <%= link_to "Terms", terms_of_service_path, class: "underline hover:text-gray-600 transition" %>
+          <span class="mx-1">•</span>
+          <%= link_to "Legal", legal_notice_path, class: "underline hover:text-gray-600 transition" %>
+        </div>
+      </div>
+
+      <!-- Mobile/Tablet layout - stacked -->
+      <div class="md:hidden space-y-6">
+        <!-- Logo at top on mobile -->
         <div class="flex justify-center">
           <%= link_to "https://yurisidorov.com", class: "group" do %>
             <%= inline_svg_tag "capedbot-logo.svg", class: "h-8 w-auto fill-[#8DA0AE] group-hover:fill-red-600 transition-colors duration-300" %>
           <% end %>
         </div>
 
-        <!-- Legal links (right) -->
-        <div class="text-xs text-right text-gray-400">
-          By using this site you agree with our
-          <%= link_to "cookie policy", cookie_policy_path, class: "underline hover:text-gray-600 transition" %>.
-          <br />
-          <%= link_to "Privacy", privacy_policy_path, class: "underline hover:text-gray-600 transition ml-2" %>
-          <%= link_to "Terms", terms_of_service_path, class: "underline hover:text-gray-600 transition ml-2" %>
-          <%= link_to "Legal", legal_notice_path, class: "underline hover:text-gray-600 transition ml-2" %>
+        <!-- Copyright and project info -->
+        <div class="text-center text-xs text-gray-400 space-y-1">
+          <div>
+            &copy; <%= Date.current.year %> <%= link_to "WhyRuby.info", "https://whyruby.info", class: "underline hover:text-gray-600 transition" %>.<br class="hidden min-[480px]:block md:hidden" />
+            <span class="hidden min-[480px]:inline md:hidden">
+              Built with ❤️ in <%= link_to "Ruby #{RUBY_VERSION}", "https://www.ruby-lang.org/", class: "underline hover:text-gray-600 transition" %>
+              on
+              <%= link_to "Rails #{Rails.version}", "https://rubyonrails.org", class: "underline hover:text-gray-600 transition" %>.
+            </span>
+          </div>
+          <div class="min-[480px]:hidden">
+            Built with ❤️ in <%= link_to "Ruby #{RUBY_VERSION}", "https://www.ruby-lang.org/", class: "underline hover:text-gray-600 transition" %>
+            on
+            <%= link_to "Rails #{Rails.version}", "https://rubyonrails.org", class: "underline hover:text-gray-600 transition" %>.
+          </div>
+          <div>
+            This project is open source —
+            <%= link_to "contribute on GitHub", "https://github.com/newstler/why_ruby", class: "underline hover:text-gray-600 transition", target: "_blank", rel: "noopener" %>.
+          </div>
+        </div>
+
+        <!-- Legal links -->
+        <div class="text-center text-xs text-gray-400 space-y-1">
+          <div>
+            By using this site you agree with our
+            <%= link_to "cookie policy", cookie_policy_path, class: "underline hover:text-gray-600 transition" %>.
+          </div>
+          <div>
+            <%= link_to "Privacy", privacy_policy_path, class: "underline hover:text-gray-600 transition" %>
+            <span class="mx-1">•</span>
+            <%= link_to "Terms", terms_of_service_path, class: "underline hover:text-gray-600 transition" %>
+            <span class="mx-1">•</span>
+            <%= link_to "Legal", legal_notice_path, class: "underline hover:text-gray-600 transition" %>
+          </div>
         </div>
       </div>
     </footer>
