@@ -54,19 +54,36 @@ export default class extends Controller {
     
     this.updateDisplay()
     
-    // Only scroll if tabs are not fully visible in viewport
-    const rect = this.element.getBoundingClientRect()
-    const isTabsVisible = rect.top >= 0 && rect.top <= window.innerHeight / 2
-    
-    if (!isTabsVisible) {
-      // Scroll to a position above tabs to keep them visible
-      const tabsTop = rect.top + window.pageYOffset
-      const offset = 100 // Offset to keep tabs visible
-      window.scrollTo({
-        top: tabsTop - offset,
-        behavior: 'smooth'
-      })
-    }
+    // Small delay to ensure display is updated before measuring
+    setTimeout(() => {
+      // Find the active panel to check if its content extends below viewport
+      const activePanel = this.panelTargets.find(panel => panel.dataset.tabsName === tabName)
+      const tabsRect = this.element.getBoundingClientRect()
+      
+      if (activePanel) {
+        const panelRect = activePanel.getBoundingClientRect()
+        const viewportHeight = window.innerHeight
+        
+        // Check if either:
+        // 1. Tabs are above viewport (scrolled past them)
+        // 2. Panel content extends below viewport
+        const tabsAboveViewport = tabsRect.top < 0
+        const contentBelowViewport = panelRect.bottom > viewportHeight
+        
+        if (tabsAboveViewport || contentBelowViewport) {
+          // Calculate scroll position to show tabs with some padding
+          const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+          const tabsTop = scrollTop + tabsRect.top
+          const offset = 100 // Offset from top to keep tabs visible with some padding
+          const scrollTarget = Math.max(0, tabsTop - offset)
+          
+          window.scrollTo({
+            top: scrollTarget,
+            behavior: 'smooth'
+          })
+        }
+      }
+    }, 50) // Small delay to ensure DOM updates are complete
   }
   
   updateDisplay() {
