@@ -87,8 +87,23 @@
   <!-- Tabbed Content Section -->
   <div data-controller="tabs">
     <!-- Tab Navigation -->
-    <div class="border-b border-gray-200">
-      <nav class="-mb-px flex flex-wrap gap-x-8 gap-y-2" aria-label="Tabs">
+    <div class="border-b border-gray-200" data-tabs-target="header">
+      <div class="flex items-center justify-between">
+        <!-- User info (hidden by default, shown when scrolled) -->
+        <div class="opacity-0 transition-opacity duration-500 flex items-center gap-3 py-4" data-tabs-target="userInfo">
+          <% if @user.avatar_url.present? %>
+            <%= image_tag @user.avatar_url, alt: @user.username, class: "h-10 w-10 rounded-full" %>
+          <% else %>
+            <span class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center text-lg font-bold">
+              <%= @user.username.first.upcase %>
+            </span>
+          <% end %>
+          <span class="text-lg md:text-xl lg:text-2xl font-semibold text-gray-900">
+            <%= @user.display_name %><span class="text-gray-500 font-normal">'s</span>
+          </span>
+        </div>
+        
+        <nav class="-mb-px flex flex-wrap gap-x-8 gap-y-2" aria-label="Tabs">
         <a href="#"
            data-tabs-target="tab"
            data-tabs-name="projects"
@@ -127,7 +142,8 @@
             <%= @user.published_comments_count %>
           </span>
         </a>
-      </nav>
+        </nav>
+      </div>
     </div>
 
     <!-- Tab Panels -->
