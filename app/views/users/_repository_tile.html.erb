@@ -1,0 +1,80 @@
+<%# 
+  Repository tile partial - displays a GitHub repository in a card format
+  Locals:
+    - repository: the repository hash to display
+%>
+
+<div class="group bg-white shadow-md rounded-lg p-6 hover:shadow-2xl hover:scale-[1.02] transform transition-all duration-300 ease-out relative">
+  <%= link_to repository[:url], target: "_blank", rel: "noopener", class: "block" do %>
+    <!-- Repository Name with Stars -->
+    <div class="flex items-start justify-between mb-2">
+      <h3 class="text-xl font-semibold text-gray-900 group-hover:text-red-600 transition-colors flex-1">
+        <%= repository[:name] %>
+      </h3>
+      <% if repository[:stars] && repository[:stars] > 0 %>
+        <span class="flex items-center text-gray-600 ml-2">
+          <svg class="w-4 h-4 mr-1 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+          </svg>
+          <span class="font-semibold"><%= repository[:stars] %></span>
+        </span>
+      <% end %>
+    </div>
+    
+    <!-- Repository Description -->
+    <% if repository[:description].present? %>
+      <p class="text-gray-600 mb-4 line-clamp-2">
+        <%= repository[:description] %>
+      </p>
+    <% else %>
+      <p class="text-gray-400 italic mb-4">
+        <%= t('users.repository_tile.no_description') %>
+      </p>
+    <% end %>
+    
+    <!-- Repository Metrics -->
+    <div class="space-y-2">
+      <!-- Topics/Tags if present -->
+      <% if repository[:topics] && repository[:topics].any? %>
+        <div class="flex flex-wrap gap-1 mb-2">
+          <% repository[:topics].take(4).each do |topic| %>
+            <span class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"><%= topic %></span>
+          <% end %>
+          <% if repository[:topics].size > 4 %>
+            <span class="text-xs text-gray-500">+<%= repository[:topics].size - 4 %></span>
+          <% end %>
+        </div>
+      <% end %>
+      
+      <!-- Stats row -->
+      <div class="flex items-center justify-between text-xs text-gray-500">
+        <div class="flex items-center gap-4">
+          <% if repository[:forks_count] && repository[:forks_count] > 0 %>
+            <span class="flex items-center">
+              <svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M5 3.254V3.25v.005a.75.75 0 1 1 0-.005v.004zm.45 1.9a2.25 2.25 0 1 0-1.95.218v5.256a2.25 2.25 0 1 0 1.5 0V7.123A5.735 5.735 0 0 0 9.25 9h1.378a2.251 2.251 0 1 0 0-1.5H9.25a4.25 4.25 0 0 1-3.8-2.346zM12.75 9a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5zm-8.5 4.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5z"></path>
+              </svg>
+              <%= t('users.repository_tile.forks', count: repository[:forks_count]) %>
+            </span>
+          <% end %>
+          
+          <% if repository[:size] && repository[:size] > 0 %>
+            <span class="flex items-center">
+              <svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25V1.75zM3.75 1.5a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V4.664a.25.25 0 0 0-.073-.177l-2.914-2.914a.25.25 0 0 0-.177-.073H3.75z"></path>
+              </svg>
+              <%= t('users.repository_tile.size', size: number_to_human_size(repository[:size] * 1024)) %>
+            </span>
+          <% end %>
+        </div>
+        
+        <!-- Last commit aligned to the right -->
+        <% if repository[:pushed_at].present? %>
+          <span class="text-gray-400">
+            <%= t('users.repository_tile.last_commit', time_ago: time_ago_in_words(Time.parse(repository[:pushed_at]))) %>
+          </span>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

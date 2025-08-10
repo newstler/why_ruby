@@ -93,4 +93,24 @@ module ApplicationHelper
       nil
     end
   end
+  
+  def category_menu_active?(category)
+    # Highlight if on the category page itself
+    return true if current_page?(category_path(category))
+    
+    # Highlight if viewing a post that belongs to this category
+    if controller_name == 'posts' && action_name == 'show' && @post.present?
+      return @post.category_id == category.id
+    end
+    
+    false
+  end
+  
+  def community_menu_active?
+    # Highlight if on the users index page
+    return true if current_page?(users_path)
+    
+    # Highlight if viewing a user profile
+    controller_name == 'users' && action_name == 'show'
+  end
 end

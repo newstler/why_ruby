@@ -38,8 +38,21 @@ class User < ApplicationRecord
   
   def ruby_repositories
     return [] unless github_repos.present?
-    JSON.parse(github_repos, symbolize_names: true)
-  rescue JSON::ParserError
+    
+    repos = JSON.parse(github_repos, symbolize_names: true)
+    
+    # Filter repositories based on requirements:
+    # - Not forks
+    # - Ruby language
+    filtered_repos = repos.select do |repo|
+      !repo[:fork] && 
+      repo[:language] == 'Ruby'
+    end
+    
+    # Sort by pushed_at descending (most recently pushed first)
+    filtered_repos.sort_by { |repo| repo[:pushed_at].present? ? -Time.parse(repo[:pushed_at]).to_i : 0 }
+  rescue JSON::ParserError, ArgumentError => e
+    Rails.logger.error "Error parsing repositories: #{e.message}"
     []
   end
   
@@ -49,6 +62,10 @@ class User < ApplicationRecord
   
   def github_profile_url
     "https://github.com/#{username}"
+  end
+  
+  def github_ruby_repositories_url
+    "https://github.com/#{username}?tab=repositories&q=&type=public&language=ruby&sort="
   end
   
   def social_links

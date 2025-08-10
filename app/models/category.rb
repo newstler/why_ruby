@@ -12,6 +12,7 @@ class Category < ApplicationRecord
   
   # Scopes
   scope :ordered, -> { order(:position) }
+  scope :with_posts, -> { joins(:posts).distinct }
   
   # Callbacks
   before_validation :set_position, on: :create

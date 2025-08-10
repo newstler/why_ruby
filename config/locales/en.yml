@@ -63,3 +63,17 @@ en:
         summary_with_bio: "%{bio}"
         summary_without_bio: "View %{display_name}'s profile and contributions to the Ruby community on WhyRuby.info"
         keywords: "%{username}, Ruby developer, Ruby community, profile"
+  
+  users:
+    show:
+      view_all_repositories: "View all Ruby repositories on GitHub →"
+      no_ruby_projects: "No Ruby projects found on GitHub."
+      view_github_profile: "View GitHub profile →"
+    repository_tile:
+      no_description: "No description provided"
+      forks:
+        zero: "No forks"
+        one: "1 fork"
+        other: "%{count} forks"
+      size: "%{size}"
+      last_commit: "Last commit %{time_ago} ago"

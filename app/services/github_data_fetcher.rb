@@ -54,7 +54,7 @@ class GithubDataFetcher
     require 'net/http'
     require 'json'
     
-    uri = URI("https://api.github.com/users/#{username}/repos?per_page=100&sort=updated")
+    uri = URI("https://api.github.com/users/#{username}/repos?per_page=100&sort=pushed")
     
     request = Net::HTTP::Get.new(uri)
     request['Accept'] = 'application/vnd.github.v3+json'
@@ -81,7 +81,17 @@ class GithubDataFetcher
           url: repo['html_url'],
           language: repo['language'],
           updated_at: repo['updated_at'],
-          fork: repo['fork']
+          fork: repo['fork'],
+          forks_count: repo['forks_count'],
+          open_issues_count: repo['open_issues_count'],
+          size: repo['size'], # Size in KB
+          topics: repo['topics'] || [],
+          license: repo['license'] ? repo['license']['name'] : nil,
+          created_at: repo['created_at'],
+          pushed_at: repo['pushed_at'],
+          default_branch: repo['default_branch'],
+          has_wiki: repo['has_wiki'],
+          has_pages: repo['has_pages']
         }
       end.sort_by { |r| -r[:stars] } # Sort by stars descending
       
