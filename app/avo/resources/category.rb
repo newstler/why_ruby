@@ -18,11 +18,12 @@ class Avo::Resources::Category < Avo::BaseResource
     ::Category.unscoped.friendly.find(id)
   rescue ActiveRecord::RecordNotFound
     # If not found, try to find by historical slug
-    slug_record = FriendlyId::Slug.where(sluggable_type: 'Category', slug: id).first
+    slug_record = FriendlyId::Slug.where(sluggable_type: 'Category', slug: id).order(id: :desc).first
     if slug_record
       ::Category.unscoped.find(slug_record.sluggable_id)
     else
-      raise ActiveRecord::RecordNotFound
+      # Last resort: try to find by ID directly (in case it's a ULID)
+      ::Category.unscoped.find(id) rescue raise ActiveRecord::RecordNotFound.new("Couldn't find Category with 'id'=#{id}")
     end
   end
   

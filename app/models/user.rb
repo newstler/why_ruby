@@ -64,6 +64,19 @@ class User < ApplicationRecord
     username_changed? || super
   end
   
+  # Ensure old slug is saved to history when slug changes
+  before_save :create_slug_history, if: :will_save_change_to_slug?
+  
+  def create_slug_history
+    if slug_was.present? && slug_was != slug
+      FriendlyId::Slug.create!(
+        slug: slug_was,
+        sluggable_id: id,
+        sluggable_type: self.class.name
+      ) rescue nil
+    end
+  end
+  
   # Class methods for Omniauth
   def self.from_omniauth(auth)
     user = where(github_id: auth.uid).first_or_create do |user|

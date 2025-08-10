@@ -13,6 +13,9 @@
   .prose h3 {
     @apply text-xl font-bold mb-2 mt-4;
   }
+  .prose h4 {
+    @apply uppercase;
+  }
   .prose p {
     @apply mb-4;
   }

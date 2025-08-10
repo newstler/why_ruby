@@ -21,6 +21,20 @@ class Category < ApplicationRecord
     name_changed? || super
   end
   
+  # Ensure old slug is saved to history when slug changes
+  before_save :create_slug_history, if: :will_save_change_to_slug?
+  
+  def create_slug_history
+    if slug_was.present? && slug_was != slug
+      # Save the old slug to history
+      FriendlyId::Slug.create!(
+        slug: slug_was,
+        sluggable_id: id,
+        sluggable_type: self.class.name
+      ) rescue nil # Ignore if already exists
+    end
+  end
+  
   private
   
   def set_position

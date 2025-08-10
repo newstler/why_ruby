@@ -13,7 +13,12 @@ class Avo::CategoriesController < Avo::ResourcesController
   def after_update_path
     return params[:referrer] if params[:referrer].present?
     
-    # Use the updated record's current slug/id for the redirect
-    avo.resources_category_path(record: @record, resource: @resource)
+    # Use the updated record's current slug for the redirect
+    # @record should be the updated category at this point
+    if @record
+      avo.resources_category_path(id: @record.slug || @record.id)
+    else
+      avo.resources_categories_path
+    end
   end
 end 

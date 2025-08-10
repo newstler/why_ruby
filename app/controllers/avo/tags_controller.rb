@@ -13,7 +13,11 @@ class Avo::TagsController < Avo::ResourcesController
   def after_update_path
     return params[:referrer] if params[:referrer].present?
     
-    # Use the updated record's current slug/id for the redirect
-    avo.resources_tag_path(record: @record, resource: @resource)
+    # Use the updated record's current slug for the redirect
+    if @record
+      avo.resources_tag_path(id: @record.slug || @record.id)
+    else
+      avo.resources_tags_path
+    end
   end
 end 

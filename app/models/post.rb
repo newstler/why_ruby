@@ -36,7 +36,8 @@ class Post < ApplicationRecord
   after_create :generate_summary_job
   after_update :regenerate_summary_if_needed
   after_update :check_reports_threshold
-  after_save :update_user_counter_caches
+  after_create :update_user_counter_caches
+  after_update :update_user_counter_caches
   after_destroy :update_user_counter_caches
   
   # Instance methods
@@ -50,6 +51,19 @@ class Post < ApplicationRecord
   
   def should_generate_new_friendly_id?
     title_changed? || super
+  end
+  
+  # Ensure old slug is saved to history when slug changes
+  before_save :create_slug_history, if: :will_save_change_to_slug?
+  
+  def create_slug_history
+    if slug_was.present? && slug_was != slug
+      FriendlyId::Slug.create!(
+        slug: slug_was,
+        sluggable_id: id,
+        sluggable_type: self.class.name
+      ) rescue nil
+    end
   end
   
   def auto_hide_if_needed!
@@ -90,7 +104,11 @@ class Post < ApplicationRecord
   end
   
   def update_user_counter_caches
-    if saved_change_to_published?
+    # Update the counter if:
+    # 1. A new published post was created
+    # 2. The published status changed
+    # 3. A post was destroyed
+    if destroyed? || (persisted? && (saved_change_to_published? || (published? && previously_new_record?)))
       count = user.posts.published.count
       user.update_column(:published_posts_count, count) if user.present?
     end
