@@ -49,8 +49,6 @@
           <% end %>
           
           <span>Joined <%= @user.created_at.strftime("%B %Y") %></span>
-          <span><%= pluralize(@user.published_posts_count, "published post") %></span>
-          <span><%= pluralize(@user.published_comments_count, "comment") %></span>
           
           <% if @user.trusted? %>
             <span class="text-green-600 font-medium">✓ Trusted User</span>
@@ -86,186 +84,256 @@
     </div>
   </div>
 
-  <!-- Ruby Repositories Section -->
-  <% ruby_repos = @user.ruby_repositories %>
-  <% if ruby_repos.any? %>
-    <div class="bg-white shadow rounded-lg p-8">
-      <h2 class="text-2xl font-bold text-gray-900 mb-6">Ruby Projects on GitHub</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <% ruby_repos.first(6).each do |repo| %>
-          <div class="border rounded-lg p-4 hover:shadow-md transition-shadow">
-            <%= link_to repo[:url], target: "_blank", rel: "noopener", class: "block" do %>
-              <div class="flex items-start justify-between">
-                <div class="flex-1">
-                  <h3 class="font-semibold text-blue-600 hover:text-blue-800">
-                    <%= repo[:name] %>
-                    <% if repo[:fork] %>
-                      <span class="text-xs text-gray-500 ml-1">(fork)</span>
-                    <% end %>
-                  </h3>
-                  <% if repo[:description].present? %>
-                    <p class="text-sm text-gray-600 mt-1 line-clamp-2"><%= repo[:description] %></p>
+  <!-- Tabbed Content Section -->
+  <div data-controller="tabs">
+    <!-- Tab Navigation -->
+    <div class="border-b border-gray-200">
+      <nav class="-mb-px flex flex-wrap gap-x-8 gap-y-2" aria-label="Tabs">
+        <a href="#"
+           data-tabs-target="tab"
+           data-tabs-name="projects"
+           data-action="click->tabs#switch"
+           class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-4 px-1 border-b-4 border-transparent font-semibold text-lg md:text-xl lg:text-2xl transition-all duration-200 flex items-center gap-2"
+           role="tab"
+           aria-selected="false">
+          <span>Projects</span>
+          <span class="bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full text-sm md:text-base font-semibold">
+            <%= @ruby_repos.size %>
+          </span>
+        </a>
+        
+        <a href="#"
+           data-tabs-target="tab"
+           data-tabs-name="posts"
+           data-action="click->tabs#switch"
+           class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-4 px-1 border-b-4 border-transparent font-semibold text-lg md:text-xl lg:text-2xl transition-all duration-200 flex items-center gap-2"
+           role="tab"
+           aria-selected="false">
+          <span>Posts</span>
+          <span class="bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full text-sm md:text-base font-semibold">
+            <%= @user.published_posts_count %>
+          </span>
+        </a>
+        
+        <a href="#"
+           data-tabs-target="tab"
+           data-tabs-name="comments"
+           data-action="click->tabs#switch"
+           class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-4 px-1 border-b-4 border-transparent font-semibold text-lg md:text-xl lg:text-2xl transition-all duration-200 flex items-center gap-2"
+           role="tab"
+           aria-selected="false">
+          <span>Comments</span>
+          <span class="bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full text-sm md:text-base font-semibold">
+            <%= @user.published_comments_count %>
+          </span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- Tab Panels -->
+    <div class="mt-8">
+      <!-- Projects Tab Panel -->
+      <div data-tabs-target="panel" data-tabs-name="projects" role="tabpanel" class="hidden">
+        <% if @ruby_repos.any? %>
+          <div class="bg-white shadow rounded-lg p-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Ruby Projects on GitHub</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <% @ruby_repos.each do |repo| %>
+                <div class="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <%= link_to repo[:url], target: "_blank", rel: "noopener", class: "block" do %>
+                    <div class="flex items-start justify-between">
+                      <div class="flex-1">
+                        <h3 class="font-semibold text-blue-600 hover:text-blue-800">
+                          <%= repo[:name] %>
+                          <% if repo[:fork] %>
+                            <span class="text-xs text-gray-500 ml-1">(fork)</span>
+                          <% end %>
+                        </h3>
+                        <% if repo[:description].present? %>
+                          <p class="text-sm text-gray-600 mt-1 line-clamp-2"><%= repo[:description] %></p>
+                        <% end %>
+                        <div class="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+                          <% if repo[:language].present? %>
+                            <span class="flex items-center">
+                              <span class="w-3 h-3 rounded-full bg-red-500 mr-1"></span>
+                              <%= repo[:language] %>
+                            </span>
+                          <% end %>
+                          <% if repo[:stars] > 0 %>
+                            <span class="flex items-center">
+                              ⭐ <%= repo[:stars] %>
+                            </span>
+                          <% end %>
+                          <span>Updated <%= time_ago_in_words(repo[:updated_at]) %> ago</span>
+                        </div>
+                      </div>
+                    </div>
                   <% end %>
-                  <div class="flex items-center space-x-4 mt-2 text-xs text-gray-500">
-                    <% if repo[:language].present? %>
-                      <span class="flex items-center">
-                        <span class="w-3 h-3 rounded-full bg-red-500 mr-1"></span>
-                        <%= repo[:language] %>
-                      </span>
-                    <% end %>
-                    <% if repo[:stars] > 0 %>
-                      <span class="flex items-center">
-                        ⭐ <%= repo[:stars] %>
-                      </span>
-                    <% end %>
-                    <span>Updated <%= time_ago_in_words(repo[:updated_at]) %> ago</span>
-                  </div>
                 </div>
+              <% end %>
+            </div>
+            
+            <% if @user.github_profile_url.present? %>
+              <div class="mt-6 text-center">
+                <%= link_to "View all repositories on GitHub →", @user.github_profile_url, 
+                    target: "_blank", rel: "noopener", class: "text-blue-600 hover:text-blue-800 text-sm" %>
               </div>
             <% end %>
           </div>
+        <% else %>
+          <div class="bg-white shadow rounded-lg p-8 text-center">
+            <p class="text-gray-600">No Ruby projects found on GitHub.</p>
+            <% if @user.github_profile_url.present? %>
+              <p class="mt-2">
+                <%= link_to "View GitHub profile →", @user.github_profile_url, 
+                    target: "_blank", rel: "noopener", class: "text-blue-600 hover:text-blue-800 text-sm" %>
+              </p>
+            <% end %>
+          </div>
         <% end %>
       </div>
-      
-      <% if ruby_repos.size > 6 %>
-        <div class="mt-4 text-center">
-          <%= link_to "View all #{ruby_repos.size} Ruby repositories on GitHub →", @user.github_profile_url, 
-              target: "_blank", rel: "noopener", class: "text-blue-600 hover:text-blue-800 text-sm" %>
-        </div>
-      <% end %>
-    </div>
-  <% end %>
 
-  <!-- Recent Comments Section -->
-  <% if @recent_comments && @recent_comments.any? %>
-    <div class="space-y-4">
-      <h2 class="text-2xl font-bold text-gray-900">Recent Comments</h2>
-      
-      <% # Desktop: 3 columns %>
-      <div class="hidden lg:flex gap-6">
-        <% # Split comments into 3 columns for desktop, maintaining left-to-right reading order %>
-        <% column1_comments = [] %>
-        <% column2_comments = [] %>
-        <% column3_comments = [] %>
-        
-        <% @recent_comments.each_with_index do |comment, index| %>
-          <% case index % 3 %>
-          <% when 0 %>
-            <% column1_comments << comment %>
-          <% when 1 %>
-            <% column2_comments << comment %>
-          <% when 2 %>
-            <% column3_comments << comment %>
-          <% end %>
-        <% end %>
-        
-        <% [column1_comments, column2_comments, column3_comments].each do |column_comments| %>
-          <div class="flex-1 space-y-6">
-            <% column_comments.each do |comment| %>
-              <%= render 'comments/comment_tile', comment: comment %>
-            <% end %>
+      <!-- Posts Tab Panel -->
+      <div data-tabs-target="panel" data-tabs-name="posts" role="tabpanel" class="hidden">
+        <% if @posts.any? %>
+          <div class="space-y-4">
+            <!-- Desktop: 3 columns -->
+            <div class="hidden lg:flex gap-6">
+              <% # Split posts into 3 columns for desktop, maintaining left-to-right reading order %>
+              <% column1_posts = [] %>
+              <% column2_posts = [] %>
+              <% column3_posts = [] %>
+              
+              <% @posts.each_with_index do |post, index| %>
+                <% case index % 3 %>
+                <% when 0 %>
+                  <% column1_posts << post %>
+                <% when 1 %>
+                  <% column2_posts << post %>
+                <% when 2 %>
+                  <% column3_posts << post %>
+                <% end %>
+              <% end %>
+              
+              <% [column1_posts, column2_posts, column3_posts].each do |column_posts| %>
+                <div class="flex-1 space-y-6">
+                  <% column_posts.each do |post| %>
+                    <%= render 'posts/post_tile', post: post %>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+            
+            <!-- Tablet: 2 columns -->
+            <div class="hidden md:flex lg:hidden gap-6">
+              <% column1_posts = [] %>
+              <% column2_posts = [] %>
+              
+              <% @posts.each_with_index do |post, index| %>
+                <% if index % 2 == 0 %>
+                  <% column1_posts << post %>
+                <% else %>
+                  <% column2_posts << post %>
+                <% end %>
+              <% end %>
+              
+              <% [column1_posts, column2_posts].each do |column_posts| %>
+                <div class="flex-1 space-y-6">
+                  <% column_posts.each do |post| %>
+                    <%= render 'posts/post_tile', post: post %>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+            
+            <!-- Mobile: 1 column -->
+            <div class="md:hidden space-y-6">
+              <% @posts.each do |post| %>
+                <%= render 'posts/post_tile', post: post %>
+              <% end %>
+            </div>
+            
+            <div class="mt-8">
+              <%= paginate @posts %>
+            </div>
+          </div>
+        <% else %>
+          <div class="bg-white shadow rounded-lg p-8 text-center">
+            <p class="text-gray-600">No published posts yet.</p>
           </div>
         <% end %>
       </div>
-      
-      <% # Tablet: 2 columns %>
-      <div class="hidden md:flex lg:hidden gap-6">
-        <% column1_comments = [] %>
-        <% column2_comments = [] %>
-        
-        <% @recent_comments.each_with_index do |comment, index| %>
-          <% if index % 2 == 0 %>
-            <% column1_comments << comment %>
-          <% else %>
-            <% column2_comments << comment %>
-          <% end %>
-        <% end %>
-        
-        <% [column1_comments, column2_comments].each do |column_comments| %>
-          <div class="flex-1 space-y-6">
-            <% column_comments.each do |comment| %>
-              <%= render 'comments/comment_tile', comment: comment %>
-            <% end %>
+
+      <!-- Comments Tab Panel -->
+      <div data-tabs-target="panel" data-tabs-name="comments" role="tabpanel" class="hidden">
+        <% if @comments && @comments.any? %>
+          <div class="space-y-4">
+            <!-- Desktop: 3 columns -->
+            <div class="hidden lg:flex gap-6">
+              <% # Split comments into 3 columns for desktop, maintaining left-to-right reading order %>
+              <% column1_comments = [] %>
+              <% column2_comments = [] %>
+              <% column3_comments = [] %>
+              
+              <% @comments.each_with_index do |comment, index| %>
+                <% case index % 3 %>
+                <% when 0 %>
+                  <% column1_comments << comment %>
+                <% when 1 %>
+                  <% column2_comments << comment %>
+                <% when 2 %>
+                  <% column3_comments << comment %>
+                <% end %>
+              <% end %>
+              
+              <% [column1_comments, column2_comments, column3_comments].each do |column_comments| %>
+                <div class="flex-1 space-y-6">
+                  <% column_comments.each do |comment| %>
+                    <%= render 'comments/comment_tile', comment: comment %>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+            
+            <!-- Tablet: 2 columns -->
+            <div class="hidden md:flex lg:hidden gap-6">
+              <% column1_comments = [] %>
+              <% column2_comments = [] %>
+              
+              <% @comments.each_with_index do |comment, index| %>
+                <% if index % 2 == 0 %>
+                  <% column1_comments << comment %>
+                <% else %>
+                  <% column2_comments << comment %>
+                <% end %>
+              <% end %>
+              
+              <% [column1_comments, column2_comments].each do |column_comments| %>
+                <div class="flex-1 space-y-6">
+                  <% column_comments.each do |comment| %>
+                    <%= render 'comments/comment_tile', comment: comment %>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+            
+            <!-- Mobile: 1 column -->
+            <div class="md:hidden space-y-6">
+              <% @comments.each do |comment| %>
+                <%= render 'comments/comment_tile', comment: comment %>
+              <% end %>
+            </div>
+            
+            <div class="mt-8">
+              <%= paginate @comments %>
+            </div>
           </div>
-        <% end %>
-      </div>
-      
-      <% # Mobile: 1 column %>
-      <div class="md:hidden space-y-6">
-        <% @recent_comments.each do |comment| %>
-          <%= render 'comments/comment_tile', comment: comment %>
+        <% else %>
+          <div class="bg-white shadow rounded-lg p-8 text-center">
+            <p class="text-gray-600">No comments yet.</p>
+          </div>
         <% end %>
       </div>
     </div>
-  <% end %>
-
-  <!-- Published Posts Section -->
-  <div class="space-y-4">
-    <h2 class="text-2xl font-bold text-gray-900">Published Posts</h2>
-    <% if @posts.any? %>
-      <div class="hidden lg:flex gap-6">
-        <% # Split posts into 3 columns for desktop, maintaining left-to-right reading order %>
-        <% column1_posts = [] %>
-        <% column2_posts = [] %>
-        <% column3_posts = [] %>
-        
-        <% @posts.each_with_index do |post, index| %>
-          <% case index % 3 %>
-          <% when 0 %>
-            <% column1_posts << post %>
-          <% when 1 %>
-            <% column2_posts << post %>
-          <% when 2 %>
-            <% column3_posts << post %>
-          <% end %>
-        <% end %>
-        
-        <% # Desktop: 3 columns %>
-        <% [column1_posts, column2_posts, column3_posts].each do |column_posts| %>
-          <div class="flex-1 space-y-6">
-            <% column_posts.each do |post| %>
-              <%= render 'posts/post_tile', post: post %>
-            <% end %>
-          </div>
-        <% end %>
-      </div>
-      
-      <% # Tablet: 2 columns %>
-      <div class="hidden md:flex lg:hidden gap-6">
-        <% column1_posts = [] %>
-        <% column2_posts = [] %>
-        
-        <% @posts.each_with_index do |post, index| %>
-          <% if index % 2 == 0 %>
-            <% column1_posts << post %>
-          <% else %>
-            <% column2_posts << post %>
-          <% end %>
-        <% end %>
-        
-        <% [column1_posts, column2_posts].each do |column_posts| %>
-          <div class="flex-1 space-y-6">
-            <% column_posts.each do |post| %>
-              <%= render 'posts/post_tile', post: post %>
-            <% end %>
-          </div>
-        <% end %>
-      </div>
-      
-      <% # Mobile: 1 column %>
-      <div class="md:hidden space-y-6">
-        <% @posts.each do |post| %>
-          <%= render 'posts/post_tile', post: post %>
-        <% end %>
-      </div>
-      
-      <div class="mt-8">
-        <%= paginate @posts %>
-      </div>
-    <% else %>
-      <div class="bg-white shadow rounded-lg p-8 text-center">
-        <p class="text-gray-600">No published posts yet.</p>
-      </div>
-    <% end %>
   </div>
 </div>
