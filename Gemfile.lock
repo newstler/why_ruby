@@ -197,6 +197,8 @@ GEM
     faraday-retry (2.3.2)
       faraday (~> 2.0)
     fastimage (2.4.0)
+    friendly_id (5.5.1)
+      activerecord (>= 4.0.0)
     fugit (1.11.1)
       et-orbi (~> 1, >= 1.2.11)
       raabro (~> 1.4)
@@ -514,6 +516,7 @@ DEPENDENCIES
   debug
   devise (~> 4.9)
   dotenv
+  friendly_id (~> 5.5)
   importmap-rails
   jbuilder
   kamal

@@ -62,6 +62,9 @@ gem "anthropic", "~> 0.3.0"
 # Pagination
 gem "kaminari", "~> 1.2"
 
+# Friendly URLs
+gem "friendly_id", "~> 5.5"
+
 # HTML/XML parsing
 gem "nokogiri", "~> 1.16"
 

@@ -7,7 +7,7 @@ class UsersController < ApplicationController
   end
   
   def show
-    @user = User.find(params[:id])
+    @user = User.friendly.find(params[:id])
     @posts = @user.posts.published.includes(:category, :tags)
                      .page(params[:page])
     @recent_comments = @user.comments.published.includes(:post)

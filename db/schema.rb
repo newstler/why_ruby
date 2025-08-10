@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_08_09_160805) do
+ActiveRecord::Schema[8.1].define(version: 2025_08_10_004804) do
   create_table "admins", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
@@ -27,9 +27,11 @@ ActiveRecord::Schema[8.1].define(version: 2025_08_09_160805) do
     t.datetime "created_at", null: false
     t.string "name", null: false
     t.integer "position", null: false
+    t.string "slug"
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_categories_on_name", unique: true
     t.index ["position"], name: "index_categories_on_position", unique: true
+    t.index ["slug"], name: "index_categories_on_slug"
   end
 
   create_table "comments", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
@@ -45,6 +47,17 @@ ActiveRecord::Schema[8.1].define(version: 2025_08_09_160805) do
     t.index ["user_id"], name: "index_comments_on_user_id"
   end
 
+  create_table "friendly_id_slugs", force: :cascade do |t|
+    t.datetime "created_at"
+    t.string "scope"
+    t.string "slug", null: false
+    t.integer "sluggable_id", null: false
+    t.string "sluggable_type", limit: 50
+    t.index ["slug", "sluggable_type", "scope"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope", unique: true
+    t.index ["slug", "sluggable_type"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type"
+    t.index ["sluggable_type", "sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_type_and_sluggable_id"
+  end
+
   create_table "posts", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
     t.string "category_id", null: false
     t.text "content"
@@ -53,6 +66,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_08_09_160805) do
     t.integer "pin_position"
     t.boolean "published", default: false, null: false
     t.integer "reports_count", default: 0, null: false
+    t.string "slug"
     t.text "summary"
     t.string "title", null: false
     t.string "title_image_url"
@@ -64,6 +78,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_08_09_160805) do
     t.index ["needs_admin_review"], name: "index_posts_on_needs_admin_review"
     t.index ["pin_position"], name: "index_posts_on_pin_position", unique: true, where: "pin_position IS NOT NULL"
     t.index ["published"], name: "index_posts_on_published"
+    t.index ["slug"], name: "index_posts_on_slug"
     t.index ["user_id"], name: "index_posts_on_user_id"
   end
 
@@ -91,8 +106,10 @@ ActiveRecord::Schema[8.1].define(version: 2025_08_09_160805) do
   create_table "tags", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name", null: false
+    t.string "slug"
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_tags_on_name", unique: true
+    t.index ["slug"], name: "index_tags_on_slug"
   end
 
   create_table "users", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
@@ -110,12 +127,14 @@ ActiveRecord::Schema[8.1].define(version: 2025_08_09_160805) do
     t.integer "published_comments_count", default: 0, null: false
     t.integer "published_posts_count", default: 0, null: false
     t.integer "role", default: 0, null: false
+    t.string "slug"
     t.string "twitter"
     t.datetime "updated_at", null: false
     t.string "username", null: false
     t.string "website"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["github_id"], name: "index_users_on_github_id", unique: true
+    t.index ["slug"], name: "index_users_on_slug"
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 

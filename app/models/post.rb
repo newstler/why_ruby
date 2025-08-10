@@ -1,4 +1,6 @@
 class Post < ApplicationRecord
+  extend FriendlyId
+  friendly_id :title, use: [:slugged, :history]
   
   # Virtual attributes
   attr_accessor :duplicate_post
@@ -12,6 +14,7 @@ class Post < ApplicationRecord
   
   # Validations
   validates :title, presence: true
+  validates :slug, uniqueness: true, allow_blank: true
   validate :content_or_url_present
   validate :url_uniqueness
   validates :url, format: URI::DEFAULT_PARSER.make_regexp(%w[http https]), allow_blank: true
@@ -43,6 +46,10 @@ class Post < ApplicationRecord
   
   def link?
     url.present?
+  end
+  
+  def should_generate_new_friendly_id?
+    title_changed? || super
   end
   
   def auto_hide_if_needed!

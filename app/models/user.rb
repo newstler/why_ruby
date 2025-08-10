@@ -1,4 +1,7 @@
 class User < ApplicationRecord
+  extend FriendlyId
+  friendly_id :username, use: [:slugged, :history]
+  
   # Associations
   has_many :posts, dependent: :destroy
   has_many :comments, dependent: :destroy
@@ -12,6 +15,7 @@ class User < ApplicationRecord
   # Validations
   validates :github_id, presence: true, uniqueness: true
   validates :username, presence: true, uniqueness: true
+  validates :slug, uniqueness: true, allow_blank: true
   validates :email, presence: true, uniqueness: true
   
   # Scopes
@@ -54,6 +58,10 @@ class User < ApplicationRecord
     links[:linkedin] = linkedin if linkedin.present?
     links[:github] = github_profile_url
     links
+  end
+  
+  def should_generate_new_friendly_id?
+    username_changed? || super
   end
   
   # Class methods for Omniauth

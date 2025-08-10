@@ -1,6 +1,6 @@
 class TagsController < ApplicationController
   def show
-    @tag = Tag.find(params[:id])
+    @tag = Tag.friendly.find(params[:id])
     @posts = @tag.posts.published.includes(:user, :category)
                     .page(params[:page])
   end
