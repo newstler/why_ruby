@@ -4,4 +4,4 @@ class CategoriesController < ApplicationController
     @posts = @category.posts.published.includes(:user, :tags)
                          .page(params[:page])
   end
-end 
+end

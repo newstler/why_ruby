@@ -6,7 +6,7 @@ namespace :friendly_id do
     # - Regenerating slugs after bulk data imports
     # - Fixing broken slugs
     # - Testing slug generation in development
-    
+
     puts "Generating slugs for Posts..."
     Post.find_each do |post|
       post.slug = nil
@@ -14,7 +14,7 @@ namespace :friendly_id do
       print "."
     end
     puts " Done!"
-    
+
     puts "Generating slugs for Categories..."
     Category.find_each do |category|
       category.slug = nil
@@ -22,7 +22,7 @@ namespace :friendly_id do
       print "."
     end
     puts " Done!"
-    
+
     puts "Generating slugs for Tags..."
     Tag.find_each do |tag|
       tag.slug = nil
@@ -30,7 +30,7 @@ namespace :friendly_id do
       print "."
     end
     puts " Done!"
-    
+
     puts "Generating slugs for Users..."
     User.find_each do |user|
       user.slug = nil
@@ -38,14 +38,14 @@ namespace :friendly_id do
       print "."
     end
     puts " Done!"
-    
+
     puts "\nAll slugs generated successfully!"
   end
-  
+
   desc "Find and fix duplicate slugs"
   task fix_duplicates: :environment do
     puts "Checking for duplicate slugs..."
-    
+
     # Check Posts
     duplicate_post_slugs = Post.group(:slug).having("COUNT(*) > 1").pluck(:slug)
     if duplicate_post_slugs.any?
@@ -57,7 +57,7 @@ namespace :friendly_id do
         end
       end
     end
-    
+
     # Check Categories
     duplicate_category_slugs = Category.group(:slug).having("COUNT(*) > 1").pluck(:slug)
     if duplicate_category_slugs.any?
@@ -69,7 +69,7 @@ namespace :friendly_id do
         end
       end
     end
-    
+
     # Check Tags
     duplicate_tag_slugs = Tag.group(:slug).having("COUNT(*) > 1").pluck(:slug)
     if duplicate_tag_slugs.any?
@@ -81,7 +81,7 @@ namespace :friendly_id do
         end
       end
     end
-    
+
     # Check Users
     duplicate_user_slugs = User.group(:slug).having("COUNT(*) > 1").pluck(:slug)
     if duplicate_user_slugs.any?
@@ -93,7 +93,7 @@ namespace :friendly_id do
         end
       end
     end
-    
+
     puts "Duplicate check complete!"
   end
 end

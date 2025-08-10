@@ -6,14 +6,14 @@ class Avo::Actions::MakeAdmin < Avo::BaseAction
   def handle(query:, fields:, current_user:, resource:, **args)
     # Ensure query is always a collection
     users = case query
-            when ActiveRecord::Relation
+    when ActiveRecord::Relation
               query
-            when Array
+    when Array
               query  # Already a collection from our patch
-            else
-              [query]  # Single record, wrap in array
-            end
-    
+    else
+              [ query ]  # Single record, wrap in array
+    end
+
     users.each do |user|
       user.update!(role: :admin)
     end
@@ -21,4 +21,4 @@ class Avo::Actions::MakeAdmin < Avo::BaseAction
     count = users.is_a?(Array) ? users.size : users.count
     succeed "Successfully made #{count} #{'user'.pluralize(count)} admin."
   end
-end 
+end

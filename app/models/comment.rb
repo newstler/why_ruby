@@ -1,23 +1,22 @@
 class Comment < ApplicationRecord
-  
   # Associations
   belongs_to :post
   belongs_to :user
-  
+
   # Validations
   validates :body, presence: true
-  
+
   # Scopes
   scope :published, -> { where(published: true) }
   scope :recent, -> { order(created_at: :desc) }
-  
+
   # Callbacks
   after_create :update_user_counter_caches
   after_update :update_user_counter_caches
   after_destroy :update_user_counter_caches
-  
+
   private
-  
+
   def update_user_counter_caches
     # Update the counter if:
     # 1. A new published comment was created
@@ -28,4 +27,4 @@ class Comment < ApplicationRecord
       user.update_column(:published_comments_count, count) if user.present?
     end
   end
-end 
+end

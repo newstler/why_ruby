@@ -16,7 +16,7 @@ class GithubDataFetcher
 
   def update_basic_profile
     raw_info = auth_data.extra.raw_info
-    
+
     user.update!(
       name: raw_info.name,
       bio: raw_info.bio,
@@ -42,7 +42,7 @@ class GithubDataFetcher
     # Fetch user's public repositories from GitHub API
     github_username = auth_data.info.nickname
     token = auth_data.credentials.token
-    
+
     # Store repos as JSON in the github_repos field
     repos = fetch_ruby_repositories(github_username, token)
     user.update!(github_repos: repos.to_json) if repos.present?
@@ -51,50 +51,50 @@ class GithubDataFetcher
   end
 
   def fetch_ruby_repositories(username, token = nil)
-    require 'net/http'
-    require 'json'
-    
+    require "net/http"
+    require "json"
+
     uri = URI("https://api.github.com/users/#{username}/repos?per_page=100&sort=pushed")
-    
+
     request = Net::HTTP::Get.new(uri)
-    request['Accept'] = 'application/vnd.github.v3+json'
-    request['Authorization'] = "Bearer #{token}" if token
-    
+    request["Accept"] = "application/vnd.github.v3+json"
+    request["Authorization"] = "Bearer #{token}" if token
+
     response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
       http.request(request)
     end
-    
-    if response.code == '200'
+
+    if response.code == "200"
       repos = JSON.parse(response.body)
-      
+
       # Filter for Ruby repositories and select relevant fields
       ruby_repos = repos.select do |repo|
-        repo['language'] == 'Ruby' || 
-        repo['description']&.downcase&.include?('ruby') ||
-        repo['name']&.downcase&.include?('ruby') ||
-        repo['name']&.downcase&.include?('rails')
+        repo["language"] == "Ruby" ||
+        repo["description"]&.downcase&.include?("ruby") ||
+        repo["name"]&.downcase&.include?("ruby") ||
+        repo["name"]&.downcase&.include?("rails")
       end.map do |repo|
         {
-          name: repo['name'],
-          description: repo['description'],
-          stars: repo['stargazers_count'],
-          url: repo['html_url'],
-          language: repo['language'],
-          updated_at: repo['updated_at'],
-          fork: repo['fork'],
-          forks_count: repo['forks_count'],
-          open_issues_count: repo['open_issues_count'],
-          size: repo['size'], # Size in KB
-          topics: repo['topics'] || [],
-          license: repo['license'] ? repo['license']['name'] : nil,
-          created_at: repo['created_at'],
-          pushed_at: repo['pushed_at'],
-          default_branch: repo['default_branch'],
-          has_wiki: repo['has_wiki'],
-          has_pages: repo['has_pages']
+          name: repo["name"],
+          description: repo["description"],
+          stars: repo["stargazers_count"],
+          url: repo["html_url"],
+          language: repo["language"],
+          updated_at: repo["updated_at"],
+          fork: repo["fork"],
+          forks_count: repo["forks_count"],
+          open_issues_count: repo["open_issues_count"],
+          size: repo["size"], # Size in KB
+          topics: repo["topics"] || [],
+          license: repo["license"] ? repo["license"]["name"] : nil,
+          created_at: repo["created_at"],
+          pushed_at: repo["pushed_at"],
+          default_branch: repo["default_branch"],
+          has_wiki: repo["has_wiki"],
+          has_pages: repo["has_pages"]
         }
       end.sort_by { |r| -r[:stars] } # Sort by stars descending
-      
+
       ruby_repos
     else
       Rails.logger.error "GitHub API returned #{response.code}: #{response.body}"

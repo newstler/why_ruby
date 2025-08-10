@@ -13,14 +13,14 @@ namespace :counter_caches do
     User.find_each do |user|
       actual_count = user.posts.published.count
       cached_count = user.published_posts_count
-      
+
       if actual_count != cached_count
         error_msg = "User ##{user.id} (#{user.username}): cached=#{cached_count}, actual=#{actual_count}"
         errors << error_msg
         puts "  ❌ #{error_msg}"
       end
     end
-    
+
     if errors.empty?
       puts "  ✅ All users.published_posts_count values are correct"
     end
@@ -31,14 +31,14 @@ namespace :counter_caches do
     User.find_each do |user|
       actual_count = user.comments.published.count
       cached_count = user.published_comments_count
-      
+
       if actual_count != cached_count
         error_msg = "User ##{user.id} (#{user.username}): cached=#{cached_count}, actual=#{actual_count}"
         errors_comments << error_msg
         puts "  ❌ #{error_msg}"
       end
     end
-    
+
     if errors_comments.empty?
       puts "  ✅ All users.published_comments_count values are correct"
     else
@@ -51,14 +51,14 @@ namespace :counter_caches do
     Post.find_each do |post|
       actual_count = post.reports.count
       cached_count = post.reports_count
-      
+
       if actual_count != cached_count
         error_msg = "Post ##{post.id} (#{post.title[0..30]}...): cached=#{cached_count}, actual=#{actual_count}"
         errors_reports << error_msg
         puts "  ❌ #{error_msg}"
       end
     end
-    
+
     if errors_reports.empty?
       puts "  ✅ All posts.reports_count values are correct"
     else
@@ -69,7 +69,7 @@ namespace :counter_caches do
     puts "\n" + "="*80
     puts "SUMMARY"
     puts "="*80
-    
+
     if errors.empty?
       puts "✅ All counter caches are correctly synchronized!"
     else

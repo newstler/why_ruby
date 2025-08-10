@@ -23,7 +23,7 @@ module WhyRuby
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
-    
+
     # Allow requests from different ports in development
     config.hosts.clear if Rails.env.development?
   end

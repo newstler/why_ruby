@@ -1,73 +1,73 @@
 class User < ApplicationRecord
   extend FriendlyId
-  friendly_id :username, use: [:slugged, :history, :finders]
-  
+  friendly_id :username, use: [ :slugged, :history, :finders ]
+
   # Associations
   has_many :posts, dependent: :destroy
   has_many :comments, dependent: :destroy
   has_many :reports, dependent: :destroy
   has_many :published_posts, -> { published }, class_name: "Post"
   has_many :published_comments, -> { published }, class_name: "Comment"
-  
+
   # Enums
   enum :role, { member: 0, admin: 1 }
-  
+
   # Validations
   validates :github_id, presence: true, uniqueness: true
   validates :username, presence: true, uniqueness: true
   validates :slug, uniqueness: true, allow_blank: true
   validates :email, presence: true, uniqueness: true
-  
+
   # Scopes
-  scope :trusted, -> { 
+  scope :trusted, -> {
     where("published_posts_count >= ? AND published_comments_count >= ?", 3, 10)
   }
   scope :admins, -> { where(role: :admin) }
-  
+
   # Devise modules for GitHub OAuth
-  devise :omniauthable, omniauth_providers: [:github]
-  
+  devise :omniauthable, omniauth_providers: [ :github ]
+
   # Instance methods
   def trusted?
     published_posts_count >= 3 && published_comments_count >= 10
   end
-  
+
   def can_report?
     trusted?
   end
-  
+
   def ruby_repositories
     return [] unless github_repos.present?
-    
+
     repos = JSON.parse(github_repos, symbolize_names: true)
-    
+
     # Filter repositories based on requirements:
     # - Not forks
     # - Ruby language
     filtered_repos = repos.select do |repo|
-      !repo[:fork] && 
-      repo[:language] == 'Ruby'
+      !repo[:fork] &&
+      repo[:language] == "Ruby"
     end
-    
+
     # Sort by pushed_at descending (most recently pushed first)
     filtered_repos.sort_by { |repo| repo[:pushed_at].present? ? -Time.parse(repo[:pushed_at]).to_i : 0 }
   rescue JSON::ParserError, ArgumentError => e
     Rails.logger.error "Error parsing repositories: #{e.message}"
     []
   end
-  
+
   def display_name
     name.presence || username
   end
-  
+
   def github_profile_url
     "https://github.com/#{username}"
   end
-  
+
   def github_ruby_repositories_url
     "https://github.com/#{username}?tab=repositories&q=&type=public&language=ruby&sort="
   end
-  
+
   def social_links
     links = {}
     links[:website] = website if website.present?
@@ -76,14 +76,14 @@ class User < ApplicationRecord
     links[:github] = github_profile_url
     links
   end
-  
+
   def should_generate_new_friendly_id?
     username_changed? || super
   end
-  
+
   # Ensure old slug is saved to history when slug changes
   before_save :create_slug_history, if: :will_save_change_to_slug?
-  
+
   def create_slug_history
     if slug_was.present? && slug_was != slug
       FriendlyId::Slug.create!(
@@ -93,7 +93,7 @@ class User < ApplicationRecord
       ) rescue nil
     end
   end
-  
+
   # Class methods for Omniauth
   def self.from_omniauth(auth)
     user = where(github_id: auth.uid).first_or_create do |user|
@@ -101,13 +101,13 @@ class User < ApplicationRecord
       user.username = auth.info.nickname
       user.avatar_url = auth.info.image
     end
-    
+
     # Fetch and update GitHub data on every sign in
     GithubDataFetcher.new(user, auth).fetch_and_update!
-    
+
     user
   end
-  
+
   def self.new_with_session(params, session)
     super.tap do |user|
       if data = session["devise.github_data"] && session["devise.github_data"]["extra"]["raw_info"]

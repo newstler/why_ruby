@@ -1,11 +1,11 @@
 class HomeController < ApplicationController
   def index
     @pinned_posts = Post.published.pinned
-                          .where.not(post_type: 'success_story')
+                          .where.not(post_type: "success_story")
                           .includes(:user, :category, :tags)
                           .reorder(:pin_position)
     @posts = Post.published
-                      .where.not(post_type: 'success_story')
+                      .where.not(post_type: "success_story")
                       .includes(:user, :category, :tags)
                       .page(params[:page])
                       .per(20)

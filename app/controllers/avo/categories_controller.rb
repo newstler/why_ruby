@@ -6,13 +6,13 @@ class Avo::CategoriesController < Avo::ResourcesController
     # If the record wasn't found, redirect to index
     redirect_to avo.resources_categories_path, alert: "Category not found"
   end
-  
+
   private
-  
+
   # Override the redirect path after update to use the new slug
   def after_update_path
     return params[:referrer] if params[:referrer].present?
-    
+
     # Use the updated record's current slug for the redirect
     # @record should be the updated category at this point
     if @record
@@ -21,4 +21,4 @@ class Avo::CategoriesController < Avo::ResourcesController
       avo.resources_categories_path
     end
   end
-end 
+end

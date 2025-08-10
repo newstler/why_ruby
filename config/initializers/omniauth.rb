@@ -4,5 +4,5 @@ Rails.application.config.middleware.use OmniAuth::Builder do
 end
 
 # Fix for Omniauth POST requests
-OmniAuth.config.allowed_request_methods = [:post, :get]
-OmniAuth.config.silence_get_warning = true 
+OmniAuth.config.allowed_request_methods = [ :post, :get ]
+OmniAuth.config.silence_get_warning = true

@@ -4,43 +4,43 @@
 
 # Create categories
 categories = [
-  { 
-    name: "Getting Started", 
+  {
+    name: "Getting Started",
     position: 1,
     description: "Begin your Ruby journey here. Find tutorials, setup guides, and beginner-friendly resources to help you write your first Ruby code."
   },
-  { 
-    name: "Ruby Language", 
+  {
+    name: "Ruby Language",
     position: 2,
     description: "Explore the beauty and power of Ruby. Learn about syntax, idioms, and language features that make Ruby a joy to write."
   },
-  { 
-    name: "Rails Framework", 
+  {
+    name: "Rails Framework",
     position: 3,
     description: "Master Ruby on Rails, the framework that revolutionized web development. Discover tips, patterns, and best practices for building modern web applications."
   },
-  { 
-    name: "Best Practices", 
+  {
+    name: "Best Practices",
     position: 4,
     description: "Write clean, maintainable, and elegant Ruby code. Learn from experienced developers about testing, refactoring, and design patterns."
   },
-  { 
-    name: "Community", 
+  {
+    name: "Community",
     position: 5,
     description: "Connect with passionate Ruby developers from around the world. Explore their projects, contributions, and insights."
   },
-  { 
-    name: "Tools & Libraries", 
+  {
+    name: "Tools & Libraries",
     position: 6,
     description: "Discover powerful gems, development tools, and libraries that enhance your Ruby development experience and productivity."
   },
-  { 
-    name: "Success Stories", 
+  {
+    name: "Success Stories",
     position: 7,
     description: "Read inspiring stories from companies and developers who chose Ruby. Learn how Ruby powered their growth and success."
   },
-  { 
-    name: "Performance", 
+  {
+    name: "Performance",
     position: 8,
     description: "Optimize your Ruby applications for speed and efficiency. Learn profiling techniques, performance tips, and scaling strategies."
   }
@@ -51,7 +51,7 @@ categories.each do |cat|
     c.position = cat[:position]
     c.description = cat[:description]
   end
-  
+
   # Update description if it doesn't exist
   if category.description.blank? && cat[:description].present?
     category.update(description: cat[:description])
@@ -62,7 +62,7 @@ puts "Created #{Category.count} categories"
 
 # Create tags
 tags = [
-  "beginner", "advanced", "tutorial", "tips", "rails", "ruby", 
+  "beginner", "advanced", "tutorial", "tips", "rails", "ruby",
   "testing", "deployment", "gems", "api", "frontend", "backend",
   "database", "security", "performance", "refactoring", "design-patterns",
   "news", "best-practices"
@@ -96,7 +96,7 @@ if Post.count < 5
   )
   post1.tags << Tag.find_by(name: "beginner")
   post1.tags << Tag.find_by(name: "ruby")
-  
+
   post2 = Post.create!(
     user: admin,
     category: Category.find_by(name: "Rails Framework"),
@@ -107,7 +107,7 @@ if Post.count < 5
   )
   post2.tags << Tag.find_by(name: "rails")
   post2.tags << Tag.find_by(name: "news")
-  
+
   post3 = Post.create!(
     user: admin,
     category: Category.find_by(name: "Best Practices"),
@@ -117,6 +117,6 @@ if Post.count < 5
   )
   post3.tags << Tag.find_by(name: "best-practices")
   post3.tags << Tag.find_by(name: "design-patterns")
-  
+
   puts "Created sample posts"
 end

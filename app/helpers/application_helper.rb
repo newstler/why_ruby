@@ -1,14 +1,14 @@
 module ApplicationHelper
   def markdown_to_html(markdown_text)
     return "" if markdown_text.blank?
-    
+
     renderer = Redcarpet::Render::HTML.new(
       filter_html: true,
       hard_wrap: true,
-      link_attributes: { rel: 'nofollow', target: '_blank' }
+      link_attributes: { rel: "nofollow", target: "_blank" }
     )
-    
-    markdown = Redcarpet::Markdown.new(renderer, 
+
+    markdown = Redcarpet::Markdown.new(renderer,
       autolink: true,
       tables: true,
       fenced_code_blocks: true,
@@ -22,26 +22,26 @@ module ApplicationHelper
       quote: true,
       footnotes: true
     )
-    
+
     # Render markdown and apply syntax highlighting
     html = markdown.render(markdown_text)
-    
+
     # Apply syntax highlighting to code blocks
     doc = Nokogiri::HTML::DocumentFragment.parse(html)
-    doc.css('pre code').each do |code_block|
+    doc.css("pre code").each do |code_block|
       # Extract language from class attribute (e.g., "ruby" from class="ruby" or "language-ruby")
-      language_class = code_block['class'] || ''
-      language = language_class.gsub(/^(language-)?/, '') || 'text'
-      
+      language_class = code_block["class"] || ""
+      language = language_class.gsub(/^(language-)?/, "") || "text"
+
       begin
         lexer = Rouge::Lexer.find(language) || Rouge::Lexers::PlainText.new
         formatter = Rouge::Formatters::HTML.new
         highlighted_code = formatter.format(lexer.lex(code_block.text))
-        
+
         # Create a new pre element with the highlight class
         pre_element = code_block.parent
-        pre_element['class'] = "highlight highlight-#{language}"
-        
+        pre_element["class"] = "highlight highlight-#{language}"
+
         # Replace the code block's content with the highlighted version
         code_block.inner_html = highlighted_code
       rescue => e
@@ -49,10 +49,10 @@ module ApplicationHelper
         Rails.logger.error "Syntax highlighting failed for language '#{language}': #{e.message}"
       end
     end
-    
+
     doc.to_html
   end
-  
+
   def format_post_date(date)
     if date.year == Date.current.year
       date.strftime("%B %d")
@@ -60,11 +60,11 @@ module ApplicationHelper
       date.strftime("%B %d, %Y")
     end
   end
-  
+
   def format_comment_date(date)
     time_ago_in_words(date) + " ago"
   end
-  
+
   def format_short_date(date)
     if date.year == Date.current.year
       date.strftime("%b %d")
@@ -72,57 +72,57 @@ module ApplicationHelper
       date.strftime("%b %d, %Y")
     end
   end
-  
+
   def post_link_url(post)
     post.link? ? post.url : post_path(post)
   end
-  
+
   def post_link_options(post)
     post.link? ? { target: "_blank", rel: "noopener" } : {}
   end
-  
+
   def extract_domain(url)
     return nil if url.blank?
-    
+
     begin
       uri = URI.parse(url)
       host = uri.host || ""
       # Remove www. prefix if present
-      host.sub(/^www\./, '')
+      host.sub(/^www\./, "")
     rescue URI::InvalidURIError
       nil
     end
   end
-  
+
   def category_menu_active?(category)
     # Highlight if on the category page itself
     return true if current_page?(category_path(category))
-    
+
     # Highlight if viewing a post that belongs to this category
-    if controller_name == 'posts' && action_name == 'show' && @post.present?
+    if controller_name == "posts" && action_name == "show" && @post.present?
       return @post.category_id == category.id
     end
-    
+
     false
   end
-  
+
   def success_stories_menu_active?
     # Highlight if on the success stories page
-    return true if controller_name == 'posts' && action_name == 'success_stories'
-    
+    return true if controller_name == "posts" && action_name == "success_stories"
+
     # Highlight if viewing a success story post
-    if controller_name == 'posts' && action_name == 'show' && @post.present?
+    if controller_name == "posts" && action_name == "show" && @post.present?
       return @post.success_story?
     end
-    
+
     false
   end
-  
+
   def community_menu_active?
     # Highlight if on the users index page
     return true if current_page?(users_path)
-    
+
     # Highlight if viewing a user profile
-    controller_name == 'users' && action_name == 'show'
+    controller_name == "users" && action_name == "show"
   end
 end

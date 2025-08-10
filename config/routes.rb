@@ -1,11 +1,11 @@
 Rails.application.routes.draw do
-  devise_for :users, controllers: { omniauth_callbacks: 'users/omniauth_callbacks' }
-  
+  devise_for :users, controllers: { omniauth_callbacks: "users/omniauth_callbacks" }
+
   # Add sign out route for OmniAuth-only authentication
   devise_scope :user do
-    delete 'sign_out', to: 'users/sessions#destroy', as: :destroy_user_session
+    delete "sign_out", to: "users/sessions#destroy", as: :destroy_user_session
   end
-  
+
   # Admin panel - only accessible to users with admin role
   authenticate :user, ->(user) { user.admin? } do
     mount Avo::Engine, at: Avo.configuration.root_path
@@ -22,9 +22,9 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   resources :posts do
-    resources :comments, only: [:create, :destroy]
-    resources :reports, only: [:create]
-    
+    resources :comments, only: [ :create, :destroy ]
+    resources :reports, only: [ :create ]
+
     collection do
       get :success_stories
       post :preview
@@ -32,23 +32,23 @@ Rails.application.routes.draw do
       post :check_duplicate_url
     end
   end
-  
-  resources :categories, only: [:show]
-  resources :tags, only: [:show] do
+
+  resources :categories, only: [ :show ]
+  resources :tags, only: [ :show ] do
     collection do
       get :search
     end
   end
-  
+
   # User profiles and community
-  resources :users, only: [:index, :show]
+  resources :users, only: [ :index, :show ]
 
 
   # Legal pages
-  get 'legal/privacy', to: 'legal#show', defaults: { page: 'privacy_policy' }, as: :privacy_policy
-  get 'legal/terms', to: 'legal#show', defaults: { page: 'terms_of_service' }, as: :terms_of_service
-  get 'legal/cookies', to: 'legal#show', defaults: { page: 'cookie_policy' }, as: :cookie_policy
-  get 'legal', to: 'legal#show', defaults: { page: 'legal_notice' }, as: :legal_notice
+  get "legal/privacy", to: "legal#show", defaults: { page: "privacy_policy" }, as: :privacy_policy
+  get "legal/terms", to: "legal#show", defaults: { page: "terms_of_service" }, as: :terms_of_service
+  get "legal/cookies", to: "legal#show", defaults: { page: "cookie_policy" }, as: :cookie_policy
+  get "legal", to: "legal#show", defaults: { page: "legal_notice" }, as: :legal_notice
 
   # Defines the root path route ("/")
   root "home#index"

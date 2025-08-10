@@ -6,13 +6,13 @@ class Avo::PostsController < Avo::ResourcesController
     # If the record wasn't found, redirect to index
     redirect_to avo.resources_posts_path, alert: "Post not found"
   end
-  
+
   private
-  
+
   # Override the redirect path after update to use the new slug
   def after_update_path
     return params[:referrer] if params[:referrer].present?
-    
+
     # Use the updated record's current slug for the redirect
     if @record
       avo.resources_post_path(id: @record.slug || @record.id)
@@ -20,4 +20,4 @@ class Avo::PostsController < Avo::ResourcesController
       avo.resources_posts_path
     end
   end
-end 
+end
