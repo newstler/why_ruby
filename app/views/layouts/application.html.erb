@@ -90,8 +90,8 @@
             <% end %>
           </div>
           
-          <!-- Desktop navigation - hidden on mobile -->
-          <div class="hidden md:flex-1 md:flex justify-center items-center space-x-4">
+          <!-- Desktop navigation - hidden on mobile and tablets in portrait -->
+          <div class="hidden lg:flex-1 lg:flex justify-center items-center space-x-4">
             <% Category.with_posts.ordered.each do |category| %>
               <%= link_to category.name, category_path(category), 
                   class: "#{category_menu_active?(category) ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
@@ -110,8 +110,8 @@
             <% end %>
           </div>
           
-          <!-- Desktop user section - hidden on mobile -->
-          <div class="hidden md:flex items-center">
+          <!-- Desktop user section - hidden on mobile and tablets in portrait -->
+          <div class="hidden lg:flex items-center">
             <% if user_signed_in? %>
               <div class="relative" data-controller="dropdown">
                 <button type="button" class="flex items-center gap-x-1 text-sm rounded-full cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 p-2" data-action="click->dropdown#toggle click@window->dropdown#hide">
@@ -146,7 +146,7 @@
           </div>
           
           <!-- Mobile menu button -->
-          <div class="md:hidden">
+          <div class="lg:hidden">
             <button type="button" 
                     class="text-gray-500 hover:text-gray-600 focus:outline-none focus:text-gray-600 p-3 -mr-3 rounded-md touch-manipulation" 
                     data-action="click->mobile-menu#toggle"
@@ -159,7 +159,7 @@
         </div>
         
         <!-- Mobile menu -->
-        <div class="hidden md:hidden" data-mobile-menu-target="menu">
+        <div class="hidden lg:hidden" data-mobile-menu-target="menu">
           <div class="pt-4 pb-3 border-t border-gray-200">
             <!-- Categories -->
             <div class="space-y-1 px-2">
