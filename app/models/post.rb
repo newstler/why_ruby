@@ -93,7 +93,7 @@ class Post < ApplicationRecord
   private
 
   def generate_png_for_success_story
-    SuccessStoryImageGenerator.new(self).generate!
+    GenerateSuccessStoryImageJob.perform_later(self)
   end
 
   def content_or_url_or_logo_present
