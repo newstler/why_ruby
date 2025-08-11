@@ -51,6 +51,11 @@
   line-height: 1.6;
 }
 
+.prose h4 {
+  font-size: 0.875rem;
+  color: var(--color-gray-400);
+}
+
 .prose p {
   margin-top: 1.25em;
   margin-bottom: 1.25em;
