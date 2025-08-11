@@ -160,6 +160,11 @@ class PostsController < ApplicationController
 
   def set_post
     @post = Post.includes(:tags).friendly.find(params[:id])
+
+    # Only allow viewing unpublished posts by their owner or admin
+    if !@post.published? && (!user_signed_in? || (current_user != @post.user && !current_user.admin?))
+      redirect_to root_path, alert: "This post is not published yet."
+    end
   end
 
 

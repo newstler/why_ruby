@@ -25,7 +25,16 @@
 <%= turbo_stream_from "post_#{@post.id}" %>
 
 <div class="max-w-4xl mx-auto">
-  <article class="bg-white shadow rounded-lg p-4 md:p-8 mb-8">
+  <article class="bg-white shadow rounded-lg p-4 md:p-8 mb-8 <%= 'unpublished-post' unless @post.published? %>">
+    <!-- Draft label for unpublished posts -->
+    <% unless @post.published? %>
+      <div class="mb-4">
+        <span class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-gray-200 text-gray-700">
+          <%= t('posts.draft') %>
+        </span>
+      </div>
+    <% end %>
+    
     <!-- Post Header -->
     <div class="mb-6">
       <div class="flex items-center justify-between mb-4">
@@ -59,13 +68,13 @@
     <!-- Post Image or Logo -->
     <% if @post.success_story? && @post.logo_svg.present? %>
       <div class="mb-8">
-        <div class="h-64 md:h-80 rounded-lg flex justify-center items-center p-12 success-story-show-logo">
+        <div class="h-64 md:h-80 rounded-lg flex justify-center items-center p-12 success-story-show-logo <%= 'grayscale' unless @post.published? %>">
           <%= safe_svg_content(@post.logo_svg) %>
         </div>
       </div>
     <% elsif @post.title_image_url.present? && !@post.link? %>
       <div class="mb-8">
-        <div class="aspect-video rounded-lg overflow-hidden">
+        <div class="aspect-video rounded-lg overflow-hidden <%= 'grayscale' unless @post.published? %>">
           <%= image_tag @post.title_image_url, alt: @post.title, class: "w-full h-full object-cover" %>
         </div>
       </div>

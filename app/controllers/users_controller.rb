@@ -22,8 +22,14 @@ class UsersController < ApplicationController
     @user = User.friendly.find(params[:id])
 
     # Load posts with pagination support
-    @posts = @user.posts.published.includes(:category, :tags)
-                     .page(params[:page])
+    # Show unpublished posts only to the owner
+    @posts = if user_signed_in? && current_user == @user
+               @user.posts.includes(:category, :tags)
+                          .page(params[:page])
+    else
+               @user.posts.published.includes(:category, :tags)
+                          .page(params[:page])
+    end
 
     # Load all comments for display in the comments tab
     @comments = @user.comments.published.includes(:post)
