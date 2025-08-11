@@ -55,7 +55,7 @@
     <% if @post.success_story? && @post.logo_svg.present? %>
       <div class="mb-8 flex justify-center items-center p-8">
         <div class="max-w-md w-full success-story-logo">
-          <%= raw @post.logo_svg %>
+          <%= safe_svg_content(@post.logo_svg) %>
         </div>
       </div>
     <% elsif @post.title_image_url.present? && !@post.link? %>
@@ -67,7 +67,7 @@
     <!-- Post Body -->
     <% if @post.success_story? %>
       <div class="prose prose-sm md:prose-lg max-w-none mb-8">
-        <%= raw markdown_to_html(@post.content) %>
+        <%= safe_markdown_content(@post.content) %>
       </div>
     <% elsif @post.link? %>
       <div class="mb-8">
@@ -83,7 +83,7 @@
             <% end %>
             <div class="flex items-center justify-between">
               <p class="text-blue-600 text-sm truncate flex-1 mr-4"><%= @post.url %></p>
-              <%= link_to "Visit Link", @post.url, target: "_blank", rel: "noopener", 
+              <%= link_to "Visit Link", safe_external_url(@post.url), target: "_blank", rel: "noopener", 
                   class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex-shrink-0" %>
             </div>
           </div>
@@ -91,7 +91,7 @@
       </div>
     <% else %>
       <div class="prose prose-sm md:prose-lg max-w-none mb-8">
-        <%= raw markdown_to_html(@post.content) %>
+        <%= safe_markdown_content(@post.content) %>
       </div>
     <% end %>
 

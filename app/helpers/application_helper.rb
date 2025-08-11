@@ -74,7 +74,7 @@ module ApplicationHelper
   end
 
   def post_link_url(post)
-    post.link? ? post.url : post_path(post)
+    post.link? ? safe_external_url(post.url) : post_path(post)
   end
 
   def post_link_options(post)
@@ -124,5 +124,38 @@ module ApplicationHelper
 
     # Highlight if viewing a user profile
     controller_name == "users" && action_name == "show"
+  end
+
+  def safe_external_url(url)
+    return "#" if url.blank?
+    
+    # Parse the URL and validate it
+    begin
+      uri = URI.parse(url)
+      
+      # Only allow http, https, and mailto schemes
+      allowed_schemes = %w[http https mailto]
+      return "#" unless allowed_schemes.include?(uri.scheme&.downcase)
+      
+      # Return the original URL if it's safe
+      url
+    rescue URI::InvalidURIError
+      # If the URL is invalid, return a safe fallback
+      "#"
+    end
+  end
+
+  def safe_svg_content(svg_content)
+    # This helper makes it explicit that SVG content has been sanitized
+    # The actual sanitization happens in the model via SvgSanitizer
+    # The SVG is already sanitized, so we can safely mark it as html_safe
+    return "" if svg_content.blank?
+    svg_content.html_safe
+  end
+
+  def safe_markdown_content(markdown_text)
+    # This helper makes it explicit that markdown has been safely rendered
+    # with HTML filtering enabled
+    markdown_to_html(markdown_text).html_safe
   end
 end

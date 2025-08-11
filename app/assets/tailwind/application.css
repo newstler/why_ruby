@@ -31,6 +31,7 @@
   .prose code {
     @apply bg-gray-100 px-1 py-0.5 rounded text-sm font-mono;
   }
+
   .prose pre {
     @apply bg-gray-100 p-4 rounded overflow-x-auto mb-4;
   }
@@ -70,5 +71,18 @@
   .comment-highlight:target .comment-content,
   .comment-highlighting {
     animation: highlight-blink 1s ease-in-out;
+  }
+  
+  /* Override Tailwind Typography's default backtick decorations for inline code */
+  /* Use utilities layer to ensure it comes after typography plugin styles */
+  .prose :where(code):not(:where([class~=not-prose],[class~=not-prose] *)):before,
+  .prose :where(code):not(:where([class~=not-prose],[class~=not-prose] *)):after,
+  .prose-sm :where(code):not(:where([class~=not-prose],[class~=not-prose] *)):before,
+  .prose-sm :where(code):not(:where([class~=not-prose],[class~=not-prose] *)):after,
+  .prose-lg :where(code):not(:where([class~=not-prose],[class~=not-prose] *)):before,
+  .prose-lg :where(code):not(:where([class~=not-prose],[class~=not-prose] *)):after,
+  .md\:prose-lg :where(code):not(:where([class~=not-prose],[class~=not-prose] *)):before,
+  .md\:prose-lg :where(code):not(:where([class~=not-prose],[class~=not-prose] *)):after {
+    content: none !important;
   }
 }

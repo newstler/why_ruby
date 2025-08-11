@@ -299,7 +299,7 @@
             
             <% if @user.github_ruby_repositories_url.present? %>
               <div class="mt-8 text-center">
-                <%= link_to t('users.show.view_all_repositories'), @user.github_ruby_repositories_url, 
+                <%= link_to t('users.show.view_all_repositories'), safe_external_url(@user.github_ruby_repositories_url), 
                     target: "_blank", rel: "noopener", class: "text-gray-400 hover:text-gray-600" %>
               </div>
             <% end %>
@@ -309,7 +309,7 @@
             <p class="text-gray-600"><%= t('users.show.no_ruby_projects') %></p>
             <% if @user.github_profile_url.present? %>
               <p class="mt-2">
-                <%= link_to t('users.show.view_github_profile'), @user.github_profile_url, 
+                <%= link_to t('users.show.view_github_profile'), safe_external_url(@user.github_profile_url), 
                     target: "_blank", rel: "noopener", class: "text-gray-600 hover:text-gray-800" %>
               </p>
             <% end %>

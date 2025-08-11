@@ -26,8 +26,16 @@ Rails.application.config.after_initialize do
 
           # Ensure we have a resource
           if @resource.nil? && params[:resource_name].present?
-            resource_class = "Avo::Resources::#{params[:resource_name].singularize.camelize}".safe_constantize
-            @resource = resource_class.new if resource_class
+            # Whitelist of allowed resource names to prevent arbitrary code execution
+            allowed_resources = %w[categories comments posts reports tags users]
+            resource_name = params[:resource_name].to_s.downcase.singularize
+            
+            if allowed_resources.include?(resource_name)
+              resource_class = "Avo::Resources::#{resource_name.camelize}".safe_constantize
+              @resource = resource_class.new if resource_class
+            else
+              Rails.logger.warn "[Avo Patch] Attempted to access invalid resource: #{params[:resource_name]}"
+            end
           end
 
           # Find all records using our custom finder

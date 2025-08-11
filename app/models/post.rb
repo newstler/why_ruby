@@ -148,18 +148,8 @@ class Post < ApplicationRecord
   def clean_logo_svg
     return unless logo_svg.present?
 
-    # Remove XML declarations, DOCTYPE, and comments
-    cleaned = logo_svg
-      .gsub(/<\?xml[^>]*\?>/i, "")
-      .gsub(/<!DOCTYPE[^>]*>/i, "")
-      .gsub(/<!--[\s\S]*?-->/m, "")
-      .strip
-
-    # Extract just the SVG element if it exists
-    svg_match = cleaned.match(/<svg[^>]*>[\s\S]*<\/svg>/i)
-    if svg_match
-      self.logo_svg = svg_match[0].strip
-    end
+    # Sanitize the SVG content to prevent XSS attacks
+    self.logo_svg = SvgSanitizer.sanitize(logo_svg)
   end
 
   def generate_summary_job

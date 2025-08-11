@@ -104,6 +104,18 @@
   border-radius: 0.25rem;
 }
 
+/* Override Tailwind Typography's default backtick decorations for inline code */
+.prose code:before,
+.prose code:after,
+.prose-sm code:before,
+.prose-sm code:after,
+.prose-lg code:before,
+.prose-lg code:after,
+.md\:prose-lg code:before,
+.md\:prose-lg code:after {
+  content: none !important;
+}
+
 .prose pre {
   background-color: #1f2937;
   color: #f9fafb;
