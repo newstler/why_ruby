@@ -38,15 +38,19 @@ class SuccessStoryImageGenerator
       svg_file.rewind
 
       # Convert SVG to PNG with transparency using ImageMagick directly
-      # -background none: transparent background
-      # -density 300: high quality
-      # -resize 1152x540>: max dimensions (only shrink if larger)
+      # Strategy: CSS "contain" behavior - fit entire logo within box
+      # - Target: 1152x540px box
+      # - Small logos get upsized to fill the box (maintaining aspect ratio)
+      # - Large logos get downsized to fit within the box
+      # - Aspect ratio is always preserved
+      # The logo will touch either the width or height boundary, whichever is reached first
       svg_to_png_cmd = [
         "convert",
         "-background", "none",
         "-density", "300",
         svg_file.path,
-        "-resize", "1152x540>",
+        "-resize", "1152x540",  # Fit within 1152x540 box (CSS contain behavior)
+        "-gravity", "center",
         png_file.path
       ]
 
