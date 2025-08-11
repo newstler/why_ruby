@@ -8,9 +8,9 @@ class SvgSanitizer
 
   # Allowed attributes (no event handlers)
   # Note: These should be lowercase for comparison
+  # width and height are intentionally excluded to allow proper responsive scaling
   ALLOWED_ATTRIBUTES = %w[
-    id class style
-    width height viewbox preserveaspectratio
+    viewbox preserveaspectratio
     x y x1 y1 x2 y2 cx cy r rx ry
     d points fill stroke stroke-width stroke-linecap stroke-linejoin
     fill-opacity stroke-opacity opacity
@@ -90,10 +90,28 @@ class SvgSanitizer
       end
     end
 
+    # Store original dimensions before cleaning for viewBox calculation
+    original_width = svg_element["width"]
+    original_height = svg_element["height"]
+
     # Also clean the SVG element itself
     svg_element.attributes.keys.each do |name|
       unless ALLOWED_ATTRIBUTES.include?(name.downcase)
         svg_element.remove_attribute(name)
+      end
+    end
+
+    # Ensure SVG has a viewBox for proper scaling
+    # If no viewBox exists but we had width/height, create one
+    if svg_element["viewBox"].blank? && svg_element["viewbox"].blank?
+      if original_width && original_height
+        # Extract numeric values from width/height (remove px, %, etc)
+        width_val = original_width.to_s.gsub(/[^\d.]/, "").to_f
+        height_val = original_height.to_s.gsub(/[^\d.]/, "").to_f
+
+        if width_val > 0 && height_val > 0
+          svg_element["viewBox"] = "0 0 #{width_val} #{height_val}"
+        end
       end
     end
 

@@ -58,14 +58,16 @@
 
     <!-- Post Image or Logo -->
     <% if @post.success_story? && @post.logo_svg.present? %>
-      <div class="mb-8 flex justify-center items-center p-8">
-        <div class="max-w-md w-full success-story-logo">
+      <div class="mb-8">
+        <div class="h-64 md:h-80 rounded-lg flex justify-center items-center p-12 success-story-show-logo">
           <%= safe_svg_content(@post.logo_svg) %>
         </div>
       </div>
     <% elsif @post.title_image_url.present? && !@post.link? %>
-      <div class="mb-8 rounded-lg overflow-hidden">
-        <%= image_tag @post.title_image_url, alt: @post.title, class: "w-full h-auto object-cover rounded-lg" %>
+      <div class="mb-8">
+        <div class="aspect-video rounded-lg overflow-hidden">
+          <%= image_tag @post.title_image_url, alt: @post.title, class: "w-full h-full object-cover" %>
+        </div>
       </div>
     <% end %>
 
@@ -78,8 +80,8 @@
       <div class="mb-8">
         <div class="bg-white border border-gray-300 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
           <% if @post.title_image_url.present? %>
-            <div class="aspect-w-16 aspect-h-9">
-              <%= image_tag @post.title_image_url, alt: @post.title, class: "w-full h-64 object-cover" %>
+            <div class="aspect-video">
+              <%= image_tag @post.title_image_url, alt: @post.title, class: "w-full h-full object-cover" %>
             </div>
           <% end %>
           <div class="p-6">

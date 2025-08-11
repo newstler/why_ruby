@@ -18,7 +18,7 @@
   
   <%= link_to post_link_url(post), post_link_options(post).merge(class: "block cursor-pointer") do %>
     <% if post.success_story? && post.logo_svg.present? %>
-      <div class="mb-4 flex justify-center items-center h-32 p-4 success-story-tile-logo">
+      <div class="mb-4 h-48 rounded-lg flex justify-center items-center p-8 success-story-tile-logo">
         <%= raw post.logo_svg %>
       </div>
     <% elsif post.title_image_url.present? %>

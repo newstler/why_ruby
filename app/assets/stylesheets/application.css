@@ -237,12 +237,12 @@ input[type="checkbox"] {
   @apply w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500 focus:ring-2;
 }
 
-/* Success story tile logo styles */
-.success-story-tile-logo svg {
-  max-height: 100%;
-  width: auto;
+/* Success story logo styles for tiles and show page */
+.success-story-tile-logo svg,
+.success-story-show-logo svg {
   max-width: 100%;
-  height: auto;
+  height: 100%;
+  width: auto;
 }
 
 /* Logo carousel styles */
