@@ -1,17 +1,17 @@
 <%# Set meta tags for user profile %>
-<% content_for :meta_title, t('meta.users.show.title', display_name: @user.display_name, username: @user.display_name) %>
+<% content_for(:meta_title) { t('meta.users.show.title', display_name: @user.display_name, username: @user.display_name) } %>
 <% 
   if @user.bio.present?
-    content_for :meta_summary, t('meta.users.show.summary_with_bio', bio: @user.bio)
+    content_for(:meta_summary) { t('meta.users.show.summary_with_bio', bio: @user.bio) }
   else
-    content_for :meta_summary, t('meta.users.show.summary_without_bio', display_name: @user.display_name)
+    content_for(:meta_summary) { t('meta.users.show.summary_without_bio', display_name: @user.display_name) }
   end
 %>
-<% content_for :meta_keywords, t('meta.users.show.keywords', username: @user.display_name) %>
+<% content_for(:meta_keywords) { t('meta.users.show.keywords', username: @user.display_name) } %>
 <% if @user.avatar_url.present? %>
-  <% content_for :meta_image, @user.avatar_url %>
+  <% content_for(:meta_image) { @user.avatar_url } %>
 <% end %>
-<% content_for :meta_type, "profile" %>
+<% content_for(:meta_type) { "profile" } %>
 
 <div class="space-y-8">
   <!-- Tabbed Content Section -->

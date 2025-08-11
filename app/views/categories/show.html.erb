@@ -1,7 +1,7 @@
 <%# Set meta tags for this category %>
-<% content_for :meta_title, t('meta.categories.show.title', category_name: @category.name) %>
-<% content_for :meta_summary, t('meta.categories.show.summary', category_name_lower: @category.name.downcase) %>
-<% content_for :meta_keywords, t('meta.categories.show.keywords', category_name: @category.name) %>
+<% content_for(:meta_title) { t('meta.categories.show.title', category_name: @category.name) } %>
+<% content_for(:meta_summary) { t('meta.categories.show.summary', category_name_lower: @category.name.downcase) } %>
+<% content_for(:meta_keywords) { t('meta.categories.show.keywords', category_name: @category.name) } %>
 
 <div class="space-y-8">
     <div class="mb-8">

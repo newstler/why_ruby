@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <!-- Essential Meta Tags (First Priority) -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    
+    <!-- Page Title -->
     <title><%= content_for(:meta_title) ? "#{content_for(:meta_title)} | #{t('meta.site.name')}" : t('meta.default.title') %></title>
     
+    <!-- Rails Security Tags -->
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
     
     <!-- SEO Meta Tags -->
     <meta name="description" content="<%= content_for(:meta_summary).presence || t('meta.default.summary') %>">
@@ -18,17 +20,18 @@
     <link rel="canonical" href="<%= content_for(:meta_url).presence || request.original_url %>">
     
     <!-- Open Graph / Facebook Meta Tags -->
-    <meta property="og:type" content="<%= content_for(:meta_type).presence || "website" %>">
-    <meta property="og:url" content="<%= content_for(:meta_url).presence || request.original_url %>">
-    <meta property="og:title" content="<%= content_for(:meta_title).presence || t('meta.default.title') %>">
-    <meta property="og:description" content="<%= content_for(:meta_summary).presence || t('meta.default.summary') %>">
     <% 
-      og_image = content_for(:meta_image).presence || "/og-image.png"
+      og_image = content_for(:meta_image)
+      og_image = og_image.presence || "/og-image.png"
       # Ensure we have a full URL for the image
       unless og_image.start_with?('http')
         og_image = request.base_url + og_image
       end
     %>
+    <meta property="og:type" content="<%= content_for(:meta_type).presence || "website" %>">
+    <meta property="og:url" content="<%= content_for(:meta_url).presence || request.original_url %>">
+    <meta property="og:title" content="<%= content_for(:meta_title).presence || t('meta.default.title') %>">
+    <meta property="og:description" content="<%= content_for(:meta_summary).presence || t('meta.default.summary') %>">
     <meta property="og:image" content="<%= og_image %>">
     <meta property="og:site_name" content="<%= t('meta.site.name') %>">
     <meta property="og:locale" content="<%= I18n.locale.to_s.gsub('-', '_') %>">
@@ -42,40 +45,38 @@
     <meta name="twitter:site" content="<%= t('meta.social.twitter_site') %>">
     <meta name="twitter:creator" content="<%= t('meta.social.twitter_creator') %>">
     
-    <!-- Additional Meta Tags -->
+    <!-- PWA and Mobile App Meta Tags -->
     <meta name="theme-color" content="#dc2626">
     <meta name="application-name" content="<%= t('meta.site.application_name') %>">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="<%= t('meta.site.apple_app_title') %>">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="msapplication-TileColor" content="#dc2626">
     <meta name="msapplication-TileImage" content="/android-chrome-192x192.png">
-
+    
     <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
     <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
-    <!-- Favicons for all platforms -->
+    
+    <!-- Favicons and Icons -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" href="/icon.png">
-    <link rel="icon" type="image/svg+xml" href="/icon.svg">
-    
-    <!-- Apple Touch Icon -->
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    
-    <!-- Android Chrome Icons -->
     <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
-
+    <link rel="icon" type="image/png" href="/icon.png">
+    <link rel="icon" type="image/svg+xml" href="/icon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    
+    <!-- Stylesheets and JavaScript -->
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
-
-    <!-- Google tag (gtag.js) -->
+    
+    <!-- Google Analytics (Last) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-55VPDFY7NM"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'G-55VPDFY7NM');
     </script>
   </head>
