@@ -128,15 +128,15 @@ module ApplicationHelper
 
   def safe_external_url(url)
     return "#" if url.blank?
-    
+
     # Parse the URL and validate it
     begin
       uri = URI.parse(url)
-      
+
       # Only allow http, https, and mailto schemes
       allowed_schemes = %w[http https mailto]
       return "#" unless allowed_schemes.include?(uri.scheme&.downcase)
-      
+
       # Return the original URL if it's safe
       url
     rescue URI::InvalidURIError

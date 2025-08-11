@@ -5,5 +5,10 @@
 pre-commit:
   commands:
     rubocop:
-      run: bundle exec rubocop -A --force-exclusion
-      stage_fixed: true  # Automatically stage files fixed by RuboCop
+      run: |
+        bundle exec rubocop -A --force-exclusion
+        if [ -n "$(git diff --name-only)" ]; then
+          git diff --name-only | xargs git add
+        fi
+      # This runs RuboCop with auto-fix on the entire project
+      # and automatically stages ALL fixed files

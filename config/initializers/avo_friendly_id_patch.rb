@@ -29,7 +29,7 @@ Rails.application.config.after_initialize do
             # Whitelist of allowed resource names to prevent arbitrary code execution
             allowed_resources = %w[categories comments posts reports tags users]
             resource_name = params[:resource_name].to_s.downcase.singularize
-            
+
             if allowed_resources.include?(resource_name)
               resource_class = "Avo::Resources::#{resource_name.camelize}".safe_constantize
               @resource = resource_class.new if resource_class

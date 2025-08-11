@@ -56,9 +56,9 @@ class SvgSanitizer
     # Find SVG elements first
     svg_elements = doc.css("svg")
     return "" if svg_elements.empty?
-    
+
     svg_element = svg_elements.first
-    
+
     # Process all elements within the SVG
     svg_element.css("*").each do |element|
       unless ALLOWED_ELEMENTS.include?(element.name.downcase)
@@ -89,7 +89,7 @@ class SvgSanitizer
         end
       end
     end
-    
+
     # Also clean the SVG element itself
     svg_element.attributes.keys.each do |name|
       unless ALLOWED_ATTRIBUTES.include?(name.downcase)
