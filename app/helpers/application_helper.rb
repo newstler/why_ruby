@@ -35,9 +35,7 @@ module ApplicationHelper
 
       begin
         lexer = Rouge::Lexer.find(language) || Rouge::Lexers::PlainText.new
-        # Use inline styles instead of CSS classes for more reliable styling
-        theme = Rouge::Themes::Github.new
-        formatter = Rouge::Formatters::HTMLInline.new(theme)
+        formatter = Rouge::Formatters::HTML.new
         highlighted_code = formatter.format(lexer.lex(code_block.text))
 
         # Create a new pre element with the highlight class
