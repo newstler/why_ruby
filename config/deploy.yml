@@ -4,6 +4,11 @@ service: why_ruby
 # Name of the container image.
 image: ysidorov/why_ruby
 
+# Deploy and drain timeouts
+deploy_timeout: 60  # Give Rails 60 seconds to boot (default is 30)
+drain_timeout: 30   # Time to wait for requests to complete before stopping old containers
+readiness_delay: 15 # Wait 15 seconds after container is running before checking health
+
 # Deploy to these servers.
 servers:
   web:
@@ -20,6 +25,10 @@ servers:
 proxy:
   ssl: true
   host: whyruby.info
+  healthcheck:
+    path: /up
+    interval: 3      # Check every 3 seconds
+    timeout: 5       # Give each check 5 seconds to respond
 
 # Credentials for your image host.
 
@@ -56,7 +65,7 @@ env:
     # DB_HOST: 192.168.0.2
 
     # Log everything from Rails
-    # RAILS_LOG_LEVEL: debug
+    RAILS_LOG_LEVEL: debug
 
 # Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
 # "bin/kamal logs -r job" will tail logs from the first server in the job section.

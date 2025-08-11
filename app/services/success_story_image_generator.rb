@@ -1,7 +1,3 @@
-require "mini_magick"
-require "base64"
-require "tempfile"
-
 class SuccessStoryImageGenerator
   TEMPLATE_PATH = Rails.root.join("app", "assets", "images", "success_story_teplate.png")
 
