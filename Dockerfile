@@ -20,7 +20,7 @@ RUN echo 'Acquire::http::Pipeline-Depth 0;\nAcquire::http::No-Cache true;\nAcqui
 # Install base packages
 RUN rm -rf /var/lib/apt/lists/* && \
     apt-get update -qq --fix-missing && \
-    apt-get install --no-install-recommends -y curl libjemalloc2 libvips sqlite3 && \
+    apt-get install --no-install-recommends -y curl libjemalloc2 libvips sqlite3 imagemagick && \
     rm -rf /var/lib/apt/lists/*
 
 # Set production environment
@@ -42,6 +42,8 @@ COPY Gemfile Gemfile.lock ./
 RUN bundle install && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
     bundle exec bootsnap precompile --gemfile
+
+RUN apt-get update && apt-get install -y imagemagick
 
 # Copy application code
 COPY . .

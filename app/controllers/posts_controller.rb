@@ -1,6 +1,6 @@
 class PostsController < ApplicationController
-  before_action :authenticate_user!, except: [ :show, :success_stories ]
-  before_action :set_post, only: [ :show, :edit, :update, :destroy ]
+  before_action :authenticate_user!, except: [ :show, :success_stories, :image ]
+  before_action :set_post, only: [ :show, :edit, :update, :destroy, :image ]
   before_action :authorize_user!, only: [ :edit, :update, :destroy ]
 
   def index
@@ -20,6 +20,27 @@ class PostsController < ApplicationController
 
   def show
     @comments = @post.comments.published.includes(:user).order(created_at: :asc)
+  end
+
+  # Serve proxied/generated images for social sharing
+  def image
+    if @post.success_story? && @post.logo_png_base64.present?
+      # Success story - serve the generated PNG
+      data = @post.logo_png_base64.match(/^data:image\/png;base64,(.+)$/)[1]
+      image_data = Base64.decode64(data)
+
+      expires_in 1.week, public: true
+      send_data image_data,
+                type: "image/png",
+                disposition: "inline",
+                filename: "#{@post.slug}.png"
+    elsif @post.title_image_url.present?
+      # Regular post - proxy the external image
+      proxy_external_image(@post.title_image_url)
+    else
+      # No image available
+      head :not_found
+    end
   end
 
   def new
@@ -140,6 +161,28 @@ class PostsController < ApplicationController
 
   def set_post
     @post = Post.includes(:tags).friendly.find(params[:id])
+  end
+
+  def proxy_external_image(url)
+    require "net/http"
+    require "uri"
+
+    uri = URI.parse(url)
+    response = Net::HTTP.get_response(uri)
+
+    # Only proxy successful responses with image content
+    if response.code == "200" && response["content-type"]&.start_with?("image/")
+      # Cache the proxied image for 1 week
+      expires_in 1.week, public: true
+      send_data response.body,
+                type: response["content-type"],
+                disposition: "inline"
+    else
+      head :not_found
+    end
+  rescue => e
+    Rails.logger.error "Image proxy error: #{e.message}"
+    head :internal_server_error
   end
 
   def normalize_url_for_checking(url)
