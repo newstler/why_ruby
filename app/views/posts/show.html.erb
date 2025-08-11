@@ -1,5 +1,9 @@
 <%# Set meta tags for this post %>
-<% content_for :meta_title, t('meta.posts.show.title', post_title: @post.title) %>
+<% if @post.success_story? %>
+  <% content_for :meta_title, "#{@post.title} - Ruby Success Story" %>
+<% else %>
+  <% content_for :meta_title, t('meta.posts.show.title', post_title: @post.title) %>
+<% end %>
 <% content_for :meta_summary, @post.summary if @post.summary.present? %>
 <% 
   categories_and_tags = [@post.category&.name, @post.tags.pluck(:name)].compact.flatten.join(", ")
@@ -10,10 +14,11 @@
 <% if @post.user.present? %>
   <% content_for :meta_author, @post.user.display_name %>
 <% end %>
-<% if @post.title_image_url.present? && !@post.success_story? %>
-  <% content_for :meta_image, @post.title_image_url %>
+<%# Set meta image %>
+<% if @post.has_social_image? %>
+  <% content_for :meta_image, @post.proxied_image_url %>
 <% end %>
-<%# Success stories and posts without images will use the default from layout %>
+<%# Posts without images will use the default from layout %>
 
 <%= turbo_stream_from "post_#{@post.id}" %>
 

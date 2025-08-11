@@ -25,6 +25,10 @@ Rails.application.routes.draw do
     resources :comments, only: [ :create, :destroy ]
     resources :reports, only: [ :create ]
 
+    member do
+      get "image.png", to: "posts#image", as: :image
+    end
+
     collection do
       get :success_stories
       post :preview
@@ -42,7 +46,6 @@ Rails.application.routes.draw do
 
   # User profiles and community
   resources :users, only: [ :index, :show ]
-
 
   # Legal pages
   get "legal/privacy", to: "legal#show", defaults: { page: "privacy_policy" }, as: :privacy_policy

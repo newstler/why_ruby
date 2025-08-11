@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
-
-    <%= yield :head %>
-    
-    <title><%= content_for(:meta_title) ? "#{content_for(:meta_title)} | #{t('meta.site.name')}" : t('meta.default.title') %></title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title><%= content_for(:meta_title) ? "#{content_for(:meta_title)} | #{t('meta.site.name')}" : t('meta.default.title') %></title>
+    
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     
@@ -26,7 +24,10 @@
     <meta property="og:description" content="<%= content_for(:meta_summary).presence || t('meta.default.summary') %>">
     <% 
       og_image = content_for(:meta_image).presence || "/og-image.png"
-      og_image = og_image.start_with?('http') ? og_image : request.base_url + og_image
+      # Ensure we have a full URL for the image
+      unless og_image.start_with?('http')
+        og_image = request.base_url + og_image
+      end
     %>
     <meta property="og:image" content="<%= og_image %>">
     <meta property="og:site_name" content="<%= t('meta.site.name') %>">

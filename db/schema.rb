@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_08_10_193916) do
+ActiveRecord::Schema[8.1].define(version: 2025_08_11_145537) do
   create_table "admins", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
@@ -63,6 +63,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_08_10_193916) do
     t.string "category_id"
     t.text "content"
     t.datetime "created_at", null: false
+    t.text "logo_png_base64"
     t.text "logo_svg"
     t.boolean "needs_admin_review", default: false, null: false
     t.integer "pin_position"
