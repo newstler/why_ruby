@@ -22,7 +22,7 @@ class PostsController < ApplicationController
     @comments = @post.comments.published.includes(:user).order(created_at: :asc)
   end
 
-  # Serve proxied/generated images for social sharing
+  # Serve generated PNG images for success stories
   def image
     if @post.success_story? && @post.logo_png_base64.present?
       # Success story - serve the generated PNG
@@ -34,14 +34,13 @@ class PostsController < ApplicationController
                 type: "image/png",
                 disposition: "inline",
                 filename: "#{@post.slug}.png"
-    elsif @post.title_image_url.present?
-      # Regular post - proxy the external image
-      proxy_external_image(@post.title_image_url)
     else
       # No image available
       head :not_found
     end
   end
+
+
 
   def new
     @post = current_user.posts.build
@@ -163,27 +162,7 @@ class PostsController < ApplicationController
     @post = Post.includes(:tags).friendly.find(params[:id])
   end
 
-  def proxy_external_image(url)
-    require "net/http"
-    require "uri"
 
-    uri = URI.parse(url)
-    response = Net::HTTP.get_response(uri)
-
-    # Only proxy successful responses with image content
-    if response.code == "200" && response["content-type"]&.start_with?("image/")
-      # Cache the proxied image for 1 week
-      expires_in 1.week, public: true
-      send_data response.body,
-                type: response["content-type"],
-                disposition: "inline"
-    else
-      head :not_found
-    end
-  rescue => e
-    Rails.logger.error "Image proxy error: #{e.message}"
-    head :internal_server_error
-  end
 
   def normalize_url_for_checking(url)
     return nil unless url.present?

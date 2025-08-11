@@ -15,8 +15,10 @@
   <% content_for(:meta_author) { @post.user.display_name } %>
 <% end %>
 <%# Set meta image %>
-<% if @post.has_social_image? %>
-  <% content_for(:meta_image) { @post.proxied_image_url } %>
+<% if @post.success_story? && @post.logo_png_base64.present? %>
+  <% content_for(:meta_image) { image_post_path(@post) } %>
+<% elsif @post.title_image_url.present? %>
+  <% content_for(:meta_image) { @post.title_image_url } %>
 <% end %>
 <%# Posts without images will use the default from layout %>
 
