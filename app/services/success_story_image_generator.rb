@@ -3,7 +3,7 @@ require "base64"
 require "tempfile"
 
 class SuccessStoryImageGenerator
-  TEMPLATE_PATH = Rails.root.join("public", "success_story_teplate.png")
+  TEMPLATE_PATH = Rails.root.join("app", "assets", "images", "success_story_teplate.png")
 
   # NOTE: This service uses ImageMagick's 'convert' command for compatibility with v6
   # which is commonly available on servers. The warnings about deprecated 'convert'
