@@ -10,12 +10,10 @@
 <% if @post.user.present? %>
   <% content_for :meta_author, @post.user.display_name %>
 <% end %>
-<% if @post.success_story? && @post.logo_svg.present? %>
-  <%# Success stories don't have meta images %>
-<% elsif @post.title_image_url.present? %>
+<% if @post.title_image_url.present? && !@post.success_story? %>
   <% content_for :meta_image, @post.title_image_url %>
 <% end %>
-<% content_for :twitter_card, @post.title_image_url.present? ? "summary_large_image" : "summary" %>
+<%# Success stories and posts without images will use the default from layout %>
 
 <%= turbo_stream_from "post_#{@post.id}" %>
 

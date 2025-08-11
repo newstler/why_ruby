@@ -1,7 +1,12 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:meta_title).presence || t('meta.default.title') %></title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+    
+    <title><%= content_for(:meta_title) ? "#{content_for(:meta_title)} | #{t('meta.site.name')}" : t('meta.default.title') %></title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -20,7 +25,7 @@
     <meta property="og:title" content="<%= content_for(:meta_title).presence || t('meta.default.title') %>">
     <meta property="og:description" content="<%= content_for(:meta_summary).presence || t('meta.default.summary') %>">
     <% 
-      og_image = content_for(:meta_image).presence || "/android-chrome-512x512.png"
+      og_image = content_for(:meta_image).presence || "/og-image.png"
       og_image = og_image.start_with?('http') ? og_image : request.base_url + og_image
     %>
     <meta property="og:image" content="<%= og_image %>">
@@ -42,11 +47,6 @@
     <meta name="apple-mobile-web-app-title" content="<%= t('meta.site.apple_app_title') %>">
     <meta name="msapplication-TileColor" content="#dc2626">
     <meta name="msapplication-TileImage" content="/android-chrome-192x192.png">
-    
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
-
-    <%= yield :head %>
 
     <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
     <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
