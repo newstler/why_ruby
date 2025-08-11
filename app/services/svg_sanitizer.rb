@@ -10,6 +10,7 @@ class SvgSanitizer
   # Note: These should be lowercase for comparison
   # width and height are intentionally excluded to allow proper responsive scaling
   ALLOWED_ATTRIBUTES = %w[
+    style class
     viewbox preserveaspectratio
     x y x1 y1 x2 y2 cx cy r rx ry
     d points fill stroke stroke-width stroke-linecap stroke-linejoin
