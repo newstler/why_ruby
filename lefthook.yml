@@ -1,0 +1,9 @@
+# Lefthook configuration
+# This file defines git hooks that automatically run
+# No setup needed - just run 'bundle install' and hooks are active!
+
+pre-commit:
+  commands:
+    rubocop:
+      run: bundle exec rubocop -A --force-exclusion
+      stage_fixed: true  # Automatically stage files fixed by RuboCop

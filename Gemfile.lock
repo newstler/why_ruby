@@ -252,6 +252,7 @@ GEM
       kaminari-core (= 1.2.2)
     kaminari-core (1.2.2)
     language_server-protocol (3.17.0.5)
+    lefthook (1.12.2)
     lint_roller (1.1.0)
     logger (1.7.0)
     loofah (2.24.1)
@@ -520,6 +521,7 @@ DEPENDENCIES
   jbuilder
   kamal
   kaminari (~> 1.2)
+  lefthook
   metainspector
   nokogiri (~> 1.16)
   omniauth-github (~> 2.0)
