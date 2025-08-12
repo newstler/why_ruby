@@ -199,6 +199,7 @@ GEM
       faraday (~> 2.0)
     fastimage (2.4.0)
     ffi (1.17.2-arm64-darwin)
+    ffi (1.17.2-x86_64-linux-gnu)
     friendly_id (5.5.1)
       activerecord (>= 4.0.0)
     fugit (1.11.1)
@@ -283,8 +284,7 @@ GEM
       fastimage (~> 2.2)
       nesty (~> 1.0)
       nokogiri (~> 1.18.8)
-    mini_magick (5.2.0)
-      benchmark
+    mini_magick (5.3.0)
       logger
     mini_mime (1.1.5)
     minitest (5.25.5)
@@ -534,7 +534,7 @@ DEPENDENCIES
   kaminari (~> 1.2)
   lefthook
   metainspector
-  mini_magick (~> 5.0)
+  mini_magick (~> 5.3)
   nokogiri (~> 1.16)
   omniauth-github (~> 2.0)
   omniauth-rails_csrf_protection (~> 1.0)
