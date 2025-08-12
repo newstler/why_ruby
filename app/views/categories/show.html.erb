@@ -1,7 +1,31 @@
-<%# Set meta tags for this category %>
-<% content_for(:meta_title) { t('meta.categories.show.title', category_name: @category.name) } %>
-<% content_for(:meta_summary) { t('meta.categories.show.summary', category_name_lower: @category.name.downcase) } %>
-<% content_for(:meta_keywords) { t('meta.categories.show.keywords', category_name: @category.name) } %>
+<%# Set page title %>
+<% content_for(:title) { category_meta_title(@category) } %>
+
+<%# Override meta tags for this category %>
+<% content_for :head do %>
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="<%= category_meta_description(@category) %>">
+  <meta name="keywords" content="<%= category_meta_keywords(@category) %>">
+  <link rel="canonical" href="<%= category_url(@category) %>">
+  
+  <!-- Open Graph / Facebook Meta Tags -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="<%= category_url(@category) %>">
+  <meta property="og:title" content="<%= category_meta_title(@category) %>">
+  <meta property="og:description" content="<%= category_meta_description(@category) %>">
+  <meta property="og:image" content="<%= category_meta_image_url(@category) %>">
+  <meta property="og:site_name" content="<%= t('meta.site.name') %>">
+  <meta property="og:locale" content="<%= I18n.locale.to_s.gsub('-', '_') %>">
+  
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="<%= category_url(@category) %>">
+  <meta name="twitter:title" content="<%= category_meta_title(@category) %>">
+  <meta name="twitter:description" content="<%= category_meta_description(@category) %>">
+  <meta name="twitter:image" content="<%= category_meta_image_url(@category) %>">
+  <meta name="twitter:site" content="<%= t('meta.social.twitter_site') %>">
+  <meta name="twitter:creator" content="<%= t('meta.social.twitter_creator') %>">
+<% end %>
 
 <div class="space-y-8">
     <div class="mb-8">

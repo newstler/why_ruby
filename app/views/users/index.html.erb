@@ -1,7 +1,31 @@
-<%# Set meta tags for users page %>
-<% content_for(:meta_title) { "Ruby Community" } %>
-<% content_for(:meta_summary) { "Connect with passionate Ruby developers from around the world. Explore their projects, contributions, and insights." } %>
-<% content_for(:meta_keywords) { "ruby developers, ruby community, ruby programmers, rails developers" } %>
+<%# Set page title %>
+<% content_for(:title) { "Ruby Community" } %>
+
+<%# Override meta tags for community page %>
+<% content_for :head do %>
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Connect with passionate Ruby developers from around the world. Explore their projects, contributions, and insights.">
+  <meta name="keywords" content="ruby developers, ruby community, ruby programmers, rails developers">
+  <link rel="canonical" href="<%= users_url %>">
+  
+  <!-- Open Graph / Facebook Meta Tags -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="<%= users_url %>">
+  <meta property="og:title" content="Ruby Community">
+  <meta property="og:description" content="Connect with passionate Ruby developers from around the world. Explore their projects, contributions, and insights.">
+  <meta property="og:image" content="<%= request.base_url %>/og-image.png">
+  <meta property="og:site_name" content="<%= t('meta.site.name') %>">
+  <meta property="og:locale" content="<%= I18n.locale.to_s.gsub('-', '_') %>">
+  
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="<%= users_url %>">
+  <meta name="twitter:title" content="Ruby Community">
+  <meta name="twitter:description" content="Connect with passionate Ruby developers from around the world. Explore their projects, contributions, and insights.">
+  <meta name="twitter:image" content="<%= request.base_url %>/og-image.png">
+  <meta name="twitter:site" content="<%= t('meta.social.twitter_site') %>">
+  <meta name="twitter:creator" content="<%= t('meta.social.twitter_creator') %>">
+<% end %>
 
 <div class="space-y-8">
   <!-- Header -->

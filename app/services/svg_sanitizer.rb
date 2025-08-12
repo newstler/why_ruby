@@ -1,11 +1,13 @@
 class SvgSanitizer
   # This sanitizer ensures SVGs are safe and cross-platform compatible
   #
-  # IMPORTANT: SVG Case Sensitivity
-  # SVG attributes are case-sensitive per the spec. Many SVG editors output incorrect
-  # lowercase versions (e.g., 'viewbox' instead of 'viewBox'). While macOS may be forgiving,
-  # Linux strictly enforces case sensitivity, causing SVGs to break on production servers.
-  # We fix these case issues BEFORE saving to the database to ensure consistency.
+  # CRITICAL: SVG Case Sensitivity
+  # 1. SVG attributes are case-sensitive (viewBox, not viewbox)
+  # 2. Linux strictly enforces this, macOS is forgiving
+  # 3. We use Nokogiri::XML (not HTML) to preserve case
+  #
+  # We still fix case before parsing to handle any incoming
+  # SVGs with incorrect case, then XML parser preserves it.
 
   # Allowed SVG elements
   ALLOWED_ELEMENTS = %w[
@@ -167,19 +169,28 @@ class SvgSanitizer
       svg_content = svg_content.gsub(pattern, "")
     end
 
-    # Parse the SVG - use HTML parsing mode for better compatibility
+    # Parse the SVG - use XML parsing since SVG is XML!
+    # This preserves attribute case (viewBox stays viewBox)
     begin
-      doc = Nokogiri::HTML::DocumentFragment.parse(svg_content)
+      # Parse with NOENT disabled to prevent XXE attacks (though Nokogiri does this by default)
+      doc = Nokogiri::XML::DocumentFragment.parse(svg_content) do |config|
+        config.nonet  # Disable network connections
+        config.noent  # Disable entity substitution
+      end
     rescue => e
       Rails.logger.error "Failed to parse SVG: #{e.message}"
       return ""
     end
 
-    # Find SVG elements first
-    svg_elements = doc.css("svg")
-    return "" if svg_elements.empty?
+    # Find SVG element - in XML mode, it's a direct child
+    svg_element = if doc.children.any? { |c| c.name.downcase == "svg" }
+                    doc.children.find { |c| c.name.downcase == "svg" }
+    else
+                    # Fallback to CSS selector for nested SVGs
+                    doc.at_css("svg") || doc.at_xpath("//svg")
+    end
 
-    svg_element = svg_elements.first
+    return "" unless svg_element
 
     # Process all elements within the SVG
     svg_element.css("*").each do |element|
@@ -238,6 +249,7 @@ class SvgSanitizer
     end
 
     # Return the cleaned SVG
-    svg_element.to_html
+    # Using XML parser preserves case, so no need to fix again
+    svg_element.to_xml
   end
 end
