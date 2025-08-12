@@ -153,7 +153,7 @@ export default class extends Controller {
     // Update title placeholder
     if (this.hasTitleInputTarget) {
       if (currentType === 'success_story') {
-        this.titleInputTarget.placeholder = 'Enter company name'
+        this.titleInputTarget.placeholder = 'Enter company or project name'
       } else {
         this.titleInputTarget.placeholder = 'Enter a descriptive title'
       }
