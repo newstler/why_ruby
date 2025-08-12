@@ -94,6 +94,10 @@ class SvgSanitizer
   # Fix viewBox positioning issues
   # Some SVGs have offset viewBox values (e.g., "0 302.1 612 192") that cause content
   # to render outside the visible area. We normalize these to start at 0,0.
+  #
+  # NOTE: This is conservative - only fixes when offset is likely problematic:
+  # - Y offset > height (content completely above visible area)
+  # - X offset > width (content completely to the left of visible area)
   def self.fix_viewbox_offset(svg_content)
     return svg_content if svg_content.blank?
 
@@ -105,8 +109,9 @@ class SvgSanitizer
       if values.length == 4
         x_offset, y_offset, width, height = values
 
-        # If there's an offset, normalize it
-        if x_offset != 0 || y_offset != 0
+        # Only fix if offset seems problematic (content likely outside visible area)
+        # This preserves intentional offsets for sprites, artistic crops, etc.
+        if y_offset > height || x_offset > width || y_offset > 100
           # Create new viewBox starting at 0,0
           new_viewbox = "0 0 #{width} #{height}"
 
@@ -148,9 +153,14 @@ class SvgSanitizer
     # Many SVG editors output incorrect case for attributes, which breaks on Linux
     svg_content = fix_svg_case_sensitivity(svg_content)
 
-    # Fix viewBox offset issues
-    # Some SVGs have offset viewBox that causes content to render outside visible area
-    svg_content = fix_viewbox_offset(svg_content)
+    # NOTE: We DON'T automatically fix viewBox offsets as they may be intentional for:
+    # - Icon sprites/atlases (showing specific regions)
+    # - Artistic cropping
+    # - Animation preparation
+    # - Print bleeds
+    # - Technical diagrams with specific coordinate systems
+    # Uncomment the line below only if you're having issues with offset viewBoxes:
+    # svg_content = fix_viewbox_offset(svg_content)
 
     # Remove any dangerous patterns
     DANGEROUS_PATTERNS.each do |pattern|
