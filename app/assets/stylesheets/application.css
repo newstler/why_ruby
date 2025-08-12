@@ -146,6 +146,16 @@
   font-weight: 400;
 }
 
+/* Remove top margin from first element in preview containers */
+.prose > :first-child {
+  margin-top: 0;
+}
+
+/* Remove bottom margin from last element in preview containers */
+.prose > :last-child {
+  margin-bottom: 0;
+}
+
 /* Rouge Syntax Highlighting - GitHub Light Theme */
 .highlight .c { color: #6a737d; font-style: italic } /* Comment */
 .highlight .err { color: #a61717; background-color: #e3d2d2 } /* Error */
