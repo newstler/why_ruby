@@ -99,8 +99,10 @@
                   class: "#{category_menu_active?(category) ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
             <% end %>
             
-            <%= link_to "Success Stories", success_stories_posts_path, 
-                class: "#{success_stories_menu_active? ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
+            <% if has_success_stories? %>
+              <%= link_to "Success Stories", success_stories_posts_path, 
+                  class: "#{success_stories_menu_active? ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
+            <% end %>
             
             <%= link_to "Community", users_path, 
                 class: "#{community_menu_active? ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
@@ -170,8 +172,10 @@
                 <%= link_to category.name, category_path(category), 
                     class: "#{category_menu_active?(category) ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} block px-3 py-2 rounded-md text-base font-medium" %>
               <% end %>
-              <%= link_to "Success Stories", success_stories_posts_path, 
-                  class: "#{success_stories_menu_active? ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} block px-3 py-2 rounded-md text-base font-medium" %>
+              <% if has_success_stories? %>
+                <%= link_to "Success Stories", success_stories_posts_path, 
+                    class: "#{success_stories_menu_active? ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} block px-3 py-2 rounded-md text-base font-medium" %>
+              <% end %>
               <%= link_to "Community", users_path, 
                   class: "#{community_menu_active? ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} block px-3 py-2 rounded-md text-base font-medium" %>
             </div>

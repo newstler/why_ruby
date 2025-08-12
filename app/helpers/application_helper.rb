@@ -158,4 +158,9 @@ module ApplicationHelper
     # with HTML filtering enabled
     markdown_to_html(markdown_text).html_safe
   end
+
+  def has_success_stories?
+    # Cache the result for the request to avoid multiple DB queries
+    @has_success_stories ||= Post.success_stories.published.exists?
+  end
 end
