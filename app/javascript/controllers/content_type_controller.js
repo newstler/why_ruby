@@ -135,10 +135,7 @@ export default class extends Controller {
       }
       // Clear logo
       this.clearLogo()
-      // Clear image URL
-      if (this.hasImageInputTarget) {
-        this.imageInputTarget.value = ''
-      }
+      // Don't clear image URL when switching to link - it can be populated from metadata
     } else if (newType === 'article') {
       // Clear URL when switching to article
       if (this.hasUrlInputTarget) {
@@ -202,7 +199,8 @@ export default class extends Controller {
     this.titleFieldTarget.classList.remove('hidden')
     
     if (this.hasImageFieldTarget) {
-      this.imageFieldTarget.classList.add('hidden')
+      // Keep image field visible for external links
+      this.imageFieldTarget.classList.remove('hidden')
     }
     if (this.hasCategoryFieldTarget) {
       this.categoryFieldTarget.classList.remove('hidden')
