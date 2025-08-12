@@ -109,10 +109,8 @@ GEM
       addressable
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
-    anthropic (0.3.2)
-      event_stream_parser (>= 0.3.0, < 2.0.0)
-      faraday (>= 1)
-      faraday-multipart (>= 1)
+    anthropic (1.6.0)
+      connection_pool
     ast (2.4.3)
     avo (3.23.0)
       actionview (>= 6.1)
@@ -508,7 +506,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  anthropic (~> 0.3.0)
+  anthropic (~> 1.6.0)
   avo (>= 3.2)
   bootsnap
   brakeman
