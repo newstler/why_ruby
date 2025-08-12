@@ -1,7 +1,7 @@
 <%# Set meta tags for this tag %>
-<% content_for :meta_title, t('meta.tags.show.title', tag_name: @tag.name) %>
-<% content_for :meta_summary, t('meta.tags.show.summary', tag_name: @tag.name) %>
-<% content_for :meta_keywords, t('meta.tags.show.keywords', tag_name: @tag.name) %>
+<% content_for(:meta_title) { t('meta.tags.show.title', tag_name: @tag.name) } %>
+<% content_for(:meta_summary) { t('meta.tags.show.summary', tag_name: @tag.name) } %>
+<% content_for(:meta_keywords) { t('meta.tags.show.keywords', tag_name: @tag.name) } %>
 
 <div class="space-y-8">
   <h1 class="text-3xl font-bold text-gray-900 mb-2">#<%= @tag.name %></h1>

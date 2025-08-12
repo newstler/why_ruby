@@ -49,7 +49,7 @@
                 class="<%= post.link? ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %> px-4 py-3 text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer">
           <div class="flex flex-col items-center">
             <span class="font-medium">External Link</span>
-            <span class="text-xs mt-0.5 opacity-75">Share a link</span>
+            <span class="text-xs mt-0.5 opacity-75">Article, video, tutorial...</span>
           </div>
         </button>
         <button type="button"
@@ -59,7 +59,7 @@
                 class="<%= post.success_story? ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %> px-4 py-3 text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer">
           <div class="flex flex-col items-center">
             <span class="font-medium">Success Story</span>
-            <span class="text-xs mt-0.5 opacity-75">With logo</span>
+            <span class="text-xs mt-0.5 opacity-75">Powered by Ruby</span>
           </div>
         </button>
         </div>
@@ -278,7 +278,6 @@
                 "action": "input->markdown-preview#updatePreview",
                 "link-metadata-target": "summary"
               } %>
-          <p class="mt-1 text-sm text-gray-500">A 2-3 sentence summary that captures the key points. Leave blank to auto-generate.</p>
         </div>
         
         <div class="hidden lg:block" data-markdown-preview-target="previewContainer">
@@ -288,21 +287,39 @@
           </div>
         </div>
       </div>
+      <p class="mt-1 text-sm text-gray-500">A 2-3 sentence summary that captures the key points. Leave blank to auto-generate.</p>
     </div>
 
-    <div>
-      <label class="flex items-center space-x-2">
-        <%= form.check_box :published, class: "rounded border-gray-300 text-red-600 focus:ring-red-500" %>
-        <span class="text-sm font-medium text-gray-700">Publish immediately</span>
-      </label>
-      <p class="mt-1 text-sm text-gray-500">If unchecked, content will be saved as a draft</p>
-    </div>
-
-    <div class="flex justify-end space-x-4">
-      <%= link_to "Cancel", posts_path, class: "px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50" %>
-      <%= form.submit post.new_record? ? "Create Post" : "Update Post", 
-          class: "px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
-          data: { "turbo-submits-with": post.new_record? ? "Creating..." : "Updating...", disable_with: post.new_record? ? "Creating..." : "Updating..." } %>
+    <div class="flex items-center justify-between" data-controller="publish-toggle">
+      <div class="flex items-center space-x-2">
+        <span class="text-sm font-medium <%= post.published? ? 'text-gray-500' : 'text-gray-900' %>" data-publish-toggle-target="draftLabel">
+          Draft
+        </span>
+        <button type="button"
+                class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 <%= post.published? ? 'bg-red-600' : 'bg-gray-400' %>"
+                role="switch"
+                aria-checked="<%= post.published? %>"
+                data-action="click->publish-toggle#toggle"
+                data-publish-toggle-target="track">
+          <span class="sr-only">Toggle publication status</span>
+          <span aria-hidden="true"
+                class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out <%= post.published? ? 'translate-x-4' : 'translate-x-0' %>"
+                data-publish-toggle-target="switch"></span>
+        </button>
+        <span class="text-sm font-medium <%= post.published? ? 'text-gray-900' : 'text-gray-500' %>" data-publish-toggle-target="publishLabel">
+          Publish
+        </span>
+        <%= form.check_box :published, 
+            class: "hidden", 
+            data: { "publish-toggle-target": "checkbox" } %>
+      </div>
+      
+      <div class="flex items-center space-x-4">
+        <%= link_to "Cancel", posts_path, class: "px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50" %>
+        <%= form.submit post.new_record? ? "Create Post" : "Update Post", 
+            class: "px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
+            data: { "turbo-submits-with": post.new_record? ? "Creating..." : "Updating...", disable_with: post.new_record? ? "Creating..." : "Updating..." } %>
+      </div>
     </div>
   </div>
 <% end %> 

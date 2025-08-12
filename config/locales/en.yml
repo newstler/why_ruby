@@ -37,6 +37,7 @@ en:
     sign_in_to_comment: "Sign in to leave a comment."
   
   posts:
+    draft: "Draft"
     form:
       tags:
         label: "Tags"

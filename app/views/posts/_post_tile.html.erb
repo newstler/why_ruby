@@ -4,7 +4,15 @@
     - post: the post to display
 %>
 
-<div id="<%= dom_id(post) %>" class="group bg-white shadow-md rounded-lg p-6 hover:shadow-2xl hover:scale-[1.02] transform transition-all duration-300 ease-out relative cursor-pointer">
+<div id="<%= dom_id(post) %>" class="group bg-white shadow-md rounded-lg p-6 hover:shadow-2xl hover:scale-[1.02] transform transition-all duration-300 ease-out relative cursor-pointer <%= 'unpublished-post' unless post.published? %>">
+  <% unless post.published? %>
+    <div class="absolute top-4 left-4 z-10">
+      <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-gray-200 text-gray-700">
+        <%= t('posts.draft') %>
+      </span>
+    </div>
+  <% end %>
+  
   <% if user_signed_in? && (post.user == current_user || current_user.admin?) %>
     <div class="absolute top-4 right-4 flex items-center space-x-2 z-10">
       <%= link_to edit_post_path(post), class: "text-gray-400 hover:text-gray-600 transition-colors p-1 bg-white rounded-full shadow-sm hover:shadow", title: "Edit" do %>
@@ -18,11 +26,11 @@
   
   <%= link_to post_link_url(post), post_link_options(post).merge(class: "block cursor-pointer") do %>
     <% if post.success_story? && post.logo_svg.present? %>
-      <div class="mb-4 flex justify-center items-center h-32 p-4 success-story-tile-logo">
+      <div class="mb-4 h-48 rounded-lg flex justify-center items-center p-8 success-story-tile-logo <%= 'grayscale' unless post.published? %>">
         <%= raw post.logo_svg %>
       </div>
     <% elsif post.title_image_url.present? %>
-      <div class="mb-4 aspect-video overflow-hidden rounded-lg">
+      <div class="mb-4 aspect-video overflow-hidden rounded-lg <%= 'grayscale' unless post.published? %>">
         <%= image_tag post.title_image_url, alt: post.title, class: "w-full h-full object-cover" %>
       </div>
     <% end %>
@@ -46,7 +54,7 @@
     </div>
     
     <div class="flex items-start justify-between mb-2 gap-3">
-      <h3 class="text-xl font-semibold text-gray-900 group-hover:text-red-600 transition-colors">
+      <h3 class="text-xl font-semibold <%= post.published? ? 'text-gray-900 group-hover:text-red-600' : 'text-gray-500' %> transition-colors">
         <%= post.title %>
       </h3>
       <% if post.comments.any? %>

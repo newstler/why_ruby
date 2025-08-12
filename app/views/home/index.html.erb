@@ -42,7 +42,7 @@
 </div>
 
 <!-- Success Stories Floating Logos (Full Width) -->
-<% if @success_stories.any? %>
+<% if @success_stories.count >= 5 %>
   <div class="py-8 md:py-16 bg-gray-50 my-8 md:my-16">
     <h2 class="text-center text-sm font-semibold text-gray-600 tracking-wide uppercase mb-6 md:mb-12">
       Success powered by Ruby
@@ -106,7 +106,7 @@
 
   <!-- Recent Posts -->
   <div class="space-y-4">
-    <h2 class="text-center text-sm font-semibold text-gray-600 tracking-wide uppercase my-8 md:my-16">Latest wisdom to explore</h2>
+    <h2 class="text-center text-sm font-semibold text-gray-600 tracking-wide uppercase my-8 md:my-16">Recent <span>♥️</span> shared</h2>
     <div class="hidden lg:flex gap-6">
       <% # Split posts into 3 columns for desktop, maintaining left-to-right reading order %>
       <% column1_posts = [] %>
@@ -160,6 +160,17 @@
     <div class="md:hidden space-y-6">
       <% @posts.each do |post| %>
         <%= render 'posts/post_tile', post: post %>
+      <% end %>
+    </div>
+    
+    <div class="mt-12 mb-8 text-center">
+      <% if user_signed_in? %>
+        <%= link_to "Share what you love about Ruby →", new_post_path, 
+            class: "text-gray-400 hover:text-gray-600 transition-colors" %>
+      <% else %>
+        <%= link_to "Share what you love about Ruby →", 
+            github_auth_with_return_path(return_to: new_post_path),
+            class: "text-gray-400 hover:text-gray-600 transition-colors" %>
       <% end %>
     </div>
   </div>

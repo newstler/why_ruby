@@ -88,21 +88,12 @@ class Post < ApplicationRecord
     end
   end
 
-  # Returns a proxied/generated image URL for social sharing
-  def proxied_image_url
-    return nil unless has_social_image?
-    Rails.application.routes.url_helpers.image_post_path(self)
-  end
 
-  # Check if post has an image suitable for social sharing
-  def has_social_image?
-    (success_story? && logo_png_base64.present?) || title_image_url.present?
-  end
 
   private
 
   def generate_png_for_success_story
-    SuccessStoryImageGenerator.new(self).generate!
+    GenerateSuccessStoryImageJob.perform_later(self)
   end
 
   def content_or_url_or_logo_present

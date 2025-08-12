@@ -1,7 +1,7 @@
 <%# Set meta tags for this category %>
-<% content_for :meta_title, t('meta.categories.show.title', category_name: @category.name) %>
-<% content_for :meta_summary, t('meta.categories.show.summary', category_name_lower: @category.name.downcase) %>
-<% content_for :meta_keywords, t('meta.categories.show.keywords', category_name: @category.name) %>
+<% content_for(:meta_title) { t('meta.categories.show.title', category_name: @category.name) } %>
+<% content_for(:meta_summary) { t('meta.categories.show.summary', category_name_lower: @category.name.downcase) } %>
+<% content_for(:meta_keywords) { t('meta.categories.show.keywords', category_name: @category.name) } %>
 
 <div class="space-y-8">
     <div class="mb-8">
@@ -71,7 +71,18 @@
         <% end %>
       </div>
       
-      <div class="mt-8">
+      <div class="mt-12 mb-8 text-center">
+        <% if user_signed_in? %>
+          <%= link_to "Share what you love about Ruby →", new_post_path, 
+              class: "text-gray-400 hover:text-gray-600 transition-colors" %>
+        <% else %>
+          <%= link_to "Share what you love about Ruby →", 
+              github_auth_with_return_path(return_to: new_post_path),
+              class: "text-gray-400 hover:text-gray-600 transition-colors" %>
+        <% end %>
+      </div>
+      
+      <div class="mt-12 flex justify-center">
         <%= paginate @posts %>
       </div>
     <% else %>

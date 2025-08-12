@@ -191,6 +191,7 @@ class Avo::Resources::Post < Avo::BaseResource
   def actions
     action Avo::Actions::TogglePublished
     action Avo::Actions::RegenerateSummary
+    action Avo::Actions::RegenerateSuccessStoryImage
     action Avo::Actions::BulkDelete
     # action Avo::Actions::PinContent
     # action Avo::Actions::ClearReports
