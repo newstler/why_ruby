@@ -1,7 +1,7 @@
 module PostsHelper
   def post_meta_title(post)
     if post.success_story?
-      "#{post.title} - Ruby Success Story"
+      "#{post.title} Success Story"
     else
       post.title
     end
