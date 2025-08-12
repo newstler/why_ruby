@@ -94,9 +94,29 @@
     </div>
   </div>
 
+  <!-- Community CTA -->
+  <% if user_signed_in? %>
+    <div class="mt-12 mb-8 text-center">
+      <% tweet_text = "Join us and share what you love about Ruby! https://whyruby.info" %>
+      <%= link_to "Invite your Ruby friends to join →", 
+          "https://x.com/intent/tweet?text=#{CGI.escape(tweet_text)}", 
+          target: "_blank",
+          rel: "noopener",
+          class: "text-gray-400 hover:text-gray-600 transition-colors" %>
+    </div>
+  <% else %>
+    <div class="mt-12 mb-8 text-center">
+      <%= link_to "Join the friendly Ruby community →", 
+          user_github_omniauth_authorize_path,
+          method: :post,
+          data: { turbo: false },
+          class: "text-gray-400 hover:text-gray-600 transition-colors" %>
+    </div>
+  <% end %>
+
   <!-- Pagination -->
   <% if @users.total_pages > 1 %>
-    <div class="mt-8">
+    <div class="mt-12 flex justify-center">
       <%= paginate @users %>
     </div>
   <% end %>

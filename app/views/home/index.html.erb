@@ -106,7 +106,7 @@
 
   <!-- Recent Posts -->
   <div class="space-y-4">
-    <h2 class="text-center text-sm font-semibold text-gray-600 tracking-wide uppercase my-8 md:my-16">Latest wisdom to explore</h2>
+    <h2 class="text-center text-sm font-semibold text-gray-600 tracking-wide uppercase my-8 md:my-16">Recent <span>♥️</span> shared</h2>
     <div class="hidden lg:flex gap-6">
       <% # Split posts into 3 columns for desktop, maintaining left-to-right reading order %>
       <% column1_posts = [] %>
@@ -162,5 +162,12 @@
         <%= render 'posts/post_tile', post: post %>
       <% end %>
     </div>
+    
+    <% if user_signed_in? %>
+      <div class="mt-12 mb-8 text-center">
+        <%= link_to "Share what you love about Ruby →", new_post_path, 
+            class: "text-gray-400 hover:text-gray-600 transition-colors" %>
+      </div>
+    <% end %>
   </div>
 </div> 

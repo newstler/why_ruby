@@ -67,9 +67,9 @@
     </div>
     
     <% if user_signed_in? %>
-      <div class="mt-8 text-center">
+      <div class="mt-12 mb-8 text-center">
         <%= link_to "Share your success story →", new_post_path(type: 'success_story'), 
-            class: "text-gray-400 hover:text-gray-600" %>
+            class: "text-gray-400 hover:text-gray-600 transition-colors" %>
       </div>
     <% end %>
     
