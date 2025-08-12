@@ -2,9 +2,6 @@ class GenerateSummaryJob < ApplicationJob
   queue_as :default
 
   def perform(post, force: false)
-    # Skip if not published
-    return unless post.published?
-
     # Skip if summary exists and we're not forcing regeneration
     return if post.summary.present? && !force
 
@@ -44,17 +41,7 @@ class GenerateSummaryJob < ApplicationJob
   private
 
   def prepare_text_with_context(post)
-    if post.article? || post.success_story?
-      # For articles and success stories, use the actual content
-      text = post.content
-      # Remove markdown formatting for cleaner summaries
-      text = ActionView::Base.full_sanitizer.sanitize(text)
-      context = {
-        type: post.post_type,
-        title: post.title,
-        has_code: post.content.include?("```")
-      }
-    else
+    if post.link?
       # For external links, fetch the actual content
       text = fetch_external_content(post.url)
 
@@ -68,6 +55,16 @@ class GenerateSummaryJob < ApplicationJob
         title: post.title,
         url: post.url,
         domain: (URI.parse(post.url).host rescue nil)
+      }
+    else
+      # For articles and success stories, use the actual content
+      text = post.content
+      # Remove markdown formatting for cleaner summaries
+      text = ActionView::Base.full_sanitizer.sanitize(text)
+      context = {
+        type: post.post_type,
+        title: post.title,
+        has_code: post.content.include?("```")
       }
     end
 
