@@ -91,12 +91,66 @@ class SvgSanitizer
     fixed
   end
 
+  # Fix viewBox positioning issues
+  # Some SVGs have offset viewBox values (e.g., "0 302.1 612 192") that cause content
+  # to render outside the visible area. We normalize these to start at 0,0.
+  def self.fix_viewbox_offset(svg_content)
+    return svg_content if svg_content.blank?
+
+    # Match viewBox attribute
+    if svg_content =~ /viewBox\s*=\s*["']([^"']+)["']/i
+      viewbox_value = $1
+      values = viewbox_value.split(/\s+/).map(&:to_f)
+
+      if values.length == 4
+        x_offset, y_offset, width, height = values
+
+        # If there's an offset, normalize it
+        if x_offset != 0 || y_offset != 0
+          # Create new viewBox starting at 0,0
+          new_viewbox = "0 0 #{width} #{height}"
+
+          # Replace the viewBox
+          fixed_svg = svg_content.gsub(/viewBox\s*=\s*["'][^"']+["']/i, "viewBox=\"#{new_viewbox}\"")
+
+          # Add a transform to the SVG content to compensate for the offset
+          # This moves all content up/left by the offset amount
+          if x_offset != 0 || y_offset != 0
+            # Add transform to the first <svg> tag
+            fixed_svg = fixed_svg.sub(/<svg([^>]*)>/i) do |match|
+              attrs = $1
+              # Check if there's already a transform
+              if attrs =~ /transform\s*=/i
+                # Prepend to existing transform
+                attrs.sub!(/transform\s*=\s*["']([^"']+)["']/i) do |t|
+                  "transform=\"translate(#{-x_offset} #{-y_offset}) #{$1}\""
+                end
+                "<svg#{attrs}>"
+              else
+                # Add new transform
+                "<svg#{attrs} transform=\"translate(#{-x_offset} #{-y_offset})\">"
+              end
+            end
+          end
+
+          return fixed_svg
+        end
+      end
+    end
+
+    svg_content
+  end
+
   def self.sanitize(svg_content)
     return "" if svg_content.blank?
 
     # Fix common SVG case sensitivity issues FIRST
     # Many SVG editors output incorrect case for attributes, which breaks on Linux
     svg_content = fix_svg_case_sensitivity(svg_content)
+
+    # Fix viewBox offset issues
+    # Some SVGs have offset viewBox that causes content to render outside visible area
+    svg_content = fix_viewbox_offset(svg_content)
 
     # Remove any dangerous patterns
     DANGEROUS_PATTERNS.each do |pattern|
