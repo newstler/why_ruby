@@ -63,7 +63,7 @@ export default class extends Controller {
     const content = this.inputTarget.value
     
     if (content.trim() === "") {
-      this.previewTarget.innerHTML = "<p class='text-gray-500'>Preview will appear here as you type...</p>"
+      this.previewTarget.innerHTML = "<p class='text-gray-400'>Preview will appear here as you type...</p>"
       return
     }
 

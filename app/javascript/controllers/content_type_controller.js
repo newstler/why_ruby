@@ -69,6 +69,20 @@ export default class extends Controller {
     this.clearFieldsOnTypeChange(previousType, type)
     
     this.toggleFields()
+    
+    // Dispatch event for form validation after a short delay to ensure DOM updates
+    setTimeout(() => {
+      this.element.dispatchEvent(new CustomEvent('postTypeChanged', { 
+        detail: { postType: type },
+        bubbles: true 
+      }))
+      
+      // Also trigger validation directly
+      const titleInput = this.element.querySelector('[name="post[title]"]')
+      if (titleInput) {
+        titleInput.dispatchEvent(new Event('input', { bubbles: true }))
+      }
+    }, 50)
   }
   
   getCurrentType() {
@@ -324,6 +338,8 @@ export default class extends Controller {
       // Store SVG content in hidden field
       if (this.hasSvgContentTarget) {
         this.svgContentTarget.value = svgContent
+        // Trigger validation after logo is added
+        this.svgContentTarget.dispatchEvent(new Event('change', { bubbles: true }))
       }
       
       // Hide upload area and show preview
@@ -360,10 +376,21 @@ export default class extends Controller {
     this.clearLogo()
   }
   
+  updateSelectColor(event) {
+    const select = event.target
+    if (select.value === '') {
+      select.classList.add('placeholder-selected')
+    } else {
+      select.classList.remove('placeholder-selected')
+    }
+  }
+  
   clearLogo() {
     // Clear the hidden SVG content field
     if (this.hasSvgContentTarget) {
       this.svgContentTarget.value = ''
+      // Trigger validation after logo is removed
+      this.svgContentTarget.dispatchEvent(new Event('change', { bubbles: true }))
     }
     
     // Clear the file input
