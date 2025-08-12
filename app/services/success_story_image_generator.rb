@@ -60,8 +60,14 @@ class SuccessStoryImageGenerator
       end
 
       # Get dimensions of the converted logo
-      dimensions_cmd = "identify -format '%wx%h' #{png_file.path}"
-      dimensions = `#{dimensions_cmd}`.strip
+      # Use Open3 to safely execute the command and avoid command injection
+      require "open3"
+      stdout, status = Open3.capture2("identify", "-format", "%wx%h", png_file.path)
+      unless status.success?
+        Rails.logger.error "Failed to get image dimensions"
+        return nil
+      end
+      dimensions = stdout.strip
       logo_width, logo_height = dimensions.split("x").map(&:to_i)
 
       # Calculate position to center logo at 960x432 on 1920x1080 template
