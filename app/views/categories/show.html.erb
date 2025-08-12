@@ -71,12 +71,16 @@
         <% end %>
       </div>
       
-      <% if user_signed_in? %>
-        <div class="mt-12 mb-8 text-center">
+      <div class="mt-12 mb-8 text-center">
+        <% if user_signed_in? %>
           <%= link_to "Share what you love about Ruby →", new_post_path, 
               class: "text-gray-400 hover:text-gray-600 transition-colors" %>
-        </div>
-      <% end %>
+        <% else %>
+          <%= link_to "Share what you love about Ruby →", 
+              github_auth_with_return_path(return_to: new_post_path),
+              class: "text-gray-400 hover:text-gray-600 transition-colors" %>
+        <% end %>
+      </div>
       
       <div class="mt-12 flex justify-center">
         <%= paginate @posts %>

@@ -5,7 +5,11 @@ class ApplicationController < ActionController::Base
   protected
 
   def after_sign_in_path_for(resource)
-    # Redirect to user's profile after sign in
+    # Check if there's a stored return path
+    return_to = session.delete(:return_to)
+    return return_to if return_to.present?
+
+    # Otherwise redirect to user's profile after sign in
     if resource.is_a?(User)
       user_path(resource)
     else

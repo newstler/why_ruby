@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   # Add sign out route for OmniAuth-only authentication
   devise_scope :user do
     delete "sign_out", to: "users/sessions#destroy", as: :destroy_user_session
+    match "sign_in_github", to: "users/sessions#github_auth", as: :github_auth_with_return, via: [ :get, :post ]
   end
 
   # Admin panel - only accessible to users with admin role
