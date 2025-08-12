@@ -1,4 +1,12 @@
 class SvgSanitizer
+  # This sanitizer ensures SVGs are safe and cross-platform compatible
+  #
+  # IMPORTANT: SVG Case Sensitivity
+  # SVG attributes are case-sensitive per the spec. Many SVG editors output incorrect
+  # lowercase versions (e.g., 'viewbox' instead of 'viewBox'). While macOS may be forgiving,
+  # Linux strictly enforces case sensitivity, causing SVGs to break on production servers.
+  # We fix these case issues BEFORE saving to the database to ensure consistency.
+
   # Allowed SVG elements
   ALLOWED_ELEMENTS = %w[
     svg g path rect circle ellipse line polyline polygon text tspan textPath
@@ -38,10 +46,59 @@ class SvgSanitizer
     /-moz-binding:/i
   ].freeze
 
+  # Fix common SVG case sensitivity issues
+  # Many SVG editors output incorrect case for attributes, which breaks on Linux
+  def self.fix_svg_case_sensitivity(svg_content)
+    return svg_content if svg_content.blank?
+
+    fixed = svg_content.dup
+
+    # Most common problematic attributes
+    fixed.gsub!(/\bviewbox=/i, "viewBox=")
+    fixed.gsub!(/\bpreserveaspectratio=/i, "preserveAspectRatio=")
+
+    # Gradient-related attributes
+    fixed.gsub!(/\bgradientunits=/i, "gradientUnits=")
+    fixed.gsub!(/\bgradienttransform=/i, "gradientTransform=")
+
+    # Pattern-related attributes
+    fixed.gsub!(/\bpatternunits=/i, "patternUnits=")
+    fixed.gsub!(/\bpatterntransform=/i, "patternTransform=")
+
+    # Other common camelCase attributes
+    fixed.gsub!(/\bclippath=/i, "clipPath=")
+    fixed.gsub!(/\btextlength=/i, "textLength=")
+    fixed.gsub!(/\blengthadjust=/i, "lengthAdjust=")
+    fixed.gsub!(/\bbaseprofile=/i, "baseProfile=")
+
+    # Marker-related attributes
+    fixed.gsub!(/\bmarkerwidth=/i, "markerWidth=")
+    fixed.gsub!(/\bmarkerheight=/i, "markerHeight=")
+    fixed.gsub!(/\bmarkerunits=/i, "markerUnits=")
+
+    # Reference attributes
+    fixed.gsub!(/\brefx=/i, "refX=")
+    fixed.gsub!(/\brefy=/i, "refY=")
+
+    # Path and stroke attributes
+    fixed.gsub!(/\bpathlength=/i, "pathLength=")
+    fixed.gsub!(/\bstrokedasharray=/i, "strokeDasharray=")
+    fixed.gsub!(/\bstrokedashoffset=/i, "strokeDashoffset=")
+    fixed.gsub!(/\bstrokelinecap=/i, "strokeLinecap=")
+    fixed.gsub!(/\bstrokelinejoin=/i, "strokeLinejoin=")
+    fixed.gsub!(/\bstrokemiterlimit=/i, "strokeMiterlimit=")
+
+    fixed
+  end
+
   def self.sanitize(svg_content)
     return "" if svg_content.blank?
 
-    # Remove any dangerous patterns first
+    # Fix common SVG case sensitivity issues FIRST
+    # Many SVG editors output incorrect case for attributes, which breaks on Linux
+    svg_content = fix_svg_case_sensitivity(svg_content)
+
+    # Remove any dangerous patterns
     DANGEROUS_PATTERNS.each do |pattern|
       svg_content = svg_content.gsub(pattern, "")
     end
