@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   # Admin panel - only accessible to users with admin role
   authenticate :user, ->(user) { user.admin? } do
     mount Avo::Engine, at: Avo.configuration.root_path
+    mount Litestream::Engine, at: "/litestream"
   end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
