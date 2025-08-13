@@ -27,7 +27,7 @@
       <!-- Default Open Graph / Facebook Meta Tags -->
       <meta property="og:type" content="website">
       <meta property="og:url" content="<%= request.original_url %>">
-      <meta property="og:title" content="<%= t('meta.default.title') %>">
+      <meta property="og:title" content="<%= full_page_title(yield(:title).presence) %>">
       <meta property="og:description" content="<%= t('meta.default.summary') %>">
       <meta property="og:image" content="<%= request.base_url %>/og-image.png">
       <meta property="og:site_name" content="<%= t('meta.site.name') %>">
@@ -36,7 +36,7 @@
       <!-- Default Twitter Card Meta Tags -->
       <meta name="twitter:card" content="summary_large_image">
       <meta name="twitter:url" content="<%= request.original_url %>">
-      <meta name="twitter:title" content="<%= t('meta.default.title') %>">
+      <meta name="twitter:title" content="<%= full_page_title(yield(:title).presence) %>">
       <meta name="twitter:description" content="<%= t('meta.default.summary') %>">
       <meta name="twitter:image" content="<%= request.base_url %>/og-image.png">
       <meta name="twitter:site" content="<%= t('meta.social.twitter_site') %>">

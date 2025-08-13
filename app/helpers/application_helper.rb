@@ -164,6 +164,15 @@ module ApplicationHelper
     @has_success_stories ||= Post.success_stories.published.exists?
   end
 
+  # Generate the full formatted page title that matches the <title> tag format
+  def full_page_title(page_title = nil)
+    if page_title.present?
+      "Why Ruby? — #{page_title}"
+    else
+      "Why Ruby?"
+    end
+  end
+
   # URL helpers for the new routing structure
   def post_url_for(post)
     if post.success_story?

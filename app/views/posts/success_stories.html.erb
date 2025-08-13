@@ -11,7 +11,7 @@
   <!-- Open Graph / Facebook Meta Tags -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="<%= success_stories_url %>">
-  <meta property="og:title" content="Success Stories">
+  <meta property="og:title" content="<%= full_page_title("Success Stories") %>">
   <meta property="og:description" content="Real-world success stories from companies using Ruby and Rails">
   <meta property="og:image" content="<%= request.base_url %>/og-image.png">
   <meta property="og:site_name" content="<%= t('meta.site.name') %>">
@@ -20,7 +20,7 @@
   <!-- Twitter Card Meta Tags -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="<%= success_stories_url %>">
-  <meta name="twitter:title" content="Success Stories">
+  <meta name="twitter:title" content="<%= full_page_title("Success Stories") %>">
   <meta name="twitter:description" content="Real-world success stories from companies using Ruby and Rails">
   <meta name="twitter:image" content="<%= request.base_url %>/og-image.png">
   <meta name="twitter:site" content="<%= t('meta.social.twitter_site') %>">

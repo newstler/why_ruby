@@ -11,7 +11,7 @@
   <!-- Open Graph / Facebook Meta Tags -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="<%= category_url(@category) %>">
-  <meta property="og:title" content="<%= category_meta_title(@category) %>">
+  <meta property="og:title" content="<%= full_page_title(category_meta_title(@category)) %>">
   <meta property="og:description" content="<%= category_meta_description(@category) %>">
   <meta property="og:image" content="<%= category_meta_image_url(@category) %>">
   <meta property="og:site_name" content="<%= t('meta.site.name') %>">
@@ -20,7 +20,7 @@
   <!-- Twitter Card Meta Tags -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="<%= category_url(@category) %>">
-  <meta name="twitter:title" content="<%= category_meta_title(@category) %>">
+  <meta name="twitter:title" content="<%= full_page_title(category_meta_title(@category)) %>">
   <meta name="twitter:description" content="<%= category_meta_description(@category) %>">
   <meta name="twitter:image" content="<%= category_meta_image_url(@category) %>">
   <meta name="twitter:site" content="<%= t('meta.social.twitter_site') %>">

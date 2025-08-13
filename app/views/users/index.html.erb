@@ -1,5 +1,5 @@
 <%# Set page title %>
-<% content_for(:title) { "Ruby Community" } %>
+<% content_for(:title) { "Community" } %>
 
 <%# Override meta tags for community page %>
 <% content_for :head do %>
@@ -11,7 +11,7 @@
   <!-- Open Graph / Facebook Meta Tags -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="<%= users_url %>">
-  <meta property="og:title" content="Ruby Community">
+  <meta property="og:title" content="<%= full_page_title("Community") %>">
   <meta property="og:description" content="Connect with passionate Ruby developers from around the world. Explore their projects, contributions, and insights.">
   <meta property="og:image" content="<%= request.base_url %>/og-image.png">
   <meta property="og:site_name" content="<%= t('meta.site.name') %>">
@@ -20,7 +20,7 @@
   <!-- Twitter Card Meta Tags -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="<%= users_url %>">
-  <meta name="twitter:title" content="Ruby Community">
+  <meta name="twitter:title" content="<%= full_page_title("Community") %>">
   <meta name="twitter:description" content="Connect with passionate Ruby developers from around the world. Explore their projects, contributions, and insights.">
   <meta name="twitter:image" content="<%= request.base_url %>/og-image.png">
   <meta name="twitter:site" content="<%= t('meta.social.twitter_site') %>">
@@ -29,7 +29,7 @@
 
 <div class="space-y-8">
   <!-- Header -->
-  <h1 class="text-4xl font-black text-gray-900 mb-4">Ruby Community</h1>
+  <h1 class="text-4xl font-black text-gray-900 mb-4">Community</h1>
   <p class="text-lg text-gray-600">
     Connect with passionate Ruby developers from around the world. Explore their projects, contributions, and insights.
   </p>
