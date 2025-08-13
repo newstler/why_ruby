@@ -50,7 +50,7 @@ class Post < ApplicationRecord
   before_validation :clean_logo_svg
   after_create :generate_summary_job
   after_update :regenerate_summary_if_needed
-  after_save :generate_png_for_success_story, if: -> { success_story? && saved_change_to_logo_svg? }
+  after_save :generate_success_story_image, if: -> { success_story? && saved_change_to_logo_svg? }
   after_commit :process_featured_image_if_needed
   after_update :check_reports_threshold
   after_create :update_user_counter_caches
@@ -98,7 +98,7 @@ class Post < ApplicationRecord
 
   private
 
-  def generate_png_for_success_story
+  def generate_success_story_image
     # Force regeneration when logo changes on an existing record
     # saved_change_to_logo_svg? returns true if logo_svg changed in the last save
     # For new records, we don't need to force (no existing image)
@@ -258,7 +258,6 @@ class Post < ApplicationRecord
 
     if result[:success]
       update_columns(
-        image_blur_data: result[:blur_data],
         image_variants: result[:variants]
       )
       Rails.logger.info "Successfully processed image for Post ##{id}"
@@ -287,7 +286,7 @@ class Post < ApplicationRecord
   end
 
   def has_processed_images?
-    image_variants.present? && image_blur_data.present?
+    image_variants.present?
   end
 
   def reprocess_image!
@@ -298,7 +297,6 @@ class Post < ApplicationRecord
 
     if result[:success]
       update_columns(
-        image_blur_data: result[:blur_data],
         image_variants: result[:variants]
       )
     end
@@ -315,6 +313,6 @@ class Post < ApplicationRecord
     end
 
     # Clear image processing fields
-    update_columns(image_blur_data: nil, image_variants: nil)
+    update_columns(image_variants: nil)
   end
 end

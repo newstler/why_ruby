@@ -58,10 +58,4 @@ module ImageHelper
       :medium
     end
   end
-
-  # CSS for blur loading effect - DEPRECATED
-  # Kept for backward compatibility but no longer used due to Turbo issues
-  def blur_loading_styles
-    ""
-  end
 end

@@ -1,7 +1,6 @@
 class SuccessStoryImageGenerator
   # Template should be 1200x630 WebP format
   TEMPLATE_PATH = Rails.root.join("app", "assets", "images", "success_story_template.webp")
-  FALLBACK_PNG_TEMPLATE = Rails.root.join("app", "assets", "images", "success_story_template.png")
 
   # OG Image dimensions
   OG_WIDTH = 1200
@@ -47,7 +46,6 @@ class SuccessStoryImageGenerator
 
         if result[:success]
           @post.update_columns(
-            image_blur_data: result[:blur_data],
             image_variants: result[:variants]
           )
         end
@@ -68,10 +66,9 @@ class SuccessStoryImageGenerator
       svg_file.write(@post.logo_svg)
       svg_file.rewind
 
-      # Determine which template to use
-      template_path = File.exist?(TEMPLATE_PATH) ? TEMPLATE_PATH : FALLBACK_PNG_TEMPLATE
-      unless File.exist?(template_path)
-        Rails.logger.error "No template file found for success story image generation"
+      # Check if template exists
+      unless File.exist?(TEMPLATE_PATH)
+        Rails.logger.error "Template file not found for success story image generation: #{TEMPLATE_PATH}"
         return nil
       end
 
@@ -160,7 +157,7 @@ class SuccessStoryImageGenerator
       # Composite logo onto template using ImageMagick
       composite_cmd = [
         "convert",
-        template_path.to_s,
+        TEMPLATE_PATH.to_s,
         logo_file.path,
         "-geometry", "+#{x_offset}+#{y_offset}",
         "-composite",
