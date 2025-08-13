@@ -61,11 +61,17 @@ class PostsController < ApplicationController
     process_tags
 
     # Clean params before update
-    cleaned_params = post_params.except(:tag_names)
+    cleaned_params = post_params.except(:tag_names, :metadata_image_url, :remove_featured_image)
     cleaned_params[:category_id] = nil if cleaned_params[:category_id] == "" && @post.success_story?
 
-    # Handle image removal if checkbox was checked
-    if params[:post][:remove_featured_image] == "1"
+    # Handle featured image: removal, upload, or metadata fetch
+    if cleaned_params[:featured_image].present?
+      # A new file was uploaded - Rails will handle this automatically via cleaned_params
+    elsif @post.link? && params[:post][:metadata_image_url].present?
+      # Fetch and attach image from metadata for link posts
+      fetch_and_attach_image_from_url(params[:post][:metadata_image_url])
+    elsif params[:post][:remove_featured_image] == "1"
+      # Only remove if no new image is being added
       @post.featured_image.purge
     end
 
@@ -169,7 +175,7 @@ class PostsController < ApplicationController
   private
 
   def fetch_and_attach_image_from_url(url)
-    return if url.blank? || @post.featured_image.attached?
+    return if url.blank?
 
     begin
       require "open-uri"
@@ -197,7 +203,7 @@ class PostsController < ApplicationController
         filename += extension
       end
 
-      # Attach the image
+      # Attach the image (will replace existing if present)
       @post.featured_image.attach(
         io: image_io,
         filename: filename
@@ -250,7 +256,7 @@ class PostsController < ApplicationController
   end
 
   def post_params
-    params.require(:post).permit(:title, :content, :url, :summary, :category_id, :featured_image, :metadata_image_url, :published, :tag_names, :post_type, :logo_svg, tag_ids: [])
+    params.require(:post).permit(:title, :content, :url, :summary, :category_id, :featured_image, :metadata_image_url, :remove_featured_image, :published, :tag_names, :post_type, :logo_svg, tag_ids: [])
   end
 
   def clean_post_params

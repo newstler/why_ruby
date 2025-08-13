@@ -1,4 +1,4 @@
-<%= form_with model: post, data: { controller: "content-type form-validation", post_id: (post.persisted? ? post.id : nil), "form-validation-post-type-value": post.post_type.presence || 'article' } do |form| %>
+<%= form_with model: post, url: (post.persisted? ? post_update_path(post) : posts_path), data: { turbo: false, controller: "content-type form-validation", post_id: (post.persisted? ? post.id : nil), "form-validation-post-type-value": post.post_type.presence || 'article' } do |form| %>
   <% if post.errors.any? %>
     <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
       <div class="flex">
@@ -216,7 +216,7 @@
               "content-type-target": "imageInput",
               "action": "change->content-type#handleImageUpload"
             } %>
-        <%= hidden_field_tag "post[metadata_image_url]", nil, data: { "link-metadata-target": "imageUrl", "content-type-target": "metadataImageUrl" } %>
+        <%= form.hidden_field :metadata_image_url, data: { "link-metadata-target": "imageUrl", "content-type-target": "metadataImageUrl" } %>
         
         <div class="hidden" data-content-type-target="imagePreviewWrapper">
           <div class="relative bg-gray-50 p-6 rounded-lg border border-gray-200">
@@ -252,7 +252,7 @@
               <p class="text-sm text-gray-600"><%= post.featured_image.filename %></p>
               <p class="text-xs text-gray-500">Size: <%= number_to_human_size(post.featured_image.byte_size) %></p>
             </div>
-            <%= hidden_field_tag "post[remove_featured_image]", "0", data: { "content-type-target": "removeImageFlag" } %>
+            <%= form.hidden_field :remove_featured_image, value: "0", data: { "content-type-target": "removeImageFlag" } %>
           </div>
         <% end %>
       </div>

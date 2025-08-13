@@ -449,6 +449,11 @@ export default class extends Controller {
         return
       }
       
+      // Reset the remove flag since we're adding a new image
+      if (this.hasRemoveImageFlagTarget) {
+        this.removeImageFlagTarget.value = '0'
+      }
+      
       // Show preview
       const reader = new FileReader()
       reader.onload = (e) => {
@@ -552,6 +557,11 @@ export default class extends Controller {
     // Set the metadata_image_url hidden field value
     if (this.hasMetadataImageUrlTarget) {
       this.metadataImageUrlTarget.value = imageUrl
+    }
+    
+    // Reset the remove flag since we're adding a new image
+    if (this.hasRemoveImageFlagTarget) {
+      this.removeImageFlagTarget.value = '0'
     }
     
     // Hide upload area
