@@ -173,6 +173,27 @@ module ApplicationHelper
     end
   end
 
+  # Generate versioned URL for OG image to bust social media caches
+  # Can accept a custom path for resource-specific images or use default
+  def versioned_og_image_url(custom_path = nil)
+    if custom_path
+      # For custom paths (like post-specific images), just append a version parameter
+      # The version will be handled by the resource itself (e.g., post.updated_at)
+      custom_path
+    else
+      # For the default og-image.png, use file modification time as version
+      og_image_path = Rails.root.join("public", "og-image.png")
+      version = if File.exist?(og_image_path)
+        File.mtime(og_image_path).to_i.to_s
+      else
+        # Fallback to app version or deployment timestamp
+        Rails.application.config.assets.version || Time.current.to_i.to_s
+      end
+
+      "#{request.base_url}/og-image.png?v=#{version}"
+    end
+  end
+
   # URL helpers for the new routing structure
   def post_url_for(post)
     if post.success_story?

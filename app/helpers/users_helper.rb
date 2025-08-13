@@ -19,7 +19,7 @@ module UsersHelper
     if user.avatar_url.present?
       user.avatar_url
     else
-      "#{request.base_url}/og-image.png"
+      versioned_og_image_url
     end
   end
 end

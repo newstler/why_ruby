@@ -96,7 +96,15 @@ class Post < ApplicationRecord
   private
 
   def generate_png_for_success_story
-    GenerateSuccessStoryImageJob.perform_later(self)
+    # Force regeneration when logo changes on an existing record
+    # saved_change_to_logo_svg? returns true if logo_svg changed in the last save
+    # For new records, we don't need to force (no existing image)
+    # For existing records with logo changes, we need to force regeneration
+    force_regenerate = saved_change_to_logo_svg? && !saved_change_to_id?
+
+    Rails.logger.info "GenerateSuccessStoryImageJob triggered for post #{id}: force=#{force_regenerate}, logo_changed=#{saved_change_to_logo_svg?}, new_record=#{saved_change_to_id?}"
+
+    GenerateSuccessStoryImageJob.perform_later(self, force: force_regenerate)
   end
 
   def content_or_url_or_logo_present

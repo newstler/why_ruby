@@ -66,6 +66,17 @@ class Avo::Resources::Post < Avo::BaseResource
 
     field :category, as: :belongs_to
 
+    # Post type and success story fields
+    field :post_type, as: :select,
+      options: { article: "Article", link: "Link", success_story: "Success Story" }.invert,
+      hide_on: [ :index ]
+
+    field :logo_svg, as: :textarea,
+      name: "Logo SVG",
+      hide_on: [ :index ],
+      rows: 10,
+      help: "SVG code for success story logo (only used for Success Story posts)"
+
     # Status badges for index view
     field :published,
       as: :text,
@@ -157,6 +168,51 @@ class Avo::Resources::Post < Avo::BaseResource
     field :content, as: :textarea, hide_on: [ :index ], rows: 20
     field :summary, as: :textarea, hide_on: [ :index ], rows: 5
     field :title_image_url, as: :text, hide_on: [ :index ]
+
+    # Featured image (for success stories and other posts)
+    field :featured_image, as: :file,
+      name: "Featured Image",
+      hide_on: [ :index ],
+      accept: "image/*",
+      help: "Generated automatically for success stories with logos"
+
+    # OG Image Preview
+    field :og_image_preview,
+      as: :text,
+      name: "OG Image Preview",
+      only_on: [ :show ],
+      format_using: -> do
+        # Generate the OG image URL
+        og_url = if record.featured_image.attached?
+          if record.success_story?
+            "#{view_context.request.base_url}/success-stories/#{record.to_param}/og-image.png?v=#{record.updated_at.to_i}"
+          elsif record.category
+            "#{view_context.request.base_url}/#{record.category.to_param}/#{record.to_param}/og-image.png?v=#{record.updated_at.to_i}"
+          else
+            "#{view_context.request.base_url}/uncategorized/#{record.to_param}/og-image.png?v=#{record.updated_at.to_i}"
+          end
+        else
+          # Default OG image with version based on file modification time
+          og_image_path = Rails.root.join("public", "og-image.png")
+          version = File.exist?(og_image_path) ? File.mtime(og_image_path).to_i.to_s : Time.current.to_i.to_s
+          "#{view_context.request.base_url}/og-image.png?v=#{version}"
+        end
+
+        # Build the HTML without concat to avoid duplication
+        image_link = link_to(og_url, target: "_blank", class: "inline-block") do
+          image_tag(og_url,
+            class: "max-w-md border border-gray-300 rounded shadow-sm hover:shadow-md transition-shadow",
+            alt: "OG Image Preview")
+        end
+
+        url_display = content_tag(:div, class: "text-sm text-gray-600") do
+          "URL: #{link_to(og_url, og_url, target: '_blank', class: 'text-blue-600 hover:underline break-all')}".html_safe
+        end
+
+        content_tag(:div, class: "space-y-2") do
+          "#{image_link}#{url_display}".html_safe
+        end
+      end
 
     # Counts and metadata
     field :reports_count, as: :number, readonly: true, hide_on: [ :index ]

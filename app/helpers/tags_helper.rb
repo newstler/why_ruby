@@ -12,6 +12,6 @@ module TagsHelper
   end
 
   def tag_meta_image_url(tag)
-    "#{request.base_url}/og-image.png"
+    versioned_og_image_url
   end
 end

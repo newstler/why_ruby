@@ -26,7 +26,7 @@ namespace :success_stories do
     puts "Queueing image generation for #{success_stories.count} success stories..."
 
     success_stories.find_each do |post|
-      GenerateSuccessStoryImageJob.perform_later(post)
+      GenerateSuccessStoryImageJob.perform_later(post, force: true)
       print "."
     end
 
@@ -55,7 +55,7 @@ namespace :success_stories do
     puts "Found #{missing.count} success stories missing images..."
 
     missing.find_each do |post|
-      GenerateSuccessStoryImageJob.perform_later(post)
+      GenerateSuccessStoryImageJob.perform_later(post, force: false)
       print "."
     end
 
