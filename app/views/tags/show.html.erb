@@ -1,7 +1,31 @@
-<%# Set meta tags for this tag %>
-<% content_for(:meta_title) { t('meta.tags.show.title', tag_name: @tag.name) } %>
-<% content_for(:meta_summary) { t('meta.tags.show.summary', tag_name: @tag.name) } %>
-<% content_for(:meta_keywords) { t('meta.tags.show.keywords', tag_name: @tag.name) } %>
+<%# Set page title %>
+<% content_for(:title) { tag_meta_title(@tag) } %>
+
+<%# Override meta tags for this tag page %>
+<% content_for :head do %>
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="<%= tag_meta_description(@tag) %>">
+  <meta name="keywords" content="<%= tag_meta_keywords(@tag) %>">
+  <link rel="canonical" href="<%= tag_url(@tag) %>">
+  
+  <!-- Open Graph / Facebook Meta Tags -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="<%= tag_url(@tag) %>">
+  <meta property="og:title" content="<%= tag_meta_title(@tag) %>">
+  <meta property="og:description" content="<%= tag_meta_description(@tag) %>">
+  <meta property="og:image" content="<%= tag_meta_image_url(@tag) %>">
+  <meta property="og:site_name" content="<%= t('meta.site.name') %>">
+  <meta property="og:locale" content="<%= I18n.locale.to_s.gsub('-', '_') %>">
+  
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="<%= tag_url(@tag) %>">
+  <meta name="twitter:title" content="<%= tag_meta_title(@tag) %>">
+  <meta name="twitter:description" content="<%= tag_meta_description(@tag) %>">
+  <meta name="twitter:image" content="<%= tag_meta_image_url(@tag) %>">
+  <meta name="twitter:site" content="<%= t('meta.social.twitter_site') %>">
+  <meta name="twitter:creator" content="<%= t('meta.social.twitter_creator') %>">
+<% end %>
 
 <div class="space-y-8">
   <h1 class="text-3xl font-bold text-gray-900 mb-2">#<%= @tag.name %></h1>

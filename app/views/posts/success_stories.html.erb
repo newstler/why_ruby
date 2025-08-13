@@ -1,7 +1,31 @@
-<%# Set meta tags for this page %>
-<% content_for(:meta_title) { "Success Stories" } %>
-<% content_for(:meta_summary) { "Real-world success stories from companies using Ruby and Rails" } %>
-<% content_for(:meta_keywords) { "ruby success stories, rails case studies, ruby companies, rails startups" } %>
+<%# Set page title %>
+<% content_for(:title) { "Success Stories" } %>
+
+<%# Override meta tags for success stories page %>
+<% content_for :head do %>
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Real-world success stories from companies using Ruby and Rails">
+  <meta name="keywords" content="ruby success stories, rails case studies, ruby companies, rails startups">
+  <link rel="canonical" href="<%= success_stories_posts_url %>">
+  
+  <!-- Open Graph / Facebook Meta Tags -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="<%= success_stories_posts_url %>">
+  <meta property="og:title" content="Success Stories">
+  <meta property="og:description" content="Real-world success stories from companies using Ruby and Rails">
+  <meta property="og:image" content="<%= request.base_url %>/og-image.png">
+  <meta property="og:site_name" content="<%= t('meta.site.name') %>">
+  <meta property="og:locale" content="<%= I18n.locale.to_s.gsub('-', '_') %>">
+  
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="<%= success_stories_posts_url %>">
+  <meta name="twitter:title" content="Success Stories">
+  <meta name="twitter:description" content="Real-world success stories from companies using Ruby and Rails">
+  <meta name="twitter:image" content="<%= request.base_url %>/og-image.png">
+  <meta name="twitter:site" content="<%= t('meta.social.twitter_site') %>">
+  <meta name="twitter:creator" content="<%= t('meta.social.twitter_creator') %>">
+<% end %>
 
 <div class="max-w-7xl mx-auto">
   <div class="mb-8">

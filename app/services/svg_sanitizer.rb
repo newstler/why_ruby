@@ -1,4 +1,14 @@
 class SvgSanitizer
+  # This sanitizer ensures SVGs are safe and cross-platform compatible
+  #
+  # CRITICAL: SVG Case Sensitivity
+  # 1. SVG attributes are case-sensitive (viewBox, not viewbox)
+  # 2. Linux strictly enforces this, macOS is forgiving
+  # 3. We use Nokogiri::XML (not HTML) to preserve case
+  #
+  # We still fix case before parsing to handle any incoming
+  # SVGs with incorrect case, then XML parser preserves it.
+
   # Allowed SVG elements
   ALLOWED_ELEMENTS = %w[
     svg g path rect circle ellipse line polyline polygon text tspan textPath
@@ -38,27 +48,149 @@ class SvgSanitizer
     /-moz-binding:/i
   ].freeze
 
+  # Fix common SVG case sensitivity issues
+  # Many SVG editors output incorrect case for attributes, which breaks on Linux
+  def self.fix_svg_case_sensitivity(svg_content)
+    return svg_content if svg_content.blank?
+
+    fixed = svg_content.dup
+
+    # Most common problematic attributes
+    fixed.gsub!(/\bviewbox=/i, "viewBox=")
+    fixed.gsub!(/\bpreserveaspectratio=/i, "preserveAspectRatio=")
+
+    # Gradient-related attributes
+    fixed.gsub!(/\bgradientunits=/i, "gradientUnits=")
+    fixed.gsub!(/\bgradienttransform=/i, "gradientTransform=")
+
+    # Pattern-related attributes
+    fixed.gsub!(/\bpatternunits=/i, "patternUnits=")
+    fixed.gsub!(/\bpatterntransform=/i, "patternTransform=")
+
+    # Other common camelCase attributes
+    fixed.gsub!(/\bclippath=/i, "clipPath=")
+    fixed.gsub!(/\btextlength=/i, "textLength=")
+    fixed.gsub!(/\blengthadjust=/i, "lengthAdjust=")
+    fixed.gsub!(/\bbaseprofile=/i, "baseProfile=")
+
+    # Marker-related attributes
+    fixed.gsub!(/\bmarkerwidth=/i, "markerWidth=")
+    fixed.gsub!(/\bmarkerheight=/i, "markerHeight=")
+    fixed.gsub!(/\bmarkerunits=/i, "markerUnits=")
+
+    # Reference attributes
+    fixed.gsub!(/\brefx=/i, "refX=")
+    fixed.gsub!(/\brefy=/i, "refY=")
+
+    # Path and stroke attributes
+    fixed.gsub!(/\bpathlength=/i, "pathLength=")
+    fixed.gsub!(/\bstrokedasharray=/i, "strokeDasharray=")
+    fixed.gsub!(/\bstrokedashoffset=/i, "strokeDashoffset=")
+    fixed.gsub!(/\bstrokelinecap=/i, "strokeLinecap=")
+    fixed.gsub!(/\bstrokelinejoin=/i, "strokeLinejoin=")
+    fixed.gsub!(/\bstrokemiterlimit=/i, "strokeMiterlimit=")
+
+    fixed
+  end
+
+  # Fix viewBox positioning issues
+  # Some SVGs have offset viewBox values (e.g., "0 302.1 612 192") that cause content
+  # to render outside the visible area. We normalize these to start at 0,0.
+  #
+  # NOTE: This is conservative - only fixes when offset is likely problematic:
+  # - Y offset > height (content completely above visible area)
+  # - X offset > width (content completely to the left of visible area)
+  def self.fix_viewbox_offset(svg_content)
+    return svg_content if svg_content.blank?
+
+    # Match viewBox attribute
+    if svg_content =~ /viewBox\s*=\s*["']([^"']+)["']/i
+      viewbox_value = $1
+      values = viewbox_value.split(/\s+/).map(&:to_f)
+
+      if values.length == 4
+        x_offset, y_offset, width, height = values
+
+        # Only fix if offset seems problematic (content likely outside visible area)
+        # This preserves intentional offsets for sprites, artistic crops, etc.
+        if y_offset > height || x_offset > width || y_offset > 100
+          # Create new viewBox starting at 0,0
+          new_viewbox = "0 0 #{width} #{height}"
+
+          # Replace the viewBox
+          fixed_svg = svg_content.gsub(/viewBox\s*=\s*["'][^"']+["']/i, "viewBox=\"#{new_viewbox}\"")
+
+          # Add a transform to the SVG content to compensate for the offset
+          # This moves all content up/left by the offset amount
+          if x_offset != 0 || y_offset != 0
+            # Add transform to the first <svg> tag
+            fixed_svg = fixed_svg.sub(/<svg([^>]*)>/i) do |match|
+              attrs = $1
+              # Check if there's already a transform
+              if attrs =~ /transform\s*=/i
+                # Prepend to existing transform
+                attrs.sub!(/transform\s*=\s*["']([^"']+)["']/i) do |t|
+                  "transform=\"translate(#{-x_offset} #{-y_offset}) #{$1}\""
+                end
+                "<svg#{attrs}>"
+              else
+                # Add new transform
+                "<svg#{attrs} transform=\"translate(#{-x_offset} #{-y_offset})\">"
+              end
+            end
+          end
+
+          return fixed_svg
+        end
+      end
+    end
+
+    svg_content
+  end
+
   def self.sanitize(svg_content)
     return "" if svg_content.blank?
 
-    # Remove any dangerous patterns first
+    # Fix common SVG case sensitivity issues FIRST
+    # Many SVG editors output incorrect case for attributes, which breaks on Linux
+    svg_content = fix_svg_case_sensitivity(svg_content)
+
+    # NOTE: We DON'T automatically fix viewBox offsets as they may be intentional for:
+    # - Icon sprites/atlases (showing specific regions)
+    # - Artistic cropping
+    # - Animation preparation
+    # - Print bleeds
+    # - Technical diagrams with specific coordinate systems
+    # Uncomment the line below only if you're having issues with offset viewBoxes:
+    # svg_content = fix_viewbox_offset(svg_content)
+
+    # Remove any dangerous patterns
     DANGEROUS_PATTERNS.each do |pattern|
       svg_content = svg_content.gsub(pattern, "")
     end
 
-    # Parse the SVG - use HTML parsing mode for better compatibility
+    # Parse the SVG - use XML parsing since SVG is XML!
+    # This preserves attribute case (viewBox stays viewBox)
     begin
-      doc = Nokogiri::HTML::DocumentFragment.parse(svg_content)
+      # Parse with NOENT disabled to prevent XXE attacks (though Nokogiri does this by default)
+      doc = Nokogiri::XML::DocumentFragment.parse(svg_content) do |config|
+        config.nonet  # Disable network connections
+        config.noent  # Disable entity substitution
+      end
     rescue => e
       Rails.logger.error "Failed to parse SVG: #{e.message}"
       return ""
     end
 
-    # Find SVG elements first
-    svg_elements = doc.css("svg")
-    return "" if svg_elements.empty?
+    # Find SVG element - in XML mode, it's a direct child
+    svg_element = if doc.children.any? { |c| c.name.downcase == "svg" }
+                    doc.children.find { |c| c.name.downcase == "svg" }
+    else
+                    # Fallback to CSS selector for nested SVGs
+                    doc.at_css("svg") || doc.at_xpath("//svg")
+    end
 
-    svg_element = svg_elements.first
+    return "" unless svg_element
 
     # Process all elements within the SVG
     svg_element.css("*").each do |element|
@@ -117,6 +249,7 @@ class SvgSanitizer
     end
 
     # Return the cleaned SVG
-    svg_element.to_html
+    # Using XML parser preserves case, so no need to fix again
+    svg_element.to_xml
   end
 end

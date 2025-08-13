@@ -22,7 +22,10 @@ class PostsController < ApplicationController
       data = @post.logo_png_base64.match(/^data:image\/png;base64,(.+)$/)[1]
       image_data = Base64.decode64(data)
 
-      expires_in 1.week, public: true
+      # Use ETag based on post's updated_at to allow caching but invalidate on changes
+      # This way browsers cache the image but revalidate when the post is updated
+      fresh_when(etag: @post, last_modified: @post.updated_at, public: true)
+
       send_data image_data,
                 type: "image/png",
                 disposition: "inline",

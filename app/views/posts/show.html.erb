@@ -1,26 +1,34 @@
-<%# Set meta tags for this post %>
-<% if @post.success_story? %>
-  <% content_for(:meta_title) { "#{@post.title} - Ruby Success Story" } %>
-<% else %>
-  <% content_for(:meta_title) { t('meta.posts.show.title', post_title: @post.title) } %>
+<%# Set page title %>
+<% content_for(:title) { post_meta_title(@post) } %>
+
+<%# Override meta tags for this post %>
+<% content_for :head do %>
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="<%= post_meta_description(@post) %>">
+  <meta name="keywords" content="<%= post_meta_keywords(@post) %>">
+  <% if post_meta_author(@post).present? %>
+    <meta name="author" content="<%= post_meta_author(@post) %>">
+  <% end %>
+  <link rel="canonical" href="<%= post_url(@post) %>">
+  
+  <!-- Open Graph / Facebook Meta Tags -->
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="<%= post_url(@post) %>">
+  <meta property="og:title" content="<%= post_meta_title(@post) %>">
+  <meta property="og:description" content="<%= post_meta_description(@post) %>">
+  <meta property="og:image" content="<%= post_meta_image_url(@post) %>">
+  <meta property="og:site_name" content="<%= t('meta.site.name') %>">
+  <meta property="og:locale" content="<%= I18n.locale.to_s.gsub('-', '_') %>">
+  
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="<%= post_url(@post) %>">
+  <meta name="twitter:title" content="<%= post_meta_title(@post) %>">
+  <meta name="twitter:description" content="<%= post_meta_description(@post) %>">
+  <meta name="twitter:image" content="<%= post_meta_image_url(@post) %>">
+  <meta name="twitter:site" content="<%= t('meta.social.twitter_site') %>">
+  <meta name="twitter:creator" content="<%= t('meta.social.twitter_creator') %>">
 <% end %>
-<% content_for(:meta_summary) { @post.summary } if @post.summary.present? %>
-<% 
-  categories_and_tags = [@post.category&.name, @post.tags.pluck(:name)].compact.flatten.join(", ")
-  content_for(:meta_keywords) { t('meta.posts.show.keywords', categories_and_tags: categories_and_tags) }
-%>
-<% content_for(:meta_url) { post_url(@post) } %>
-<% content_for(:meta_type) { "article" } %>
-<% if @post.user.present? %>
-  <% content_for(:meta_author) { @post.user.display_name } %>
-<% end %>
-<%# Set meta image %>
-<% if @post.success_story? && @post.logo_png_base64.present? %>
-  <% content_for(:meta_image) { image_post_path(@post) } %>
-<% elsif @post.title_image_url.present? %>
-  <% content_for(:meta_image) { @post.title_image_url } %>
-<% end %>
-<%# Posts without images will use the default from layout %>
 
 <%= turbo_stream_from "post_#{@post.id}" %>
 

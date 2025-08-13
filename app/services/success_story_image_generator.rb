@@ -37,26 +37,69 @@ class SuccessStoryImageGenerator
       svg_file.write(@post.logo_svg)
       svg_file.rewind
 
-      # Convert SVG to PNG with transparency using ImageMagick directly
-      # Strategy: CSS "contain" behavior - fit entire logo within box
-      # - Target: 1152x540px box
-      # - Small logos get upsized to fill the box (maintaining aspect ratio)
-      # - Large logos get downsized to fit within the box
-      # - Aspect ratio is always preserved
-      # The logo will touch either the width or height boundary, whichever is reached first
-      svg_to_png_cmd = [
-        "convert",
-        "-background", "none",
-        "-density", "300",
-        svg_file.path,
-        "-resize", "1152x540",  # Fit within 1152x540 box (CSS contain behavior)
-        "-gravity", "center",
-        png_file.path
-      ]
+      # Dual approach: Try rsvg-convert first (better SVG handling), fall back to ImageMagick
+      converted = false
 
-      unless system(*svg_to_png_cmd)
-        Rails.logger.error "Failed to convert SVG to PNG"
-        return nil
+      # Method 1: Try rsvg-convert (preferred - no black border issues)
+      if system("which", "rsvg-convert", out: File::NULL, err: File::NULL)
+        Rails.logger.info "Using rsvg-convert for SVG conversion"
+
+        # First pass: Convert at high resolution
+        temp_high_res = Tempfile.new([ "high_res", ".png" ])
+        rsvg_cmd = [
+          "rsvg-convert",
+          "--keep-aspect-ratio",
+          "--width", "1728",  # 1.5x target width for better quality
+          "--height", "810",  # 1.5x target height for better quality
+          "--background-color", "transparent",
+          svg_file.path,
+          "--output", temp_high_res.path
+        ]
+
+        if system(*rsvg_cmd, err: File::NULL)
+          # Second pass: Resize to target dimensions with high quality
+          resize_cmd = [
+            "convert",
+            temp_high_res.path,
+            "-resize", "1152x540",  # Fit within box
+            "-filter", "Lanczos",
+            "-quality", "100",
+            "-background", "none",
+            "-gravity", "center",
+            "-extent", "1152x540",  # Canvas size
+            "PNG32:#{png_file.path}"  # Force 32-bit PNG with alpha
+          ]
+
+          if system(*resize_cmd)
+            converted = true
+            Rails.logger.info "Successfully converted SVG using rsvg-convert"
+          end
+        end
+
+        temp_high_res.close
+        temp_high_res.unlink
+      end
+
+      # Method 2: Fall back to ImageMagick
+      unless converted
+        Rails.logger.info "Using ImageMagick for SVG conversion"
+
+        svg_to_png_cmd = [
+          "convert",
+          "-background", "none",
+          "-density", "450",  # Higher density for better quality
+          svg_file.path,
+          "-resize", "1152x540",  # Fit within box
+          "-filter", "Lanczos",
+          "-quality", "100",
+          "-gravity", "center",
+          "PNG32:#{png_file.path}"  # Force 32-bit PNG with alpha
+        ]
+
+        unless system(*svg_to_png_cmd)
+          Rails.logger.error "Failed to convert SVG to PNG with both methods"
+          return nil
+        end
       end
 
       # Get dimensions of the converted logo
@@ -115,17 +158,38 @@ class SuccessStoryImageGenerator
       svg_file.write(@post.logo_svg)
       svg_file.rewind
 
-      # Simple SVG to PNG conversion
-      convert_cmd = [
-        "convert",
-        "-background", "none",
-        svg_file.path,
-        png_file.path
-      ]
+      # Dual approach for simple conversion too
+      converted = false
 
-      unless system(*convert_cmd)
-        Rails.logger.error "Failed to convert SVG to PNG"
-        return nil
+      # Try rsvg-convert first
+      if system("which", "rsvg-convert", out: File::NULL, err: File::NULL)
+        rsvg_cmd = [
+          "rsvg-convert",
+          "--keep-aspect-ratio",
+          "--background-color", "transparent",
+          svg_file.path,
+          "--output", png_file.path
+        ]
+
+        if system(*rsvg_cmd, err: File::NULL)
+          converted = true
+        end
+      end
+
+      # Fall back to ImageMagick
+      unless converted
+        convert_cmd = [
+          "convert",
+          "-background", "none",
+          "-density", "300",
+          svg_file.path,
+          "PNG32:#{png_file.path}"
+        ]
+
+        unless system(*convert_cmd)
+          Rails.logger.error "Failed to convert SVG to PNG"
+          return nil
+        end
       end
 
       image_data = File.read(png_file.path)

@@ -6,44 +6,42 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     
     <!-- Page Title -->
-    <title><%= content_for(:meta_title) ? "#{content_for(:meta_title)} | #{t('meta.site.name')}" : t('meta.default.title') %></title>
+    <% page_title = yield(:title).presence %>
+    <title><%= page_title ? "Why Ruby? — #{page_title}" : "Why Ruby?" %></title>
     
     <!-- Rails Security Tags -->
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="<%= content_for(:meta_summary).presence || t('meta.default.summary') %>">
-    <meta name="keywords" content="<%= content_for(:meta_keywords).presence || t('meta.default.keywords') %>">
-    <meta name="author" content="<%= content_for(:meta_author).presence || t('meta.default.author') %>">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="<%= content_for(:meta_url).presence || request.original_url %>">
-    
-    <!-- Open Graph / Facebook Meta Tags -->
-    <% 
-      og_image = content_for(:meta_image)
-      og_image = og_image.presence || "/og-image.png"
-      # Ensure we have a full URL for the image
-      unless og_image.start_with?('http')
-        og_image = request.base_url + og_image
-      end
-    %>
-    <meta property="og:type" content="<%= content_for(:meta_type).presence || "website" %>">
-    <meta property="og:url" content="<%= content_for(:meta_url).presence || request.original_url %>">
-    <meta property="og:title" content="<%= content_for(:meta_title).presence || t('meta.default.title') %>">
-    <meta property="og:description" content="<%= content_for(:meta_summary).presence || t('meta.default.summary') %>">
-    <meta property="og:image" content="<%= og_image %>">
-    <meta property="og:site_name" content="<%= t('meta.site.name') %>">
-    <meta property="og:locale" content="<%= I18n.locale.to_s.gsub('-', '_') %>">
-    
-    <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="<%= content_for(:twitter_card).presence || "summary_large_image" %>">
-    <meta name="twitter:url" content="<%= content_for(:meta_url).presence || request.original_url %>">
-    <meta name="twitter:title" content="<%= content_for(:meta_title).presence || t('meta.default.title') %>">
-    <meta name="twitter:description" content="<%= content_for(:meta_summary).presence || t('meta.default.summary') %>">
-    <meta name="twitter:image" content="<%= og_image %>">
-    <meta name="twitter:site" content="<%= t('meta.social.twitter_site') %>">
-    <meta name="twitter:creator" content="<%= t('meta.social.twitter_creator') %>">
+    <!-- Custom head content from views (or defaults if not provided) -->
+    <% if content_for?(:head) %>
+      <%= yield(:head) %>
+    <% else %>
+      <!-- Default Meta Tags -->
+      <meta name="description" content="<%= t('meta.default.summary') %>">
+      <meta name="keywords" content="<%= t('meta.default.keywords') %>">
+      <meta name="author" content="<%= t('meta.default.author') %>">
+      <meta name="robots" content="index, follow">
+      <link rel="canonical" href="<%= request.original_url %>">
+      
+      <!-- Default Open Graph / Facebook Meta Tags -->
+      <meta property="og:type" content="website">
+      <meta property="og:url" content="<%= request.original_url %>">
+      <meta property="og:title" content="<%= t('meta.default.title') %>">
+      <meta property="og:description" content="<%= t('meta.default.summary') %>">
+      <meta property="og:image" content="<%= request.base_url %>/og-image.png">
+      <meta property="og:site_name" content="<%= t('meta.site.name') %>">
+      <meta property="og:locale" content="<%= I18n.locale.to_s.gsub('-', '_') %>">
+      
+      <!-- Default Twitter Card Meta Tags -->
+      <meta name="twitter:card" content="summary_large_image">
+      <meta name="twitter:url" content="<%= request.original_url %>">
+      <meta name="twitter:title" content="<%= t('meta.default.title') %>">
+      <meta name="twitter:description" content="<%= t('meta.default.summary') %>">
+      <meta name="twitter:image" content="<%= request.base_url %>/og-image.png">
+      <meta name="twitter:site" content="<%= t('meta.social.twitter_site') %>">
+      <meta name="twitter:creator" content="<%= t('meta.social.twitter_creator') %>">
+    <% end %>
     
     <!-- PWA and Mobile App Meta Tags -->
     <meta name="theme-color" content="#dc2626">
@@ -66,6 +64,7 @@
     <link rel="icon" type="image/png" href="/icon.png">
     <link rel="icon" type="image/svg+xml" href="/icon.svg">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    
     
     <!-- Stylesheets and JavaScript -->
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>

@@ -1,17 +1,32 @@
-<%# Set meta tags for user profile %>
-<% content_for(:meta_title) { t('meta.users.show.title', display_name: @user.display_name, username: @user.display_name) } %>
-<% 
-  if @user.bio.present?
-    content_for(:meta_summary) { t('meta.users.show.summary_with_bio', bio: @user.bio) }
-  else
-    content_for(:meta_summary) { t('meta.users.show.summary_without_bio', display_name: @user.display_name) }
-  end
-%>
-<% content_for(:meta_keywords) { t('meta.users.show.keywords', username: @user.display_name) } %>
-<% if @user.avatar_url.present? %>
-  <% content_for(:meta_image) { @user.avatar_url } %>
+<%# Set page title %>
+<% content_for(:title) { user_meta_title(@user) } %>
+
+<%# Override meta tags for this user profile %>
+<% content_for :head do %>
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="<%= user_meta_description(@user) %>">
+  <meta name="keywords" content="<%= user_meta_keywords(@user) %>">
+  <meta name="author" content="<%= user_meta_title(@user) %>">
+  <link rel="canonical" href="<%= user_url(@user) %>">
+  
+  <!-- Open Graph / Facebook Meta Tags -->
+  <meta property="og:type" content="profile">
+  <meta property="og:url" content="<%= user_url(@user) %>">
+  <meta property="og:title" content="<%= user_meta_title(@user) %>">
+  <meta property="og:description" content="<%= user_meta_description(@user) %>">
+  <meta property="og:image" content="<%= user_meta_image_url(@user) %>">
+  <meta property="og:site_name" content="<%= t('meta.site.name') %>">
+  <meta property="og:locale" content="<%= I18n.locale.to_s.gsub('-', '_') %>">
+  
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="<%= user_url(@user) %>">
+  <meta name="twitter:title" content="<%= user_meta_title(@user) %>">
+  <meta name="twitter:description" content="<%= user_meta_description(@user) %>">
+  <meta name="twitter:image" content="<%= user_meta_image_url(@user) %>">
+  <meta name="twitter:site" content="<%= t('meta.social.twitter_site') %>">
+  <meta name="twitter:creator" content="<%= t('meta.social.twitter_creator') %>">
 <% end %>
-<% content_for(:meta_type) { "profile" } %>
 
 <div class="space-y-8">
   <!-- Tabbed Content Section -->
