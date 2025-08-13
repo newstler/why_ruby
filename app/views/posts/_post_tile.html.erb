@@ -31,7 +31,7 @@
       </div>
     <% elsif post.featured_image.attached? %>
       <div class="mb-4 aspect-video overflow-hidden rounded-lg <%= 'grayscale' unless post.published? %>">
-        <%= image_tag post.featured_image, alt: post.title, class: "w-full h-full object-cover" %>
+        <%= post_image_tag(post, size: :thumb, css_class: "w-full h-full object-cover", alt: post.title) %>
       </div>
     <% end %>
     

@@ -1,4 +1,5 @@
 module ApplicationHelper
+  include ImageHelper
   def markdown_to_html(markdown_text)
     return "" if markdown_text.blank?
 

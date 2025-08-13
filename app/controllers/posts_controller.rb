@@ -38,17 +38,23 @@ class PostsController < ApplicationController
   end
 
   def create
-    @post = current_user.posts.build(post_params.except(:tag_names, :metadata_image_url))
+    @post = current_user.posts.build(post_params.except(:tag_names, :metadata_image_url, :remove_featured_image))
     clean_post_params
     process_tags
 
-    # Fetch and attach image from metadata if it's a link post
-    if @post.link? && params[:post][:metadata_image_url].present?
-      fetch_and_attach_image_from_url(params[:post][:metadata_image_url])
-    end
-
+    # Save the post first
     if @post.save
-      redirect_to post_path_for(@post), notice: "Post was successfully created."
+      # Then handle image attachment after post is saved
+      if @post.link? && params[:post][:metadata_image_url].present?
+        fetch_and_attach_image_from_url(params[:post][:metadata_image_url])
+      end
+
+      # Redirect to category page for link posts, post page for others
+      if @post.link? && @post.category
+        redirect_to category_path(@post.category), notice: "Link was successfully posted."
+      else
+        redirect_to post_path_for(@post), notice: "Post was successfully created."
+      end
     else
       render :new, status: :unprocessable_entity
     end
@@ -64,19 +70,34 @@ class PostsController < ApplicationController
     cleaned_params = post_params.except(:tag_names, :metadata_image_url, :remove_featured_image)
     cleaned_params[:category_id] = nil if cleaned_params[:category_id] == "" && @post.success_story?
 
-    # Handle featured image: removal, upload, or metadata fetch
-    if cleaned_params[:featured_image].present?
-      # A new file was uploaded - Rails will handle this automatically via cleaned_params
-    elsif @post.link? && params[:post][:metadata_image_url].present?
-      # Fetch and attach image from metadata for link posts
-      fetch_and_attach_image_from_url(params[:post][:metadata_image_url])
-    elsif params[:post][:remove_featured_image] == "1"
-      # Only remove if no new image is being added
+    # Determine if we have a new image being uploaded
+    has_new_image = cleaned_params[:featured_image].present? ||
+                   (@post.link? && params[:post][:metadata_image_url].present?)
+
+    # If we have a new image, always purge the old one first (regardless of remove flag)
+    if has_new_image && @post.featured_image.attached?
       @post.featured_image.purge
+      @post.clear_image_variants!
+    # Otherwise, check if we're just removing without replacement
+    elsif params[:post][:remove_featured_image] == "1" && !has_new_image
+      @post.featured_image.purge_later
+      @post.clear_image_variants!
+    end
+
+    # Handle metadata image fetch for link posts
+    if @post.link? && params[:post][:metadata_image_url].present?
+      fetch_and_attach_image_from_url(params[:post][:metadata_image_url])
+      # Remove from cleaned_params to avoid Rails trying to process it
+      cleaned_params.delete(:featured_image)
     end
 
     if @post.update(cleaned_params)
-      redirect_to post_path_for(@post), notice: "Post was successfully updated."
+      # Redirect to category page for link posts, post page for others
+      if @post.link? && @post.category
+        redirect_to category_path(@post.category), notice: "Link was successfully updated."
+      else
+        redirect_to post_path_for(@post), notice: "Post was successfully updated."
+      end
     else
       render :edit, status: :unprocessable_entity
     end
@@ -177,41 +198,8 @@ class PostsController < ApplicationController
   def fetch_and_attach_image_from_url(url)
     return if url.blank?
 
-    begin
-      require "open-uri"
-      require "net/http"
-
-      # Download the image
-      image_io = URI.open(url,
-        "User-Agent" => "Ruby/#{RUBY_VERSION}",
-        read_timeout: 10,
-        open_timeout: 10
-      )
-
-      # Get filename from URL or use default
-      filename = File.basename(URI.parse(url).path).presence || "image"
-      # Add extension if missing
-      unless filename.include?(".")
-        content_type = image_io.meta["content-type"]
-        extension = case content_type
-        when /jpeg|jpg/i then ".jpg"
-        when /png/i then ".png"
-        when /gif/i then ".gif"
-        when /webp/i then ".webp"
-        else ".jpg"
-        end
-        filename += extension
-      end
-
-      # Attach the image (will replace existing if present)
-      @post.featured_image.attach(
-        io: image_io,
-        filename: filename
-      )
-    rescue => e
-      Rails.logger.error "Failed to fetch image from URL #{url}: #{e.message}"
-      # Don't fail the post creation if image fetch fails
-    end
+    # Use ImageProcessor to fetch and process the image
+    ImageProcessor.process_from_url(url, @post)
   end
 
   def set_post

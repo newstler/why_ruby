@@ -425,18 +425,36 @@ export default class extends Controller {
     
     const files = event.dataTransfer.files
     if (files.length > 0 && this.hasImageInputTarget) {
+      const file = files[0]
+      
       // Check if file is an image
-      if (files[0].type.startsWith('image/')) {
-        // Create a DataTransfer to properly set the files
-        const dataTransfer = new DataTransfer()
-        dataTransfer.items.add(files[0])
-        this.imageInputTarget.files = dataTransfer.files
-        
-        // Trigger the change event to show preview
-        this.handleImageUpload({ target: this.imageInputTarget })
-      } else {
+      if (!file.type.startsWith('image/')) {
         alert('Please select an image file')
+        return
       }
+      
+      // Check if it's a GIF (not allowed)
+      if (file.type === 'image/gif') {
+        alert('GIF format is not allowed. Please use JPEG, PNG, or WebP.')
+        return
+      }
+      
+      // Check file size (20MB limit)
+      const maxSize = parseInt(this.imageInputTarget.dataset.maxSize || 20971520)
+      if (file.size > maxSize) {
+        const maxSizeMB = (maxSize / 1024 / 1024).toFixed(1)
+        const fileSizeMB = (file.size / 1024 / 1024).toFixed(1)
+        alert(`Image is too large (${fileSizeMB}MB). Maximum size is ${maxSizeMB}MB.`)
+        return
+      }
+      
+      // Create a DataTransfer to properly set the files
+      const dataTransfer = new DataTransfer()
+      dataTransfer.items.add(file)
+      this.imageInputTarget.files = dataTransfer.files
+      
+      // Trigger the change event to show preview
+      this.handleImageUpload({ target: this.imageInputTarget })
     }
   }
   
@@ -445,6 +463,23 @@ export default class extends Controller {
     if (file) {
       if (!file.type.startsWith('image/')) {
         alert('Please select an image file')
+        event.target.value = ''
+        return
+      }
+      
+      // Check file size (20MB limit)
+      const maxSize = parseInt(event.target.dataset.maxSize || 20971520) // 20MB default
+      if (file.size > maxSize) {
+        const maxSizeMB = (maxSize / 1024 / 1024).toFixed(1)
+        const fileSizeMB = (file.size / 1024 / 1024).toFixed(1)
+        alert(`Image is too large (${fileSizeMB}MB). Maximum size is ${maxSizeMB}MB.`)
+        event.target.value = ''
+        return
+      }
+      
+      // Check if it's a GIF (not allowed)
+      if (file.type === 'image/gif') {
+        alert('GIF format is not allowed. Please use JPEG, PNG, or WebP.')
         event.target.value = ''
         return
       }
@@ -462,12 +497,9 @@ export default class extends Controller {
           this.imageUploadAreaTarget.classList.add('hidden')
         }
         
-        // Hide existing persisted image preview if there is one
+        // Hide ALL existing image previews (both persisted and new)
         this.imagePreviewWrapperTargets.forEach(wrapper => {
-          // If this wrapper contains a persisted image (has an img with src starting with http), hide it
-          if (wrapper.querySelector('img[src^="http"]') || wrapper.querySelector('img[src^="/rails/active_storage"]')) {
-            wrapper.classList.add('hidden')
-          }
+          wrapper.classList.add('hidden')
         })
         
         // Clear any existing preview first
@@ -490,13 +522,14 @@ export default class extends Controller {
           this.imagePreviewTarget.innerHTML = `<img src="${e.target.result}" class="max-w-full max-h-64 object-contain rounded" />`
         }
         
-        // Insert file info
+        // Insert file info with validation status
         if (this.hasImageInfoTarget) {
           const sizeInKB = Math.round(file.size / 1024)
           const sizeString = sizeInKB < 1024 ? `${sizeInKB} KB` : `${(sizeInKB / 1024).toFixed(1)} MB`
+          const sizeClass = file.size > maxSize * 0.8 ? 'text-orange-600' : 'text-gray-500'
           this.imageInfoTarget.innerHTML = `
             <p class="text-sm text-gray-600">${file.name}</p>
-            <p class="text-xs text-gray-500">Size: ${sizeString}</p>
+            <p class="text-xs ${sizeClass}">Size: ${sizeString}</p>
           `
         }
       }
@@ -513,18 +546,19 @@ export default class extends Controller {
     if (clickedWrapper) {
       // Check if this is a persisted image or a new upload
       const isPersistedImage = clickedWrapper.querySelector('img[src^="http"]:not([src*="data:"])') || 
-                              clickedWrapper.querySelector('img[src^="/rails/active_storage"]')
+                              clickedWrapper.querySelector('img[src^="/rails/active_storage"]') ||
+                              clickedWrapper.querySelector('img[src^="/rails/blobs"]')
+      
+      // Hide the clicked wrapper
+      clickedWrapper.classList.add('hidden')
       
       if (isPersistedImage && !clickedWrapper.contains(this.imagePreviewTarget)) {
-        // This is a persisted image - mark for removal and hide
+        // This is a persisted image - mark for removal
         if (this.hasRemoveImageFlagTarget) {
           this.removeImageFlagTarget.value = '1'
         }
-        clickedWrapper.classList.add('hidden')
       } else {
-        // This is a new upload/metadata image - clear and hide it
-        clickedWrapper.classList.add('hidden')
-        
+        // This is a new upload/metadata image - clear the inputs
         // Clear the file input
         if (this.hasImageInputTarget) {
           this.imageInputTarget.value = ''
@@ -542,11 +576,11 @@ export default class extends Controller {
         if (this.hasImageInfoTarget) {
           this.imageInfoTarget.innerHTML = ''
         }
-        
-        // Show upload area
-        if (this.hasImageUploadAreaTarget) {
-          this.imageUploadAreaTarget.classList.remove('hidden')
-        }
+      }
+      
+      // Always show upload area when removing any image
+      if (this.hasImageUploadAreaTarget) {
+        this.imageUploadAreaTarget.classList.remove('hidden')
       }
     }
   }

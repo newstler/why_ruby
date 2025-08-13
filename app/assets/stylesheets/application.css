@@ -387,6 +387,41 @@ input[type="checkbox"] {
   z-index: 15;
 }
 
+/* Blur image loading effect - CURRENTLY DISABLED DUE TO TURBO ISSUES */
+/* Keeping CSS for potential future use */
+.image-blur-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.image-blur-container .blur-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: cover;
+  background-position: center;
+  transition: opacity 0.3s ease-out;
+}
+
+.image-blur-container .actual-image {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+}
+
+.image-blur-container.loaded .blur-placeholder {
+  opacity: 0;
+}
+
+.image-blur-container.loaded .actual-image {
+  opacity: 1;
+}
+
 /* Unpublished/Draft Posts Styling */
 .unpublished-post {
   background-color: #f9fafb;
