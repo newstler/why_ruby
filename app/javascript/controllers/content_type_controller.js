@@ -9,6 +9,12 @@ export default class extends Controller {
     "linkTitleHint", 
     "imageField",
     "imageInput",
+    "imageUploadArea",
+    "imagePreview",
+    "imagePreviewWrapper",
+    "imageInfo",
+    "removeImageFlag",
+    "metadataImageUrl",
     "categoryField",
     "categorySelect",
     "tagsField",
@@ -104,6 +110,10 @@ export default class extends Controller {
       // Clear URL when switching away from link
       if (this.hasUrlInputTarget) {
         this.urlInputTarget.value = ''
+      }
+      // Clear metadata image URL
+      if (this.hasMetadataImageUrlTarget) {
+        this.metadataImageUrlTarget.value = ''
       }
     }
     
@@ -357,6 +367,10 @@ export default class extends Controller {
       // Show preview
       if (this.hasLogoPreviewTarget) {
         this.logoPreviewTargets.forEach(preview => {
+          // Clear any existing preview first
+          preview.innerHTML = ''
+          
+          // Add new SVG content
           preview.innerHTML = svgContent
           
           // Style the SVG for preview
@@ -374,6 +388,214 @@ export default class extends Controller {
   removeLogo(event) {
     event.preventDefault()
     this.clearLogo()
+  }
+  
+  // Image upload methods
+  triggerImageUpload(event) {
+    event.preventDefault()
+    event.stopPropagation()
+    if (this.hasImageInputTarget) {
+      this.imageInputTarget.click()
+    }
+  }
+  
+  handleImageDragOver(event) {
+    event.preventDefault()
+    event.stopPropagation()
+    if (this.hasImageUploadAreaTarget) {
+      this.imageUploadAreaTarget.classList.add('border-red-400', 'bg-red-50')
+    }
+  }
+  
+  handleImageDragLeave(event) {
+    event.preventDefault()
+    event.stopPropagation()
+    if (this.hasImageUploadAreaTarget) {
+      this.imageUploadAreaTarget.classList.remove('border-red-400', 'bg-red-50')
+    }
+  }
+  
+  handleImageDrop(event) {
+    event.preventDefault()
+    event.stopPropagation()
+    
+    if (this.hasImageUploadAreaTarget) {
+      this.imageUploadAreaTarget.classList.remove('border-red-400', 'bg-red-50')
+    }
+    
+    const files = event.dataTransfer.files
+    if (files.length > 0 && this.hasImageInputTarget) {
+      // Check if file is an image
+      if (files[0].type.startsWith('image/')) {
+        // Create a DataTransfer to properly set the files
+        const dataTransfer = new DataTransfer()
+        dataTransfer.items.add(files[0])
+        this.imageInputTarget.files = dataTransfer.files
+        
+        // Trigger the change event to show preview
+        this.handleImageUpload({ target: this.imageInputTarget })
+      } else {
+        alert('Please select an image file')
+      }
+    }
+  }
+  
+  handleImageUpload(event) {
+    const file = event.target.files[0]
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file')
+        event.target.value = ''
+        return
+      }
+      
+      // Show preview
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        // Hide upload area
+        if (this.hasImageUploadAreaTarget) {
+          this.imageUploadAreaTarget.classList.add('hidden')
+        }
+        
+        // Hide existing persisted image preview if there is one
+        this.imagePreviewWrapperTargets.forEach(wrapper => {
+          // If this wrapper contains a persisted image (has an img with src starting with http), hide it
+          if (wrapper.querySelector('img[src^="http"]') || wrapper.querySelector('img[src^="/rails/active_storage"]')) {
+            wrapper.classList.add('hidden')
+          }
+        })
+        
+        // Clear any existing preview first
+        if (this.hasImagePreviewTarget) {
+          this.imagePreviewTarget.innerHTML = ''
+        }
+        if (this.hasImageInfoTarget) {
+          this.imageInfoTarget.innerHTML = ''
+        }
+        
+        // Show only the preview wrapper that contains the preview target (the one for new uploads)
+        this.imagePreviewWrapperTargets.forEach(wrapper => {
+          if (wrapper.contains(this.imagePreviewTarget)) {
+            wrapper.classList.remove('hidden')
+          }
+        })
+        
+        // Insert new image preview
+        if (this.hasImagePreviewTarget) {
+          this.imagePreviewTarget.innerHTML = `<img src="${e.target.result}" class="max-w-full max-h-64 object-contain rounded" />`
+        }
+        
+        // Insert file info
+        if (this.hasImageInfoTarget) {
+          const sizeInKB = Math.round(file.size / 1024)
+          const sizeString = sizeInKB < 1024 ? `${sizeInKB} KB` : `${(sizeInKB / 1024).toFixed(1)} MB`
+          this.imageInfoTarget.innerHTML = `
+            <p class="text-sm text-gray-600">${file.name}</p>
+            <p class="text-xs text-gray-500">Size: ${sizeString}</p>
+          `
+        }
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+  
+  removeImage(event) {
+    event.preventDefault()
+    
+    // Get the wrapper that contains the clicked button
+    const clickedWrapper = event.currentTarget.closest('[data-content-type-target*="imagePreviewWrapper"]')
+    
+    if (clickedWrapper) {
+      // Check if this is a persisted image or a new upload
+      const isPersistedImage = clickedWrapper.querySelector('img[src^="http"]:not([src*="data:"])') || 
+                              clickedWrapper.querySelector('img[src^="/rails/active_storage"]')
+      
+      if (isPersistedImage && !clickedWrapper.contains(this.imagePreviewTarget)) {
+        // This is a persisted image - mark for removal and hide
+        if (this.hasRemoveImageFlagTarget) {
+          this.removeImageFlagTarget.value = '1'
+        }
+        clickedWrapper.classList.add('hidden')
+      } else {
+        // This is a new upload/metadata image - clear and hide it
+        clickedWrapper.classList.add('hidden')
+        
+        // Clear the file input
+        if (this.hasImageInputTarget) {
+          this.imageInputTarget.value = ''
+        }
+        
+        // Clear metadata image URL
+        if (this.hasMetadataImageUrlTarget) {
+          this.metadataImageUrlTarget.value = ''
+        }
+        
+        // Clear preview content
+        if (this.hasImagePreviewTarget) {
+          this.imagePreviewTarget.innerHTML = ''
+        }
+        if (this.hasImageInfoTarget) {
+          this.imageInfoTarget.innerHTML = ''
+        }
+        
+        // Show upload area
+        if (this.hasImageUploadAreaTarget) {
+          this.imageUploadAreaTarget.classList.remove('hidden')
+        }
+      }
+    }
+  }
+  
+  showMetadataImagePreview(imageUrl) {
+    if (!imageUrl) return
+    
+    // Set the metadata_image_url hidden field value
+    if (this.hasMetadataImageUrlTarget) {
+      this.metadataImageUrlTarget.value = imageUrl
+    }
+    
+    // Hide upload area
+    if (this.hasImageUploadAreaTarget) {
+      this.imageUploadAreaTarget.classList.add('hidden')
+    }
+    
+    // Hide existing persisted image preview if there is one
+    this.imagePreviewWrapperTargets.forEach(wrapper => {
+      // If this wrapper contains a persisted image (has an img with src starting with http), hide it
+      if (wrapper.querySelector('img[src^="http"]') || wrapper.querySelector('img[src^="/rails/active_storage"]')) {
+        wrapper.classList.add('hidden')
+      }
+    })
+    
+    // Clear any existing preview first
+    if (this.hasImagePreviewTarget) {
+      this.imagePreviewTarget.innerHTML = ''
+    }
+    if (this.hasImageInfoTarget) {
+      this.imageInfoTarget.innerHTML = ''
+    }
+    
+    // Show only the preview wrapper that contains the preview target (the one for new uploads)
+    this.imagePreviewWrapperTargets.forEach(wrapper => {
+      if (wrapper.contains(this.imagePreviewTarget)) {
+        wrapper.classList.remove('hidden')
+      }
+    })
+    
+    // Insert new image preview
+    if (this.hasImagePreviewTarget) {
+      this.imagePreviewTarget.innerHTML = `<img src="${imageUrl}" class="max-w-full max-h-64 object-contain rounded" />`
+    }
+    
+    // Insert info
+    if (this.hasImageInfoTarget) {
+      const url = new URL(imageUrl)
+      const filename = url.pathname.split('/').pop() || 'image'
+      this.imageInfoTarget.innerHTML = `
+        <p class="text-sm text-gray-600">${filename}</p>
+        <p class="text-xs text-gray-500">From link metadata</p>
+      `
+    }
   }
   
   updateSelectColor(event) {

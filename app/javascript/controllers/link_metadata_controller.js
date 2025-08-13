@@ -4,7 +4,6 @@ export default class extends Controller {
   static targets = ["url", "title", "summary", "image", "preview", "fetchButton", "loading", "duplicateWarning"]
   
   connect() {
-    console.log("Link metadata controller connected")
     this.checkTimeout = null
   }
   
@@ -23,6 +22,10 @@ export default class extends Controller {
       this.loadingTarget.classList.remove('hidden')
     }
     
+    // Get the post ID if we're editing
+    const form = this.element.closest('form')
+    const postId = form ? (form.dataset.postId || form.getAttribute('data-post-id')) : null
+    
     try {
       const response = await fetch('/posts/fetch_metadata', {
         method: 'POST',
@@ -30,7 +33,10 @@ export default class extends Controller {
           'Content-Type': 'application/json',
           'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content
         },
-        body: JSON.stringify({ url: url })
+        body: JSON.stringify({ 
+          url: url,
+          exclude_id: postId
+        })
       })
       
       const data = await response.json()
@@ -73,11 +79,18 @@ export default class extends Controller {
     }
     
     if (metadata.image_url) {
-      const imageField = form.querySelector('[data-link-metadata-target="image"]')
-      if (imageField) {
-        imageField.value = metadata.image_url
-        // Trigger input event to activate form validation
-        imageField.dispatchEvent(new Event('input', { bubbles: true }))
+      // Store the image URL for backend processing
+      if (this.hasImageUrlTarget) {
+        this.imageUrlTarget.value = metadata.image_url
+      }
+      
+      // Show the image preview in the form
+      const contentTypeController = this.element.closest('[data-controller*="content-type"]')
+      if (contentTypeController) {
+        const controller = this.application.getControllerForElementAndIdentifier(contentTypeController, 'content-type')
+        if (controller) {
+          controller.showMetadataImagePreview(metadata.image_url)
+        }
       }
     }
   }
@@ -152,7 +165,9 @@ export default class extends Controller {
     }
     
     // Get the post ID if we're editing
-    const postId = this.element.closest('form').dataset.postId
+    const form = this.element.closest('form')
+    // Try both camelCase and the actual attribute name
+    const postId = form ? (form.dataset.postId || form.getAttribute('data-post-id')) : null
     
     try {
       const response = await fetch('/posts/check_duplicate_url', {

@@ -33,10 +33,14 @@ class PostsController < ApplicationController
   end
 
   def create
-    @post = current_user.posts.build(post_params.except(:tag_names, :image_url))
+    @post = current_user.posts.build(post_params.except(:tag_names, :metadata_image_url))
     clean_post_params
     process_tags
-    fetch_and_attach_image if params[:post][:image_url].present?
+
+    # Fetch and attach image from metadata if it's a link post
+    if @post.link? && params[:post][:metadata_image_url].present?
+      fetch_and_attach_image_from_url(params[:post][:metadata_image_url])
+    end
 
     if @post.save
       redirect_to post_path_for(@post), notice: "Post was successfully created."
@@ -52,11 +56,13 @@ class PostsController < ApplicationController
     process_tags
 
     # Clean params before update
-    cleaned_params = post_params.except(:tag_names, :image_url)
+    cleaned_params = post_params.except(:tag_names)
     cleaned_params[:category_id] = nil if cleaned_params[:category_id] == "" && @post.success_story?
 
-    # Handle image upload or URL
-    fetch_and_attach_image if params[:post][:image_url].present?
+    # Handle image removal if checkbox was checked
+    if params[:post][:remove_featured_image] == "1"
+      @post.featured_image.purge
+    end
 
     if @post.update(cleaned_params)
       redirect_to post_path_for(@post), notice: "Post was successfully updated."
@@ -92,12 +98,16 @@ class PostsController < ApplicationController
 
   def fetch_metadata
     url = params[:url]
+    exclude_id = params[:exclude_id] || request.request_parameters[:exclude_id]
 
     # Normalize URL for duplicate checking
     normalized_url = normalize_url_for_checking(url)
 
-    # Check for existing post
-    existing_post = Post.where(url: normalized_url).first
+    # Check for existing post (excluding current post if editing)
+    existing_post = Post.where(url: normalized_url)
+    existing_post = existing_post.where.not(id: exclude_id) if exclude_id.present?
+    existing_post = existing_post.first
+
     if existing_post
       render json: {
         success: false,
@@ -105,7 +115,7 @@ class PostsController < ApplicationController
         existing_post: {
           id: existing_post.id,
           title: existing_post.title,
-          url: post_path(existing_post)
+          url: post_path_for(existing_post)
         }
       }
       return
@@ -130,7 +140,12 @@ class PostsController < ApplicationController
     url = params[:url]
     normalized_url = normalize_url_for_checking(url)
 
-    existing_post = Post.where(url: normalized_url).where.not(id: params[:exclude_id]).first
+    # Handle exclude_id from both regular params and JSON body
+    exclude_id = params[:exclude_id] || request.request_parameters[:exclude_id]
+
+    existing_post = Post.where(url: normalized_url)
+    existing_post = existing_post.where.not(id: exclude_id) if exclude_id.present?
+    existing_post = existing_post.first
 
     if existing_post
       render json: {
@@ -138,7 +153,7 @@ class PostsController < ApplicationController
         existing_post: {
           id: existing_post.id,
           title: existing_post.title,
-          url: post_path(existing_post)
+          url: post_path_for(existing_post)
         }
       }
     else
@@ -148,22 +163,43 @@ class PostsController < ApplicationController
 
   private
 
-  def fetch_and_attach_image
-    url = params[:post][:image_url]
-    return unless url.present?
+  def fetch_and_attach_image_from_url(url)
+    return if url.blank? || @post.featured_image.attached?
 
     begin
       require "open-uri"
-      image_data = URI.open(url)
-      filename = File.basename(URI.parse(url).path).presence || "image.jpg"
+      require "net/http"
 
+      # Download the image
+      image_io = URI.open(url,
+        "User-Agent" => "Ruby/#{RUBY_VERSION}",
+        read_timeout: 10,
+        open_timeout: 10
+      )
+
+      # Get filename from URL or use default
+      filename = File.basename(URI.parse(url).path).presence || "image"
+      # Add extension if missing
+      unless filename.include?(".")
+        content_type = image_io.meta["content-type"]
+        extension = case content_type
+        when /jpeg|jpg/i then ".jpg"
+        when /png/i then ".png"
+        when /gif/i then ".gif"
+        when /webp/i then ".webp"
+        else ".jpg"
+        end
+        filename += extension
+      end
+
+      # Attach the image
       @post.featured_image.attach(
-        io: image_data,
+        io: image_io,
         filename: filename
       )
     rescue => e
-      Rails.logger.error "Failed to fetch image from URL: #{e.message}"
-      @post.errors.add(:base, "Failed to fetch image from URL")
+      Rails.logger.error "Failed to fetch image from URL #{url}: #{e.message}"
+      # Don't fail the post creation if image fetch fails
     end
   end
 
@@ -209,7 +245,7 @@ class PostsController < ApplicationController
   end
 
   def post_params
-    params.require(:post).permit(:title, :content, :url, :summary, :category_id, :featured_image, :image_url, :published, :tag_names, :post_type, :logo_svg, tag_ids: [])
+    params.require(:post).permit(:title, :content, :url, :summary, :category_id, :featured_image, :metadata_image_url, :published, :tag_names, :post_type, :logo_svg, tag_ids: [])
   end
 
   def clean_post_params

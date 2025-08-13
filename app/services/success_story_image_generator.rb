@@ -1,5 +1,5 @@
 class SuccessStoryImageGenerator
-  TEMPLATE_PATH = Rails.root.join("app", "assets", "images", "success_story_teplate.png")
+  TEMPLATE_PATH = Rails.root.join("app", "assets", "images", "success_story_template.png")
 
   # NOTE: This service uses ImageMagick's 'convert' command directly for v6 compatibility
   # No Ruby gems required, just ImageMagick binary installed on the system
@@ -67,12 +67,12 @@ class SuccessStoryImageGenerator
           resize_cmd = [
             "convert",
             temp_high_res.path,
-            "-resize", "1152x540",  # Fit within box
+            "-resize", "686x320",  # Fit within box
             "-filter", "Lanczos",
             "-quality", "100",
             "-background", "none",
             "-gravity", "center",
-            "-extent", "1152x540",  # Canvas size
+            "-extent", "686x320",  # Canvas size
             "PNG32:#{png_file.path}"  # Force 32-bit PNG with alpha
           ]
 
@@ -95,7 +95,7 @@ class SuccessStoryImageGenerator
           "-background", "none",
           "-density", "450",  # Higher density for better quality
           svg_file.path,
-          "-resize", "1152x540",  # Fit within box
+          "-resize", "686x320",  # Fit within box
           "-filter", "Lanczos",
           "-quality", "100",
           "-gravity", "center",
@@ -119,9 +119,12 @@ class SuccessStoryImageGenerator
       dimensions = stdout.strip
       logo_width, logo_height = dimensions.split("x").map(&:to_i)
 
+      # # Calculate position to center logo at 960x432 on 1920x1080 template
+      # x_offset = 960 - (logo_width / 2)
+      # y_offset = 386 - (logo_height / 2)
       # Calculate position to center logo at 960x432 on 1920x1080 template
-      x_offset = 960 - (logo_width / 2)
-      y_offset = 386 - (logo_height / 2)
+      x_offset = 621 - (logo_width / 2)
+      y_offset = 250 - (logo_height / 2)
 
       # Composite logo onto template using ImageMagick
       composite_cmd = [
