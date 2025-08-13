@@ -15,14 +15,19 @@ class PostsController < ApplicationController
     @comments = @post.comments.published.includes(:user).order(created_at: :asc)
   end
 
-  # Serve images for posts
+  # Serve images directly for posts with stable URLs for social media
   def image
     if @post.featured_image.attached?
-      # Serve the image directly without aggressive caching
-      redirect_to rails_blob_url(@post.featured_image, disposition: "inline"), allow_other_host: true
+      # Serve the image directly from our custom URL
+      # This provides a clean, stable URL for social media crawlers
+      send_data @post.featured_image.download,
+                type: @post.featured_image.content_type,
+                disposition: "inline"
     else
-      # Fallback to default OG image
-      redirect_to "/og-image.png", allow_other_host: true
+      # Serve default OG image
+      send_file Rails.root.join("public", "og-image.png"),
+                type: "image/png",
+                disposition: "inline"
     end
   end
 
