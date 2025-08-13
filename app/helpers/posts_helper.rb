@@ -18,7 +18,14 @@ module PostsHelper
 
   def post_meta_image_url(post)
     if post.featured_image.attached?
-      post_image_url(post)
+      if post.success_story?
+        "#{request.base_url}/success-stories/#{post.to_param}/og-image.png"
+      elsif post.category
+        "#{request.base_url}/#{post.category.to_param}/#{post.to_param}/og-image.png"
+      else
+        # Fallback for posts without category (shouldn't happen normally)
+        "#{request.base_url}/uncategorized/#{post.to_param}/og-image.png"
+      end
     else
       "#{request.base_url}/og-image.png"
     end

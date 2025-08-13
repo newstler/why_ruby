@@ -18,8 +18,7 @@ class PostsController < ApplicationController
   # Serve images for posts
   def image
     if @post.featured_image.attached?
-      # Use Rails built-in image serving with proper caching headers
-      expires_in 1.year, public: true
+      # Serve the image directly without aggressive caching
       redirect_to rails_blob_url(@post.featured_image, disposition: "inline"), allow_other_host: true
     else
       # Fallback to default OG image

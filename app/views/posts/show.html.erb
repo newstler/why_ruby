@@ -9,11 +9,11 @@
   <% if post_meta_author(@post).present? %>
     <meta name="author" content="<%= post_meta_author(@post) %>">
   <% end %>
-  <link rel="canonical" href="<%= post_url(@post) %>">
+  <link rel="canonical" href="<%= post_url_for(@post) %>">
   
   <!-- Open Graph / Facebook Meta Tags -->
   <meta property="og:type" content="article">
-  <meta property="og:url" content="<%= post_url(@post) %>">
+  <meta property="og:url" content="<%= post_url_for(@post) %>">
   <meta property="og:title" content="<%= post_meta_title(@post) %>">
   <meta property="og:description" content="<%= post_meta_description(@post) %>">
   <meta property="og:image" content="<%= post_meta_image_url(@post) %>">
@@ -22,7 +22,7 @@
   
   <!-- Twitter Card Meta Tags -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:url" content="<%= post_url(@post) %>">
+  <meta name="twitter:url" content="<%= post_url_for(@post) %>">
   <meta name="twitter:title" content="<%= post_meta_title(@post) %>">
   <meta name="twitter:description" content="<%= post_meta_description(@post) %>">
   <meta name="twitter:image" content="<%= post_meta_image_url(@post) %>">

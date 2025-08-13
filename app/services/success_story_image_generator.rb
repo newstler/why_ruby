@@ -121,7 +121,7 @@ class SuccessStoryImageGenerator
 
       # Calculate position to center logo at 960x432 on 1920x1080 template
       x_offset = 960 - (logo_width / 2)
-      y_offset = 432 - (logo_height / 2)
+      y_offset = 386 - (logo_height / 2)
 
       # Composite logo onto template using ImageMagick
       composite_cmd = [

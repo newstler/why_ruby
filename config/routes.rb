@@ -23,8 +23,9 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   # Success stories route (standalone)
-  get "success_stories", to: "posts#success_stories", as: :success_stories
-  get "success_stories/:id", to: "posts#show", as: :success_story, defaults: { success_story: true }
+  get "success-stories", to: "posts#success_stories", as: :success_stories
+  get "success-stories/:id", to: "posts#show", as: :success_story, defaults: { success_story: true }
+  get "success-stories/:id/og-image.png", to: "posts#image", as: :success_story_image, defaults: { success_story: true }
 
   # Community routes
   get "community", to: "users#index", as: :users
@@ -50,9 +51,6 @@ Rails.application.routes.draw do
   put "posts/:id", to: "posts#update"
   delete "posts/:id", to: "posts#destroy", as: :post_destroy
 
-  # Post member actions
-  get "posts/:id/image.png", to: "posts#image", as: :post_image
-
   # Comments and reports for posts
   post "posts/:post_id/comments", to: "comments#create", as: :post_comments
   delete "posts/:post_id/comments/:id", to: "comments#destroy", as: :post_comment
@@ -63,6 +61,7 @@ Rails.application.routes.draw do
 
   # Post routes (must be after category)
   get ":category_id/:id", to: "posts#show", as: :post, constraints: { category_id: /[^\/]+/, id: /[^\/]+/ }
+  get ":category_id/:id/og-image.png", to: "posts#image", as: :post_image, constraints: { category_id: /[^\/]+/, id: /[^\/]+/ }
 
   # Legal pages
   get "legal/privacy", to: "legal#show", defaults: { page: "privacy_policy" }, as: :privacy_policy
