@@ -3,13 +3,6 @@ class PostsController < ApplicationController
   before_action :set_post, only: [ :show, :edit, :update, :destroy, :image ]
   before_action :authorize_user!, only: [ :edit, :update, :destroy ]
 
-  def index
-    @posts = current_user.posts
-                         .includes(:category, :tags, :comments)
-                         .page(params[:page])
-                         .per(20)
-  end
-
   def success_stories
     @posts = Post.success_stories
                  .published

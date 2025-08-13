@@ -22,6 +22,19 @@
   max-width: 65ch;
 }
 
+/* Select placeholder style */
+select.placeholder-selected {
+  color: #9ca3af;
+}
+
+select option[value=""] {
+  color: #9ca3af;
+}
+
+select option:not([value=""]) {
+  color: #374151;
+}
+
 /* Allow prose to be full width when explicitly set */
 .prose.max-w-none {
   max-width: none;
@@ -215,12 +228,6 @@
 .highlight .vg { color: #e36209 } /* Name.Variable.Global */
 .highlight .vi { color: #e36209 } /* Name.Variable.Instance */
 .highlight .il { color: #005cc5 } /* Literal.Number.Integer.Long */
-
-/* Focus styles */
-*:focus-visible {
-  outline: 2px solid #dc2626;
-  outline-offset: 2px;
-}
 
 /* Form styles */
 input[type="text"],

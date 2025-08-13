@@ -59,16 +59,26 @@ export default class extends Controller {
     
     if (metadata.title) {
       const titleField = form.querySelector('[data-link-metadata-target="title"]')
-      if (titleField) titleField.value = metadata.title
+      if (titleField) {
+        titleField.value = metadata.title
+        // Trigger input event to activate form validation
+        titleField.dispatchEvent(new Event('input', { bubbles: true }))
+      }
     }
     
     if (metadata.summary && this.hasSummaryTarget) {
       this.summaryTarget.value = metadata.summary
+      // Trigger input event to activate form validation
+      this.summaryTarget.dispatchEvent(new Event('input', { bubbles: true }))
     }
     
     if (metadata.image_url) {
       const imageField = form.querySelector('[data-link-metadata-target="image"]')
-      if (imageField) imageField.value = metadata.image_url
+      if (imageField) {
+        imageField.value = metadata.image_url
+        // Trigger input event to activate form validation
+        imageField.dispatchEvent(new Event('input', { bubbles: true }))
+      }
     }
   }
   
