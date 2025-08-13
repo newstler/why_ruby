@@ -17,10 +17,8 @@ module PostsHelper
   end
 
   def post_meta_image_url(post)
-    if post.success_story? && post.logo_png_base64.present?
-      image_post_url(post)
-    elsif post.title_image_url.present?
-      post.title_image_url
+    if post.featured_image.attached?
+      post_image_url(post)
     else
       "#{request.base_url}/og-image.png"
     end

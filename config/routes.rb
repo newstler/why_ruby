@@ -22,31 +22,47 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  resources :posts, except: [ :index ] do
-    resources :comments, only: [ :create, :destroy ]
-    resources :reports, only: [ :create ]
+  # Success stories route (standalone)
+  get "success_stories", to: "posts#success_stories", as: :success_stories
+  get "success_stories/:id", to: "posts#show", as: :success_story, defaults: { success_story: true }
 
-    member do
-      get "image.png", to: "posts#image", as: :image
-    end
+  # Community routes
+  get "community", to: "users#index", as: :users
+  get "community/:id", to: "users#show", as: :user
 
-    collection do
-      get :success_stories
-      post :preview
-      post :fetch_metadata
-      post :check_duplicate_url
-    end
-  end
-
-  resources :categories, only: [ :show ]
+  # Tags route (keeping as resources for now)
   resources :tags, only: [ :show ] do
     collection do
       get :search
     end
   end
 
-  # User profiles and community
-  resources :users, only: [ :index, :show ]
+  # Post collection actions (preview, metadata, etc)
+  post "posts/preview", to: "posts#preview", as: :preview_posts
+  post "posts/fetch_metadata", to: "posts#fetch_metadata", as: :fetch_metadata_posts
+  post "posts/check_duplicate_url", to: "posts#check_duplicate_url", as: :check_duplicate_url_posts
+
+  # New and edit routes for posts (need to be defined before dynamic routes)
+  get "posts/new", to: "posts#new", as: :new_post
+  get "posts/:id/edit", to: "posts#edit", as: :edit_post
+  post "posts", to: "posts#create", as: :posts
+  patch "posts/:id", to: "posts#update", as: :post_update
+  put "posts/:id", to: "posts#update"
+  delete "posts/:id", to: "posts#destroy", as: :post_destroy
+
+  # Post member actions
+  get "posts/:id/image.png", to: "posts#image", as: :post_image
+
+  # Comments and reports for posts
+  post "posts/:post_id/comments", to: "comments#create", as: :post_comments
+  delete "posts/:post_id/comments/:id", to: "comments#destroy", as: :post_comment
+  post "posts/:post_id/reports", to: "reports#create", as: :post_reports
+
+  # Category routes (must be at the end due to catch-all nature)
+  get ":id", to: "categories#show", as: :category, constraints: { id: /[^\/]+/ }
+
+  # Post routes (must be after category)
+  get ":category_id/:id", to: "posts#show", as: :post, constraints: { category_id: /[^\/]+/, id: /[^\/]+/ }
 
   # Legal pages
   get "legal/privacy", to: "legal#show", defaults: { page: "privacy_policy" }, as: :privacy_policy

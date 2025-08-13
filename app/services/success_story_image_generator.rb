@@ -18,10 +18,16 @@ class SuccessStoryImageGenerator
     end
 
     # Convert SVG logo to PNG and overlay on template
-    png_base64 = generate_social_image
+    png_data = generate_social_image
 
-    # Store the generated PNG
-    @post.update_column(:logo_png_base64, png_base64) if png_base64.present?
+    # Store the generated PNG in ActiveStorage
+    if png_data && !png_data.empty?
+      @post.featured_image.attach(
+        io: StringIO.new(png_data),
+        filename: "#{@post.slug}-social.png",
+        content_type: "image/png"
+      )
+    end
   end
 
   private
@@ -132,9 +138,8 @@ class SuccessStoryImageGenerator
         return nil
       end
 
-      # Read and encode to base64
-      image_data = File.read(output_file.path)
-      "data:image/png;base64,#{Base64.strict_encode64(image_data)}"
+      # Read and return raw PNG data
+      File.read(output_file.path)
 
     rescue => e
       Rails.logger.error "Failed to generate success story image: #{e.message}"
@@ -150,7 +155,7 @@ class SuccessStoryImageGenerator
   end
 
   # Alternative method to just convert SVG to PNG without template
-  def svg_to_png_base64
+  def svg_to_png
     svg_file = Tempfile.new([ "logo", ".svg" ])
     png_file = Tempfile.new([ "logo", ".png" ])
 
@@ -192,8 +197,8 @@ class SuccessStoryImageGenerator
         end
       end
 
-      image_data = File.read(png_file.path)
-      "data:image/png;base64,#{Base64.strict_encode64(image_data)}"
+      # Return raw PNG data
+      File.read(png_file.path)
     rescue => e
       Rails.logger.error "Failed to convert SVG to PNG: #{e.message}"
       nil

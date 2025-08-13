@@ -15,6 +15,9 @@ class Post < ApplicationRecord
   has_many :comments, dependent: :destroy
   has_many :reports, dependent: :destroy
 
+  # ActiveStorage attachments
+  has_one_attached :featured_image  # For all posts (articles, links, and success stories)
+
   # Validations
   validates :title, presence: true
   validates :slug, uniqueness: true, allow_blank: true

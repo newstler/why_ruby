@@ -15,24 +15,15 @@ class PostsController < ApplicationController
     @comments = @post.comments.published.includes(:user).order(created_at: :asc)
   end
 
-  # Serve generated PNG images for success stories
+  # Serve images for posts
   def image
-    if @post.success_story? && @post.logo_png_base64.present?
-      # Success story - serve the generated PNG
-      data = @post.logo_png_base64.match(/^data:image\/png;base64,(.+)$/)[1]
-      image_data = Base64.decode64(data)
-
-      # Use ETag based on post's updated_at to allow caching but invalidate on changes
-      # This way browsers cache the image but revalidate when the post is updated
-      fresh_when(etag: @post, last_modified: @post.updated_at, public: true)
-
-      send_data image_data,
-                type: "image/png",
-                disposition: "inline",
-                filename: "#{@post.slug}.png"
+    if @post.featured_image.attached?
+      # Use Rails built-in image serving with proper caching headers
+      expires_in 1.year, public: true
+      redirect_to rails_blob_url(@post.featured_image, disposition: "inline"), allow_other_host: true
     else
-      # No image available
-      head :not_found
+      # Fallback to default OG image
+      redirect_to "/og-image.png", allow_other_host: true
     end
   end
 
@@ -43,12 +34,13 @@ class PostsController < ApplicationController
   end
 
   def create
-    @post = current_user.posts.build(post_params.except(:tag_names))
+    @post = current_user.posts.build(post_params.except(:tag_names, :image_url))
     clean_post_params
     process_tags
+    fetch_and_attach_image if params[:post][:image_url].present?
 
     if @post.save
-      redirect_to @post, notice: "Post was successfully created."
+      redirect_to post_path_for(@post), notice: "Post was successfully created."
     else
       render :new, status: :unprocessable_entity
     end
@@ -61,11 +53,14 @@ class PostsController < ApplicationController
     process_tags
 
     # Clean params before update
-    cleaned_params = post_params.except(:tag_names)
+    cleaned_params = post_params.except(:tag_names, :image_url)
     cleaned_params[:category_id] = nil if cleaned_params[:category_id] == "" && @post.success_story?
 
+    # Handle image upload or URL
+    fetch_and_attach_image if params[:post][:image_url].present?
+
     if @post.update(cleaned_params)
-      redirect_to @post, notice: "Post was successfully updated."
+      redirect_to post_path_for(@post), notice: "Post was successfully updated."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -154,8 +149,37 @@ class PostsController < ApplicationController
 
   private
 
+  def fetch_and_attach_image
+    url = params[:post][:image_url]
+    return unless url.present?
+
+    begin
+      require "open-uri"
+      image_data = URI.open(url)
+      filename = File.basename(URI.parse(url).path).presence || "image.jpg"
+
+      @post.featured_image.attach(
+        io: image_data,
+        filename: filename
+      )
+    rescue => e
+      Rails.logger.error "Failed to fetch image from URL: #{e.message}"
+      @post.errors.add(:base, "Failed to fetch image from URL")
+    end
+  end
+
   def set_post
-    @post = Post.includes(:tags).friendly.find(params[:id])
+    # Handle success story route
+    if params[:success_story]
+      @post = Post.success_stories.includes(:tags).friendly.find(params[:id])
+    # Handle category/post route
+    elsif params[:category_id]
+      @category = Category.friendly.find(params[:category_id])
+      @post = @category.posts.includes(:tags).friendly.find(params[:id])
+    # Handle direct post access (for edit, destroy, etc.)
+    else
+      @post = Post.includes(:tags).friendly.find(params[:id])
+    end
 
     # Only allow viewing unpublished posts by their owner or admin
     if !@post.published? && (!user_signed_in? || (current_user != @post.user && !current_user.admin?))
@@ -186,7 +210,7 @@ class PostsController < ApplicationController
   end
 
   def post_params
-    params.require(:post).permit(:title, :content, :url, :summary, :category_id, :title_image_url, :published, :tag_names, :post_type, :logo_svg, tag_ids: [])
+    params.require(:post).permit(:title, :content, :url, :summary, :category_id, :featured_image, :image_url, :published, :tag_names, :post_type, :logo_svg, tag_ids: [])
   end
 
   def clean_post_params
@@ -211,6 +235,17 @@ class PostsController < ApplicationController
         tags << tag
       end
       @post.tags = tags
+    end
+  end
+
+  def post_path_for(post)
+    if post.success_story?
+      success_story_path(post)
+    elsif post.category
+      post_path(post.category, post)
+    else
+      # Fallback for posts without category (shouldn't happen in normal flow)
+      post_path("uncategorized", post)
     end
   end
 end

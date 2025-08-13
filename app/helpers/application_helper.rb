@@ -74,7 +74,7 @@ module ApplicationHelper
   end
 
   def post_link_url(post)
-    post.link? ? safe_external_url(post.url) : post_path(post)
+    post.link? ? safe_external_url(post.url) : post_path_for(post)
   end
 
   def post_link_options(post)
@@ -162,5 +162,28 @@ module ApplicationHelper
   def has_success_stories?
     # Cache the result for the request to avoid multiple DB queries
     @has_success_stories ||= Post.success_stories.published.exists?
+  end
+
+  # URL helpers for the new routing structure
+  def post_url_for(post)
+    if post.success_story?
+      success_story_url(post)
+    elsif post.category
+      post_url(post.category, post)
+    else
+      # Fallback for posts without category
+      post_url("uncategorized", post)
+    end
+  end
+
+  def post_path_for(post)
+    if post.success_story?
+      success_story_path(post)
+    elsif post.category
+      post_path(post.category, post)
+    else
+      # Fallback for posts without category
+      post_path("uncategorized", post)
+    end
   end
 end
