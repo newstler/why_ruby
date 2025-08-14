@@ -1,4 +1,56 @@
 namespace :images do
+  desc "Process existing images to WebP variants (run after migration 20250813204048)"
+  task process_initial: :environment do
+    puts "Processing existing images to WebP variants..."
+    processed_count = 0
+    error_count = 0
+    skipped_count = 0
+
+    Post.includes(featured_image_attachment: :blob).find_each do |post|
+      next unless post.featured_image.attached?
+
+      begin
+        # Skip if already processed (has variants)
+        if post.image_variants.present?
+          skipped_count += 1
+          print "S" # Skip indicator
+          next
+        end
+
+        blob = post.featured_image.blob
+
+        # Process the image to generate variants
+        processor = ImageProcessor.new(blob)
+        result = processor.process!
+
+        if result[:success]
+          post.update_columns(
+            image_blur_data: result[:blur_data],
+            image_variants: result[:variants]
+          )
+          processed_count += 1
+          print "." # Progress indicator
+        else
+          Rails.logger.error "Failed to process image for Post ##{post.id}: #{result[:error]}"
+          error_count += 1
+          print "E"
+        end
+
+      rescue => e
+        Rails.logger.error "Error processing Post ##{post.id}: #{e.message}"
+        error_count += 1
+        print "E"
+      end
+    end
+
+    puts # New line after progress dots
+    puts "\n" + "="*50
+    puts "Initial image processing complete!"
+    puts "Processed: #{processed_count} images"
+    puts "Skipped (already processed): #{skipped_count} images"
+    puts "Errors: #{error_count}" if error_count > 0
+  end
+
   desc "Reprocess all post images with better quality settings"
   task reprocess_all: :environment do
     processed = 0
