@@ -1,15 +1,7 @@
 class PostsController < ApplicationController
-  before_action :authenticate_user!, except: [ :show, :success_stories, :image ]
+  before_action :authenticate_user!, except: [ :show, :image ]
   before_action :set_post, only: [ :show, :edit, :update, :destroy, :image ]
   before_action :authorize_user!, only: [ :edit, :update, :destroy ]
-
-  def success_stories
-    @posts = Post.success_stories
-                 .published
-                 .includes(:user, :comments)
-                 .page(params[:page])
-                 .per(20)
-  end
 
   def show
     @comments = @post.comments.published.includes(:user).order(created_at: :asc)
@@ -203,11 +195,8 @@ class PostsController < ApplicationController
   end
 
   def set_post
-    # Handle success story route
-    if params[:success_story]
-      @post = Post.success_stories.includes(:tags).friendly.find(params[:id])
     # Handle category/post route
-    elsif params[:category_id]
+    if params[:category_id]
       @category = Category.friendly.find(params[:category_id])
       @post = @category.posts.includes(:tags).friendly.find(params[:id])
     # Handle direct post access (for edit, destroy, etc.)
@@ -273,9 +262,7 @@ class PostsController < ApplicationController
   end
 
   def post_path_for(post)
-    if post.success_story?
-      success_story_path(post)
-    elsif post.category
+    if post.category
       post_path(post.category, post)
     else
       # Fallback for posts without category (shouldn't happen in normal flow)

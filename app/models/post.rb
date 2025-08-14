@@ -27,7 +27,7 @@ class Post < ApplicationRecord
   validate :url_uniqueness
   validates :url, format: URI::DEFAULT_PARSER.make_regexp(%w[http https]), allow_blank: true
   validates :pin_position, uniqueness: true, allow_nil: true, numericality: { only_integer: true }
-  validates :category_id, presence: true, unless: :success_story?
+  validates :category_id, presence: true
   validate :logo_svg_valid_if_present
   validate :featured_image_validation
 
@@ -39,14 +39,21 @@ class Post < ApplicationRecord
   scope :pinned, -> { where.not(pin_position: nil) }
   scope :articles, -> { where(post_type: "article") }
   scope :links, -> { where(post_type: "link") }
-  scope :success_stories, -> { where(post_type: "success_story") }
+  scope :success_stories, -> {
+    success_category = Category.success_story_category
+    if success_category
+      where(category_id: success_category.id).or(where(post_type: "success_story"))
+    else
+      where(post_type: "success_story")
+    end
+  }
   scope :homepage_order, -> { reorder(:pin_position, created_at: :desc) }
   scope :needing_review, -> { where(needs_admin_review: true) }
 
   # Callbacks
   before_validation :normalize_url
   before_validation :set_post_type
-  before_validation :clean_category_for_success_stories
+  before_validation :set_success_story_category
   before_validation :clean_logo_svg
   after_create :generate_summary_job
   after_update :regenerate_summary_if_needed
@@ -67,7 +74,8 @@ class Post < ApplicationRecord
   end
 
   def success_story?
-    post_type == "success_story"
+    # Check both post_type (for backward compatibility) and category
+    post_type == "success_story" || category&.is_success_story?
   end
 
   def should_generate_new_friendly_id?
@@ -159,10 +167,11 @@ class Post < ApplicationRecord
     end
   end
 
-  def clean_category_for_success_stories
-    # Convert empty string category_id to nil for success stories
-    if post_type == "success_story" && category_id == ""
-      self.category_id = nil
+  def set_success_story_category
+    # Auto-assign success story category if post_type is success_story
+    if post_type == "success_story" && category_id.blank?
+      success_category = Category.success_story_category
+      self.category_id = success_category.id if success_category
     end
   end
 
@@ -233,10 +242,9 @@ class Post < ApplicationRecord
       errors.add(:featured_image, "is too large (maximum is #{MAX_IMAGE_SIZE / 1.megabyte}MB)")
     end
 
-    # Check allowed content types (no GIFs)
-    allowed_types = %w[image/jpeg image/jpg image/png image/webp]
-    unless allowed_types.include?(featured_image.blob.content_type)
-      errors.add(:featured_image, "must be a JPEG, PNG, or WebP image (GIFs not allowed)")
+    # Check allowed content types
+    unless ImageProcessor::ALLOWED_CONTENT_TYPES.include?(featured_image.blob.content_type)
+      errors.add(:featured_image, "must be a JPEG, PNG, WebP, or TIFF image")
     end
   end
 

@@ -42,6 +42,9 @@ class Avo::Resources::Category < Avo::BaseResource
     field :id, as: :text, readonly: true
     field :name, as: :text, required: true
     field :description, as: :textarea, rows: 3, placeholder: "Describe what this category is about..."
+    field :is_success_story, as: :boolean,
+          help: "This flag cannot be changed once set. Only one category can be marked as the Success Story category.",
+          readonly: -> { record.persisted? && record.is_success_story? }
     field :position, as: :number, required: true
     field :created_at, as: :date_time, readonly: true
     field :updated_at, as: :date_time, readonly: true

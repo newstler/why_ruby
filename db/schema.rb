@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_08_13_233505) do
+ActiveRecord::Schema[8.1].define(version: 2025_08_13_235819) do
   create_table "active_storage_attachments", id: :string, force: :cascade do |t|
     t.string "blob_id", null: false
     t.datetime "created_at", null: false
@@ -54,10 +54,12 @@ ActiveRecord::Schema[8.1].define(version: 2025_08_13_233505) do
   create_table "categories", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
+    t.boolean "is_success_story", default: false, null: false
     t.string "name", null: false
     t.integer "position", null: false
     t.string "slug"
     t.datetime "updated_at", null: false
+    t.index ["is_success_story"], name: "index_categories_on_is_success_story", unique: true, where: "is_success_story = true"
     t.index ["name"], name: "index_categories_on_name", unique: true
     t.index ["position"], name: "index_categories_on_position", unique: true
     t.index ["slug"], name: "index_categories_on_slug"
@@ -88,7 +90,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_08_13_233505) do
   end
 
   create_table "posts", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
-    t.string "category_id"
+    t.string "category_id", null: false
     t.text "content"
     t.datetime "created_at", null: false
     t.json "image_variants"

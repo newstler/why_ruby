@@ -19,9 +19,7 @@ module PostsHelper
   def post_meta_image_url(post)
     if post.featured_image.attached?
       # Generate the resource-specific image URL with version parameter
-      base_url = if post.success_story?
-        "#{request.base_url}/success-stories/#{post.to_param}/og-image.png"
-      elsif post.category
+      base_url = if post.category
         "#{request.base_url}/#{post.category.to_param}/#{post.to_param}/og-image.png"
       else
         # Fallback for posts without category (shouldn't happen normally)

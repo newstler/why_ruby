@@ -184,9 +184,7 @@ class Avo::Resources::Post < Avo::BaseResource
       format_using: -> do
         # Generate the OG image URL
         og_url = if record.featured_image.attached?
-          if record.success_story?
-            "#{view_context.request.base_url}/success-stories/#{record.to_param}/og-image.png?v=#{record.updated_at.to_i}"
-          elsif record.category
+          if record.category
             "#{view_context.request.base_url}/#{record.category.to_param}/#{record.to_param}/og-image.png?v=#{record.updated_at.to_i}"
           else
             "#{view_context.request.base_url}/uncategorized/#{record.to_param}/og-image.png?v=#{record.updated_at.to_i}"

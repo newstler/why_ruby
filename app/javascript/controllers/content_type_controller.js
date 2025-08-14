@@ -30,6 +30,16 @@ export default class extends Controller {
     "contentInput",
     "summaryInput"
   ]
+
+  // Allowed image types (must match backend validation)
+  static allowedImageTypes = [
+    'image/jpeg',
+    'image/jpg', 
+    'image/png',
+    'image/webp',
+    'image/tiff',
+    'image/x-tiff'
+  ]
   
   connect() {
     console.log("Content type controller connected")
@@ -433,9 +443,9 @@ export default class extends Controller {
         return
       }
       
-      // Check if it's a GIF (not allowed)
-      if (file.type === 'image/gif') {
-        alert('GIF format is not allowed. Please use JPEG, PNG, or WebP.')
+      // Check if the image type is allowed
+      if (!this.constructor.allowedImageTypes.includes(file.type)) {
+        alert('This image format is not supported. Please use JPEG, PNG, WebP, or TIFF.')
         return
       }
       
@@ -477,9 +487,9 @@ export default class extends Controller {
         return
       }
       
-      // Check if it's a GIF (not allowed)
-      if (file.type === 'image/gif') {
-        alert('GIF format is not allowed. Please use JPEG, PNG, or WebP.')
+      // Check if the image type is allowed
+      if (!this.constructor.allowedImageTypes.includes(file.type)) {
+        alert('This image format is not supported. Please use JPEG, PNG, WebP, or TIFF.')
         event.target.value = ''
         return
       }

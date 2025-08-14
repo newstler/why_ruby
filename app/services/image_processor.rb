@@ -1,7 +1,14 @@
 # Service for processing uploaded images into multiple WebP variants
 # Uses ImageMagick directly for compatibility with server constraints
 class ImageProcessor
-  ALLOWED_CONTENT_TYPES = %w[image/jpeg image/jpg image/png image/webp].freeze
+  ALLOWED_CONTENT_TYPES = %w[
+    image/jpeg
+    image/jpg
+    image/png
+    image/webp
+    image/tiff
+    image/x-tiff
+  ].freeze
 
   # Variant dimensions (width x height)
   VARIANTS = {

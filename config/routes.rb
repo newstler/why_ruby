@@ -23,11 +23,6 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  # Success stories route (standalone)
-  get "success-stories", to: "posts#success_stories", as: :success_stories
-  get "success-stories/:id", to: "posts#show", as: :success_story, defaults: { success_story: true }
-  get "success-stories/:id/og-image.png", to: "posts#image", as: :success_story_image, defaults: { success_story: true }
-
   # Community routes
   get "community", to: "users#index", as: :users
   get "community/:id", to: "users#show", as: :user

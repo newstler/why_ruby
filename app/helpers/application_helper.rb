@@ -107,17 +107,8 @@ module ApplicationHelper
     false
   end
 
-  def success_stories_menu_active?
-    # Highlight if on the success stories page
-    return true if controller_name == "posts" && action_name == "success_stories"
-
-    # Highlight if viewing a success story post
-    if controller_name == "posts" && action_name == "show" && @post.present?
-      return @post.success_story?
-    end
-
-    false
-  end
+  # Since success stories now work like regular categories, we can remove this method
+  # and just use category_menu_active? for success stories too
 
   def community_menu_active?
     # Highlight if on the users index page
@@ -162,7 +153,11 @@ module ApplicationHelper
 
   def has_success_stories?
     # Cache the result for the request to avoid multiple DB queries
-    @has_success_stories ||= Post.success_stories.published.exists?
+    if Category.success_story_category
+      @has_success_stories ||= Category.success_story_category.posts.published.exists?
+    else
+      @has_success_stories ||= Post.success_stories.published.exists?
+    end
   end
 
   # Generate the full formatted page title that matches the <title> tag format
@@ -197,9 +192,7 @@ module ApplicationHelper
 
   # URL helpers for the new routing structure
   def post_url_for(post)
-    if post.success_story?
-      success_story_url(post)
-    elsif post.category
+    if post.category
       post_url(post.category, post)
     else
       # Fallback for posts without category
@@ -208,9 +201,7 @@ module ApplicationHelper
   end
 
   def post_path_for(post)
-    if post.success_story?
-      success_story_path(post)
-    elsif post.category
+    if post.category
       post_path(post.category, post)
     else
       # Fallback for posts without category
