@@ -68,7 +68,16 @@
 
     <div id="category-field" class="<%= 'hidden' if post.success_story? %>" data-content-type-target="categoryField">
       <%= form.label :category_id, "Category", class: "block text-sm font-bold text-black mb-2" %>
-      <%= form.select :category_id, options_for_select(Category.regular.ordered.pluck(:name, :id), post.category_id), { prompt: "Select a category..." }, class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 #{post.category_id.blank? ? 'placeholder-selected' : ''}", data: { "content-type-target": "categorySelect", "form-validation-target": "requiredField", "action": "change->form-validation#validateForm change->content-type#updateSelectColor" } %>
+      <% 
+        categories_with_descriptions = Category.regular.ordered.pluck(:name, :id, :description)
+        category_options = categories_with_descriptions.map do |name, id, description|
+          [name, id, { "data-description" => description }]
+        end
+      %>
+      <%= form.select :category_id, options_for_select(category_options, post.category_id), { prompt: "Select a category..." }, class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 #{post.category_id.blank? ? 'placeholder-selected' : ''}", data: { "content-type-target": "categorySelect", "form-validation-target": "requiredField", "action": "change->form-validation#validateForm change->content-type#updateSelectColor change->content-type#updateCategoryHint" } %>
+      <p class="mt-2 text-xs text-gray-400 hidden" data-content-type-target="categoryHint">
+        <!-- Category description will be displayed here -->
+      </p>
     </div>
 
     <div id="link-fields" class="<%= 'hidden' unless post.link? %>" data-controller="link-metadata" data-content-type-target="linkFields">

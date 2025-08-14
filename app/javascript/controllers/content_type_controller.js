@@ -17,6 +17,7 @@ export default class extends Controller {
     "metadataImageUrl",
     "categoryField",
     "categorySelect",
+    "categoryHint",
     "tagsField",
     "tagsInput",
     "logoField",
@@ -56,6 +57,11 @@ export default class extends Controller {
       }
     } else {
       this.toggleFields()
+    }
+    
+    // Show category hint if a category is already selected (e.g., when editing)
+    if (this.hasCategorySelectTarget && this.categorySelectTarget.value) {
+      this.updateCategoryHint({ target: this.categorySelectTarget })
     }
   }
   
@@ -691,6 +697,38 @@ export default class extends Controller {
     // Show upload area again
     if (this.hasUploadAreaTarget) {
       this.uploadAreaTarget.classList.remove('hidden')
+    }
+  }
+  
+  updateCategoryHint(event) {
+    const select = event.target
+    
+    if (!this.hasCategoryHintTarget) return
+    
+    if (select.value === '') {
+      // Hide hint when no category is selected
+      this.categoryHintTarget.classList.add('hidden')
+      this.categoryHintTarget.textContent = ''
+    } else {
+      // Find the selected option and get its description
+      const selectedOption = select.options[select.selectedIndex]
+      let description = selectedOption.dataset.description
+      
+      if (description && description.trim() !== '') {
+        // Add period at the end if it doesn't have one
+        description = description.trim()
+        if (!description.endsWith('.')) {
+          description += '.'
+        }
+        
+        // Show hint with description
+        this.categoryHintTarget.textContent = description
+        this.categoryHintTarget.classList.remove('hidden')
+      } else {
+        // Hide hint if no description
+        this.categoryHintTarget.classList.add('hidden')
+        this.categoryHintTarget.textContent = ''
+      }
     }
   }
 }

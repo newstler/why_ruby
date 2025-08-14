@@ -30,6 +30,20 @@
 en:
   hello: "Hello world"
   
+  # Shared values - defined here to be referenced elsewhere
+  shared:
+    site:
+      name: &site_name "WhyRuby.info"
+      app_name: &app_name "Why Ruby?"
+      apple_app_title: &apple_app_title "WhyRuby"
+    community:
+      title: &community_title "Community"
+      description: &community_description "Connect with passionate Ruby developers from around the world and explore their projects, posts, and stories"
+      keywords: &community_keywords "ruby developers, ruby community, ruby programmers, rails developers"
+    keywords:
+      base: &keywords_base "Ruby, Ruby on Rails"
+      programming: &keywords_programming "programming, web development"
+  
   auth:
     sign_in_with_github: "Sign in with GitHub"
   
@@ -53,9 +67,9 @@ en:
       keywords: "Ruby, Ruby on Rails, Rails, programming, web development, Ruby community, Ruby tutorials, Ruby resources, Ruby advocacy, why Ruby"
       author: "Yuri Sidorov"
     site:
-      name: "WhyRuby.info"
-      application_name: "Why Ruby?"
-      apple_app_title: "WhyRuby"
+      name: *site_name
+      application_name: *app_name
+      apple_app_title: *apple_app_title
     social:
       twitter_site: "@yurisidorov"
       twitter_creator: "@yurisidorov"
@@ -74,6 +88,10 @@ en:
         summary: "Explore Ruby posts and resources tagged with #%{tag_name} on WhyRuby.info"
         keywords: "%{tag_name}, Ruby, Ruby on Rails, programming, tags"
     users:
+      index:
+        title: *community_title
+        summary: *community_description
+        keywords: *community_keywords
       show:
         title: "%{display_name} (@%{username})"
         summary_with_bio: "%{bio}"
@@ -81,6 +99,12 @@ en:
         keywords: "%{username}, Ruby developer, Ruby community, profile"
   
   users:
+    index:
+      title: *community_title
+      description: *community_description
+      keywords: *community_keywords
+      invite_friends: "Invite your Ruby friends to join →"
+      join_community: "Join the friendly Ruby community →"
     show:
       view_all_repositories: "View all Ruby repositories on GitHub →"
       no_ruby_projects: "No Ruby projects found on GitHub."
