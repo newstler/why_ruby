@@ -12,6 +12,6 @@ module CategoriesHelper
   end
 
   def category_meta_image_url(category)
-    "#{request.base_url}/og-image.png"
+    versioned_og_image_url
   end
 end

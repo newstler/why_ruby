@@ -252,6 +252,20 @@ GEM
     language_server-protocol (3.17.0.5)
     lefthook (1.12.3)
     lint_roller (1.1.0)
+    litestream (0.14.0-arm64-darwin)
+      actionpack (>= 7.0)
+      actionview (>= 7.0)
+      activejob (>= 7.0)
+      activesupport (>= 7.0)
+      railties (>= 7.0)
+      sqlite3
+    litestream (0.14.0-x86_64-linux)
+      actionpack (>= 7.0)
+      actionview (>= 7.0)
+      activejob (>= 7.0)
+      activesupport (>= 7.0)
+      railties (>= 7.0)
+      sqlite3
     logger (1.7.0)
     loofah (2.24.1)
       crass (~> 1.0.2)
@@ -520,6 +534,7 @@ DEPENDENCIES
   kamal
   kaminari (~> 1.2)
   lefthook
+  litestream (~> 0.14.0)
   metainspector
   nokogiri (~> 1.16)
   omniauth-github (~> 2.0)

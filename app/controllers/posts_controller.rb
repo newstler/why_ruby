@@ -1,38 +1,25 @@
 class PostsController < ApplicationController
-  before_action :authenticate_user!, except: [ :show, :success_stories, :image ]
+  before_action :authenticate_user!, except: [ :show, :image ]
   before_action :set_post, only: [ :show, :edit, :update, :destroy, :image ]
   before_action :authorize_user!, only: [ :edit, :update, :destroy ]
-
-  def success_stories
-    @posts = Post.success_stories
-                 .published
-                 .includes(:user, :comments)
-                 .page(params[:page])
-                 .per(20)
-  end
 
   def show
     @comments = @post.comments.published.includes(:user).order(created_at: :asc)
   end
 
-  # Serve generated PNG images for success stories
+  # Serve images directly for posts with stable URLs for social media
   def image
-    if @post.success_story? && @post.logo_png_base64.present?
-      # Success story - serve the generated PNG
-      data = @post.logo_png_base64.match(/^data:image\/png;base64,(.+)$/)[1]
-      image_data = Base64.decode64(data)
-
-      # Use ETag based on post's updated_at to allow caching but invalidate on changes
-      # This way browsers cache the image but revalidate when the post is updated
-      fresh_when(etag: @post, last_modified: @post.updated_at, public: true)
-
-      send_data image_data,
-                type: "image/png",
-                disposition: "inline",
-                filename: "#{@post.slug}.png"
+    if @post.featured_image.attached?
+      # Serve the image directly from our custom URL
+      # This provides a clean, stable URL for social media crawlers
+      send_data @post.featured_image.download,
+                type: @post.featured_image.content_type,
+                disposition: "inline"
     else
-      # No image available
-      head :not_found
+      # Serve default OG image
+      send_file Rails.root.join("public", "og-image.png"),
+                type: "image/png",
+                disposition: "inline"
     end
   end
 
@@ -43,12 +30,23 @@ class PostsController < ApplicationController
   end
 
   def create
-    @post = current_user.posts.build(post_params.except(:tag_names))
+    @post = current_user.posts.build(post_params.except(:tag_names, :metadata_image_url, :remove_featured_image))
     clean_post_params
     process_tags
 
+    # Save the post first
     if @post.save
-      redirect_to @post, notice: "Post was successfully created."
+      # Then handle image attachment after post is saved
+      if @post.link? && params[:post][:metadata_image_url].present?
+        fetch_and_attach_image_from_url(params[:post][:metadata_image_url])
+      end
+
+      # Redirect to category page for link posts, post page for others
+      if @post.link? && @post.category
+        redirect_to category_path(@post.category), notice: "Link was successfully posted."
+      else
+        redirect_to post_path_for(@post), notice: "Post was successfully created."
+      end
     else
       render :new, status: :unprocessable_entity
     end
@@ -61,11 +59,37 @@ class PostsController < ApplicationController
     process_tags
 
     # Clean params before update
-    cleaned_params = post_params.except(:tag_names)
+    cleaned_params = post_params.except(:tag_names, :metadata_image_url, :remove_featured_image)
     cleaned_params[:category_id] = nil if cleaned_params[:category_id] == "" && @post.success_story?
 
+    # Determine if we have a new image being uploaded
+    has_new_image = cleaned_params[:featured_image].present? ||
+                   (@post.link? && params[:post][:metadata_image_url].present?)
+
+    # If we have a new image, always purge the old one first (regardless of remove flag)
+    if has_new_image && @post.featured_image.attached?
+      @post.featured_image.purge
+      @post.clear_image_variants!
+    # Otherwise, check if we're just removing without replacement
+    elsif params[:post][:remove_featured_image] == "1" && !has_new_image
+      @post.featured_image.purge_later
+      @post.clear_image_variants!
+    end
+
+    # Handle metadata image fetch for link posts
+    if @post.link? && params[:post][:metadata_image_url].present?
+      fetch_and_attach_image_from_url(params[:post][:metadata_image_url])
+      # Remove from cleaned_params to avoid Rails trying to process it
+      cleaned_params.delete(:featured_image)
+    end
+
     if @post.update(cleaned_params)
-      redirect_to @post, notice: "Post was successfully updated."
+      # Redirect to category page for link posts, post page for others
+      if @post.link? && @post.category
+        redirect_to category_path(@post.category), notice: "Link was successfully updated."
+      else
+        redirect_to post_path_for(@post), notice: "Post was successfully updated."
+      end
     else
       render :edit, status: :unprocessable_entity
     end
@@ -98,12 +122,16 @@ class PostsController < ApplicationController
 
   def fetch_metadata
     url = params[:url]
+    exclude_id = params[:exclude_id] || request.request_parameters[:exclude_id]
 
     # Normalize URL for duplicate checking
     normalized_url = normalize_url_for_checking(url)
 
-    # Check for existing post
-    existing_post = Post.where(url: normalized_url).first
+    # Check for existing post (excluding current post if editing)
+    existing_post = Post.where(url: normalized_url)
+    existing_post = existing_post.where.not(id: exclude_id) if exclude_id.present?
+    existing_post = existing_post.first
+
     if existing_post
       render json: {
         success: false,
@@ -111,7 +139,7 @@ class PostsController < ApplicationController
         existing_post: {
           id: existing_post.id,
           title: existing_post.title,
-          url: post_path(existing_post)
+          url: post_path_for(existing_post)
         }
       }
       return
@@ -136,7 +164,12 @@ class PostsController < ApplicationController
     url = params[:url]
     normalized_url = normalize_url_for_checking(url)
 
-    existing_post = Post.where(url: normalized_url).where.not(id: params[:exclude_id]).first
+    # Handle exclude_id from both regular params and JSON body
+    exclude_id = params[:exclude_id] || request.request_parameters[:exclude_id]
+
+    existing_post = Post.where(url: normalized_url)
+    existing_post = existing_post.where.not(id: exclude_id) if exclude_id.present?
+    existing_post = existing_post.first
 
     if existing_post
       render json: {
@@ -144,7 +177,7 @@ class PostsController < ApplicationController
         existing_post: {
           id: existing_post.id,
           title: existing_post.title,
-          url: post_path(existing_post)
+          url: post_path_for(existing_post)
         }
       }
     else
@@ -154,8 +187,22 @@ class PostsController < ApplicationController
 
   private
 
+  def fetch_and_attach_image_from_url(url)
+    return if url.blank?
+
+    # Use ImageProcessor to fetch and process the image
+    ImageProcessor.process_from_url(url, @post)
+  end
+
   def set_post
-    @post = Post.includes(:tags).friendly.find(params[:id])
+    # Handle category/post route
+    if params[:category_id]
+      @category = Category.friendly.find(params[:category_id])
+      @post = @category.posts.includes(:tags).friendly.find(params[:id])
+    # Handle direct post access (for edit, destroy, etc.)
+    else
+      @post = Post.includes(:tags).friendly.find(params[:id])
+    end
 
     # Only allow viewing unpublished posts by their owner or admin
     if !@post.published? && (!user_signed_in? || (current_user != @post.user && !current_user.admin?))
@@ -186,7 +233,7 @@ class PostsController < ApplicationController
   end
 
   def post_params
-    params.require(:post).permit(:title, :content, :url, :summary, :category_id, :title_image_url, :published, :tag_names, :post_type, :logo_svg, tag_ids: [])
+    params.require(:post).permit(:title, :content, :url, :summary, :category_id, :featured_image, :metadata_image_url, :remove_featured_image, :published, :tag_names, :post_type, :logo_svg, tag_ids: [])
   end
 
   def clean_post_params
@@ -211,6 +258,15 @@ class PostsController < ApplicationController
         tags << tag
       end
       @post.tags = tags
+    end
+  end
+
+  def post_path_for(post)
+    if post.category
+      post_path(post.category, post)
+    else
+      # Fallback for posts without category (shouldn't happen in normal flow)
+      post_path("uncategorized", post)
     end
   end
 end

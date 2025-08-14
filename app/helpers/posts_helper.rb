@@ -17,12 +17,19 @@ module PostsHelper
   end
 
   def post_meta_image_url(post)
-    if post.success_story? && post.logo_png_base64.present?
-      image_post_url(post)
-    elsif post.title_image_url.present?
-      post.title_image_url
+    if post.featured_image.attached?
+      # Generate the resource-specific image URL with version parameter
+      base_url = if post.category
+        "#{request.base_url}/#{post.category.to_param}/#{post.to_param}/og-image.png"
+      else
+        # Fallback for posts without category (shouldn't happen normally)
+        "#{request.base_url}/uncategorized/#{post.to_param}/og-image.png"
+      end
+      # Add version parameter based on post's updated_at timestamp
+      "#{base_url}?v=#{post.updated_at.to_i}"
     else
-      "#{request.base_url}/og-image.png"
+      # Use the default versioned OG image
+      versioned_og_image_url
     end
   end
 

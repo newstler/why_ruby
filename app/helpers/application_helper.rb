@@ -1,4 +1,5 @@
 module ApplicationHelper
+  include ImageHelper
   def markdown_to_html(markdown_text)
     return "" if markdown_text.blank?
 
@@ -74,7 +75,7 @@ module ApplicationHelper
   end
 
   def post_link_url(post)
-    post.link? ? safe_external_url(post.url) : post_path(post)
+    post.link? ? safe_external_url(post.url) : post_path_for(post)
   end
 
   def post_link_options(post)
@@ -106,17 +107,8 @@ module ApplicationHelper
     false
   end
 
-  def success_stories_menu_active?
-    # Highlight if on the success stories page
-    return true if controller_name == "posts" && action_name == "success_stories"
-
-    # Highlight if viewing a success story post
-    if controller_name == "posts" && action_name == "show" && @post.present?
-      return @post.success_story?
-    end
-
-    false
-  end
+  # Since success stories now work like regular categories, we can remove this method
+  # and just use category_menu_active? for success stories too
 
   def community_menu_active?
     # Highlight if on the users index page
@@ -161,6 +153,59 @@ module ApplicationHelper
 
   def has_success_stories?
     # Cache the result for the request to avoid multiple DB queries
-    @has_success_stories ||= Post.success_stories.published.exists?
+    if Category.success_story_category
+      @has_success_stories ||= Category.success_story_category.posts.published.exists?
+    else
+      @has_success_stories ||= Post.success_stories.published.exists?
+    end
+  end
+
+  # Generate the full formatted page title that matches the <title> tag format
+  def full_page_title(page_title = nil)
+    if page_title.present?
+      "Why Ruby? — #{page_title}"
+    else
+      "Why Ruby?"
+    end
+  end
+
+  # Generate versioned URL for OG image to bust social media caches
+  # Can accept a custom path for resource-specific images or use default
+  def versioned_og_image_url(custom_path = nil)
+    if custom_path
+      # For custom paths (like post-specific images), just append a version parameter
+      # The version will be handled by the resource itself (e.g., post.updated_at)
+      custom_path
+    else
+      # For the default og-image.png, use file modification time as version
+      og_image_path = Rails.root.join("public", "og-image.png")
+      version = if File.exist?(og_image_path)
+        File.mtime(og_image_path).to_i.to_s
+      else
+        # Fallback to app version or deployment timestamp
+        Rails.application.config.assets.version || Time.current.to_i.to_s
+      end
+
+      "#{request.base_url}/og-image.png?v=#{version}"
+    end
+  end
+
+  # URL helpers for the new routing structure
+  def post_url_for(post)
+    if post.category
+      post_url(post.category, post)
+    else
+      # Fallback for posts without category
+      post_url("uncategorized", post)
+    end
+  end
+
+  def post_path_for(post)
+    if post.category
+      post_path(post.category, post)
+    else
+      # Fallback for posts without category
+      post_path("uncategorized", post)
+    end
   end
 end

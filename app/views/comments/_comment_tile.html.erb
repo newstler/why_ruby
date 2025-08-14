@@ -1,4 +1,4 @@
-<%= link_to post_path(comment.post, anchor: "comment-#{comment.id}"), class: "block" do %>
+<%= link_to post_path_for(comment.post) + "#comment-#{comment.id}", class: "block" do %>
   <div class="bg-white shadow rounded-lg p-6 hover:shadow-md transition-shadow">
     <div class="space-y-3">
       <!-- Post Title -->

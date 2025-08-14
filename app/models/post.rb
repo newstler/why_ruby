@@ -7,6 +7,7 @@ class Post < ApplicationRecord
 
   # Constants
   POST_TYPES = %w[article link success_story].freeze
+  MAX_IMAGE_SIZE = 20.megabytes # 20MB limit for uploaded images
 
   # Associations
   belongs_to :user
@@ -14,6 +15,9 @@ class Post < ApplicationRecord
   has_and_belongs_to_many :tags
   has_many :comments, dependent: :destroy
   has_many :reports, dependent: :destroy
+
+  # ActiveStorage attachments
+  has_one_attached :featured_image  # For all posts (articles, links, and success stories)
 
   # Validations
   validates :title, presence: true
@@ -23,8 +27,9 @@ class Post < ApplicationRecord
   validate :url_uniqueness
   validates :url, format: URI::DEFAULT_PARSER.make_regexp(%w[http https]), allow_blank: true
   validates :pin_position, uniqueness: true, allow_nil: true, numericality: { only_integer: true }
-  validates :category_id, presence: true, unless: :success_story?
+  validates :category_id, presence: true
   validate :logo_svg_valid_if_present
+  validate :featured_image_validation
 
   # Default scope
   default_scope { order(created_at: :desc) }
@@ -34,18 +39,26 @@ class Post < ApplicationRecord
   scope :pinned, -> { where.not(pin_position: nil) }
   scope :articles, -> { where(post_type: "article") }
   scope :links, -> { where(post_type: "link") }
-  scope :success_stories, -> { where(post_type: "success_story") }
+  scope :success_stories, -> {
+    success_category = Category.success_story_category
+    if success_category
+      where(category_id: success_category.id).or(where(post_type: "success_story"))
+    else
+      where(post_type: "success_story")
+    end
+  }
   scope :homepage_order, -> { reorder(:pin_position, created_at: :desc) }
   scope :needing_review, -> { where(needs_admin_review: true) }
 
   # Callbacks
   before_validation :normalize_url
   before_validation :set_post_type
-  before_validation :clean_category_for_success_stories
+  before_validation :set_success_story_category
   before_validation :clean_logo_svg
   after_create :generate_summary_job
   after_update :regenerate_summary_if_needed
-  after_save :generate_png_for_success_story, if: -> { success_story? && saved_change_to_logo_svg? }
+  after_save :generate_success_story_image, if: -> { success_story? && saved_change_to_logo_svg? }
+  after_commit :process_featured_image_if_needed
   after_update :check_reports_threshold
   after_create :update_user_counter_caches
   after_update :update_user_counter_caches
@@ -61,7 +74,8 @@ class Post < ApplicationRecord
   end
 
   def success_story?
-    post_type == "success_story"
+    # Check both post_type (for backward compatibility) and category
+    post_type == "success_story" || category&.is_success_story?
   end
 
   def should_generate_new_friendly_id?
@@ -92,8 +106,16 @@ class Post < ApplicationRecord
 
   private
 
-  def generate_png_for_success_story
-    GenerateSuccessStoryImageJob.perform_later(self)
+  def generate_success_story_image
+    # Force regeneration when logo changes on an existing record
+    # saved_change_to_logo_svg? returns true if logo_svg changed in the last save
+    # For new records, we don't need to force (no existing image)
+    # For existing records with logo changes, we need to force regeneration
+    force_regenerate = saved_change_to_logo_svg? && !saved_change_to_id?
+
+    Rails.logger.info "GenerateSuccessStoryImageJob triggered for post #{id}: force=#{force_regenerate}, logo_changed=#{saved_change_to_logo_svg?}, new_record=#{saved_change_to_id?}"
+
+    GenerateSuccessStoryImageJob.perform_later(self, force: force_regenerate)
   end
 
   def content_or_url_or_logo_present
@@ -145,10 +167,11 @@ class Post < ApplicationRecord
     end
   end
 
-  def clean_category_for_success_stories
-    # Convert empty string category_id to nil for success stories
-    if post_type == "success_story" && category_id == ""
-      self.category_id = nil
+  def set_success_story_category
+    # Auto-assign success story category if post_type is success_story
+    if post_type == "success_story" && category_id.blank?
+      success_category = Category.success_story_category
+      self.category_id = success_category.id if success_category
     end
   end
 
@@ -209,5 +232,95 @@ class Post < ApplicationRecord
     if url.match?(/^http:\/\/(www\.)?(github\.com|twitter\.com|youtube\.com|linkedin\.com|stackoverflow\.com)/i)
       self.url = url.sub(/^http:/, "https:")
     end
+  end
+
+  def featured_image_validation
+    return unless featured_image.attached?
+
+    # Check file size
+    if featured_image.blob.byte_size > MAX_IMAGE_SIZE
+      errors.add(:featured_image, "is too large (maximum is #{MAX_IMAGE_SIZE / 1.megabyte}MB)")
+    end
+
+    # Check allowed content types
+    unless ImageProcessor::ALLOWED_CONTENT_TYPES.include?(featured_image.blob.content_type)
+      errors.add(:featured_image, "must be a JPEG, PNG, WebP, or TIFF image")
+    end
+  end
+
+  def process_featured_image_if_needed
+    # Check if we have a new image attachment that needs processing
+    return unless featured_image.attached?
+
+    # Process if:
+    # 1. No variants exist yet (new upload or migration)
+    # 2. Featured image was just attached/changed
+    should_process = !has_processed_images? ||
+                    (previous_changes.key?("updated_at") && featured_image.blob.created_at > 1.minute.ago)
+
+    return unless should_process
+
+    Rails.logger.info "Processing image for Post ##{id}"
+    processor = ImageProcessor.new(featured_image)
+    result = processor.process!
+
+    if result[:success]
+      update_columns(
+        image_variants: result[:variants]
+      )
+      Rails.logger.info "Successfully processed image for Post ##{id}"
+    else
+      Rails.logger.error "Failed to process image for Post ##{id}: #{result[:error]}"
+    end
+  end
+
+  public
+
+  # Image variant methods (public so they can be used in views/helpers)
+  def image_variant(size = :medium)
+    return nil unless featured_image.attached? && image_variants.present?
+
+    variant_id = image_variants[size.to_s]
+    return featured_image.blob unless variant_id
+
+    ActiveStorage::Blob.find_by(id: variant_id) || featured_image.blob
+  end
+
+  def image_url_for_size(size = :medium)
+    blob = image_variant(size)
+    return nil unless blob
+
+    Rails.application.routes.url_helpers.rails_blob_path(blob, only_path: true)
+  end
+
+  def has_processed_images?
+    image_variants.present?
+  end
+
+  def reprocess_image!
+    return unless featured_image.attached?
+
+    processor = ImageProcessor.new(featured_image)
+    result = processor.process!
+
+    if result[:success]
+      update_columns(
+        image_variants: result[:variants]
+      )
+    end
+
+    result
+  end
+
+  def clear_image_variants!
+    # Clear variant blobs if they exist
+    if image_variants.present?
+      image_variants.each do |_size, blob_id|
+        ActiveStorage::Blob.find_by(id: blob_id)&.purge_later
+      end
+    end
+
+    # Clear image processing fields
+    update_columns(image_variants: nil)
   end
 end

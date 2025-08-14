@@ -10,9 +10,8 @@ class Avo::Actions::RegenerateSuccessStoryImage < Avo::BaseAction
     query.each do |post|
       next unless post.success_story? && post.logo_svg.present?
 
-      # Clear existing image and regenerate
-      post.update_column(:logo_png_base64, nil)
-      GenerateSuccessStoryImageJob.perform_later(post)
+      # Force regenerate the image
+      GenerateSuccessStoryImageJob.perform_later(post, force: true)
     end
 
     succeed "Image regeneration queued for #{query.count} #{"post".pluralize(query.count)}"

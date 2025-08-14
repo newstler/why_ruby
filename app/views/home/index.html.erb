@@ -4,7 +4,7 @@
 <div class="space-y-16">
   <!-- Hero Section -->
   <div class="max-w-4xl  mx-auto flex flex-col items-center">
-    <%= image_tag "heart.png", class: "w-32 md:w-64 h-32 md:h-64" %>
+    <%= image_tag "heart.webp", class: "w-32 md:w-64 h-32 md:h-64" %>
     <p class="text-2xl md:text-6xl text-gray-600 font-bold text-center mt-8">
       Discover why <span class="text-red-600">Ruby</span> continues to be a <span class="text-red-600">beloved language</span> for developers worldwide
     </p>
@@ -58,7 +58,7 @@
           <% # Create multiple sets for seamless looping %>
           <% 2.times do |set_index| %>
             <% shuffled_stories.each_with_index do |story, index| %>
-                      <%= link_to post_path(story), 
+                      <%= link_to post_path_for(story), 
                 class: "logo-item flex-shrink-0 transition-all duration-300 group relative mx-3 md:mx-10",
               data: { 
                 action: "mouseenter->logo-carousel#pause mouseleave->logo-carousel#resume mousemove->logo-carousel#showTooltip mouseleave->logo-carousel#hideTooltip",
@@ -83,7 +83,7 @@
         <div class="logo-tooltip fixed opacity-0 pointer-events-none transition-all duration-200" 
              data-logo-carousel-target="tooltip" 
              data-story-id="<%= story.id %>"
-             data-story-url="<%= post_path(story) %>"
+             data-story-url="<%= post_path_for(story) %>"
              style="display: none; z-index: 9999;">
           <div class="bg-white rounded-lg shadow-xl p-4 md:p-5 w-72 md:w-80 border border-gray-100 hover:shadow-2xl transition-shadow cursor-pointer">
             <h3 class="text-lg font-bold text-gray-900 mb-2 leading-tight"><%= story.title %></h3>

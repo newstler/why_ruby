@@ -9,8 +9,15 @@ export default class extends Controller {
     "linkTitleHint", 
     "imageField",
     "imageInput",
+    "imageUploadArea",
+    "imagePreview",
+    "imagePreviewWrapper",
+    "imageInfo",
+    "removeImageFlag",
+    "metadataImageUrl",
     "categoryField",
     "categorySelect",
+    "categoryHint",
     "tagsField",
     "tagsInput",
     "logoField",
@@ -23,6 +30,16 @@ export default class extends Controller {
     "urlInput",
     "contentInput",
     "summaryInput"
+  ]
+
+  // Allowed image types (must match backend validation)
+  static allowedImageTypes = [
+    'image/jpeg',
+    'image/jpg', 
+    'image/png',
+    'image/webp',
+    'image/tiff',
+    'image/x-tiff'
   ]
   
   connect() {
@@ -40,6 +57,11 @@ export default class extends Controller {
       }
     } else {
       this.toggleFields()
+    }
+    
+    // Show category hint if a category is already selected (e.g., when editing)
+    if (this.hasCategorySelectTarget && this.categorySelectTarget.value) {
+      this.updateCategoryHint({ target: this.categorySelectTarget })
     }
   }
   
@@ -104,6 +126,10 @@ export default class extends Controller {
       // Clear URL when switching away from link
       if (this.hasUrlInputTarget) {
         this.urlInputTarget.value = ''
+      }
+      // Clear metadata image URL
+      if (this.hasMetadataImageUrlTarget) {
+        this.metadataImageUrlTarget.value = ''
       }
     }
     
@@ -357,6 +383,10 @@ export default class extends Controller {
       // Show preview
       if (this.hasLogoPreviewTarget) {
         this.logoPreviewTargets.forEach(preview => {
+          // Clear any existing preview first
+          preview.innerHTML = ''
+          
+          // Add new SVG content
           preview.innerHTML = svgContent
           
           // Style the SVG for preview
@@ -374,6 +404,258 @@ export default class extends Controller {
   removeLogo(event) {
     event.preventDefault()
     this.clearLogo()
+  }
+  
+  // Image upload methods
+  triggerImageUpload(event) {
+    event.preventDefault()
+    event.stopPropagation()
+    if (this.hasImageInputTarget) {
+      this.imageInputTarget.click()
+    }
+  }
+  
+  handleImageDragOver(event) {
+    event.preventDefault()
+    event.stopPropagation()
+    if (this.hasImageUploadAreaTarget) {
+      this.imageUploadAreaTarget.classList.add('border-red-400', 'bg-red-50')
+    }
+  }
+  
+  handleImageDragLeave(event) {
+    event.preventDefault()
+    event.stopPropagation()
+    if (this.hasImageUploadAreaTarget) {
+      this.imageUploadAreaTarget.classList.remove('border-red-400', 'bg-red-50')
+    }
+  }
+  
+  handleImageDrop(event) {
+    event.preventDefault()
+    event.stopPropagation()
+    
+    if (this.hasImageUploadAreaTarget) {
+      this.imageUploadAreaTarget.classList.remove('border-red-400', 'bg-red-50')
+    }
+    
+    const files = event.dataTransfer.files
+    if (files.length > 0 && this.hasImageInputTarget) {
+      const file = files[0]
+      
+      // Check if file is an image
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file')
+        return
+      }
+      
+      // Check if the image type is allowed
+      if (!this.constructor.allowedImageTypes.includes(file.type)) {
+        alert('This image format is not supported. Please use JPEG, PNG, WebP, or TIFF.')
+        return
+      }
+      
+      // Check file size (20MB limit)
+      const maxSize = parseInt(this.imageInputTarget.dataset.maxSize || 20971520)
+      if (file.size > maxSize) {
+        const maxSizeMB = (maxSize / 1024 / 1024).toFixed(1)
+        const fileSizeMB = (file.size / 1024 / 1024).toFixed(1)
+        alert(`Image is too large (${fileSizeMB}MB). Maximum size is ${maxSizeMB}MB.`)
+        return
+      }
+      
+      // Create a DataTransfer to properly set the files
+      const dataTransfer = new DataTransfer()
+      dataTransfer.items.add(file)
+      this.imageInputTarget.files = dataTransfer.files
+      
+      // Trigger the change event to show preview
+      this.handleImageUpload({ target: this.imageInputTarget })
+    }
+  }
+  
+  handleImageUpload(event) {
+    const file = event.target.files[0]
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file')
+        event.target.value = ''
+        return
+      }
+      
+      // Check file size (20MB limit)
+      const maxSize = parseInt(event.target.dataset.maxSize || 20971520) // 20MB default
+      if (file.size > maxSize) {
+        const maxSizeMB = (maxSize / 1024 / 1024).toFixed(1)
+        const fileSizeMB = (file.size / 1024 / 1024).toFixed(1)
+        alert(`Image is too large (${fileSizeMB}MB). Maximum size is ${maxSizeMB}MB.`)
+        event.target.value = ''
+        return
+      }
+      
+      // Check if the image type is allowed
+      if (!this.constructor.allowedImageTypes.includes(file.type)) {
+        alert('This image format is not supported. Please use JPEG, PNG, WebP, or TIFF.')
+        event.target.value = ''
+        return
+      }
+      
+      // Reset the remove flag since we're adding a new image
+      if (this.hasRemoveImageFlagTarget) {
+        this.removeImageFlagTarget.value = '0'
+      }
+      
+      // Show preview
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        // Hide upload area
+        if (this.hasImageUploadAreaTarget) {
+          this.imageUploadAreaTarget.classList.add('hidden')
+        }
+        
+        // Hide ALL existing image previews (both persisted and new)
+        this.imagePreviewWrapperTargets.forEach(wrapper => {
+          wrapper.classList.add('hidden')
+        })
+        
+        // Clear any existing preview first
+        if (this.hasImagePreviewTarget) {
+          this.imagePreviewTarget.innerHTML = ''
+        }
+        if (this.hasImageInfoTarget) {
+          this.imageInfoTarget.innerHTML = ''
+        }
+        
+        // Show only the preview wrapper that contains the preview target (the one for new uploads)
+        this.imagePreviewWrapperTargets.forEach(wrapper => {
+          if (wrapper.contains(this.imagePreviewTarget)) {
+            wrapper.classList.remove('hidden')
+          }
+        })
+        
+        // Insert new image preview
+        if (this.hasImagePreviewTarget) {
+          this.imagePreviewTarget.innerHTML = `<img src="${e.target.result}" class="max-w-full max-h-64 object-contain rounded" />`
+        }
+        
+        // Insert file info with validation status
+        if (this.hasImageInfoTarget) {
+          const sizeInKB = Math.round(file.size / 1024)
+          const sizeString = sizeInKB < 1024 ? `${sizeInKB} KB` : `${(sizeInKB / 1024).toFixed(1)} MB`
+          const sizeClass = file.size > maxSize * 0.8 ? 'text-orange-600' : 'text-gray-500'
+          this.imageInfoTarget.innerHTML = `
+            <p class="text-sm text-gray-600">${file.name}</p>
+            <p class="text-xs ${sizeClass}">Size: ${sizeString}</p>
+          `
+        }
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+  
+  removeImage(event) {
+    event.preventDefault()
+    
+    // Get the wrapper that contains the clicked button
+    const clickedWrapper = event.currentTarget.closest('[data-content-type-target*="imagePreviewWrapper"]')
+    
+    if (clickedWrapper) {
+      // Check if this is a persisted image or a new upload
+      const isPersistedImage = clickedWrapper.querySelector('img[src^="http"]:not([src*="data:"])') || 
+                              clickedWrapper.querySelector('img[src^="/rails/active_storage"]') ||
+                              clickedWrapper.querySelector('img[src^="/rails/blobs"]')
+      
+      // Hide the clicked wrapper
+      clickedWrapper.classList.add('hidden')
+      
+      if (isPersistedImage && !clickedWrapper.contains(this.imagePreviewTarget)) {
+        // This is a persisted image - mark for removal
+        if (this.hasRemoveImageFlagTarget) {
+          this.removeImageFlagTarget.value = '1'
+        }
+      } else {
+        // This is a new upload/metadata image - clear the inputs
+        // Clear the file input
+        if (this.hasImageInputTarget) {
+          this.imageInputTarget.value = ''
+        }
+        
+        // Clear metadata image URL
+        if (this.hasMetadataImageUrlTarget) {
+          this.metadataImageUrlTarget.value = ''
+        }
+        
+        // Clear preview content
+        if (this.hasImagePreviewTarget) {
+          this.imagePreviewTarget.innerHTML = ''
+        }
+        if (this.hasImageInfoTarget) {
+          this.imageInfoTarget.innerHTML = ''
+        }
+      }
+      
+      // Always show upload area when removing any image
+      if (this.hasImageUploadAreaTarget) {
+        this.imageUploadAreaTarget.classList.remove('hidden')
+      }
+    }
+  }
+  
+  showMetadataImagePreview(imageUrl) {
+    if (!imageUrl) return
+    
+    // Set the metadata_image_url hidden field value
+    if (this.hasMetadataImageUrlTarget) {
+      this.metadataImageUrlTarget.value = imageUrl
+    }
+    
+    // Reset the remove flag since we're adding a new image
+    if (this.hasRemoveImageFlagTarget) {
+      this.removeImageFlagTarget.value = '0'
+    }
+    
+    // Hide upload area
+    if (this.hasImageUploadAreaTarget) {
+      this.imageUploadAreaTarget.classList.add('hidden')
+    }
+    
+    // Hide existing persisted image preview if there is one
+    this.imagePreviewWrapperTargets.forEach(wrapper => {
+      // If this wrapper contains a persisted image (has an img with src starting with http), hide it
+      if (wrapper.querySelector('img[src^="http"]') || wrapper.querySelector('img[src^="/rails/active_storage"]')) {
+        wrapper.classList.add('hidden')
+      }
+    })
+    
+    // Clear any existing preview first
+    if (this.hasImagePreviewTarget) {
+      this.imagePreviewTarget.innerHTML = ''
+    }
+    if (this.hasImageInfoTarget) {
+      this.imageInfoTarget.innerHTML = ''
+    }
+    
+    // Show only the preview wrapper that contains the preview target (the one for new uploads)
+    this.imagePreviewWrapperTargets.forEach(wrapper => {
+      if (wrapper.contains(this.imagePreviewTarget)) {
+        wrapper.classList.remove('hidden')
+      }
+    })
+    
+    // Insert new image preview
+    if (this.hasImagePreviewTarget) {
+      this.imagePreviewTarget.innerHTML = `<img src="${imageUrl}" class="max-w-full max-h-64 object-contain rounded" />`
+    }
+    
+    // Insert info
+    if (this.hasImageInfoTarget) {
+      const url = new URL(imageUrl)
+      const filename = url.pathname.split('/').pop() || 'image'
+      this.imageInfoTarget.innerHTML = `
+        <p class="text-sm text-gray-600">${filename}</p>
+        <p class="text-xs text-gray-500">From link metadata</p>
+      `
+    }
   }
   
   updateSelectColor(event) {
@@ -415,6 +697,38 @@ export default class extends Controller {
     // Show upload area again
     if (this.hasUploadAreaTarget) {
       this.uploadAreaTarget.classList.remove('hidden')
+    }
+  }
+  
+  updateCategoryHint(event) {
+    const select = event.target
+    
+    if (!this.hasCategoryHintTarget) return
+    
+    if (select.value === '') {
+      // Hide hint when no category is selected
+      this.categoryHintTarget.classList.add('hidden')
+      this.categoryHintTarget.textContent = ''
+    } else {
+      // Find the selected option and get its description
+      const selectedOption = select.options[select.selectedIndex]
+      let description = selectedOption.dataset.description
+      
+      if (description && description.trim() !== '') {
+        // Add period at the end if it doesn't have one
+        description = description.trim()
+        if (!description.endsWith('.')) {
+          description += '.'
+        }
+        
+        // Show hint with description
+        this.categoryHintTarget.textContent = description
+        this.categoryHintTarget.classList.remove('hidden')
+      } else {
+        // Hide hint if no description
+        this.categoryHintTarget.classList.add('hidden')
+        this.categoryHintTarget.textContent = ''
+      }
     }
   }
 }

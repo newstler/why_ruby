@@ -1,5 +1,16 @@
 class SuccessStoryImageGenerator
-  TEMPLATE_PATH = Rails.root.join("app", "assets", "images", "success_story_teplate.png")
+  # Template should be 1200x630 WebP format
+  TEMPLATE_PATH = Rails.root.join("app", "assets", "images", "success_story_template.webp")
+
+  # OG Image dimensions
+  OG_WIDTH = 1200
+  OG_HEIGHT = 630
+
+  # Logo positioning (centered in the template)
+  LOGO_MAX_WIDTH = 410   # Maximum width for logo
+  LOGO_MAX_HEIGHT = 190  # Maximum height for logo
+  LOGO_CENTER_X = 410    # Center X position (1200/2)
+  LOGO_CENTER_Y = 145    # Center Y position (630/2)
 
   # NOTE: This service uses ImageMagick's 'convert' command directly for v6 compatibility
   # No Ruby gems required, just ImageMagick binary installed on the system
@@ -17,11 +28,29 @@ class SuccessStoryImageGenerator
       return nil
     end
 
-    # Convert SVG logo to PNG and overlay on template
-    png_base64 = generate_social_image
+    # Convert SVG logo to WebP and overlay on template
+    webp_data = generate_social_image
 
-    # Store the generated PNG
-    @post.update_column(:logo_png_base64, png_base64) if png_base64.present?
+    # Store the generated WebP in ActiveStorage
+    if webp_data && !webp_data.empty?
+      @post.featured_image.attach(
+        io: StringIO.new(webp_data),
+        filename: "#{@post.slug}-social.webp",
+        content_type: "image/webp"
+      )
+
+      # Also process variants for the success story image
+      if @post.featured_image.attached?
+        processor = ImageProcessor.new(@post.featured_image)
+        result = processor.process!
+
+        if result[:success]
+          @post.update_columns(
+            image_variants: result[:variants]
+          )
+        end
+      end
+    end
   end
 
   private
@@ -29,13 +58,19 @@ class SuccessStoryImageGenerator
   def generate_social_image
     # Create temp files
     svg_file = Tempfile.new([ "logo", ".svg" ])
-    png_file = Tempfile.new([ "logo_converted", ".png" ])
-    output_file = Tempfile.new([ "success_story", ".png" ])
+    logo_file = Tempfile.new([ "logo_converted", ".webp" ])
+    output_file = Tempfile.new([ "success_story", ".webp" ])
 
     begin
       # Write SVG to file
       svg_file.write(@post.logo_svg)
       svg_file.rewind
+
+      # Check if template exists
+      unless File.exist?(TEMPLATE_PATH)
+        Rails.logger.error "Template file not found for success story image generation: #{TEMPLATE_PATH}"
+        return nil
+      end
 
       # Dual approach: Try rsvg-convert first (better SVG handling), fall back to ImageMagick
       converted = false
@@ -44,30 +79,31 @@ class SuccessStoryImageGenerator
       if system("which", "rsvg-convert", out: File::NULL, err: File::NULL)
         Rails.logger.info "Using rsvg-convert for SVG conversion"
 
-        # First pass: Convert at high resolution
+        # First pass: Convert at high resolution for quality
         temp_high_res = Tempfile.new([ "high_res", ".png" ])
         rsvg_cmd = [
           "rsvg-convert",
           "--keep-aspect-ratio",
-          "--width", "1728",  # 1.5x target width for better quality
-          "--height", "810",  # 1.5x target height for better quality
+          "--width", (LOGO_MAX_WIDTH * 2).to_s,  # 2x for better quality
+          "--height", (LOGO_MAX_HEIGHT * 2).to_s,
           "--background-color", "transparent",
           svg_file.path,
           "--output", temp_high_res.path
         ]
 
         if system(*rsvg_cmd, err: File::NULL)
-          # Second pass: Resize to target dimensions with high quality
+          # Second pass: Convert to WebP and resize to fit within bounds
           resize_cmd = [
             "convert",
             temp_high_res.path,
-            "-resize", "1152x540",  # Fit within box
+            "-resize", "#{LOGO_MAX_WIDTH}x#{LOGO_MAX_HEIGHT}>",  # Shrink to fit
             "-filter", "Lanczos",
-            "-quality", "100",
+            "-quality", "95",
             "-background", "none",
             "-gravity", "center",
-            "-extent", "1152x540",  # Canvas size
-            "PNG32:#{png_file.path}"  # Force 32-bit PNG with alpha
+            "-define", "webp:method=6",
+            "-define", "webp:alpha-quality=100",
+            "webp:#{logo_file.path}"
           ]
 
           if system(*resize_cmd)
@@ -84,28 +120,29 @@ class SuccessStoryImageGenerator
       unless converted
         Rails.logger.info "Using ImageMagick for SVG conversion"
 
-        svg_to_png_cmd = [
+        svg_to_webp_cmd = [
           "convert",
           "-background", "none",
-          "-density", "450",  # Higher density for better quality
+          "-density", "300",  # Higher density for better quality
           svg_file.path,
-          "-resize", "1152x540",  # Fit within box
+          "-resize", "#{LOGO_MAX_WIDTH}x#{LOGO_MAX_HEIGHT}>",  # Shrink to fit
           "-filter", "Lanczos",
-          "-quality", "100",
+          "-quality", "95",
           "-gravity", "center",
-          "PNG32:#{png_file.path}"  # Force 32-bit PNG with alpha
+          "-define", "webp:method=6",
+          "-define", "webp:alpha-quality=100",
+          "webp:#{logo_file.path}"
         ]
 
-        unless system(*svg_to_png_cmd)
-          Rails.logger.error "Failed to convert SVG to PNG with both methods"
+        unless system(*svg_to_webp_cmd)
+          Rails.logger.error "Failed to convert SVG to WebP with both methods"
           return nil
         end
       end
 
       # Get dimensions of the converted logo
-      # Use Open3 to safely execute the command and avoid command injection
       require "open3"
-      stdout, status = Open3.capture2("identify", "-format", "%wx%h", png_file.path)
+      stdout, status = Open3.capture2("identify", "-format", "%wx%h", logo_file.path)
       unless status.success?
         Rails.logger.error "Failed to get image dimensions"
         return nil
@@ -113,18 +150,20 @@ class SuccessStoryImageGenerator
       dimensions = stdout.strip
       logo_width, logo_height = dimensions.split("x").map(&:to_i)
 
-      # Calculate position to center logo at 960x432 on 1920x1080 template
-      x_offset = 960 - (logo_width / 2)
-      y_offset = 432 - (logo_height / 2)
+      # Calculate position to center logo on template
+      x_offset = LOGO_CENTER_X - (logo_width / 2)
+      y_offset = LOGO_CENTER_Y - (logo_height / 2)
 
       # Composite logo onto template using ImageMagick
       composite_cmd = [
         "convert",
         TEMPLATE_PATH.to_s,
-        png_file.path,
+        logo_file.path,
         "-geometry", "+#{x_offset}+#{y_offset}",
         "-composite",
-        output_file.path
+        "-quality", "95",
+        "-define", "webp:method=4",
+        "webp:#{output_file.path}"
       ]
 
       unless system(*composite_cmd)
@@ -132,9 +171,8 @@ class SuccessStoryImageGenerator
         return nil
       end
 
-      # Read and encode to base64
-      image_data = File.read(output_file.path)
-      "data:image/png;base64,#{Base64.strict_encode64(image_data)}"
+      # Read and return raw WebP data
+      File.read(output_file.path)
 
     rescue => e
       Rails.logger.error "Failed to generate success story image: #{e.message}"
@@ -142,17 +180,17 @@ class SuccessStoryImageGenerator
     ensure
       svg_file.close
       svg_file.unlink
-      png_file.close
-      png_file.unlink
+      logo_file.close
+      logo_file.unlink
       output_file.close
       output_file.unlink
     end
   end
 
-  # Alternative method to just convert SVG to PNG without template
-  def svg_to_png_base64
+  # Alternative method to just convert SVG to WebP without template
+  def svg_to_webp
     svg_file = Tempfile.new([ "logo", ".svg" ])
-    png_file = Tempfile.new([ "logo", ".png" ])
+    webp_file = Tempfile.new([ "logo", ".webp" ])
 
     begin
       svg_file.write(@post.logo_svg)
@@ -163,45 +201,65 @@ class SuccessStoryImageGenerator
 
       # Try rsvg-convert first
       if system("which", "rsvg-convert", out: File::NULL, err: File::NULL)
+        # First convert to PNG with rsvg-convert
+        temp_png = Tempfile.new([ "temp", ".png" ])
         rsvg_cmd = [
           "rsvg-convert",
           "--keep-aspect-ratio",
           "--background-color", "transparent",
           svg_file.path,
-          "--output", png_file.path
+          "--output", temp_png.path
         ]
 
         if system(*rsvg_cmd, err: File::NULL)
-          converted = true
+          # Then convert PNG to WebP
+          png_to_webp_cmd = [
+            "convert",
+            temp_png.path,
+            "-quality", "95",
+            "-define", "webp:method=6",
+            "-define", "webp:alpha-quality=100",
+            "webp:#{webp_file.path}"
+          ]
+
+          if system(*png_to_webp_cmd)
+            converted = true
+          end
         end
+
+        temp_png.close
+        temp_png.unlink
       end
 
-      # Fall back to ImageMagick
+      # Fall back to direct ImageMagick conversion
       unless converted
         convert_cmd = [
           "convert",
           "-background", "none",
           "-density", "300",
           svg_file.path,
-          "PNG32:#{png_file.path}"
+          "-quality", "95",
+          "-define", "webp:method=6",
+          "-define", "webp:alpha-quality=100",
+          "webp:#{webp_file.path}"
         ]
 
         unless system(*convert_cmd)
-          Rails.logger.error "Failed to convert SVG to PNG"
+          Rails.logger.error "Failed to convert SVG to WebP"
           return nil
         end
       end
 
-      image_data = File.read(png_file.path)
-      "data:image/png;base64,#{Base64.strict_encode64(image_data)}"
+      # Return raw WebP data
+      File.read(webp_file.path)
     rescue => e
-      Rails.logger.error "Failed to convert SVG to PNG: #{e.message}"
+      Rails.logger.error "Failed to convert SVG to WebP: #{e.message}"
       nil
     ensure
       svg_file.close
       svg_file.unlink
-      png_file.close
-      png_file.unlink
+      webp_file.close
+      webp_file.unlink
     end
   end
 end
