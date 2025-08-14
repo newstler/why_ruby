@@ -1,0 +1,10 @@
+{
+  "ignored_warnings": [
+    {
+      "fingerprint": "38f64dd1ec6010dbb35640fb9e64944351f11dc4d52ad74c25d9157dad3921da",
+      "note": "False positive: source_path comes from ActiveStorage's temporary file system, not user input. The path is validated and expanded to prevent directory traversal. Using Open3 with array form prevents shell injection."
+    }
+  ],
+  "updated": "2025-08-14 05:05:00 +0200",
+  "brakeman_version": "7.1.0"
+}

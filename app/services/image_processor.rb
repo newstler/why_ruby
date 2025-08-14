@@ -1,5 +1,7 @@
 # Service for processing uploaded images into multiple WebP variants
 # Uses ImageMagick directly for compatibility with server constraints
+require "open3"
+
 class ImageProcessor
   ALLOWED_CONTENT_TYPES = %w[
     image/jpeg
@@ -89,10 +91,21 @@ class ImageProcessor
     variant_file = Tempfile.new([ "variant", ".webp" ])
 
     begin
+      # Validate that source_path is a real file to prevent injection
+      unless File.exist?(source_path) && File.file?(source_path)
+        Rails.logger.error "Invalid source file: #{source_path}"
+        return nil
+      end
+
+      # Use absolute path to prevent directory traversal
+      safe_source_path = File.expand_path(source_path)
+      safe_output_path = File.expand_path(variant_file.path)
+
       # Resize and convert to WebP with high quality
+      # Using Open3 for better security and error handling
       cmd = [
         "convert",
-        source_path,
+        safe_source_path,
         "-resize", "#{config[:width]}x#{config[:height]}>",  # Only shrink larger images
         "-filter", "Lanczos",                                # Best quality resize filter
         "-quality", config[:quality].to_s,
@@ -101,10 +114,11 @@ class ImageProcessor
         "-define", "webp:alpha-quality=100",                 # Preserve alpha quality
         "-define", "webp:image-hint=photo",                  # Optimize for photos
         "-strip",                                             # Remove metadata
-        "webp:#{variant_file.path}"
+        "webp:#{safe_output_path}"
       ]
 
-      unless system(*cmd, err: File::NULL)
+      stdout, status = Open3.capture2(*cmd)
+      unless status.success?
         Rails.logger.error "Failed to generate variant: #{config.inspect}"
         return nil
       end

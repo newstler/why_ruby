@@ -52,18 +52,18 @@ Rails.application.routes.draw do
   delete "posts/:post_id/comments/:id", to: "comments#destroy", as: :post_comment
   post "posts/:post_id/reports", to: "reports#create", as: :post_reports
 
+  # Legal pages (must be before catch-all routes)
+  get "legal/privacy", to: "legal#show", defaults: { page: "privacy_policy" }, as: :privacy_policy
+  get "legal/terms", to: "legal#show", defaults: { page: "terms_of_service" }, as: :terms_of_service
+  get "legal/cookies", to: "legal#show", defaults: { page: "cookie_policy" }, as: :cookie_policy
+  get "legal", to: "legal#show", defaults: { page: "legal_notice" }, as: :legal_notice
+
   # Category routes (must be at the end due to catch-all nature)
   get ":id", to: "categories#show", as: :category, constraints: { id: /[^\/]+/ }
 
   # Post routes (must be after category)
   get ":category_id/:id", to: "posts#show", as: :post, constraints: { category_id: /[^\/]+/, id: /[^\/]+/ }
   get ":category_id/:id/og-image.png", to: "posts#image", as: :post_image, constraints: { category_id: /[^\/]+/, id: /[^\/]+/ }
-
-  # Legal pages
-  get "legal/privacy", to: "legal#show", defaults: { page: "privacy_policy" }, as: :privacy_policy
-  get "legal/terms", to: "legal#show", defaults: { page: "terms_of_service" }, as: :terms_of_service
-  get "legal/cookies", to: "legal#show", defaults: { page: "cookie_policy" }, as: :cookie_policy
-  get "legal", to: "legal#show", defaults: { page: "legal_notice" }, as: :legal_notice
 
   # Defines the root path route ("/")
   root "home#index"
