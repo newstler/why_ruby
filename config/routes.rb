@@ -63,7 +63,7 @@ Rails.application.routes.draw do
 
   # Post routes (must be after category)
   get ":category_id/:id", to: "posts#show", as: :post, constraints: { category_id: /[^\/]+/, id: /[^\/]+/ }
-  get ":category_id/:id/og-image.png", to: "posts#image", as: :post_image, constraints: { category_id: /[^\/]+/, id: /[^\/]+/ }
+  get ":category_id/:id/og-image.webp", to: "posts#image", as: :post_image, constraints: { category_id: /[^\/]+/, id: /[^\/]+/ }
 
   # Defines the root path route ("/")
   root "home#index"

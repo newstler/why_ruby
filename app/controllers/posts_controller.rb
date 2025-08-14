@@ -10,15 +10,23 @@ class PostsController < ApplicationController
   # Serve images directly for posts with stable URLs for social media
   def image
     if @post.featured_image.attached?
-      # Serve the image directly from our custom URL
-      # This provides a clean, stable URL for social media crawlers
-      send_data @post.featured_image.download,
-                type: @post.featured_image.content_type,
-                disposition: "inline"
+      # Serve the og variant (1200x630 WebP) for social media
+      og_blob = @post.image_variant(:og)
+
+      if og_blob
+        send_data og_blob.download,
+                  type: "image/webp",
+                  disposition: "inline"
+      else
+        # Fallback to original if og variant not available yet
+        send_data @post.featured_image.download,
+                  type: "image/webp",
+                  disposition: "inline"
+      end
     else
-      # Serve default OG image
-      send_file Rails.root.join("public", "og-image.png"),
-                type: "image/png",
+      # Serve default OG image (should also be WebP)
+      send_file Rails.root.join("public", "og-image.webp"),
+                type: "image/webp",
                 disposition: "inline"
     end
   end
