@@ -1,6 +1,6 @@
 module ImageHelper
   # Generate a responsive image tag - simplified for Turbo compatibility
-  def responsive_post_image(post, size: :medium, css_class: "", alt: nil, loading: "auto")
+  def responsive_post_image(post, size: :post, css_class: "", alt: nil, loading: "auto")
     return nil unless post.featured_image.attached?
 
     # Get the appropriate blob
@@ -23,7 +23,7 @@ module ImageHelper
   end
 
   # Simpler version for tile/grid views
-  def post_image_tag(post, size: :thumb, css_class: "", alt: nil)
+  def post_image_tag(post, size: :tile, css_class: "", alt: nil)
     return nil unless post.featured_image.attached?
 
     # Get the appropriate blob
@@ -49,13 +49,13 @@ module ImageHelper
   def image_size_for_context(context)
     case context
     when :tile, :grid
-      :thumb
+      :tile
     when :post, :show
-      :medium
+      :post
     when :og, :social
-      :large
+      :og
     else
-      :medium
+      :post
     end
   end
 end

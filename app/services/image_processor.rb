@@ -1,7 +1,5 @@
 # Service for processing uploaded images into multiple WebP variants
 # Uses ImageMagick directly for compatibility with server constraints
-require "open3"
-
 class ImageProcessor
   ALLOWED_CONTENT_TYPES = %w[
     image/jpeg
@@ -14,9 +12,9 @@ class ImageProcessor
 
   # Variant dimensions (width x height)
   VARIANTS = {
-    thumb: { width: 684, height: 384, quality: 92 },   # For tiles (2x for retina)
-    medium: { width: 1664, height: 936, quality: 94 }, # For post pages (2x for retina)
-    large: { width: 1920, height: 1080, quality: 95 }  # Capped "original"
+    tile: { width: 684, height: 384, quality: 92 },     # For tiles/grids (2x for retina)
+    post: { width: 1664, height: 936, quality: 94 },    # For post detail pages (2x for retina)
+    og: { width: 1200, height: 630, quality: 95 }       # Open Graph meta image (exact dimensions)
   }.freeze
 
   def initialize(blob_or_attachment)
@@ -91,21 +89,10 @@ class ImageProcessor
     variant_file = Tempfile.new([ "variant", ".webp" ])
 
     begin
-      # Validate that source_path is a real file to prevent injection
-      unless File.exist?(source_path) && File.file?(source_path)
-        Rails.logger.error "Invalid source file: #{source_path}"
-        return nil
-      end
-
-      # Use absolute path to prevent directory traversal
-      safe_source_path = File.expand_path(source_path)
-      safe_output_path = File.expand_path(variant_file.path)
-
       # Resize and convert to WebP with high quality
-      # Using Open3 for better security and error handling
       cmd = [
         "convert",
-        safe_source_path,
+        source_path,
         "-resize", "#{config[:width]}x#{config[:height]}>",  # Only shrink larger images
         "-filter", "Lanczos",                                # Best quality resize filter
         "-quality", config[:quality].to_s,
@@ -114,11 +101,10 @@ class ImageProcessor
         "-define", "webp:alpha-quality=100",                 # Preserve alpha quality
         "-define", "webp:image-hint=photo",                  # Optimize for photos
         "-strip",                                             # Remove metadata
-        "webp:#{safe_output_path}"
+        "webp:#{variant_file.path}"
       ]
 
-      stdout, status = Open3.capture2(*cmd)
-      unless status.success?
+      unless system(*cmd, err: File::NULL)
         Rails.logger.error "Failed to generate variant: #{config.inspect}"
         return nil
       end
