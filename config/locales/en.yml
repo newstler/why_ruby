@@ -104,7 +104,7 @@ en:
       description: *community_description
       keywords: *community_keywords
       invite_friends: "Invite your Ruby friends to join →"
-      join_community: "Join the friendly Ruby community →"
+      join_community: "Sign in with GitHub to appear on this page →"
     show:
       view_all_repositories: "View all Ruby repositories on GitHub →"
       no_ruby_projects: "No Ruby projects found on GitHub."
