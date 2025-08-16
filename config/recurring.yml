@@ -1,3 +1,4 @@
+# Example configuration:
 # production:
 #   periodic_cleanup:
 #     class: CleanSoftDeletedRecordsJob
@@ -8,3 +9,17 @@
 #     command: "SoftDeletedRecord.due.delete_all"
 #     priority: 2
 #     schedule: at 5am every day
+
+development:
+  update_github_data:
+    class: UpdateGithubDataJob
+    queue: default
+    schedule: every day at 2am
+    description: "Update GitHub profile and repository data for all users"
+
+production:
+  update_github_data:
+    class: UpdateGithubDataJob
+    queue: default
+    schedule: every day at 2am
+    description: "Update GitHub profile and repository data for all users"
