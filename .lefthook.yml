@@ -6,6 +6,7 @@ pre-commit:
   commands:
     rubocop:
       run: |
+        set -e  # Exit on any error
         bundle exec rubocop -A --force-exclusion
         if [ -n "$(git diff --name-only)" ]; then
           git diff --name-only | xargs git add

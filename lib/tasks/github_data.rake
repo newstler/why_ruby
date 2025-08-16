@@ -1,4 +1,11 @@
 namespace :github do
+  desc "Update GitHub data for all users using the UpdateGithubDataJob"
+  task update_all_job: :environment do
+    puts "Starting GitHub data update job for all users..."
+    UpdateGithubDataJob.perform_now
+    puts "Job completed. Check logs for details."
+  end
+
   desc "Update GitHub data for all users (requires GitHub API token)"
   task update_all: :environment do
     puts "Updating GitHub data for all users..."
@@ -44,20 +51,27 @@ namespace :github do
           if repos_response.code == "200"
             repos = JSON.parse(repos_response.body)
 
+            # Filter for Ruby repositories, excluding forks
             ruby_repos = repos.select do |repo|
+              # Skip forked repositories - we only want original work
+              next if repo["fork"]
+
+              # Check if it's a Ruby-related repository
               repo["language"] == "Ruby" ||
               repo["description"]&.downcase&.include?("ruby") ||
               repo["name"]&.downcase&.include?("ruby") ||
               repo["name"]&.downcase&.include?("rails")
             end.map do |repo|
+              # Only store fields we actually display on the user's page
               {
                 name: repo["name"],
                 description: repo["description"],
                 stars: repo["stargazers_count"],
                 url: repo["html_url"],
-                language: repo["language"],
-                updated_at: repo["updated_at"],
-                fork: repo["fork"]
+                forks_count: repo["forks_count"],
+                size: repo["size"], # Size in KB
+                topics: repo["topics"] || [],
+                pushed_at: repo["pushed_at"]
               }
             end.sort_by { |r| -r[:stars] }
 
@@ -66,7 +80,7 @@ namespace :github do
               github_data_updated_at: Time.current
             )
 
-            puts "✓ Updated with #{ruby_repos.size} Ruby repos"
+            puts "✓ Updated with #{ruby_repos.size} original Ruby repos (excluding forks)"
           else
             puts "✗ Failed to fetch repos: #{repos_response.code}"
           end
@@ -136,20 +150,27 @@ namespace :github do
         if repos_response.code == "200"
           repos = JSON.parse(repos_response.body)
 
+          # Filter for Ruby repositories, excluding forks
           ruby_repos = repos.select do |repo|
+            # Skip forked repositories - we only want original work
+            next if repo["fork"]
+
+            # Check if it's a Ruby-related repository
             repo["language"] == "Ruby" ||
             repo["description"]&.downcase&.include?("ruby") ||
             repo["name"]&.downcase&.include?("ruby") ||
             repo["name"]&.downcase&.include?("rails")
           end.map do |repo|
+            # Only store fields we actually display on the user's page
             {
               name: repo["name"],
               description: repo["description"],
               stars: repo["stargazers_count"],
               url: repo["html_url"],
-              language: repo["language"],
-              updated_at: repo["updated_at"],
-              fork: repo["fork"]
+              forks_count: repo["forks_count"],
+              size: repo["size"], # Size in KB
+              topics: repo["topics"] || [],
+              pushed_at: repo["pushed_at"]
             }
           end.sort_by { |r| -r[:stars] }
 
@@ -158,7 +179,7 @@ namespace :github do
             github_data_updated_at: Time.current
           )
 
-          puts "✓ Updated with #{ruby_repos.size} Ruby repos"
+          puts "✓ Updated with #{ruby_repos.size} original Ruby repos (excluding forks)"
           puts "\nProfile data:"
           puts "  Name: #{user.name}"
           puts "  Bio: #{user.bio}"
