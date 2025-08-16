@@ -55,7 +55,7 @@ namespace :github do
             ruby_repos = repos.select do |repo|
               # Skip forked repositories - we only want original work
               next if repo["fork"]
-              
+
               # Check if it's a Ruby-related repository
               repo["language"] == "Ruby" ||
               repo["description"]&.downcase&.include?("ruby") ||
@@ -154,7 +154,7 @@ namespace :github do
           ruby_repos = repos.select do |repo|
             # Skip forked repositories - we only want original work
             next if repo["fork"]
-            
+
             # Check if it's a Ruby-related repository
             repo["language"] == "Ruby" ||
             repo["description"]&.downcase&.include?("ruby") ||

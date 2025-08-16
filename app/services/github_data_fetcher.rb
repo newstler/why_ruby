@@ -28,7 +28,7 @@ class GithubDataFetcher
 
   def update_from_oauth_data
     raw_info = auth_data.extra.raw_info
-    
+
     user.update!(
       name: raw_info.name,
       bio: raw_info.bio,
@@ -43,21 +43,21 @@ class GithubDataFetcher
   def update_from_api
     require "net/http"
     require "json"
-    
+
     return unless user.username.present?
-    
+
     uri = URI("https://api.github.com/users/#{user.username}")
     request = Net::HTTP::Get.new(uri)
     request["Accept"] = "application/vnd.github.v3+json"
     request["Authorization"] = "Bearer #{api_token}" if api_token.present?
-    
+
     response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
       http.request(request)
     end
-    
+
     if response.code == "200"
       data = JSON.parse(response.body)
-      
+
       user.update!(
         name: data["name"],
         bio: data["bio"],
@@ -76,9 +76,9 @@ class GithubDataFetcher
   def fetch_and_store_repositories
     # Get username from auth_data if available, otherwise from user
     github_username = auth_data&.info&.nickname || user.username
-    
+
     return unless github_username.present?
-    
+
     # Store repos as JSON in the github_repos field
     repos = fetch_ruby_repositories(github_username)
     user.update!(github_repos: repos.to_json) if repos.present?
@@ -107,7 +107,7 @@ class GithubDataFetcher
       ruby_repos = repos.select do |repo|
         # Skip forked repositories - we only want original work
         next if repo["fork"]
-        
+
         # Check if it's a Ruby-related repository
         repo["language"] == "Ruby" ||
         repo["description"]&.downcase&.include?("ruby") ||
