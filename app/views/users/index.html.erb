@@ -61,6 +61,9 @@
 
   <!-- Community Members Grid -->
   <div class="space-y-6">
+    <% # Map user id to 1-based position in the overall sorted list so we can show medals on tiles %>
+    <% user_positions = {} %>
+    <% @users.each_with_index { |u, i| user_positions[u.id] = i + 1 } %>
     <!-- Desktop: 3 columns -->
     <div class="hidden lg:flex gap-6">
       <% # Split users into 3 columns for desktop, maintaining left-to-right reading order %>
@@ -82,7 +85,7 @@
       <% [column1_users, column2_users, column3_users].each do |column_users| %>
         <div class="flex-1 space-y-6">
           <% column_users.each do |user| %>
-            <%= render 'users/user_tile', user: user %>
+            <%= render 'users/user_tile', user: user, rank: user_positions[user.id] %>
           <% end %>
         </div>
       <% end %>
@@ -104,7 +107,7 @@
       <% [column1_users, column2_users].each do |column_users| %>
         <div class="flex-1 space-y-6">
           <% column_users.each do |user| %>
-            <%= render 'users/user_tile', user: user %>
+            <%= render 'users/user_tile', user: user, rank: user_positions[user.id] %>
           <% end %>
         </div>
       <% end %>
@@ -113,7 +116,7 @@
     <!-- Mobile: 1 column -->
     <div class="md:hidden space-y-6">
       <% @users.each do |user| %>
-        <%= render 'users/user_tile', user: user %>
+        <%= render 'users/user_tile', user: user, rank: user_positions[user.id] %>
       <% end %>
     </div>
   </div>

@@ -2,18 +2,30 @@
   User tile partial - displays a user in a card format
   Locals:
     - user: the user to display
+    - rank: optional 1-based position in the list (for medals)
 %>
 
 <%= link_to user_path(user), class: "group block bg-white shadow rounded-lg p-6 hover:shadow-lg transition-shadow" do %>
   <div class="flex items-center gap-4">
-    <!-- Avatar -->
-    <% if user.avatar_url.present? %>
-      <%= image_tag user.avatar_url, alt: user.display_name, class: "h-20 w-20 rounded-full flex-shrink-0" %>
-    <% else %>
-      <span class="h-20 w-20 rounded-full bg-gray-300 flex items-center justify-center text-3xl font-bold flex-shrink-0">
-        <%= user.display_name.first.upcase %>
-      </span>
-    <% end %>
+    <!-- Avatar with rank badge -->
+    <div class="relative h-20 w-20 flex-shrink-0">
+      <% if user.avatar_url.present? %>
+        <%= image_tag user.avatar_url, alt: user.display_name, class: "h-20 w-20 rounded-full" %>
+      <% else %>
+        <span class="h-20 w-20 rounded-full bg-gray-300 flex items-center justify-center text-3xl font-bold">
+          <%= user.display_name.first.upcase %>
+        </span>
+      <% end %>
+
+      <% if defined?(rank) && rank.present? && rank.to_i <= 3 %>
+        <% filter_style = case rank.to_i
+          when 1 then ''
+          when 2 then 'filter: grayscale(1);'
+          when 3 then 'filter: sepia(1) hue-rotate(330deg) saturate(4) brightness(0.9);'
+        end %>
+        <span class="absolute left-0 bottom-0 block leading-none text-lg select-none z-10" style="<%= [filter_style, 'bottom: 1px;', 'text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 8px rgba(255,255,255,0.95), 0 0 12px rgba(255,255,255,0.9), 1px 1px 0 #fff, -1px 1px 0 #fff, 1px -1px 0 #fff, -1px -1px 0 #fff'].join(' ') %>" title="Top <%= rank %>">🏆</span>
+      <% end %>
+    </div>
     
     <div class="flex flex-col justify-center flex-1 min-w-0">
       <!-- First line: Name and Stars -->
