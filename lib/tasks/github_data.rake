@@ -77,6 +77,8 @@ namespace :github do
 
             user.update!(
               github_repos: ruby_repos.to_json,
+              github_stars_sum: ruby_repos.sum { |r| r[:stars].to_i },
+              github_repos_count: ruby_repos.size,
               github_data_updated_at: Time.current
             )
 
@@ -176,6 +178,8 @@ namespace :github do
 
           user.update!(
             github_repos: ruby_repos.to_json,
+            github_stars_sum: ruby_repos.sum { |r| r[:stars].to_i },
+            github_repos_count: ruby_repos.size,
             github_data_updated_at: Time.current
           )
 

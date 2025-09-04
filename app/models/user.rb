@@ -50,6 +50,17 @@ class User < ApplicationRecord
     []
   end
 
+  def total_github_stars
+    return github_stars_sum if respond_to?(:github_stars_sum) && github_stars_sum.present?
+
+    repos = ruby_repositories
+    return 0 if repos.blank?
+
+    repos.sum { |repo| repo[:stars].to_i }
+  rescue => _e
+    0
+  end
+
   def display_name
     name.presence || username
   end
