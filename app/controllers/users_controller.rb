@@ -13,7 +13,7 @@ class UsersController < ApplicationController
       @filter_company = params[:company]
     end
 
-    @users = @users.order(published_posts_count: :desc, published_comments_count: :desc)
+    @users = @users.order(github_stars_sum: :desc, published_posts_count: :desc, github_repos_count: :desc)
                    .page(params[:page])
                    .per(20)
   end

@@ -41,19 +41,24 @@ class User < ApplicationRecord
 
     repos = JSON.parse(github_repos, symbolize_names: true)
 
-    # Filter repositories based on requirements:
-    # - Not forks
-    # - Ruby language
-    filtered_repos = repos.select do |repo|
-      !repo[:fork] &&
-      repo[:language] == "Ruby"
-    end
-
-    # Sort by pushed_at descending (most recently pushed first)
-    filtered_repos.sort_by { |repo| repo[:pushed_at].present? ? -Time.parse(repo[:pushed_at]).to_i : 0 }
+    # Repositories are already filtered for Ruby language and exclude forks
+    # during the fetch process in GithubDataFetcher
+    # Just sort by pushed_at descending (most recently pushed first)
+    repos.sort_by { |repo| repo[:pushed_at].present? ? -Time.parse(repo[:pushed_at]).to_i : 0 }
   rescue JSON::ParserError, ArgumentError => e
     Rails.logger.error "Error parsing repositories: #{e.message}"
     []
+  end
+
+  def total_github_stars
+    return github_stars_sum if respond_to?(:github_stars_sum) && github_stars_sum.present?
+
+    repos = ruby_repositories
+    return 0 if repos.blank?
+
+    repos.sum { |repo| repo[:stars].to_i }
+  rescue => _e
+    0
   end
 
   def display_name

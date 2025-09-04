@@ -79,9 +79,13 @@ class GithubDataFetcher
 
     return unless github_username.present?
 
-    # Store repos as JSON in the github_repos field
+    # Store repos as JSON in the github_repos field and update stars sum
     repos = fetch_ruby_repositories(github_username)
-    user.update!(github_repos: repos.to_json) if repos.present?
+    if repos.present?
+      stars_sum = repos.sum { |r| r[:stars].to_i }
+      repos_count = repos.size
+      user.update!(github_repos: repos.to_json, github_stars_sum: stars_sum, github_repos_count: repos_count)
+    end
   rescue => e
     Rails.logger.error "Failed to fetch GitHub repositories for #{github_username}: #{e.message}"
   end

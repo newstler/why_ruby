@@ -284,7 +284,7 @@
             </div>
             
             <!-- Tablet: 2 columns -->
-            <div class="hidden lg:flex xl:hidden gap-6">
+            <div class="hidden md:flex lg:hidden gap-6">
               <% column1_repos = [] %>
               <% column2_repos = [] %>
               
@@ -306,7 +306,7 @@
             </div>
             
             <!-- Mobile: 1 column -->
-            <div class="lg:hidden space-y-6">
+            <div class="md:hidden space-y-6">
               <% @ruby_repos.each do |repository| %>
                 <%= render 'users/repository_tile', repository: repository %>
               <% end %>
@@ -364,7 +364,7 @@
             </div>
             
             <!-- Tablet: 2 columns -->
-            <div class="hidden lg:flex xl:hidden gap-6">
+            <div class="hidden md:flex lg:hidden gap-6">
               <% column1_posts = [] %>
               <% column2_posts = [] %>
               
@@ -386,7 +386,7 @@
             </div>
             
             <!-- Mobile: 1 column -->
-            <div class="lg:hidden space-y-6">
+            <div class="md:hidden space-y-6">
               <% @posts.each do |post| %>
                 <%= render 'posts/post_tile', post: post %>
               <% end %>
@@ -435,7 +435,7 @@
             </div>
             
             <!-- Tablet: 2 columns -->
-            <div class="hidden lg:flex xl:hidden gap-6">
+            <div class="hidden md:flex lg:hidden gap-6">
               <% column1_comments = [] %>
               <% column2_comments = [] %>
               
@@ -457,7 +457,7 @@
             </div>
             
             <!-- Mobile: 1 column -->
-            <div class="lg:hidden space-y-6">
+            <div class="md:hidden space-y-6">
               <% @comments.each do |comment| %>
                 <%= render 'comments/comment_tile', comment: comment %>
               <% end %>

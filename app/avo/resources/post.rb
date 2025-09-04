@@ -169,12 +169,26 @@ class Avo::Resources::Post < Avo::BaseResource
     field :summary, as: :textarea, hide_on: [ :index ], rows: 5
     field :title_image_url, as: :text, hide_on: [ :index ]
 
-    # Featured image (for success stories and other posts)
+    # Featured image upload without auto-preview/variants (Avo should not generate variants)
     field :featured_image, as: :file,
       name: "Featured Image",
       hide_on: [ :index ],
       accept: "image/*",
+      is_image: false,
       help: "Generated automatically for success stories with logos"
+
+    # Read-only preview that uses our pre-generated WebP blobs (no ActiveStorage variants)
+    field :processed_image_preview,
+      as: :text,
+      name: "Image Preview",
+      only_on: [ :show ],
+      format_using: -> do
+        if record.featured_image.attached?
+          view_context.post_image_tag(record, size: :post, css_class: "max-w-md border border-gray-300 rounded shadow-sm")
+        else
+          view_context.content_tag(:span, "No image", class: "text-gray-400")
+        end
+      end
 
     # OG Image Preview
     field :og_image_preview,
