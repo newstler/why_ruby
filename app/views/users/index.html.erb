@@ -33,7 +33,7 @@
   <div class="md:flex md:items-center md:justify-between w-full">
     <p class="text-left text-lg text-gray-600 md:flex-1 min-w-0">
       <% if user_signed_in? %>
-        <%= t('users.index.description') %>
+        <%= t('users.index.description', count: (@users.respond_to?(:total_count) ? @users.total_count : @users.count)) %>
       <% else %>
         <%= link_to t('users.index.join'), github_auth_with_return_path, class: "underline hover:text-red-600 transition-colors" %>
         <%= t('users.index.join_suffix', count: (@users.respond_to?(:total_count) ? @users.total_count : @users.count)) %>
