@@ -20,6 +20,8 @@ servers:
 proxy:
   ssl: true
   host: whyruby.info
+  deploy_timeout: 120s
+  drain_timeout: 60s
 
 # Credentials for your image host.
 
