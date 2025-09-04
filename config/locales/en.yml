@@ -38,7 +38,8 @@ en:
       apple_app_title: &apple_app_title "WhyRuby"
     community:
       title: &community_title "Community"
-      description: &community_description "Connect with passionate Ruby developers from around the world and explore their projects, posts, and stories"
+      description: &community_description "Connect with %{count} passionate Ruby developers from around the world and explore their projects, posts, and stories"
+      description_static: &community_description_static "Connect with passionate Ruby developers from around the world and explore their projects, posts, and stories"
       keywords: &community_keywords "ruby developers, ruby community, ruby programmers, rails developers"
     keywords:
       base: &keywords_base "Ruby, Ruby on Rails"
@@ -90,7 +91,7 @@ en:
     users:
       index:
         title: *community_title
-        summary: *community_description
+        summary: *community_description_static
         keywords: *community_keywords
       show:
         title: "%{display_name} (@%{username})"
@@ -102,9 +103,27 @@ en:
     index:
       title: *community_title
       description: *community_description
+      join: "Join"
+      join_suffix: "%{count} passionate Ruby developers from around the world and explore their projects, posts, and stories"
       keywords: *community_keywords
       invite_friends: "Invite your Ruby friends to join →"
       join_community: "Sign in with GitHub to appear on this page →"
+      sort_label: "Sort"
+      sort:
+        top: "Top contributors"
+        top_reverse: "Least contributors"
+        new: "Newcomers"
+        new_reverse: "Old members"
+        projects: "Top projects"
+        projects_reverse: "Fewest projects"
+        posts: "Top posts"
+        posts_reverse: "Fewest posts"
+        comments: "Top comments"
+        comments_reverse: "Fewest comments"
+        stars: "Top stars"
+        stars_reverse: "Fewest stars"
+        az: "A–Z by name"
+        az_reverse: "Z–A by name"
     show:
       view_all_repositories: "View all Ruby repositories on GitHub →"
       no_ruby_projects: "No Ruby projects found on GitHub."
