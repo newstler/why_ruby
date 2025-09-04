@@ -30,9 +30,67 @@
 <div class="space-y-8">
   <!-- Header -->
   <h1 class="text-4xl font-black text-gray-900 mb-4"><%= t('users.index.title') %></h1>
-  <p class="text-lg text-gray-600">
-    <%= t('users.index.description') %>
-  </p>
+  <div class="md:flex md:items-center md:justify-between w-full">
+    <p class="text-left text-lg text-gray-600 md:flex-1 min-w-0">
+      <% if user_signed_in? %>
+        <%= t('users.index.description') %>
+      <% else %>
+        <%= link_to t('users.index.join'), github_auth_with_return_path, class: "underline hover:text-red-600 transition-colors" %>
+        <%= t('users.index.join_suffix', count: (@users.respond_to?(:total_count) ? @users.total_count : @users.count)) %>
+      <% end %>
+    </p>
+
+    <div class="relative md:ml-auto mt-2 md:mt-0 flex-shrink-0" data-controller="dropdown">
+      <button type="button" class="flex items-center gap-x-1 text-sm rounded-full cursor-pointer bg-gray-100 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 px-3 py-2" data-action="click->dropdown#toggle click@window->dropdown#hide">
+        <span class="text-gray-400"><%= t('users.index.sort_label') %>:</span>
+        <span class="text-gray-700 font-medium">
+          <% effective_sort = (@sort == 'old' ? 'new' : @sort) %>
+          <% effective_dir  = (@sort == 'old' ? 'asc' : @dir) %>
+          <% closed_label = case effective_sort
+             when 'new' then (effective_dir == 'asc' ? t('users.index.sort.new_reverse') : t('users.index.sort.new'))
+             when 'projects' then (effective_dir == 'asc' ? t('users.index.sort.projects_reverse') : t('users.index.sort.projects'))
+             when 'posts' then (effective_dir == 'asc' ? t('users.index.sort.posts_reverse') : t('users.index.sort.posts'))
+             when 'comments' then (effective_dir == 'asc' ? t('users.index.sort.comments_reverse') : t('users.index.sort.comments'))
+             when 'stars' then (effective_dir == 'asc' ? t('users.index.sort.stars_reverse') : t('users.index.sort.stars'))
+             when 'az' then (effective_dir == 'asc' ? t('users.index.sort.az') : t('users.index.sort.az_reverse'))
+             else (effective_dir == 'asc' ? t('users.index.sort.top_reverse') : t('users.index.sort.top'))
+             end %>
+          <%= closed_label %>
+        </span>
+        <%= inline_svg_tag "chevron-down.svg", class: "ml-1 h-5 w-5 text-gray-400" %>
+      </button>
+
+      <div class="hidden absolute mt-2 w-64 divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none left-0 md:left-auto md:right-0 origin-top-left md:origin-top-right" data-dropdown-target="menu">
+        <div class="py-1">
+          <% # Helper to compute label and dir per option, showing the opposite for current based on direction %>
+          <% def sort_link(label_key, reverse_label_key, key, current_sort, current_dir, filters)
+               is_current = (current_sort == key)
+               label = if is_current
+                 # If currently ascending, opposite is descending -> use main label; if descending, opposite is ascending -> use reverse label
+                 current_dir == 'asc' ? t(label_key) : t(reverse_label_key)
+               else
+                 t(label_key)
+               end
+               dir = if is_current
+                 current_dir == 'asc' ? 'desc' : 'asc'
+               else
+                 # Defaults: az -> asc, others -> desc
+                 key == 'az' ? 'asc' : 'desc'
+               end
+               link_to label, users_path(sort: key, dir: dir, location: filters[:location], company: filters[:company]), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none cursor-pointer"
+             end %>
+
+          <%= sort_link('users.index.sort.top', 'users.index.sort.top_reverse', 'top', @sort, @dir, { location: @filter_location, company: @filter_company }) %>
+          <%= sort_link('users.index.sort.new', 'users.index.sort.new_reverse', 'new', @sort, @dir, { location: @filter_location, company: @filter_company }) %>
+          <%= sort_link('users.index.sort.projects', 'users.index.sort.projects_reverse', 'projects', @sort, @dir, { location: @filter_location, company: @filter_company }) %>
+          <%= sort_link('users.index.sort.posts', 'users.index.sort.posts_reverse', 'posts', @sort, @dir, { location: @filter_location, company: @filter_company }) %>
+          <%= sort_link('users.index.sort.comments', 'users.index.sort.comments_reverse', 'comments', @sort, @dir, { location: @filter_location, company: @filter_company }) %>
+          <%= sort_link('users.index.sort.stars', 'users.index.sort.stars_reverse', 'stars', @sort, @dir, { location: @filter_location, company: @filter_company }) %>
+          <%= sort_link('users.index.sort.az', 'users.index.sort.az_reverse', 'az', @sort, @dir, { location: @filter_location, company: @filter_company }) %>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Active Filters -->
   <% if @filter_location.present? || @filter_company.present? %>
