@@ -64,7 +64,9 @@ class Avo::Resources::Post < Avo::BaseResource
         end
       end
 
-    field :category, as: :belongs_to
+    field :category, as: :belongs_to,
+      help: "Success stories are auto-assigned to the Success Stories category",
+      readonly: -> { record.post_type == "success_story" }
 
     # Post type and success story fields
     field :post_type, as: :select,

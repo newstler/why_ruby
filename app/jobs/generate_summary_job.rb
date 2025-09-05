@@ -218,7 +218,7 @@ class GenerateSummaryJob < ApplicationJob
   end
 
   def build_system_prompt(context)
-    "Output ONLY a single teaser sentence. No preamble. Maximum 80 characters. Hook the reader with the most intriguing aspect."
+    "Output ONLY a single teaser sentence. No preamble. Maximum 200 characters. Hook the reader with the most intriguing aspect."
   end
 
   def build_user_prompt(text, context)
