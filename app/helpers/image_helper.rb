@@ -12,8 +12,8 @@ module ImageHelper
 
     return nil unless blob
 
-    # Use URL helper for consistent URL generation
-    image_url = url_for(blob)
+    # Build a path that works both in views and non-view contexts (like Avo resources)
+    image_url = Rails.application.routes.url_helpers.rails_blob_path(blob, only_path: true)
 
     # Simple image tag without complex blur loading (which breaks with Turbo)
     image_tag(image_url,
@@ -35,8 +35,8 @@ module ImageHelper
 
     return nil unless blob
 
-    # Use URL helper
-    image_url = url_for(blob)
+    # Build a path that works both in views and non-view contexts (like Avo resources)
+    image_url = Rails.application.routes.url_helpers.rails_blob_path(blob, only_path: true)
 
     # Simple image tag without lazy loading for tiles (they're small WebP files anyway)
     image_tag(image_url,

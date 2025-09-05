@@ -184,9 +184,9 @@ class Avo::Resources::Post < Avo::BaseResource
       only_on: [ :show ],
       format_using: -> do
         if record.featured_image.attached?
-          view_context.post_image_tag(record, size: :post, css_class: "max-w-md border border-gray-300 rounded shadow-sm")
+          ApplicationController.helpers.post_image_tag(record, size: :post, css_class: "max-w-md border border-gray-300 rounded shadow-sm")
         else
-          view_context.content_tag(:span, "No image", class: "text-gray-400")
+          content_tag(:span, "No image", class: "text-gray-400")
         end
       end
 
