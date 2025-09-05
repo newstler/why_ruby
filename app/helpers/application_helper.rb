@@ -178,7 +178,7 @@ module ApplicationHelper
       custom_path
     else
       # For the default og-image.png, use file modification time as version
-      og_image_path = Rails.root.join("public", "og-image.png")
+      og_image_path = Rails.root.join("public", "og-image.webp")
       version = if File.exist?(og_image_path)
         File.mtime(og_image_path).to_i.to_s
       else
