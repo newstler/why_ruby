@@ -63,7 +63,7 @@ gem "kaminari", "~> 1.2"
 gem "friendly_id", "~> 5.5"
 
 # HTML/XML parsing
-gem "nokogiri", "~> 1.16"
+gem "nokogiri", "~> 1.18"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
