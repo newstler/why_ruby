@@ -169,7 +169,7 @@ class Post < ApplicationRecord
 
   def set_success_story_category
     # Auto-assign success story category if post_type is success_story
-    if post_type == "success_story" && category_id.blank?
+    if post_type == "success_story"
       success_category = Category.success_story_category
       self.category_id = success_category.id if success_category
     end

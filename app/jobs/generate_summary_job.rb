@@ -137,22 +137,27 @@ class GenerateSummaryJob < ApplicationJob
   end
 
   def anthropic_configured?
-    Rails.application.credentials.dig(:anthropic, :access_token).present?
+    Rails.application.credentials.dig(:anthropic, :api_key).present? ||
+      Rails.application.credentials.dig(:anthropic, :access_token).present?
   end
 
   def openai_configured?
-    Rails.application.credentials.dig(:openai, :access_token).present?
+    Rails.application.credentials.dig(:openai, :api_key).present? ||
+      Rails.application.credentials.dig(:openai, :access_token).present?
   end
 
   def generate_with_anthropic(text, context)
-    client = Anthropic::Client.new(
-      access_token: Rails.application.credentials.dig(:anthropic, :access_token)
-    )
-
-    system_prompt = build_system_prompt(context)
-    user_prompt = build_user_prompt(text, context)
+    api_key = Rails.application.credentials.dig(:anthropic, :api_key).presence ||
+      Rails.application.credentials.dig(:anthropic, :access_token)
 
     begin
+      client = Anthropic::Client.new(
+        api_key: api_key
+      )
+
+      system_prompt = build_system_prompt(context)
+      user_prompt = build_user_prompt(text, context)
+
       response = client.messages(
         parameters: {
           model: "claude-3-haiku-20240307",
@@ -176,14 +181,17 @@ class GenerateSummaryJob < ApplicationJob
   end
 
   def generate_with_openai(text, context)
-    client = OpenAI::Client.new(
-      access_token: Rails.application.credentials.dig(:openai, :access_token)
-    )
-
-    system_prompt = build_system_prompt(context)
-    user_prompt = build_user_prompt(text, context)
+    token = Rails.application.credentials.dig(:openai, :api_key).presence ||
+      Rails.application.credentials.dig(:openai, :access_token)
 
     begin
+      client = OpenAI::Client.new(
+        access_token: token
+      )
+
+      system_prompt = build_system_prompt(context)
+      user_prompt = build_user_prompt(text, context)
+
       response = client.chat(
         parameters: {
           model: "gpt-3.5-turbo",
@@ -210,7 +218,7 @@ class GenerateSummaryJob < ApplicationJob
   end
 
   def build_system_prompt(context)
-    "Output ONLY a single teaser sentence. No preamble. Maximum 80 characters. Hook the reader with the most intriguing aspect."
+    "Output ONLY a single teaser sentence. No preamble. Maximum 200 characters. Hook the reader with the most intriguing aspect."
   end
 
   def build_user_prompt(text, context)
