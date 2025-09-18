@@ -223,7 +223,7 @@ GEM
     jbuilder (2.14.1)
       actionview (>= 7.0.0)
       activesupport (>= 7.0.0)
-    json (2.13.2)
+    json (2.14.1)
     jwt (3.1.2)
       base64
     kamal (2.7.0)
@@ -427,7 +427,7 @@ GEM
       rubocop (>= 1.72)
       rubocop-performance (>= 1.24)
       rubocop-rails (>= 2.30)
-    ruby-openai (8.2.0)
+    ruby-openai (8.3.0)
       event_stream_parser (>= 0.3.0, < 2.0.0)
       faraday (>= 1)
       faraday-multipart (>= 1)
@@ -547,7 +547,7 @@ DEPENDENCIES
   rorvswild (~> 1.9)
   rouge (~> 4.0)
   rubocop-rails-omakase
-  ruby-openai (~> 8.2)
+  ruby-openai (~> 8.3)
   selenium-webdriver
   solid_cable
   solid_cache
