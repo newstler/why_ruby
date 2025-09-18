@@ -53,7 +53,7 @@ gem "redcarpet", "~> 3.6"
 gem "rouge", "~> 4.0"
 
 # AI integration for summaries
-gem "ruby-openai", "~> 8.2"
+gem "ruby-openai", "~> 8.3"
 gem "anthropic", "~> 1.6.0"
 
 # Pagination
