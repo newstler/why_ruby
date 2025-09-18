@@ -75,7 +75,7 @@ group :development, :test do
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
 
-    gem "dotenv"
+  gem "dotenv"
 
   # Git hooks manager - automatically runs RuboCop before commits
   gem "lefthook", require: false
@@ -92,4 +92,8 @@ group :test do
   gem "selenium-webdriver"
 end
 
+# Backup data to S3
 gem "litestream", "~> 0.14.0"
+
+# Monitor performance
+gem "rorvswild", "~> 1.9"
