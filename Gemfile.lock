@@ -397,6 +397,7 @@ GEM
       actionpack (>= 5.2)
       railties (>= 5.2)
     rexml (3.4.1)
+    rorvswild (1.9.2)
     rouge (4.6.0)
     rubocop (1.79.2)
       json (~> 2.3)
@@ -543,6 +544,7 @@ DEPENDENCIES
   puma (>= 5.0)
   rails!
   redcarpet (~> 3.6)
+  rorvswild (~> 1.9)
   rouge (~> 4.0)
   rubocop-rails-omakase
   ruby-openai (~> 8.2)
