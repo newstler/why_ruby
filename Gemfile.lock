@@ -250,7 +250,7 @@ GEM
       kaminari-core (= 1.2.2)
     kaminari-core (1.2.2)
     language_server-protocol (3.17.0.5)
-    lefthook (1.12.3)
+    lefthook (1.13.2)
     lint_roller (1.1.0)
     litestream (0.14.0-arm64-darwin)
       actionpack (>= 7.0)
