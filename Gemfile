@@ -54,7 +54,7 @@ gem "rouge", "~> 4.0"
 
 # AI integration for summaries
 gem "ruby-openai", "~> 8.2"
-gem "anthropic", "~> 1.6.0"
+gem "anthropic", "~> 1.10.1"
 
 # Pagination
 gem "kaminari", "~> 1.2"
