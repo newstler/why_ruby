@@ -78,32 +78,35 @@ class GenerateSummaryJob < ApplicationJob
     begin
       Rails.logger.info "Fetching content from: #{url}"
 
-      page = MetaInspector.new(url,
+      fetcher = MetadataFetcher.new(url,
         connection_timeout: 5,
         read_timeout: 5,
         retries: 1,
         allow_redirections: :safe
       )
 
+      result = fetcher.fetch!
+      return nil if result.blank? || result[:parsed].blank?
+
       # Try to get the main content
       content_parts = []
 
       # Add title
-      content_parts << "Title: #{page.best_title}" if page.best_title.present?
+      content_parts << "Title: #{result[:title]}" if result[:title].present?
 
       # Add description
-      content_parts << "Description: #{page.best_description}" if page.best_description.present?
+      content_parts << "Description: #{result[:description]}" if result[:description].present?
 
       # Get the main text content
-      if page.parsed.present?
+      if result[:parsed].present?
         # Try to extract main content, removing navigation, ads, etc.
-        main_content = extract_main_content(page.parsed)
+        main_content = extract_main_content(result[:parsed])
         content_parts << main_content if main_content.present?
       end
 
       # Fallback to meta description and raw text if needed
       if content_parts.length <= 2
-        raw_text = page.parsed.css("body").text.squish rescue nil
+        raw_text = result[:parsed].css("body").text.squish rescue nil
         content_parts << raw_text if raw_text.present?
       end
 
