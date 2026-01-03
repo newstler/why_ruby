@@ -154,12 +154,13 @@ class PostsController < ApplicationController
     end
 
     begin
-      page = MetaInspector.new(url)
+      fetcher = MetadataFetcher.new(url)
+      result = fetcher.fetch!
 
       metadata = {
-        title: page.best_title || page.title,
-        summary: page.best_description || page.description,
-        image_url: page.images.best || page.images.first
+        title: result[:title],
+        summary: result[:description],
+        image_url: result[:image_url]
       }
 
       render json: { success: true, metadata: metadata }
