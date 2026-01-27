@@ -17,7 +17,8 @@
       <% end %>
 
       <%# Middle column: slides %>
-      <div class="max-w-4xl mx-auto w-full">
+      <div class="max-w-4xl mx-auto w-full"
+           data-action="mouseenter->testimonial-carousel#pause mouseleave->testimonial-carousel#resume touchstart->testimonial-carousel#pause touchend->testimonial-carousel#resume">
         <% testimonials.each_with_index do |testimonial, index| %>
           <div class="<%= index == 0 ? '' : 'hidden' %>"
                data-testimonial-carousel-target="slide">

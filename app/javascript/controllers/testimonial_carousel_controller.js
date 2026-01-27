@@ -6,6 +6,7 @@ export default class extends Controller {
   connect() {
     this.currentIndex = 0
     this.transitioning = false
+    this.paused = false
 
     this.slideTargets.forEach((slide, i) => {
       slide.style.transition = "opacity 0.6s ease-in-out"
@@ -17,6 +18,38 @@ export default class extends Controller {
         slide.style.opacity = "0"
       }
     })
+
+    this.startAutoplay()
+  }
+
+  disconnect() {
+    this.stopAutoplay()
+  }
+
+  startAutoplay() {
+    this.autoplayTimer = setInterval(() => {
+      if (!this.paused) this.next()
+    }, 10000)
+  }
+
+  stopAutoplay() {
+    if (this.autoplayTimer) {
+      clearInterval(this.autoplayTimer)
+      this.autoplayTimer = null
+    }
+  }
+
+  resetAutoplay() {
+    this.stopAutoplay()
+    this.startAutoplay()
+  }
+
+  pause() {
+    this.paused = true
+  }
+
+  resume() {
+    this.paused = false
   }
 
   next() {
@@ -32,6 +65,7 @@ export default class extends Controller {
   goToIndex(index) {
     if (index === this.currentIndex) return
     this.transitioning = true
+    this.resetAutoplay()
 
     const current = this.slideTargets[this.currentIndex]
     const next = this.slideTargets[index]
