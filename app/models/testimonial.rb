@@ -13,7 +13,7 @@ class Testimonial < ApplicationRecord
   private
 
   def enqueue_ai_processing
-    update_columns(ai_attempts: 0)
+    update_columns(ai_attempts: 0, published: false, ai_feedback: nil)
     GenerateTestimonialFieldsJob.perform_later(self)
   end
 end

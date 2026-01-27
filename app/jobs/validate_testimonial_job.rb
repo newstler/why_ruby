@@ -127,8 +127,8 @@ class ValidateTestimonialJob < ApplicationJob
   def broadcast_update(testimonial)
     Turbo::StreamsChannel.broadcast_replace_to(
       "testimonial_#{testimonial.id}",
-      target: "testimonial_form",
-      partial: "testimonials/form",
+      target: "testimonial_section",
+      partial: "testimonials/section",
       locals: { testimonial: testimonial, user: testimonial.user }
     )
   end

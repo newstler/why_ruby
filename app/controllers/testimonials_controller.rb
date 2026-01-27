@@ -5,9 +5,22 @@ class TestimonialsController < ApplicationController
     @testimonial = current_user.build_testimonial(testimonial_params)
 
     if @testimonial.save
-      redirect_to user_path(current_user), notice: "Your testimonial has been submitted for processing."
+      @processing = true
+      respond_to do |format|
+        format.turbo_stream
+        format.html { redirect_to user_path(current_user), notice: "Your testimonial has been submitted for processing." }
+      end
     else
-      redirect_to user_path(current_user), alert: @testimonial.errors.full_messages.to_sentence
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            "testimonial_section",
+            partial: "testimonials/section",
+            locals: { testimonial: @testimonial, user: current_user }
+          )
+        end
+        format.html { redirect_to user_path(current_user), alert: @testimonial.errors.full_messages.to_sentence }
+      end
     end
   end
 
@@ -15,9 +28,22 @@ class TestimonialsController < ApplicationController
     @testimonial = current_user.testimonial
 
     if @testimonial.update(testimonial_params)
-      redirect_to user_path(current_user), notice: "Your testimonial has been updated and resubmitted for processing."
+      @processing = @testimonial.saved_change_to_quote?
+      respond_to do |format|
+        format.turbo_stream
+        format.html { redirect_to user_path(current_user), notice: "Your testimonial has been updated and resubmitted for processing." }
+      end
     else
-      redirect_to user_path(current_user), alert: @testimonial.errors.full_messages.to_sentence
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            "testimonial_section",
+            partial: "testimonials/section",
+            locals: { testimonial: @testimonial, user: current_user }
+          )
+        end
+        format.html { redirect_to user_path(current_user), alert: @testimonial.errors.full_messages.to_sentence }
+      end
     end
   end
 
