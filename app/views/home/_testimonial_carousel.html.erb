@@ -42,14 +42,17 @@
             <% end %>
 
             <%# Quote + User layout %>
-            <div class="flex flex-col md:flex-row gap-8 md:gap-12 md:items-stretch mt-8">
+            <div class="flex flex-col md:flex-row gap-6 md:gap-8 md:items-stretch mt-8">
               <%# Quote block %>
               <div class="flex-1 relative">
-                <span class="absolute -top-8 -left-2 text-7xl text-red-600 font-serif leading-none select-none">&ldquo;</span>
-                <blockquote class="border border-red-200 rounded-lg p-6 md:p-8 ml-4">
+                <span class="absolute -top-8 -left-10 text-7xl text-red-600 font-serif leading-none select-none">&ldquo;</span>
+                <blockquote class="relative bg-white border border-red-200 rounded-lg p-6 md:p-8">
                   <p class="text-gray-600 text-base md:text-lg italic leading-relaxed">
                     <%= testimonial.quote %>
                   </p>
+                  <%# Speech bubble tail pointing right toward user %>
+                  <span class="hidden md:block absolute -right-4 bottom-6 w-0 h-0 border-t-[12px] border-t-transparent border-b-[12px] border-b-transparent border-l-[16px] border-l-red-200"></span>
+                  <span class="hidden md:block absolute -right-[15px] bottom-6 w-0 h-0 border-t-[12px] border-t-transparent border-b-[12px] border-b-transparent border-l-[16px] border-l-white"></span>
                 </blockquote>
               </div>
 
