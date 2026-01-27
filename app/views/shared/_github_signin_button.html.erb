@@ -8,10 +8,10 @@
 <% mobile = local_assigns.fetch(:mobile, false) %>
 <% extra_classes = local_assigns.fetch(:extra_classes, "") %>
 
-<%= button_to user_github_omniauth_authorize_path, 
-    method: :post, 
-    data: { turbo: false }, 
-    class: "inline-flex items-center #{mobile ? 'w-full justify-center' : ''} gap-2 px-4 py-2 border border-transparent #{mobile ? 'text-base' : 'text-sm'} font-medium rounded-md text-white bg-gray-800 hover:bg-gray-700 cursor-pointer transition-colors #{extra_classes}" do %>
-  <%= inline_svg_tag "github.svg", class: "h-5 w-5" %>
-  <span><%= t('auth.sign_in_with_github') %></span>
+<%= button_to user_github_omniauth_authorize_path,
+    method: :post,
+    data: { turbo: false },
+    class: "inline-flex items-center #{mobile ? 'w-full justify-center' : ''} gap-2 px-4 py-2 border border-transparent #{mobile ? 'text-base' : 'text-sm'} font-medium rounded-md text-white bg-red-600 hover:bg-red-700 cursor-pointer transition-colors #{extra_classes}" do %>
+  <span>Share why you love Ruby</span>
+  <span class="text-lg leading-none">&rarr;</span>
 <% end %>

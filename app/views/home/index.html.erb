@@ -8,9 +8,9 @@
 
 <!-- Success Stories Floating Logos (Full Width) -->
 <% if @success_stories.count >= 5 %>
-  <div class="py-8 md:py-16 bg-gray-50 my-8 md:my-16">
-    <h2 class="text-center text-sm font-semibold text-gray-600 tracking-wide uppercase mb-6 md:mb-12">
-      Success powered by Ruby
+  <div class="py-8 md:py-16 bg-gray-50 my-4 md:my-8">
+    <h2 class="text-center text-sm font-semibold text-gray-300 tracking-wide uppercase mb-6 md:mb-12">
+      Read success stories from
     </h2>
     <div class="relative logo-carousel-container" data-controller="logo-carousel">
       <div class="overflow-hidden relative">
@@ -71,7 +71,7 @@
 
   <!-- Recent Posts -->
   <div class="space-y-4">
-    <h2 class="text-center text-sm font-semibold text-gray-600 tracking-wide uppercase my-8 md:my-16">Recent <span>♥️</span> shared</h2>
+    <h2 class="text-center text-sm font-semibold text-gray-300 tracking-wide uppercase my-8 md:my-16">Recent <span>♥️</span> shared</h2>
     <div class="hidden lg:flex gap-6">
       <% # Split posts into 3 columns for desktop, maintaining left-to-right reading order %>
       <% column1_posts = [] %>

@@ -1,24 +1,30 @@
 <%# Shared testimonial display partial - used on home carousel and user profile %>
-<div class="text-center">
+<div>
   <% if testimonial.heading.present? %>
-    <h3 class="text-3xl md:text-4xl font-bold text-red-600 italic font-serif mb-2">
+    <h3 class="text-5xl md:text-7xl font-serif italic text-red-600 mb-6">
       <%= testimonial.heading %>
     </h3>
   <% end %>
 
-  <% if testimonial.subheading.present? %>
-    <p class="text-gray-600 text-lg mb-4"><%= testimonial.subheading %></p>
-  <% end %>
+  <div class="flex flex-col lg:flex-row lg:gap-8 lg:items-center">
+    <div class="lg:flex-1 min-w-0">
+      <% if testimonial.subheading.present? %>
+        <h4 class="text-2xl md:text-3xl font-bold text-gray-900 leading-tight mb-2">
+          <%= raw testimonial.subheading.split('.').map { |s| s.strip }.reject(&:blank?).map { |s| ERB::Util.html_escape(s) + "." }.join("<br>") %>
+        </h4>
+      <% end %>
 
-  <% if testimonial.body_text.present? %>
-    <p class="text-gray-500 text-sm md:text-base mb-6 max-w-lg mx-auto"><%= testimonial.body_text %></p>
-  <% end %>
+      <% if testimonial.body_text.present? %>
+        <p class="text-gray-500 text-base md:text-lg mt-6 mb-6 lg:mb-0 max-w-3xl leading-relaxed"><%= testimonial.body_text %></p>
+      <% end %>
+    </div>
 
-  <blockquote class="relative max-w-2xl mx-auto">
-    <span class="absolute -top-4 -left-2 text-6xl text-gray-200 font-serif leading-none">&ldquo;</span>
-    <p class="text-gray-900 text-lg md:text-xl italic pl-6 pr-6">
-      <%= testimonial.quote %>
-    </p>
-    <span class="absolute -bottom-6 -right-2 text-6xl text-gray-200 font-serif leading-none">&rdquo;</span>
-  </blockquote>
+    <blockquote class="relative lg:flex-1">
+      <span class="absolute -top-4 -left-2 text-6xl text-gray-200 font-serif leading-none">&ldquo;</span>
+      <p class="text-red-600 text-lg md:text-xl italic pl-6 pr-6">
+        <%= testimonial.quote %>
+      </p>
+      <span class="absolute -bottom-6 -right-2 text-6xl text-gray-200 font-serif leading-none">&rdquo;</span>
+    </blockquote>
+  </div>
 </div>

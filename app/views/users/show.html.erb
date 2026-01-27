@@ -29,26 +29,16 @@
 <% end %>
 
 <div class="space-y-8">
-  <%# Testimonial Section %>
-  <% if current_user == @user %>
-    <%# Profile owner: show editable form %>
-    <% testimonial = @user.testimonial || @user.build_testimonial %>
-    <%= render "testimonials/form", testimonial: testimonial, user: @user %>
-  <% elsif @user.testimonial&.published? %>
-    <%# Visitor: show published testimonial %>
-    <div class="bg-white rounded-lg shadow p-6">
-      <h2 class="text-xl font-bold text-gray-900 mb-4">Loves Ruby because of...</h2>
-      <%= render "testimonials/testimonial", testimonial: @user.testimonial %>
-    </div>
-  <% end %>
-
   <!-- Tabbed Content Section -->
   <div data-controller="tabs">
+    <!-- User Info + Testimonial Row -->
+    <div class="flex flex-col lg:flex-row lg:gap-8">
+      <!-- User Info (left side) -->
+      <div class="lg:flex-1 min-w-0">
     <!-- Tab Navigation with User Info -->
     <div>
-      <!-- Desktop layout: side by side -->
-      <div class="hidden lg:flex items-end justify-between gap-8">
-        <!-- User info on the left -->
+      <!-- Desktop layout -->
+      <div class="hidden lg:block">
         <div class="flex items-center gap-6">
           <% if @user.avatar_url.present? %>
             <%= image_tag @user.avatar_url, alt: @user.display_name, class: "h-32 w-32 rounded-full flex-shrink-0" %>
@@ -110,48 +100,6 @@
             </div>
           </div>
         </div>
-        
-        <!-- Tabs on the right, aligned to bottom -->
-        <nav class="flex flex-wrap gap-x-8 gap-y-2 flex-shrink-0" aria-label="Tabs">
-          <a href="#"
-             data-tabs-target="tab"
-             data-tabs-name="projects"
-             data-action="click->tabs#switch"
-             class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-4 px-1 border-b-4 border-transparent font-semibold text-lg md:text-xl lg:text-2xl transition-all duration-200 flex items-center gap-2"
-             role="tab"
-             aria-selected="false">
-            <span>Projects</span>
-            <span class="bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full text-sm md:text-base font-semibold">
-              <%= @ruby_repos.size %>
-            </span>
-          </a>
-          
-          <a href="#"
-             data-tabs-target="tab"
-             data-tabs-name="posts"
-             data-action="click->tabs#switch"
-             class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-4 px-1 border-b-4 border-transparent font-semibold text-lg md:text-xl lg:text-2xl transition-all duration-200 flex items-center gap-2"
-             role="tab"
-             aria-selected="false">
-            <span>Posts</span>
-            <span id="posts-count-desktop" class="bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full text-sm md:text-base font-semibold">
-              <%= @user.published_posts_count %>
-            </span>
-          </a>
-          
-          <a href="#"
-             data-tabs-target="tab"
-             data-tabs-name="comments"
-             data-action="click->tabs#switch"
-             class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-4 px-1 border-b-4 border-transparent font-semibold text-lg md:text-xl lg:text-2xl transition-all duration-200 flex items-center gap-2"
-             role="tab"
-             aria-selected="false">
-            <span>Comments</span>
-            <span class="bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full text-sm md:text-base font-semibold">
-              <%= @user.published_comments_count %>
-            </span>
-          </a>
-        </nav>
       </div>
       
       <!-- Mobile/Tablet layout: stacked -->
@@ -218,50 +166,68 @@
             <% end %>
           </div>
         </div>
-        
-        <!-- Tabs left-aligned below -->
-        <nav class="flex gap-x-6" aria-label="Tabs">
-          <a href="#"
-             data-tabs-target="tab"
-             data-tabs-name="projects"
-             data-action="click->tabs#switch"
-             class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-3 px-1 border-b-2 border-transparent font-semibold text-base transition-all duration-200 flex items-center gap-2"
-             role="tab"
-             aria-selected="false">
-            <span>Projects</span>
-            <span class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full text-xs font-semibold">
-              <%= @ruby_repos.size %>
-            </span>
-          </a>
-          
-          <a href="#"
-             data-tabs-target="tab"
-             data-tabs-name="posts"
-             data-action="click->tabs#switch"
-             class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-3 px-1 border-b-2 border-transparent font-semibold text-base transition-all duration-200 flex items-center gap-2"
-             role="tab"
-             aria-selected="false">
-            <span>Posts</span>
-            <span id="posts-count-mobile" class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full text-xs font-semibold">
-              <%= @user.published_posts_count %>
-            </span>
-          </a>
-          
-          <a href="#"
-             data-tabs-target="tab"
-             data-tabs-name="comments"
-             data-action="click->tabs#switch"
-             class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-3 px-1 border-b-2 border-transparent font-semibold text-base transition-all duration-200 flex items-center gap-2"
-             role="tab"
-             aria-selected="false">
-            <span>Comments</span>
-            <span class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full text-xs font-semibold">
-              <%= @user.published_comments_count %>
-            </span>
-          </a>
-        </nav>
       </div>
     </div>
+      </div><!-- end user info left side -->
+
+      <%# Testimonial Form (right side - only for profile owner) %>
+      <% if current_user == @user %>
+        <div class="lg:flex-1 mt-6 lg:mt-0">
+          <% testimonial = @user.testimonial || @user.build_testimonial %>
+          <%= render "testimonials/form", testimonial: testimonial, user: @user %>
+        </div>
+      <% end %>
+    </div><!-- end flex row -->
+
+    <%# Published Testimonial (below user info) %>
+    <% if current_user != @user && @user.testimonial&.published? %>
+      <div class="mt-6 mb-8">
+        <h2 class="text-xl font-bold text-gray-300 mb-4">loves Ruby because of...</h2>
+        <%= render "testimonials/testimonial", testimonial: @user.testimonial %>
+      </div>
+    <% end %>
+
+    <!-- Tab Navigation -->
+    <nav class="flex flex-wrap gap-x-6 lg:gap-x-8 gap-y-2 mt-6" aria-label="Tabs">
+      <a href="#"
+         data-tabs-target="tab"
+         data-tabs-name="projects"
+         data-action="click->tabs#switch"
+         class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-3 lg:py-4 px-1 border-b-2 lg:border-b-4 border-transparent font-semibold text-base lg:text-2xl transition-all duration-200 flex items-center gap-2"
+         role="tab"
+         aria-selected="false">
+        <span>Projects</span>
+        <span class="bg-gray-100 text-gray-700 px-2 lg:px-2.5 py-0.5 rounded-full text-xs lg:text-base font-semibold">
+          <%= @ruby_repos.size %>
+        </span>
+      </a>
+
+      <a href="#"
+         data-tabs-target="tab"
+         data-tabs-name="posts"
+         data-action="click->tabs#switch"
+         class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-3 lg:py-4 px-1 border-b-2 lg:border-b-4 border-transparent font-semibold text-base lg:text-2xl transition-all duration-200 flex items-center gap-2"
+         role="tab"
+         aria-selected="false">
+        <span>Posts</span>
+        <span id="posts-count" class="bg-gray-100 text-gray-700 px-2 lg:px-2.5 py-0.5 rounded-full text-xs lg:text-base font-semibold">
+          <%= @user.published_posts_count %>
+        </span>
+      </a>
+
+      <a href="#"
+         data-tabs-target="tab"
+         data-tabs-name="comments"
+         data-action="click->tabs#switch"
+         class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-3 lg:py-4 px-1 border-b-2 lg:border-b-4 border-transparent font-semibold text-base lg:text-2xl transition-all duration-200 flex items-center gap-2"
+         role="tab"
+         aria-selected="false">
+        <span>Comments</span>
+        <span class="bg-gray-100 text-gray-700 px-2 lg:px-2.5 py-0.5 rounded-full text-xs lg:text-base font-semibold">
+          <%= @user.published_comments_count %>
+        </span>
+      </a>
+    </nav>
 
     <!-- Tab Panels -->
     <div class="mt-8">
@@ -488,4 +454,5 @@
       </div>
     </div>
   </div>
+</div>
 </div>

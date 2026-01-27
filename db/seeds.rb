@@ -136,8 +136,8 @@ if Testimonial.count == 0
   [
     { username: "matz", email: "matz@ruby-lang.org", github_id: "100001", name: "Yukihiro Matsumoto", bio: "Creator of Ruby", avatar_url: "https://avatars.githubusercontent.com/u/30281?v=4" },
     { username: "dhh", email: "dhh@hey.com", github_id: "100002", name: "David Heinemeier Hansson", bio: "Creator of Ruby on Rails", company: "37signals", avatar_url: "https://avatars.githubusercontent.com/u/2741?v=4" },
-    { username: "tenderlove", email: "tenderlove@ruby-lang.org", github_id: "100003", name: "Aaron Patterson", bio: "Ruby & Rails core team", company: "Shopify", avatar_url: "https://avatars.githubusercontent.com/u/3124?v=4" },
-    { username: "eileencodes", email: "eileencodes@github.com", github_id: "100004", name: "Eileen Uchitelle", bio: "Rails core team", company: "GitHub", avatar_url: "https://avatars.githubusercontent.com/u/2381?v=4" }
+    { username: "pragdave", email: "dave@pragprog.com", github_id: "10648", name: "Dave Thomas", bio: "Author of The Pragmatic Programmer", company: "The Pragmatic Bookshelf", avatar_url: "https://avatars.githubusercontent.com/u/10648?v=4" },
+    { username: "AmandaPerino", email: "amanda@rubyonrails.org", github_id: "58528404", name: "Amanda Perino", bio: "Executive Director of Rails Foundation", company: "Rails Foundation", avatar_url: "https://avatars.githubusercontent.com/u/58528404?v=4" }
   ].each do |attrs|
     user = User.find_or_create_by!(github_id: attrs[:github_id]) do |u|
       u.username = attrs[:username]
@@ -153,7 +153,7 @@ if Testimonial.count == 0
   testimonials_data = [
     {
       user: seed_users[0],
-      quote: "Ruby is simple in appearance, but is very complex inside, just like our human body.",
+      quote: "When I released Ruby to the world, I never imagined such a rich ecosystem would grow from it. Over 200,000 gems, Ruby on Rails, RSpec, Bundler—it was the community that created and nurtured all of these. My wish to 'make programmers happy' has been realized in ways I could never have achieved alone.",
       heading: "Ecosystem",
       subheading: "A language that grows with you",
       body_text: "Ruby's rich ecosystem of gems and tools means you can build almost anything. From web applications to automation scripts, the community has created solutions for every need.",
@@ -162,7 +162,7 @@ if Testimonial.count == 0
     },
     {
       user: seed_users[1],
-      quote: "Ruby on Rails has made building web applications a joy. The convention over configuration philosophy lets me focus on what matters — creating value.",
+      quote: "Ruby is just the most beautiful programming language I have ever seen. And I pay a fair amount of attention to new programming languages that are coming up, new environments, new frameworks, and I've still yet to see anything that meets or beats Ruby in its pureness of its design.",
       heading: "Simplicity",
       subheading: "Beautiful code that reads like prose",
       body_text: "Ruby's elegant syntax makes code a pleasure to read and write. It prioritizes developer happiness, letting you express ideas naturally without fighting the language.",
@@ -171,7 +171,7 @@ if Testimonial.count == 0
     },
     {
       user: seed_users[2],
-      quote: "I love Ruby because it lets me be creative. Writing Ruby feels like having a conversation with the computer rather than issuing commands.",
+      quote: "Ruby turns ideas into code fast. Its simplicity keeps me focused; its expressiveness lets me write the way I think. It feels like the language gets out of the way, leaving just me and the problem.",
       heading: "Productivity",
       subheading: "Ship faster, iterate quicker",
       body_text: "Ruby and Rails together form an incredibly productive stack. What takes weeks in other languages can be built in days, without sacrificing code quality or maintainability.",
@@ -180,7 +180,7 @@ if Testimonial.count == 0
     },
     {
       user: seed_users[3],
-      quote: "The Ruby community is one of the most welcoming in all of tech. MINASWAN isn't just a saying — it's how we build software together.",
+      quote: "The Ruby community is filled with talent and creativity, developers attracted to Ruby's elegant syntax who program for the joy of it. It's a vibrant, welcoming community willing to share this love of programming with everyone.",
       heading: "Community",
       subheading: "Matz is nice and so we are nice",
       body_text: "Ruby's community stands out for its warmth and inclusivity. From RubyConf to local meetups, Ruby developers support each other and welcome newcomers with open arms.",

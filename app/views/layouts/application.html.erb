@@ -109,14 +109,14 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
           <!-- Logo on the left -->
-          <div class="flex-shrink-0">
+          <div class="flex-shrink-0 lg:flex-1">
             <%= link_to root_path, class: "text-4xl font-black text-red-600 whitespace-nowrap inline-flex items-center" do %>
-              Why <%= image_tag "heart.webp", class: "h-10 w-10 mx-1 inline-block", alt: "" %> Ruby?
+              Why <%= image_tag "heart.webp", class: "h-12 w-12 mx-1 inline-block", alt: "" %> Ruby?
             <% end %>
           </div>
           
           <!-- Desktop navigation - hidden on mobile and tablets in portrait -->
-          <div class="hidden lg:flex-1 lg:flex justify-center items-center space-x-4">
+          <div class="hidden lg:flex justify-center items-center space-x-4">
             <% Category.with_posts.ordered.each do |category| %>
               <% if category.is_success_story? && has_success_stories? %>
                 <%= link_to category.name, category_path(category),
@@ -139,7 +139,7 @@
           </div>
           
           <!-- Desktop user section - hidden on mobile and tablets in portrait -->
-          <div class="hidden lg:flex items-center">
+          <div class="hidden lg:flex items-center lg:flex-1 lg:justify-end">
             <% if user_signed_in? %>
               <div class="relative" data-controller="dropdown">
                 <button type="button" class="flex items-center gap-x-1 text-sm rounded-full cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 p-2" data-action="click->dropdown#toggle click@window->dropdown#hide">
