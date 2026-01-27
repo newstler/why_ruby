@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_01_27_222429) do
+ActiveRecord::Schema[8.2].define(version: 2026_01_27_231338) do
   create_table "_litestream_lock", id: false, force: :cascade do |t|
     t.integer "id"
   end
@@ -163,6 +163,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_01_27_222429) do
     t.integer "position"
     t.boolean "published", default: false
     t.text "quote", null: false
+    t.string "reject_reason"
     t.string "subheading"
     t.datetime "updated_at", null: false
     t.string "user_id", null: false

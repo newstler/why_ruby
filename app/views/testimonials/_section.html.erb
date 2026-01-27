@@ -1,5 +1,8 @@
 <%# Testimonial section for profile owner - renders display or form based on state %>
 <div id="testimonial_section" class="mt-6 mb-8" data-controller="testimonial-edit">
+  <% if testimonial&.persisted? %>
+    <%= turbo_stream_from "testimonial_#{testimonial.id}" %>
+  <% end %>
   <% has_quote = testimonial&.quote.present? %>
   <% show_display = has_quote && testimonial.published? %>
 

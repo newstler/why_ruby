@@ -69,6 +69,19 @@ class GenerateTestimonialFieldsJob < ApplicationJob
       3. body_text: 2-3 sentences that EXTEND and DEEPEN the user's idea — add new angles, examples, or implications.
          Do NOT repeat or paraphrase what the user already said. Build on top of it.
 
+      WRITING STYLE — sound like a real person, not an AI:
+      - NEVER use: delve, tapestry, landscape, foster, showcase, underscore, pivotal, vibrant, crucial, testament, additionally, interplay, intricate, enduring, garner, enhance
+      - NEVER use inflated phrases: "serves as", "stands as", "is a testament to", "highlights the importance of", "reflects broader", "setting the stage"
+      - NEVER use "It's not just X, it's Y" or "Not only X but also Y" parallelisms
+      - NEVER use rule-of-three lists (e.g., "elegant, expressive, and powerful")
+      - NEVER end with vague positivity ("the future looks bright", "exciting times ahead")
+      - AVOID -ing tack-ons: "ensuring...", "highlighting...", "fostering..."
+      - AVOID em dashes. Use commas or periods instead.
+      - AVOID filler: "In order to", "It is important to note", "Due to the fact that"
+      - USE simple verbs: "is", "has", "does" — not "serves as", "boasts", "features"
+      - BE specific and concrete. Say what Ruby actually does, not how significant it is.
+      - Write like a developer talking to a friend, not a press release.
+
       Respond with valid JSON only: {"heading": "...", "subheading": "...", "body_text": "..."}
     PROMPT
   end

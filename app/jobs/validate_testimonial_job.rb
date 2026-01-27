@@ -11,12 +11,39 @@ class ValidateTestimonialJob < ApplicationJob
 
     system_prompt = <<~PROMPT
       You validate testimonials for a Ruby programming language advocacy site.
-      Evaluate if this testimonial is meaningful, genuine, appropriate, and adds something new.
-      Existing published testimonials:
+
+      CONTENT POLICY:
+      - Hate speech, slurs, personal attacks, or targeted insults toward individuals or groups are NEVER allowed.
+      - Casual expletives used positively (e.g., "Damn, Ruby is amazing!" or "Fuck, I love this language!") are ALLOWED.
+      - The key distinction: profanity expressing enthusiasm = OK. Profanity attacking or demeaning people/groups = NOT OK.
+      - The quote MUST express genuine love or appreciation for Ruby. This is an advocacy site — negative, dismissive, sarcastic, or trolling sentiments about Ruby are NOT allowed.
+
+      VALIDATION RULES:
+      1. First check the user's QUOTE against the content policy. If it violates (including being negative about Ruby), reject immediately with reject_reason "quote".
+      2. If the quote is fine, check the AI-generated fields (heading/subheading/body). ONLY reject generation if there is a CLEAR problem:
+         - The heading duplicates an existing one listed below
+         - The body contradicts or misrepresents the quote
+         - The subheading is nonsensical or unrelated
+         - The content is factually wrong about Ruby
+         Do NOT reject just because the fields could be "better" or "more creative". Good enough is good enough — publish it.
+      3. If everything looks acceptable, publish it.
+
+      AI-SOUNDING LANGUAGE CHECK:
+      Reject with reason "generation" if the generated heading/subheading/body contains:
+      - Words: delve, tapestry, landscape, foster, showcase, underscore, pivotal, vibrant, crucial, testament, additionally, interplay, intricate, enduring, garner, enhance
+      - Patterns: "serves as", "stands as", "is a testament to", "not just X, it's Y", "not only X but also Y"
+      - Rule-of-three adjective/noun lists
+      - Vague positive endings ("the future looks bright", "exciting times ahead")
+      - Superficial -ing tack-ons ("ensuring...", "highlighting...", "fostering...")
+      If the quote itself is fine but the generated text sounds like AI wrote it, set reject_reason to "generation" and explain which phrases sound artificial.
+
+      Existing published testimonials (avoid duplicate headings/themes):
       #{existing.presence || "None yet."}
 
-      Respond with valid JSON only: {"publish": true/false, "feedback": "..."}
-      If publish is false, provide constructive feedback the user can act on.
+      Respond with valid JSON only: {"publish": true/false, "reject_reason": "quote" or "generation" or null, "feedback": "..."}
+      - reject_reason "quote": the user's quote violates content policy or is not meaningful. Feedback should tell the USER what to fix.
+      - reject_reason "generation": quote is fine but generated fields have a specific problem. Feedback must be a SPECIFIC INSTRUCTION for the AI generator, e.g., "The heading 'X' is already taken, use a different word" or "The body contradicts the quote by saying Y when the user said Z". Be concrete.
+      - reject_reason null: publishing. Feedback should be a short positive note for the user.
     PROMPT
 
     user_prompt = <<~PROMPT
@@ -40,18 +67,26 @@ class ValidateTestimonialJob < ApplicationJob
       parsed = JSON.parse(result)
 
       if parsed["publish"]
-        testimonial.update!(published: true, ai_feedback: parsed["feedback"].presence || "Your testimonial has been published!")
+        testimonial.update!(published: true, ai_feedback: parsed["feedback"], reject_reason: nil)
+      elsif parsed["reject_reason"] == "quote"
+        testimonial.update!(
+          published: false,
+          ai_feedback: parsed["feedback"],
+          reject_reason: "quote"
+        )
       elsif testimonial.ai_attempts < MAX_ATTEMPTS
         testimonial.update!(
           ai_attempts: testimonial.ai_attempts + 1,
           ai_feedback: parsed["feedback"],
+          reject_reason: "generation",
           published: false
         )
         GenerateTestimonialFieldsJob.perform_later(testimonial)
       else
         testimonial.update!(
           published: false,
-          ai_feedback: parsed["feedback"].presence || "Your testimonial couldn't be published. Please try rewriting it."
+          ai_feedback: parsed["feedback"],
+          reject_reason: "generation"
         )
       end
     else
@@ -87,7 +122,7 @@ class ValidateTestimonialJob < ApplicationJob
     response = client.messages(
       parameters: {
         model: "claude-3-haiku-20240307",
-        max_tokens: 200,
+        max_tokens: 300,
         temperature: 0.3,
         system: system_prompt,
         messages: [ { role: "user", content: user_prompt } ]
@@ -114,7 +149,7 @@ class ValidateTestimonialJob < ApplicationJob
           { role: "user", content: user_prompt }
         ],
         temperature: 0.3,
-        max_tokens: 200
+        max_tokens: 300
       }
     )
 

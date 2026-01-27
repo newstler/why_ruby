@@ -13,20 +13,22 @@ export default class extends Controller {
     const min = this.minValue
     const max = this.maxValue
 
-    this.counterTarget.textContent = `${length} / ${min}–${max}`
+    this.counterTarget.innerHTML = `${length} <span class="opacity-50">/ ${min}–${max}</span>`
+
+    const pill = "text-xs font-medium px-2.5 py-0.5 rounded-full"
 
     if (length < min) {
-      this.counterTarget.className = "text-sm mt-1 text-gray-400"
+      this.counterTarget.className = `${pill} bg-gray-100 text-gray-400`
       this.submitTarget.disabled = true
       this.submitTarget.classList.add("opacity-50", "cursor-not-allowed")
       this.submitTarget.classList.remove("cursor-pointer", "hover:bg-red-700")
     } else if (length <= max) {
-      this.counterTarget.className = "text-sm mt-1 text-green-600"
+      this.counterTarget.className = `${pill} bg-green-100 text-green-700`
       this.submitTarget.disabled = false
       this.submitTarget.classList.remove("opacity-50", "cursor-not-allowed")
       this.submitTarget.classList.add("cursor-pointer", "hover:bg-red-700")
     } else {
-      this.counterTarget.className = "text-sm mt-1 text-red-500"
+      this.counterTarget.className = `${pill} bg-red-100 text-red-600`
       this.submitTarget.disabled = true
       this.submitTarget.classList.add("opacity-50", "cursor-not-allowed")
       this.submitTarget.classList.remove("cursor-pointer", "hover:bg-red-700")

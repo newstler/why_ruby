@@ -175,9 +175,6 @@
     <%# Testimonial Section %>
     <% testimonial = @user.testimonial %>
     <% if current_user == @user %>
-      <% if testimonial&.persisted? %>
-        <%= turbo_stream_from "testimonial_#{testimonial.id}" %>
-      <% end %>
       <%= render "testimonials/section", testimonial: testimonial, user: @user %>
     <% elsif testimonial&.published? %>
       <div class="mt-6 mb-8">

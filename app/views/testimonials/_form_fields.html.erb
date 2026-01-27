@@ -32,7 +32,11 @@
 
   <% if testimonial.persisted? && testimonial.ai_feedback.present? %>
     <span class="text-sm <%= testimonial.published? ? 'text-green-600' : 'text-yellow-600' %>">
-      <%= testimonial.ai_feedback %>
+      <% if testimonial.reject_reason == "generation" %>
+        We're refining the presentation of your testimonial. Please try saving again.
+      <% else %>
+        <%= testimonial.ai_feedback %>
+      <% end %>
     </span>
   <% end %>
 </div>
