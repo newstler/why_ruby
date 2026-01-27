@@ -1,86 +1,94 @@
-<%# Testimonial carousel for home page - dark themed %>
+<%# Testimonial carousel for home page %>
 <% if testimonials.any? %>
-  <div class="py-16 md:py-24 bg-[#1a1a1a] my-8 md:my-16" data-controller="testimonial-carousel">
-    <div class="max-w-6xl mx-auto px-6 md:px-12">
+  <div class="py-12 md:py-20 my-8 md:my-16" data-controller="testimonial-carousel">
+    <div class="grid grid-cols-[auto_1fr_auto] items-center gap-4 md:gap-8">
 
-      <% testimonials.each_with_index do |testimonial, index| %>
-        <div class="<%= index == 0 ? '' : 'hidden' %>"
-             data-testimonial-carousel-target="slide">
+      <%# Left arrow %>
+      <% if testimonials.size > 1 %>
+        <button type="button"
+                class="self-center text-gray-300 hover:text-red-600 transition-colors cursor-pointer p-2"
+                data-action="testimonial-carousel#previous">
+          <svg class="w-10 h-10 md:w-12 md:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"></path>
+          </svg>
+        </button>
+      <% else %>
+        <div></div>
+      <% end %>
 
-          <%# Heading area %>
-          <% if testimonial.heading.present? %>
-            <h2 class="text-5xl md:text-7xl font-serif italic text-[#c9a84c] mb-6">
-              <%= testimonial.heading %>
-            </h2>
-          <% end %>
+      <%# Middle column: slides + dots %>
+      <div class="max-w-4xl mx-auto w-full">
+        <% testimonials.each_with_index do |testimonial, index| %>
+          <div class="<%= index == 0 ? '' : 'hidden' %>"
+               data-testimonial-carousel-target="slide">
 
-          <% if testimonial.subheading.present? %>
-            <h3 class="text-2xl md:text-3xl font-bold text-white leading-tight mb-2">
-              <%= raw testimonial.subheading.split('.').map { |s| s.strip }.reject(&:blank?).map { |s| ERB::Util.html_escape(s) + "." }.join("<br>") %>
-            </h3>
-          <% end %>
+            <%# Heading area %>
+            <% if testimonial.heading.present? %>
+              <h2 class="text-5xl md:text-7xl font-serif italic text-red-600 mb-6">
+                <%= testimonial.heading %>
+              </h2>
+            <% end %>
 
-          <% if testimonial.body_text.present? %>
-            <p class="text-gray-400 text-base md:text-lg mt-6 mb-12 max-w-3xl leading-relaxed">
-              <%= testimonial.body_text %>
-            </p>
-          <% end %>
+            <% if testimonial.subheading.present? %>
+              <h3 class="text-2xl md:text-3xl font-bold text-gray-900 leading-tight mb-2">
+                <%= raw testimonial.subheading.split('.').map { |s| s.strip }.reject(&:blank?).map { |s| ERB::Util.html_escape(s) + "." }.join("<br>") %>
+              </h3>
+            <% end %>
 
-          <%# Quote + User layout %>
-          <div class="flex flex-col md:flex-row gap-8 md:gap-12 items-start md:items-center mt-8">
-            <%# Quote block %>
-            <div class="flex-1 relative">
-              <span class="absolute -top-8 -left-2 text-7xl text-[#c9a84c] font-serif leading-none select-none">&ldquo;</span>
-              <blockquote class="border border-[#c9a84c]/40 rounded-lg p-6 md:p-8 ml-4">
-                <p class="text-gray-300 text-base md:text-lg italic leading-relaxed">
-                  <%= testimonial.quote %>
-                </p>
-              </blockquote>
-            </div>
+            <% if testimonial.body_text.present? %>
+              <p class="text-gray-500 text-base md:text-lg mt-6 mb-12 max-w-3xl leading-relaxed">
+                <%= testimonial.body_text %>
+              </p>
+            <% end %>
 
-            <%# User tile %>
-            <div class="flex flex-col items-center text-center flex-shrink-0">
-              <% user = testimonial.user %>
-              <%= link_to user_path(user), class: "group flex flex-col items-center" do %>
-                <% if user.avatar_url.present? %>
-                  <div class="w-28 h-28 md:w-36 md:h-36 rounded-full p-1 bg-gradient-to-br from-[#c9a84c] to-[#8a6d2b] mb-4">
-                    <%= image_tag user.avatar_url, alt: user.display_name,
-                        class: "w-full h-full rounded-full object-cover" %>
-                  </div>
-                <% else %>
-                  <div class="w-28 h-28 md:w-36 md:h-36 rounded-full p-1 bg-gradient-to-br from-[#c9a84c] to-[#8a6d2b] mb-4">
-                    <span class="w-full h-full rounded-full bg-[#2a2a2a] flex items-center justify-center text-4xl font-bold text-[#c9a84c]">
-                      <%= user.display_name.first.upcase %>
-                    </span>
-                  </div>
-                <% end %>
-                <h4 class="text-white text-xl md:text-2xl font-bold group-hover:text-[#c9a84c] transition-colors">
-                  <%= user.display_name %>
-                </h4>
-                <% if user.bio.present? %>
-                  <p class="text-gray-400 text-sm mt-1 italic"><%= truncate(user.bio, length: 50) %></p>
-                <% elsif user.company.present? %>
-                  <p class="text-gray-400 text-sm mt-1 italic"><%= user.company %></p>
-                <% end %>
-              <% end %>
+            <%# Quote + User layout %>
+            <div class="flex flex-col md:flex-row gap-8 md:gap-12 md:items-stretch mt-8">
+              <%# Quote block %>
+              <div class="flex-1 relative">
+                <span class="absolute -top-8 -left-2 text-7xl text-red-600 font-serif leading-none select-none">&ldquo;</span>
+                <blockquote class="border border-red-200 rounded-lg p-6 md:p-8 ml-4">
+                  <p class="text-gray-600 text-base md:text-lg italic leading-relaxed">
+                    <%= testimonial.quote %>
+                  </p>
+                </blockquote>
+              </div>
+
+              <%# User tile %>
+              <div class="flex-shrink-0 w-full max-w-sm flex items-end">
+                <%= render "users/user_tile", user: testimonial.user, frameless: true %>
+              </div>
             </div>
           </div>
-        </div>
+        <% end %>
+
+        <% if testimonials.size > 1 %>
+          <%# Navigation dots %>
+          <div class="flex justify-center gap-3 mt-12">
+            <% testimonials.each_with_index do |_, index| %>
+              <button type="button"
+                      class="w-2.5 h-2.5 rounded-full transition-colors duration-300 <%= index == 0 ? 'bg-red-600' : 'bg-gray-300' %>"
+                      data-testimonial-carousel-target="dot"
+                      data-action="testimonial-carousel#goTo"
+                      data-index="<%= index %>">
+              </button>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <%# Right arrow %>
+      <% if testimonials.size > 1 %>
+        <button type="button"
+                class="self-center text-gray-300 hover:text-red-600 transition-colors cursor-pointer p-2"
+                data-action="testimonial-carousel#next">
+          <svg class="w-10 h-10 md:w-12 md:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </button>
+      <% else %>
+        <div></div>
       <% end %>
 
-      <%# Navigation dots %>
-      <% if testimonials.size > 1 %>
-        <div class="flex justify-center gap-3 mt-12">
-          <% testimonials.each_with_index do |_, index| %>
-            <button type="button"
-                    class="w-2.5 h-2.5 rounded-full transition-colors duration-300 <%= index == 0 ? 'bg-[#c9a84c]' : 'bg-gray-600' %>"
-                    data-testimonial-carousel-target="dot"
-                    data-action="testimonial-carousel#goTo"
-                    data-index="<%= index %>">
-            </button>
-          <% end %>
-        </div>
-      <% end %>
     </div>
   </div>
 <% end %>

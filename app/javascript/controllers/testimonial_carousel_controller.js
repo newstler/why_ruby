@@ -63,10 +63,10 @@ export default class extends Controller {
     }, 600)
 
     if (this.hasDotTarget) {
-      this.dotTargets[this.currentIndex].classList.remove("bg-[#c9a84c]")
-      this.dotTargets[this.currentIndex].classList.add("bg-gray-600")
-      this.dotTargets[index].classList.add("bg-[#c9a84c]")
-      this.dotTargets[index].classList.remove("bg-gray-600")
+      this.dotTargets[this.currentIndex].classList.remove("bg-red-600")
+      this.dotTargets[this.currentIndex].classList.add("bg-gray-300")
+      this.dotTargets[index].classList.add("bg-red-600")
+      this.dotTargets[index].classList.remove("bg-gray-300")
     }
 
     this.currentIndex = index
