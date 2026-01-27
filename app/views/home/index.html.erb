@@ -1,50 +1,9 @@
 <%# Set page title for home page %>
 <% content_for(:title) { "Discover why Ruby continues to be a beloved language for developers worldwide" } %>
 
-<div class="space-y-16">
-  <!-- Hero Section -->
-  <div class="max-w-4xl  mx-auto flex flex-col items-center">
-    <%= image_tag "heart.webp", class: "w-32 md:w-64 h-32 md:h-64" %>
-    <p class="text-2xl md:text-6xl text-gray-600 font-bold text-center mt-8">
-      Discover why <span class="text-red-600">Ruby</span> continues to be a <span class="text-red-600">beloved language</span> for developers worldwide
-    </p>
-
-<!--    <p class="text-xl md:text-3xl text-gray-600 font-bold text-center mt-8">-->
-<!--      And share articles, tutorials, and resources with our community.-->
-<!--    </p>-->
-  </div>
-
+<div>
   <%# Testimonial Carousel %>
   <%= render "home/testimonial_carousel", testimonials: @testimonials %>
-
-  <!-- Pinned Posts -->
-  <% if @pinned_posts.any? %>
-    <div class="space-y-4">
-<!--      <h2 class="text-2xl font-bold text-gray-900">Featured Posts</h2>-->
-      <div class="hidden lg:flex gap-6">
-        <% # Split pinned posts into 3 columns for desktop, maintaining left-to-right order %>
-        <% pinned_cols = [[], [], []] %>
-        <% @pinned_posts.each_with_index do |post, index| %>
-          <% pinned_cols[index % 3] << post %>
-        <% end %>
-        
-        <% pinned_cols.each do |column_posts| %>
-          <div class="flex-1 space-y-6">
-            <% column_posts.each do |post| %>
-              <%= render 'posts/post_tile', post: post %>
-            <% end %>
-          </div>
-        <% end %>
-      </div>
-      
-      <% # Mobile view for pinned posts - simple grid %>
-      <div class="lg:hidden grid grid-cols-1 md:grid-cols-2 gap-6">
-        <% @pinned_posts.each do |post| %>
-          <%= render 'posts/post_tile', post: post %>
-        <% end %>
-      </div>
-    </div>
-  <% end %>
 </div>
 
 <!-- Success Stories Floating Logos (Full Width) -->
