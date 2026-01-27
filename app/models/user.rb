@@ -6,6 +6,7 @@ class User < ApplicationRecord
   has_many :posts, dependent: :destroy
   has_many :comments, dependent: :destroy
   has_many :reports, dependent: :destroy
+  has_one :testimonial, dependent: :destroy
   has_many :published_posts, -> { published }, class_name: "Post"
   has_many :published_comments, -> { published }, class_name: "Comment"
 

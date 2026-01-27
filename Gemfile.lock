@@ -165,6 +165,35 @@ GEM
     docile (1.4.1)
     dotenv (3.2.0)
     drb (2.2.3)
+    dry-configurable (1.3.0)
+      dry-core (~> 1.1)
+      zeitwerk (~> 2.6)
+    dry-core (1.2.0)
+      concurrent-ruby (~> 1.0)
+      logger
+      zeitwerk (~> 2.6)
+    dry-inflector (1.3.1)
+    dry-initializer (3.2.0)
+    dry-logic (1.6.0)
+      bigdecimal
+      concurrent-ruby (~> 1.0)
+      dry-core (~> 1.1)
+      zeitwerk (~> 2.6)
+    dry-schema (1.15.0)
+      concurrent-ruby (~> 1.0)
+      dry-configurable (~> 1.0, >= 1.0.1)
+      dry-core (~> 1.1)
+      dry-initializer (~> 3.2)
+      dry-logic (~> 1.6)
+      dry-types (~> 1.8)
+      zeitwerk (~> 2.6)
+    dry-types (1.9.0)
+      bigdecimal (>= 3.0)
+      concurrent-ruby (~> 1.0)
+      dry-core (~> 1.0)
+      dry-inflector (~> 1.0)
+      dry-logic (~> 1.4)
+      zeitwerk (~> 2.6)
     ed25519 (1.4.0)
     erb (6.0.1)
     erubi (1.13.1)
@@ -179,6 +208,13 @@ GEM
       multipart-post (~> 2.0)
     faraday-net_http (3.4.2)
       net-http (~> 0.5)
+    fast-mcp (1.6.0)
+      addressable (~> 2.8)
+      base64
+      dry-schema (~> 1.14)
+      json (~> 2.0)
+      mime-types (~> 3.4)
+      rack (>= 2.0, < 4.0)
     friendly_id (5.6.0)
       activerecord (>= 4.0.0)
     fugit (1.12.1)
@@ -262,6 +298,10 @@ GEM
     matrix (0.4.3)
     meta-tags (2.22.2)
       actionpack (>= 6.0.0, < 8.2)
+    mime-types (3.7.0)
+      logger
+      mime-types-data (~> 3.2025, >= 3.2025.0507)
+    mime-types-data (3.2026.0113)
     mini_mime (1.1.5)
     minitest (6.0.1)
       prism (~> 1.5)
@@ -458,6 +498,10 @@ GEM
     thor (1.4.0)
     thruster (0.1.17-arm64-darwin)
     thruster (0.1.17-x86_64-linux)
+    tidewave (0.4.1)
+      fast-mcp (~> 1.6.0)
+      rack (>= 2.0)
+      rails (>= 7.1.0)
     timeout (0.6.0)
     tsort (0.2.0)
     turbo-rails (2.0.20)
@@ -535,6 +579,7 @@ DEPENDENCIES
   stimulus-rails
   tailwindcss-rails (~> 4.0)
   thruster
+  tidewave (~> 0.4.1)
   turbo-rails
   web-console
 
@@ -575,6 +620,13 @@ CHECKSUMS
   docile (1.4.1) sha256=96159be799bfa73cdb721b840e9802126e4e03dfc26863db73647204c727f21e
   dotenv (3.2.0) sha256=e375b83121ea7ca4ce20f214740076129ab8514cd81378161f11c03853fe619d
   drb (2.2.3) sha256=0b00d6fdb50995fe4a45dea13663493c841112e4068656854646f418fda13373
+  dry-configurable (1.3.0) sha256=882d862858567fc1210d2549d4c090f34370fc1bb7c5c1933de3fe792e18afa8
+  dry-core (1.2.0) sha256=0cc5a7da88df397f153947eeeae42e876e999c1e30900f3c536fb173854e96a1
+  dry-inflector (1.3.1) sha256=7fb0c2bb04f67638f25c52e7ba39ab435d922a3a5c3cd196120f63accb682dcc
+  dry-initializer (3.2.0) sha256=37d59798f912dc0a1efe14a4db4a9306989007b302dcd5f25d0a2a20c166c4e3
+  dry-logic (1.6.0) sha256=da6fedbc0f90fc41f9b0cc7e6f05f5d529d1efaef6c8dcc8e0733f685745cea2
+  dry-schema (1.15.0) sha256=0f2a34adba4206bd6d46ec1b6b7691b402e198eecaff1d8349a7d48a77d82cd2
+  dry-types (1.9.0) sha256=7b656fe0a78d2432500ae1f29fefd6762f5a032ca7000e4f36bc111453d45d4d
   ed25519 (1.4.0) sha256=16e97f5198689a154247169f3453ef4cfd3f7a47481fde0ae33206cdfdcac506
   erb (6.0.1) sha256=28ecdd99c5472aebd5674d6061e3c6b0a45c049578b071e5a52c2a7f13c197e5
   erubi (1.13.1) sha256=a082103b0885dbc5ecf1172fede897f9ebdb745a4b97a5e8dc63953db1ee4ad9
@@ -583,6 +635,7 @@ CHECKSUMS
   faraday (2.14.0) sha256=8699cfe5d97e55268f2596f9a9d5a43736808a943714e3d9a53e6110593941cd
   faraday-multipart (1.2.0) sha256=7d89a949693714176f612323ca13746a2ded204031a6ba528adee788694ef757
   faraday-net_http (3.4.2) sha256=f147758260d3526939bf57ecf911682f94926a3666502e24c69992765875906c
+  fast-mcp (1.6.0) sha256=d68abb45d2daab9e7ae2934417460e4bf9ac87493c585dc5bb626f1afb7d12c4
   friendly_id (5.6.0) sha256=28e221cd53fbd21586321164c1c6fd0c9ba8dde13969cb2363679f44726bb0c3
   fugit (1.12.1) sha256=5898f478ede9b415f0804e42b8f3fd53f814bd85eebffceebdbc34e1107aaf68
   globalid (1.3.0) sha256=05c639ad6eb4594522a0b07983022f04aa7254626ab69445a0e493aa3786ff11
@@ -611,6 +664,8 @@ CHECKSUMS
   marcel (1.1.0) sha256=fdcfcfa33cc52e93c4308d40e4090a5d4ea279e160a7f6af988260fa970e0bee
   matrix (0.4.3) sha256=a0d5ab7ddcc1973ff690ab361b67f359acbb16958d1dc072b8b956a286564c5b
   meta-tags (2.22.2) sha256=7fe78af4a92be12091f473cb84a21f6bddbd37f24c4413172df76cd14fff9e83
+  mime-types (3.7.0) sha256=dcebf61c246f08e15a4de34e386ebe8233791e868564a470c3fe77c00eed5e56
+  mime-types-data (3.2026.0113) sha256=8c88fa7b1af91c87098f666b7ffbd4794799a71c05765be2c1f6df337d41b04c
   mini_mime (1.1.5) sha256=8681b7e2e4215f2a159f9400b5816d85e9d8c6c6b491e96a12797e798f8bccef
   minitest (6.0.1) sha256=7854c74f48e2e975969062833adc4013f249a4b212f5e7b9d5c040bf838d54bb
   msgpack (1.8.0) sha256=e64ce0212000d016809f5048b48eb3a65ffb169db22238fb4b72472fecb2d732
@@ -696,6 +751,7 @@ CHECKSUMS
   thor (1.4.0) sha256=8763e822ccb0f1d7bee88cde131b19a65606657b847cc7b7b4b82e772bcd8a3d
   thruster (0.1.17-arm64-darwin) sha256=75da66fc4a0f012f9a317f6362f786a3fa953879a3fa6bed8deeaebf1c1d66ec
   thruster (0.1.17-x86_64-linux) sha256=77b8f335075bd4ece7631dc84a19a710a1e6e7102cbce147b165b45851bdfcd3
+  tidewave (0.4.1) sha256=e33e0b5bd8678825fa00f2703ca64754d910996682f78b3420499068bc123258
   timeout (0.6.0) sha256=6d722ad619f96ee383a0c557ec6eb8c4ecb08af3af62098a0be5057bf00de1af
   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
   turbo-rails (2.0.20) sha256=cbcbb4dd3ce59f6471c9f911b1655b2c721998cc8303959d982da347f374ea95

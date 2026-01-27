@@ -1,11 +1,43 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+user_with_testimonial:
+  id: "01TESTTESTIMONIAL101"
+  username: "rubyist1"
+  email: "rubyist1@example.com"
+  github_id: "900001"
+  role: 0
+  avatar_url: "https://avatars.githubusercontent.com/u/1"
+  name: "Ruby Fan"
+  published_posts_count: 0
+  published_comments_count: 0
 
-# This model initially had no columns defined. If you add columns to the
-# model remove the "{}" from the fixture names and add the columns immediately
-# below each fixture, per the syntax in the comments below
-#
-one: {}
-# column: value
-#
-two: {}
-# column: value
+user_without_testimonial:
+  id: "01TESTTESTIMONIAL102"
+  username: "rubyist2"
+  email: "rubyist2@example.com"
+  github_id: "900002"
+  role: 0
+  avatar_url: "https://avatars.githubusercontent.com/u/2"
+  name: "New Rubyist"
+  published_posts_count: 0
+  published_comments_count: 0
+
+admin_user:
+  id: "01TESTTESTIMONIAL103"
+  username: "admin_test"
+  email: "admin@example.com"
+  github_id: "900003"
+  role: 1
+  avatar_url: "https://avatars.githubusercontent.com/u/3"
+  name: "Admin User"
+  published_posts_count: 5
+  published_comments_count: 15
+
+user_no_testimonial:
+  id: "01TESTTESTIMONIAL104"
+  username: "norubylove"
+  email: "norubylove@example.com"
+  github_id: "900004"
+  role: 0
+  avatar_url: "https://avatars.githubusercontent.com/u/4"
+  name: "No Testimonial"
+  published_posts_count: 0
+  published_comments_count: 0

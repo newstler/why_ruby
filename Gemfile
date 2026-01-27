@@ -94,3 +94,5 @@ gem "litestream", "~> 0.14.0"
 
 # Monitor performance
 gem "rorvswild", "~> 1.9"
+
+gem "tidewave", "~> 0.4.1", group: :development

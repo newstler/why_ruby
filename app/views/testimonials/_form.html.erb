@@ -1,0 +1,29 @@
+<%# Testimonial form partial - shown to profile owner %>
+<%= turbo_frame_tag "testimonial_form" do %>
+  <div class="bg-white rounded-lg shadow p-6">
+    <h2 class="text-2xl font-bold text-gray-900 mb-4">Why do you love Ruby?</h2>
+
+    <% if testimonial.persisted? %>
+      <%= form_with model: testimonial, url: testimonial_path, method: :patch do |f| %>
+        <%= render "testimonials/form_fields", f: f, testimonial: testimonial %>
+      <% end %>
+    <% else %>
+      <%= form_with model: testimonial, url: testimonial_path do |f| %>
+        <%= render "testimonials/form_fields", f: f, testimonial: testimonial %>
+      <% end %>
+    <% end %>
+
+    <% if testimonial.persisted? && testimonial.ai_feedback.present? %>
+      <div class="mt-4 p-3 rounded-lg <%= testimonial.published? ? 'bg-green-50 text-green-800' : 'bg-yellow-50 text-yellow-800' %>">
+        <div class="flex items-center gap-2 mb-1">
+          <% if testimonial.published? %>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Published</span>
+          <% else %>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Processing</span>
+          <% end %>
+        </div>
+        <p class="text-sm"><%= testimonial.ai_feedback %></p>
+      </div>
+    <% end %>
+  </div>
+<% end %>

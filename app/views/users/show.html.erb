@@ -29,6 +29,19 @@
 <% end %>
 
 <div class="space-y-8">
+  <%# Testimonial Section %>
+  <% if current_user == @user %>
+    <%# Profile owner: show editable form %>
+    <% testimonial = @user.testimonial || @user.build_testimonial %>
+    <%= render "testimonials/form", testimonial: testimonial, user: @user %>
+  <% elsif @user.testimonial&.published? %>
+    <%# Visitor: show published testimonial %>
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-xl font-bold text-gray-900 mb-4">Loves Ruby because of...</h2>
+      <%= render "testimonials/testimonial", testimonial: @user.testimonial %>
+    </div>
+  <% end %>
+
   <!-- Tabbed Content Section -->
   <div data-controller="tabs">
     <!-- Tab Navigation with User Info -->

@@ -128,3 +128,73 @@
 
 #   puts "Created sample posts"
 # end
+
+# Seed testimonials (pre-published, no AI processing needed)
+if Testimonial.count == 0
+  # Need at least 4 users for testimonials
+  seed_users = []
+  [
+    { username: "matz", email: "matz@ruby-lang.org", github_id: "100001", name: "Yukihiro Matsumoto", bio: "Creator of Ruby", avatar_url: "https://avatars.githubusercontent.com/u/30281?v=4" },
+    { username: "dhh", email: "dhh@hey.com", github_id: "100002", name: "David Heinemeier Hansson", bio: "Creator of Ruby on Rails", company: "37signals", avatar_url: "https://avatars.githubusercontent.com/u/2741?v=4" },
+    { username: "tenderlove", email: "tenderlove@ruby-lang.org", github_id: "100003", name: "Aaron Patterson", bio: "Ruby & Rails core team", company: "Shopify", avatar_url: "https://avatars.githubusercontent.com/u/3124?v=4" },
+    { username: "eileencodes", email: "eileencodes@github.com", github_id: "100004", name: "Eileen Uchitelle", bio: "Rails core team", company: "GitHub", avatar_url: "https://avatars.githubusercontent.com/u/2381?v=4" }
+  ].each do |attrs|
+    user = User.find_or_create_by!(github_id: attrs[:github_id]) do |u|
+      u.username = attrs[:username]
+      u.email = attrs[:email]
+      u.name = attrs[:name]
+      u.bio = attrs[:bio]
+      u.company = attrs[:company]
+      u.avatar_url = attrs[:avatar_url]
+    end
+    seed_users << user
+  end
+
+  testimonials_data = [
+    {
+      user: seed_users[0],
+      quote: "Ruby is simple in appearance, but is very complex inside, just like our human body.",
+      heading: "Ecosystem",
+      subheading: "A language that grows with you",
+      body_text: "Ruby's rich ecosystem of gems and tools means you can build almost anything. From web applications to automation scripts, the community has created solutions for every need.",
+      published: true,
+      position: 1
+    },
+    {
+      user: seed_users[1],
+      quote: "Ruby on Rails has made building web applications a joy. The convention over configuration philosophy lets me focus on what matters — creating value.",
+      heading: "Simplicity",
+      subheading: "Beautiful code that reads like prose",
+      body_text: "Ruby's elegant syntax makes code a pleasure to read and write. It prioritizes developer happiness, letting you express ideas naturally without fighting the language.",
+      published: true,
+      position: 2
+    },
+    {
+      user: seed_users[2],
+      quote: "I love Ruby because it lets me be creative. Writing Ruby feels like having a conversation with the computer rather than issuing commands.",
+      heading: "Productivity",
+      subheading: "Ship faster, iterate quicker",
+      body_text: "Ruby and Rails together form an incredibly productive stack. What takes weeks in other languages can be built in days, without sacrificing code quality or maintainability.",
+      published: true,
+      position: 3
+    },
+    {
+      user: seed_users[3],
+      quote: "The Ruby community is one of the most welcoming in all of tech. MINASWAN isn't just a saying — it's how we build software together.",
+      heading: "Community",
+      subheading: "Matz is nice and so we are nice",
+      body_text: "Ruby's community stands out for its warmth and inclusivity. From RubyConf to local meetups, Ruby developers support each other and welcome newcomers with open arms.",
+      published: true,
+      position: 4
+    }
+  ]
+
+  testimonials_data.each do |data|
+    user = data.delete(:user)
+    now = Time.current
+    # Use insert_all to skip callbacks (avoid AI processing for seeds)
+    Testimonial.insert_all([ data.merge(user_id: user.id, ai_attempts: 0, created_at: now, updated_at: now) ])
+  end
+
+  puts "Created #{Testimonial.count} testimonials"
+end

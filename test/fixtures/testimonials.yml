@@ -1,0 +1,23 @@
+published:
+  id: "01TESTTESTIMONIAL001"
+  user_id: "01TESTTESTIMONIAL101"
+  quote: "I love Ruby because it makes coding joyful."
+  heading: "Joy"
+  subheading: "Code with happiness"
+  body_text: "Ruby brings joy to developers with its elegant syntax and developer-friendly design."
+  published: true
+  ai_feedback: "Your testimonial has been published!"
+  ai_attempts: 1
+  position: 1
+
+unpublished:
+  id: "01TESTTESTIMONIAL002"
+  user_id: "01TESTTESTIMONIAL102"
+  quote: "Ruby is okay I guess."
+  heading: ~
+  subheading: ~
+  body_text: ~
+  published: false
+  ai_feedback: ~
+  ai_attempts: 0
+  position: ~
