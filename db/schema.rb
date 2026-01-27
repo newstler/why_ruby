@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_01_27_154149) do
+ActiveRecord::Schema[8.2].define(version: 2026_01_27_222429) do
   create_table "_litestream_lock", id: false, force: :cascade do |t|
     t.integer "id"
   end
@@ -170,6 +170,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_01_27_154149) do
     t.index ["position"], name: "index_testimonials_on_position"
     t.index ["published"], name: "index_testimonials_on_published"
     t.index ["user_id"], name: "index_testimonials_on_user_id", unique: true
+    t.check_constraint "length(quote) >= 140 AND length(quote) <= 320", name: "quote_length_check"
   end
 
   create_table "users", id: :string, default: -> { "ULID()" }, force: :cascade do |t|

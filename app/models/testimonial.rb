@@ -1,7 +1,7 @@
 class Testimonial < ApplicationRecord
   belongs_to :user
 
-  validates :quote, presence: true
+  validates :quote, presence: true, length: { minimum: 140, maximum: 320 }
   validates :user_id, uniqueness: true
   validates :heading, uniqueness: true, allow_nil: true
 

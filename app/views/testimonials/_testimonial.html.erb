@@ -1,9 +1,17 @@
 <%# Shared testimonial display partial - used on home carousel and user profile %>
 <div>
   <% if testimonial.heading.present? %>
-    <h3 class="text-5xl md:text-7xl font-serif italic text-red-600 mb-6">
-      <%= testimonial.heading %>
-    </h3>
+    <div class="flex items-baseline gap-4 mb-6">
+      <h3 class="text-5xl md:text-7xl font-serif italic text-red-600">
+        <%= testimonial.heading %>
+      </h3>
+      <% if local_assigns[:editable] %>
+        <button data-action="testimonial-edit#edit"
+                class="text-sm text-gray-400 hover:text-red-600 transition-colors cursor-pointer">
+          Edit
+        </button>
+      <% end %>
+    </div>
   <% end %>
 
   <div class="flex flex-col lg:flex-row lg:gap-8 lg:items-center">

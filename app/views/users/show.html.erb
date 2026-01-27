@@ -170,20 +170,31 @@
     </div>
       </div><!-- end user info left side -->
 
-      <%# Testimonial Form (right side - only for profile owner) %>
-      <% if current_user == @user %>
-        <div class="lg:flex-1 mt-6 lg:mt-0">
-          <% testimonial = @user.testimonial || @user.build_testimonial %>
-          <%= render "testimonials/form", testimonial: testimonial, user: @user %>
-        </div>
-      <% end %>
     </div><!-- end flex row -->
 
-    <%# Published Testimonial (below user info) %>
-    <% if current_user != @user && @user.testimonial&.published? %>
+    <%# Testimonial Section %>
+    <% testimonial = @user.testimonial %>
+    <% has_quote = testimonial&.quote.present? %>
+    <% if current_user == @user %>
+      <div class="mt-6 mb-8" data-controller="testimonial-edit">
+        <%# Display: shown when user has a quote %>
+        <div data-testimonial-edit-target="display" class="<%= 'hidden' unless has_quote %>">
+          <h2 class="text-xl font-bold text-gray-300 mb-4">loves Ruby because of...</h2>
+          <% if has_quote %>
+            <%= render "testimonials/testimonial", testimonial: testimonial, editable: true %>
+          <% end %>
+        </div>
+
+        <%# Form: shown when editing or no quote %>
+        <div data-testimonial-edit-target="form" class="<%= 'hidden' if has_quote %>">
+          <% form_testimonial = testimonial || @user.build_testimonial %>
+          <%= render "testimonials/form", testimonial: form_testimonial, user: @user, cancelable: has_quote %>
+        </div>
+      </div>
+    <% elsif testimonial&.published? %>
       <div class="mt-6 mb-8">
         <h2 class="text-xl font-bold text-gray-300 mb-4">loves Ruby because of...</h2>
-        <%= render "testimonials/testimonial", testimonial: @user.testimonial %>
+        <%= render "testimonials/testimonial", testimonial: testimonial %>
       </div>
     <% end %>
 

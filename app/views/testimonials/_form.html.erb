@@ -1,15 +1,18 @@
 <%# Testimonial form partial - shown to profile owner %>
 <%= turbo_frame_tag "testimonial_form" do %>
-  <div class="bg-white rounded-lg shadow p-6">
-    <h2 class="text-2xl font-bold text-gray-900 mb-4">Why do you love Ruby?</h2>
+  <div class="bg-white rounded-lg shadow p-6" data-controller="char-counter" data-char-counter-min-value="140" data-char-counter-max-value="320">
+    <div class="flex items-baseline justify-between mb-4">
+      <h2 class="text-2xl font-bold text-gray-900">Why do you love Ruby?</h2>
+      <span data-char-counter-target="counter" class="text-sm text-gray-400"></span>
+    </div>
 
     <% if testimonial.persisted? %>
       <%= form_with model: testimonial, url: testimonial_path, method: :patch do |f| %>
-        <%= render "testimonials/form_fields", f: f, testimonial: testimonial %>
+        <%= render "testimonials/form_fields", f: f, testimonial: testimonial, cancelable: local_assigns[:cancelable] %>
       <% end %>
     <% else %>
       <%= form_with model: testimonial, url: testimonial_path do |f| %>
-        <%= render "testimonials/form_fields", f: f, testimonial: testimonial %>
+        <%= render "testimonials/form_fields", f: f, testimonial: testimonial, cancelable: local_assigns[:cancelable] %>
       <% end %>
     <% end %>
 
