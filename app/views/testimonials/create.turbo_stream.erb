@@ -1,0 +1,4 @@
+<%= turbo_stream.replace "testimonial_section" do %>
+  <%= turbo_stream_from "testimonial_#{@testimonial.id}" %>
+  <%= render "testimonials/section", testimonial: @testimonial, user: current_user, processing: true %>
+<% end %>

@@ -1,0 +1,19 @@
+<%# Testimonial section for profile owner - renders display or form based on state %>
+<div id="testimonial_section" class="mt-6 mb-8" data-controller="testimonial-edit">
+  <% has_quote = testimonial&.quote.present? %>
+  <% show_display = has_quote && testimonial.published? %>
+
+  <%# Display: shown when testimonial is published %>
+  <div data-testimonial-edit-target="display" class="<%= 'hidden' unless show_display %>">
+    <h2 class="text-xl font-bold text-gray-300 mb-4">loves Ruby because of...</h2>
+    <% if show_display %>
+      <%= render "testimonials/testimonial", testimonial: testimonial, editable: true %>
+    <% end %>
+  </div>
+
+  <%# Form: shown when editing or processing %>
+  <div data-testimonial-edit-target="form" class="<%= 'hidden' if show_display %>">
+    <% form_testimonial = testimonial || user.build_testimonial %>
+    <%= render "testimonials/form", testimonial: form_testimonial, user: user, cancelable: show_display, processing: local_assigns[:processing] %>
+  </div>
+</div>
