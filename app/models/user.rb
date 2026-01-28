@@ -13,6 +13,9 @@ class User < ApplicationRecord
   # Enums
   enum :role, { member: 0, admin: 1 }
 
+  # Normalizations (strip whitespace from GitHub data)
+  normalizes :name, :bio, :company, :location, :website, :twitter, with: ->(value) { value.strip.presence }
+
   # Validations
   validates :github_id, presence: true, uniqueness: true
   validates :username, presence: true, uniqueness: true

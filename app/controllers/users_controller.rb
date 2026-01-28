@@ -4,13 +4,13 @@ class UsersController < ApplicationController
 
     # Apply filters if present
     if params[:location].present?
-      @users = @users.where(location: params[:location])
-      @filter_location = params[:location]
+      @users = @users.where(location: params[:location].strip)
+      @filter_location = params[:location].strip
     end
 
     if params[:company].present?
-      @users = @users.where(company: params[:company])
-      @filter_company = params[:company]
+      @users = @users.where(company: params[:company].strip)
+      @filter_company = params[:company].strip
     end
 
     # Sorting
