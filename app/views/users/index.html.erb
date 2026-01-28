@@ -7,7 +7,7 @@
   <meta name="description" content="<%= t('meta.users.index.summary') %>">
   <meta name="keywords" content="<%= t('meta.users.index.keywords') %>">
   <link rel="canonical" href="<%= users_url %>">
-  
+
   <!-- Open Graph / Facebook Meta Tags -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="<%= users_url %>">
@@ -16,7 +16,7 @@
   <meta property="og:image" content="<%= versioned_og_image_url %>">
   <meta property="og:site_name" content="<%= t('meta.site.name') %>">
   <meta property="og:locale" content="<%= I18n.locale.to_s.gsub('-', '_') %>">
-  
+
   <!-- Twitter Card Meta Tags -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="<%= users_url %>">
@@ -117,87 +117,105 @@
     </div>
   <% end %>
 
-  <!-- Community Members Grid -->
-  <div class="space-y-6">
-    <!-- Desktop: 3 columns -->
-    <div class="hidden lg:flex gap-6">
-      <% # Split users into 3 columns for desktop, maintaining left-to-right reading order %>
-      <% column1_users = [] %>
-      <% column2_users = [] %>
-      <% column3_users = [] %>
+  <!-- Community Members Grid with Infinite Scroll -->
+  <div data-controller="infinite-scroll">
+    <%# Split users into 3 columns for desktop, maintaining left-to-right reading order %>
+    <% column1_users = [] %>
+    <% column2_users = [] %>
+    <% column3_users = [] %>
+    <% @users.each_with_index do |user, index| %>
+      <% case index % 3 %>
+      <% when 0 then column1_users << user %>
+      <% when 1 then column2_users << user %>
+      <% when 2 then column3_users << user %>
+      <% end %>
+    <% end %>
 
-      <% @users.each_with_index do |user, index| %>
-        <% case index % 3 %>
-        <% when 0 %>
-          <% column1_users << user %>
-        <% when 1 %>
-          <% column2_users << user %>
-        <% when 2 %>
-          <% column3_users << user %>
+    <%# Desktop: 3 columns %>
+    <div id="users-grid-desktop" class="hidden lg:flex gap-6" data-infinite-scroll-target="entries">
+      <div id="users-column-lg-1" class="flex-1 basis-0 min-w-0 space-y-6">
+        <% column1_users.each do |user| %>
+          <%= render 'users/user_tile', user: user %>
         <% end %>
-      <% end %>
-
-      <% [column1_users, column2_users, column3_users].each do |column_users| %>
-        <div class="flex-1 basis-0 min-w-0 space-y-6">
-          <% column_users.each do |user| %>
-            <%= render 'users/user_tile', user: user %>
-          <% end %>
-        </div>
-      <% end %>
-    </div>
-    
-    <!-- Tablet: 2 columns -->
-    <div class="hidden md:flex lg:hidden gap-6">
-      <% column1_users = [] %>
-      <% column2_users = [] %>
-
-      <% @users.each_with_index do |user, index| %>
-        <% if index % 2 == 0 %>
-          <% column1_users << user %>
-        <% else %>
-          <% column2_users << user %>
+      </div>
+      <div id="users-column-lg-2" class="flex-1 basis-0 min-w-0 space-y-6">
+        <% column2_users.each do |user| %>
+          <%= render 'users/user_tile', user: user %>
         <% end %>
-      <% end %>
-
-      <% [column1_users, column2_users].each do |column_users| %>
-        <div class="flex-1 basis-0 min-w-0 space-y-6">
-          <% column_users.each do |user| %>
-            <%= render 'users/user_tile', user: user %>
-          <% end %>
-        </div>
-      <% end %>
+      </div>
+      <div id="users-column-lg-3" class="flex-1 basis-0 min-w-0 space-y-6">
+        <% column3_users.each do |user| %>
+          <%= render 'users/user_tile', user: user %>
+        <% end %>
+      </div>
     </div>
-    
-    <!-- Mobile: 1 column -->
-    <div class="md:hidden space-y-6">
+
+    <%# Tablet: 2 columns %>
+    <% column1_tablet = [] %>
+    <% column2_tablet = [] %>
+    <% @users.each_with_index do |user, index| %>
+      <% if index % 2 == 0 then column1_tablet << user else column2_tablet << user end %>
+    <% end %>
+
+    <div id="users-grid-tablet" class="hidden md:flex lg:hidden gap-6">
+      <div id="users-column-md-1" class="flex-1 basis-0 min-w-0 space-y-6">
+        <% column1_tablet.each do |user| %>
+          <%= render 'users/user_tile', user: user %>
+        <% end %>
+      </div>
+      <div id="users-column-md-2" class="flex-1 basis-0 min-w-0 space-y-6">
+        <% column2_tablet.each do |user| %>
+          <%= render 'users/user_tile', user: user %>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Mobile: 1 column %>
+    <div id="users-grid-mobile" class="md:hidden space-y-6">
       <% @users.each do |user| %>
         <%= render 'users/user_tile', user: user %>
       <% end %>
     </div>
+
+    <!-- Loading indicator -->
+    <div data-infinite-scroll-target="loading" class="hidden mt-8 flex justify-center">
+      <div class="flex items-center gap-2 text-gray-500">
+        <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span>Loading more...</span>
+      </div>
+    </div>
+
+    <!-- Pagination (hidden, used for infinite scroll) -->
+    <div id="infinite-scroll-pagination" data-infinite-scroll-target="pagination" class="hidden">
+      <% if @users.total_pages > 1 %>
+        <%= paginate @users %>
+      <% end %>
+    </div>
+
+    <!-- Sentinel for intersection observer -->
+    <% unless @users.last_page? %>
+      <div id="infinite-scroll-sentinel" data-infinite-scroll-sentinel class="h-1"></div>
+    <% end %>
   </div>
 
   <!-- Community CTA -->
   <% if user_signed_in? %>
-    <div class="mt-12 mb-8 text-center">
+    <div class="mt-8 mb-8 text-center">
       <% tweet_text = "Join us and share what you love about Ruby! https://whyruby.info" %>
-      <%= link_to t('users.index.invite_friends'), 
-          "https://x.com/intent/tweet?text=#{CGI.escape(tweet_text)}", 
+      <%= link_to t('users.index.invite_friends'),
+          "https://x.com/intent/tweet?text=#{CGI.escape(tweet_text)}",
           target: "_blank",
           rel: "noopener",
           class: "text-gray-400 hover:text-gray-600 transition-colors" %>
     </div>
   <% else %>
-    <div class="mt-12 mb-8 text-center">
-      <%= link_to t('users.index.join_community'), 
+    <div class="mt-8 mb-8 text-center">
+      <%= link_to t('users.index.join_community'),
           github_auth_with_return_path,
           class: "text-gray-400 hover:text-gray-600 transition-colors" %>
-    </div>
-  <% end %>
-
-  <!-- Pagination -->
-  <% if @users.total_pages > 1 %>
-    <div class="mt-12 flex justify-center">
-      <%= paginate @users %>
     </div>
   <% end %>
 </div>

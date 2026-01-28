@@ -1,0 +1,76 @@
+<%# Calculate start index based on page number and items per page %>
+<% per_page = @users.limit_value %>
+<% start_index = (@users.current_page - 1) * per_page %>
+
+<%# Split users into 3 columns for desktop %>
+<% column1_users = [] %>
+<% column2_users = [] %>
+<% column3_users = [] %>
+<% @users.each_with_index do |user, index| %>
+  <% case (start_index + index) % 3 %>
+  <% when 0 then column1_users << user %>
+  <% when 1 then column2_users << user %>
+  <% when 2 then column3_users << user %>
+  <% end %>
+<% end %>
+
+<%# Append to desktop columns %>
+<%= turbo_stream.append "users-column-lg-1" do %>
+  <% column1_users.each do |user| %>
+    <%= render 'users/user_tile', user: user %>
+  <% end %>
+<% end %>
+
+<%= turbo_stream.append "users-column-lg-2" do %>
+  <% column2_users.each do |user| %>
+    <%= render 'users/user_tile', user: user %>
+  <% end %>
+<% end %>
+
+<%= turbo_stream.append "users-column-lg-3" do %>
+  <% column3_users.each do |user| %>
+    <%= render 'users/user_tile', user: user %>
+  <% end %>
+<% end %>
+
+<%# Split users into 2 columns for tablet %>
+<% column1_tablet = [] %>
+<% column2_tablet = [] %>
+<% @users.each_with_index do |user, index| %>
+  <% if (start_index + index) % 2 == 0 then column1_tablet << user else column2_tablet << user end %>
+<% end %>
+
+<%= turbo_stream.append "users-column-md-1" do %>
+  <% column1_tablet.each do |user| %>
+    <%= render 'users/user_tile', user: user %>
+  <% end %>
+<% end %>
+
+<%= turbo_stream.append "users-column-md-2" do %>
+  <% column2_tablet.each do |user| %>
+    <%= render 'users/user_tile', user: user %>
+  <% end %>
+<% end %>
+
+<%# Append to mobile (single column) %>
+<%= turbo_stream.append "users-grid-mobile" do %>
+  <% @users.each do |user| %>
+    <%= render 'users/user_tile', user: user %>
+  <% end %>
+<% end %>
+
+<%# Update the pagination links %>
+<%= turbo_stream.replace "infinite-scroll-pagination" do %>
+  <div id="infinite-scroll-pagination" data-infinite-scroll-target="pagination" class="hidden">
+    <% if @users.total_pages > 1 %>
+      <%= paginate @users %>
+    <% end %>
+  </div>
+<% end %>
+
+<%# Update the sentinel - remove if on last page %>
+<%= turbo_stream.replace "infinite-scroll-sentinel" do %>
+  <% unless @users.last_page? %>
+    <div id="infinite-scroll-sentinel" data-infinite-scroll-sentinel class="h-1"></div>
+  <% end %>
+<% end %>
