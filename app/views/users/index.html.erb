@@ -125,7 +125,7 @@
       <% column1_users = [] %>
       <% column2_users = [] %>
       <% column3_users = [] %>
-      
+
       <% @users.each_with_index do |user, index| %>
         <% case index % 3 %>
         <% when 0 %>
@@ -136,9 +136,9 @@
           <% column3_users << user %>
         <% end %>
       <% end %>
-      
+
       <% [column1_users, column2_users, column3_users].each do |column_users| %>
-        <div class="flex-1 space-y-6">
+        <div class="flex-1 basis-0 min-w-0 space-y-6">
           <% column_users.each do |user| %>
             <%= render 'users/user_tile', user: user %>
           <% end %>
@@ -150,7 +150,7 @@
     <div class="hidden md:flex lg:hidden gap-6">
       <% column1_users = [] %>
       <% column2_users = [] %>
-      
+
       <% @users.each_with_index do |user, index| %>
         <% if index % 2 == 0 %>
           <% column1_users << user %>
@@ -158,9 +158,9 @@
           <% column2_users << user %>
         <% end %>
       <% end %>
-      
+
       <% [column1_users, column2_users].each do |column_users| %>
-        <div class="flex-1 space-y-6">
+        <div class="flex-1 basis-0 min-w-0 space-y-6">
           <% column_users.each do |user| %>
             <%= render 'users/user_tile', user: user %>
           <% end %>

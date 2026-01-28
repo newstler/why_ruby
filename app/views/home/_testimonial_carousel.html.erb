@@ -58,8 +58,8 @@
               </div>
 
               <%# User tile %>
-              <div class="flex-1 basis-0 flex items-end [&_img.rounded-full]:!h-32 [&_img.rounded-full]:!w-32 [&_span.rounded-full.bg-gray-300]:!h-32 [&_span.rounded-full.bg-gray-300]:!w-32 [&_span.rounded-full.bg-gray-300]:!text-5xl [&_.group]:w-full">
-                <%= render "users/user_tile", user: testimonial.user, frameless: true %>
+              <div class="flex-1 basis-0 flex items-end [&_.group]:w-full">
+                <%= render "users/user_tile", user: testimonial.user, frameless: true, avatar_size: "w-36 h-[130px]" %>
               </div>
             </div>
           </div>

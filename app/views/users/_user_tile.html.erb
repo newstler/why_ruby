@@ -3,18 +3,13 @@
   Locals:
     - user: the user to display
     - frameless: (optional) if true, removes card styling (shadow, background, padding)
+    - avatar_size: (optional) custom avatar size (e.g., "w-32 h-[115px]")
 %>
 
 <%= link_to user_path(user), class: "group block #{local_assigns[:frameless] ? '' : 'bg-white shadow rounded-lg p-6 hover:shadow-lg'} transition-shadow" do %>
   <div class="flex <%= local_assigns[:frameless] ? 'items-center' : 'items-start' %> gap-4">
     <!-- Avatar -->
-    <% if user.avatar_url.present? %>
-      <%= image_tag user.avatar_url, alt: user.display_name, class: "h-20 w-20 rounded-full flex-shrink-0 ring-4 ring-gray-200" %>
-    <% else %>
-      <span class="h-20 w-20 rounded-full bg-gray-300 flex items-center justify-center text-3xl font-bold flex-shrink-0 ring-4 ring-gray-200">
-        <%= user.display_name.first.upcase %>
-      </span>
-    <% end %>
+    <%= render "shared/gem_avatar", user: user, size: local_assigns[:avatar_size] || "w-24 h-[86px]", text_size: "text-3xl" %>
     
     <div class="flex flex-col justify-center flex-1 min-w-0">
       <!-- Name and Stars -->
