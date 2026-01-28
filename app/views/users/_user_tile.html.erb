@@ -9,9 +9,9 @@
   <div class="flex items-center gap-4">
     <!-- Avatar -->
     <% if user.avatar_url.present? %>
-      <%= image_tag user.avatar_url, alt: user.display_name, class: "h-20 w-20 rounded-full flex-shrink-0" %>
+      <%= image_tag user.avatar_url, alt: user.display_name, class: "h-20 w-20 rounded-full flex-shrink-0 ring-4 ring-gray-200" %>
     <% else %>
-      <span class="h-20 w-20 rounded-full bg-gray-300 flex items-center justify-center text-3xl font-bold flex-shrink-0">
+      <span class="h-20 w-20 rounded-full bg-gray-300 flex items-center justify-center text-3xl font-bold flex-shrink-0 ring-4 ring-gray-200">
         <%= user.display_name.first.upcase %>
       </span>
     <% end %>
@@ -30,25 +30,30 @@
           </span>
         <% end %>
       </div>
-      
-      <!-- Second line: Location and Company -->
+
+      <!-- Second line: Bio -->
+      <% if user.bio.present? %>
+        <p class="text-sm text-gray-600 mb-1 line-clamp-1"><%= user.bio %></p>
+      <% end %>
+
+      <!-- Third line: Company and Location -->
       <div class="flex items-center gap-3 text-xs text-gray-400 mb-1 -ml-0.5">
-        <% if user.location.present? %>
-          <span class="flex items-center">
-            <%= inline_svg_tag "location.svg", class: "w-3 h-3 mr-1" %>
-            <%= user.location %>
-          </span>
-        <% end %>
-        
         <% if user.company.present? %>
           <span class="flex items-center">
             <%= inline_svg_tag "building.svg", class: "w-3 h-3 mr-1" %>
             <%= user.company %>
           </span>
         <% end %>
+
+        <% if user.location.present? %>
+          <span class="flex items-center">
+            <%= inline_svg_tag "location.svg", class: "w-3 h-3 mr-1" %>
+            <%= user.location %>
+          </span>
+        <% end %>
       </div>
       
-      <!-- Third line: Stats -->
+      <!-- Fourth line: Stats -->
       <div class="flex items-center gap-3 text-xs">
         <% ruby_repos_count = user.ruby_repositories.size %>
         <% if ruby_repos_count > 0 %>

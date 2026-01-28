@@ -45,7 +45,7 @@
             <%# Quote + User layout %>
             <div class="flex flex-col md:flex-row gap-6 md:gap-8 md:items-end mt-8">
               <%# Quote block %>
-              <div class="flex-1 relative">
+              <div class="flex-1 basis-0 relative">
                 <span class="absolute -top-8 -left-10 text-7xl text-red-600 font-serif leading-none select-none">&ldquo;</span>
                 <blockquote class="relative bg-white border-2 border-red-200 rounded-lg p-6 md:p-8">
                   <p class="text-gray-600 text-base md:text-lg italic leading-relaxed">
@@ -58,7 +58,7 @@
               </div>
 
               <%# User tile %>
-              <div class="flex-shrink-0 w-full max-w-sm flex items-end [&_img]:ring-4 [&_img]:ring-gray-200 [&_span.rounded-full]:ring-4 [&_span.rounded-full]:ring-gray-200">
+              <div class="flex-1 basis-0 flex items-end [&_img.rounded-full]:!h-32 [&_img.rounded-full]:!w-32 [&_span.rounded-full.bg-gray-300]:!h-32 [&_span.rounded-full.bg-gray-300]:!w-32 [&_span.rounded-full.bg-gray-300]:!text-5xl [&_.group]:w-full">
                 <%= render "users/user_tile", user: testimonial.user, frameless: true %>
               </div>
             </div>
