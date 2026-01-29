@@ -35,6 +35,7 @@ class PostsController < ApplicationController
 
   def new
     @post = current_user.posts.build
+    @post.category_id = params[:category_id] if params[:category_id].present?
   end
 
   def create

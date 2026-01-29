@@ -131,7 +131,11 @@
                 class: "#{community_menu_active? ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
 
             <% if user_signed_in? %>
-              <% new_post_params = (@category&.is_success_story? || (controller_name == 'posts' && @post&.success_story?)) ? { type: 'success_story' } : {} %>
+              <%
+                is_success_story = @category&.is_success_story? || (controller_name == 'posts' && @post&.success_story?)
+                new_post_params = is_success_story ? { type: 'success_story' } : {}
+                new_post_params[:category_id] = @category.id if @category.present? && !is_success_story
+              %>
               <%= link_to new_post_path(new_post_params), class: "p-2 text-gray-400 hover:text-gray-500 rounded-full hover:bg-gray-100" do %>
                 <%= inline_svg_tag "plus.svg", class: "h-6 w-6" %>
               <% end %>
@@ -207,7 +211,11 @@
             <% if user_signed_in? %>
               <!-- New post button -->
               <div class="mt-3 px-2">
-                <% new_post_params = (@category&.is_success_story? || (controller_name == 'posts' && @post&.success_story?)) ? { type: 'success_story' } : {} %>
+                <%
+                  is_success_story = @category&.is_success_story? || (controller_name == 'posts' && @post&.success_story?)
+                  new_post_params = is_success_story ? { type: 'success_story' } : {}
+                  new_post_params[:category_id] = @category.id if @category.present? && !is_success_story
+                %>
                 <%= link_to new_post_path(new_post_params), class: "flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-100" do %>
                   <%= inline_svg_tag "plus.svg", class: "h-5 w-5 mr-2" %>
                   New Post

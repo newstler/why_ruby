@@ -1,0 +1,35 @@
+<%#
+  Add post tile partial - displays a card-like button to add new content
+  Locals:
+    - success_story: boolean, whether this is for success stories (default: false)
+    - category: Category object, the category to preselect (optional)
+%>
+
+<% success_story = local_assigns.fetch(:success_story, false) %>
+<% category = local_assigns[:category] %>
+<% new_post_params = success_story ? { type: 'success_story' } : {} %>
+<% new_post_params[:category_id] = category.id if category.present? && !success_story %>
+<% cta_title = success_story ? "Share Your Story" : "Share Your Love" %>
+<% cta_subtitle = success_story ? "Tell the world how Ruby powers your success" : "Help others discover why Ruby is amazing" %>
+
+<% if user_signed_in? %>
+  <%= link_to new_post_path(new_post_params), class: "group block bg-white/50 rounded-lg p-8 hover:bg-white hover:shadow-2xl hover:scale-[1.02] transform transition-all duration-300 ease-out cursor-pointer border-2 border-dashed border-gray-200 hover:border-red-400" do %>
+    <div class="flex flex-col items-center justify-center text-center aspect-square">
+      <div class="w-20 h-20 rounded-full bg-gray-100 group-hover:bg-red-50 flex items-center justify-center mb-6 transition-colors">
+        <%= inline_svg_tag "plus.svg", class: "h-10 w-10 text-gray-300 group-hover:text-red-500 transition-colors" %>
+      </div>
+      <h3 class="text-xl font-bold text-gray-400 group-hover:text-gray-700 transition-colors mb-2"><%= cta_title %></h3>
+      <p class="text-gray-400 group-hover:text-gray-500 transition-colors text-sm leading-relaxed"><%= cta_subtitle %></p>
+    </div>
+  <% end %>
+<% else %>
+  <%= link_to github_auth_with_return_path(return_to: new_post_path(new_post_params)), class: "group block bg-white/50 rounded-lg p-8 hover:bg-white hover:shadow-2xl hover:scale-[1.02] transform transition-all duration-300 ease-out cursor-pointer border-2 border-dashed border-gray-200 hover:border-red-400" do %>
+    <div class="flex flex-col items-center justify-center text-center aspect-square">
+      <div class="w-20 h-20 rounded-full bg-gray-100 group-hover:bg-red-50 flex items-center justify-center mb-6 transition-colors">
+        <%= inline_svg_tag "plus.svg", class: "h-10 w-10 text-gray-300 group-hover:text-red-500 transition-colors" %>
+      </div>
+      <h3 class="text-xl font-bold text-gray-400 group-hover:text-gray-700 transition-colors mb-2"><%= cta_title %></h3>
+      <p class="text-gray-400 group-hover:text-gray-500 transition-colors text-sm leading-relaxed"><%= cta_subtitle %></p>
+    </div>
+  <% end %>
+<% end %>
