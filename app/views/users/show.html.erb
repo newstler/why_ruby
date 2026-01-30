@@ -37,8 +37,8 @@
       <div class="lg:flex-1 min-w-0">
     <!-- Tab Navigation with User Info -->
     <div>
-      <!-- Desktop layout -->
-      <div class="hidden lg:block">
+      <!-- Desktop/Tablet layout -->
+      <div class="hidden md:block">
         <div class="flex items-center gap-6">
           <%= render "shared/gem_avatar", user: @user, size: "w-36 h-[130px]", text_size: "text-5xl" %>
           
@@ -96,10 +96,10 @@
         </div>
       </div>
 
-      <!-- Mobile/Tablet layout: stacked -->
-      <div class="lg:hidden">
+      <!-- Mobile layout: stacked -->
+      <div class="md:hidden">
         <!-- User info full width on top -->
-        <div class="mb-6">
+        <div class="mb-3 md:mb-6">
           <div class="flex items-center gap-4 mb-4">
             <%= render "shared/gem_avatar", user: @user, size: "w-28 h-[100px]", text_size: "text-4xl" %>
             
@@ -165,8 +165,8 @@
     <% if current_user == @user %>
       <%= render "testimonials/section", testimonial: testimonial, user: @user %>
     <% elsif testimonial&.published? %>
-      <div class="mt-6 mb-8">
-        <h2 class="text-xl font-bold text-gray-300 mb-4">loves Ruby because of...</h2>
+      <div class="md:mt-6 lg:mt-6 mb-10 md:mb-12 lg:mb-8">
+        <h2 class="text-sm md:text-xl font-bold text-gray-300 mb-8 md:mb-8 lg:mb-4">loves Ruby because of...</h2>
         <%= render "testimonials/testimonial", testimonial: testimonial %>
       </div>
     <% end %>

@@ -1,5 +1,5 @@
 <%# Testimonial section for profile owner - renders display or form based on state %>
-<div id="testimonial_section" class="mt-6 mb-8" data-controller="testimonial-edit">
+<div id="testimonial_section" class="md:mt-6 lg:mt-6 mb-10 md:mb-12 lg:mb-8" data-controller="testimonial-edit">
   <% if testimonial&.persisted? %>
     <%= turbo_stream_from "testimonial_#{testimonial.id}" %>
   <% end %>
@@ -8,7 +8,7 @@
 
   <%# Display: shown when testimonial is published %>
   <div data-testimonial-edit-target="display" class="<%= 'hidden' unless show_display %>">
-    <h2 class="text-xl font-bold text-gray-300 mb-4">loves Ruby because of...</h2>
+    <h2 class="text-sm md:text-xl font-bold text-gray-300 mb-8 md:mb-8 lg:mb-4">loves Ruby because of...</h2>
     <% if show_display %>
       <%= render "testimonials/testimonial", testimonial: testimonial, editable: true %>
     <% end %>
