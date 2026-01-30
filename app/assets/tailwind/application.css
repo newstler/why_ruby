@@ -53,6 +53,18 @@
 }
 
 @layer utilities {
+  /* Sticky header that works on tablets but not horizontal phones */
+  /* Uses min-height to distinguish: horizontal phones ~375-430px tall, tablets 600px+ */
+  .sticky-tablet {
+    position: static;
+  }
+
+  @media (min-width: 768px) and (min-height: 600px) {
+    .sticky-tablet {
+      position: sticky;
+    }
+  }
+
   @keyframes highlight-blink {
     0% { 
       background-color: theme(colors.red.200);

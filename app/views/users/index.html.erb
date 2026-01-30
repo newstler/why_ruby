@@ -28,8 +28,8 @@
 <% end %>
 
 <div class="space-y-8">
-  <!-- Sticky Header (positioned below main nav) -->
-  <div class="sticky top-24 z-10 -mx-4 px-4 md:-mx-6 md:px-6 lg:-mx-8 lg:px-8 pt-8 -mt-8 pb-8 bg-gradient-to-b from-gray-50 from-85% to-transparent">
+  <!-- Sticky Header (positioned below main nav) - sticky on tablets (min-width: 768px AND min-height: 600px) but not horizontal phones -->
+  <div class="sticky-tablet top-24 z-10 -mx-4 px-4 md:-mx-6 md:px-6 lg:-mx-8 lg:px-8 pt-8 -mt-8 pb-8 md:bg-gradient-to-b md:from-gray-50 md:from-85% md:to-transparent">
     <h1 class="text-4xl font-black text-gray-900 mb-4"><%= t('users.index.title') %></h1>
     <div class="md:flex md:items-center md:justify-between w-full">
     <p class="text-left text-lg text-gray-600 md:flex-1 min-w-0">

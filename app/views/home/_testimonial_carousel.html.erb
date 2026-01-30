@@ -1,82 +1,103 @@
 <%# Testimonial carousel for home page %>
 <% if testimonials.any? %>
-  <div class="pt-8 md:pt-14 pb-2 md:pb-4" data-controller="testimonial-carousel">
-    <div class="grid grid-cols-[auto_1fr_auto] items-center gap-4 md:gap-8">
+  <div class="pt-2 md:pt-14 pb-2 md:pb-4" data-controller="testimonial-carousel">
+    <div class="md:grid md:grid-cols-[auto_1fr_auto] md:items-center md:gap-8" data-testimonial-carousel-target="swipeArea">
 
-      <%# Left arrow %>
+      <%# Left arrow - hidden on mobile, shown on tablet+ %>
       <% if testimonials.size > 1 %>
         <button type="button"
-                class="self-center text-gray-300 hover:text-red-600 transition-colors cursor-pointer p-2"
+                class="hidden md:block self-center text-gray-300 hover:text-red-600 transition-colors cursor-pointer p-2"
                 data-action="testimonial-carousel#previous">
-          <svg class="w-10 h-10 md:w-12 md:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"></path>
           </svg>
         </button>
       <% else %>
-        <div></div>
+        <div class="hidden md:block"></div>
       <% end %>
 
       <%# Middle column: slides %>
       <div class="max-w-4xl mx-auto w-full"
            data-action="mouseenter->testimonial-carousel#pause mouseleave->testimonial-carousel#resume touchstart->testimonial-carousel#pause touchend->testimonial-carousel#resume">
-        <% testimonials.each_with_index do |testimonial, index| %>
-          <div class="<%= index == 0 ? '' : 'hidden' %>"
-               data-testimonial-carousel-target="slide">
+        <%# Slides container - this gets positioned during animation %>
+        <div data-testimonial-carousel-target="slidesContainer">
+          <% testimonials.each_with_index do |testimonial, index| %>
+            <div class="<%= index == 0 ? '' : 'hidden' %>"
+                 data-testimonial-carousel-target="slide">
 
-            <%# Heading area %>
-            <% if testimonial.heading.present? %>
-              <h2 class="text-5xl md:text-7xl font-serif italic text-red-600 mb-6">
-                <%= testimonial.heading %>
-              </h2>
-            <% end %>
+              <%# Heading area %>
+              <% if testimonial.heading.present? %>
+                <h2 class="text-4xl md:text-7xl font-serif italic text-red-600 mb-4 md:mb-6">
+                  <%= testimonial.heading %>
+                </h2>
+              <% end %>
 
-            <% if testimonial.subheading.present? %>
-              <h3 class="text-2xl md:text-3xl font-bold text-gray-900 leading-tight mb-2">
-                <%= raw testimonial.subheading.split('.').map { |s| s.strip }.reject(&:blank?).map { |s| ERB::Util.html_escape(s) + "." }.join("<br>") %>
-              </h3>
-            <% end %>
+              <% if testimonial.subheading.present? %>
+                <h3 class="text-xl md:text-3xl font-bold text-gray-900 leading-tight mb-2">
+                  <%= raw testimonial.subheading.split('.').map { |s| s.strip }.reject(&:blank?).map { |s| ERB::Util.html_escape(s) + "." }.join("<br>") %>
+                </h3>
+              <% end %>
 
-            <% if testimonial.body_text.present? %>
-              <p class="text-gray-500 text-base md:text-lg mt-6 mb-12 max-w-3xl leading-relaxed">
-                <%= testimonial.body_text %>
-              </p>
-            <% end %>
+              <% if testimonial.body_text.present? %>
+                <p class="text-gray-500 text-sm md:text-lg mt-4 md:mt-6 mb-8 md:mb-12 max-w-3xl leading-relaxed">
+                  <%= testimonial.body_text %>
+                </p>
+              <% end %>
 
-            <%# Quote + User layout %>
-            <div class="flex flex-col md:flex-row gap-6 md:gap-8 md:items-end mt-8">
-              <%# Quote block %>
-              <div class="flex-1 basis-0 relative">
-                <span class="absolute -top-8 -left-10 text-7xl text-red-600 font-serif leading-none select-none">&ldquo;</span>
-                <blockquote class="relative bg-white border-2 border-red-200 rounded-lg p-6 md:p-8">
-                  <p class="text-gray-600 text-base md:text-lg italic leading-relaxed">
-                    <%= testimonial.quote %>
-                  </p>
-                  <%# Speech bubble tail pointing right toward user %>
-                  <span class="hidden md:block absolute -right-4 bottom-6 w-0 h-0 border-t-[12px] border-t-transparent border-b-[12px] border-b-transparent border-l-[16px] border-l-red-200"></span>
-                  <span class="hidden md:block absolute -right-[14px] bottom-[26px] w-0 h-0 border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent border-l-[14px] border-l-white"></span>
-                </blockquote>
-              </div>
+              <%# Quote + User layout - stacks on mobile/tablet (below lg), side-by-side on desktop %>
+              <div class="flex flex-col lg:flex-row gap-4 md:gap-8 lg:items-end">
+                <%# Quote block %>
+                <div class="flex-1 basis-0 relative">
+                  <span class="absolute -top-6 md:-top-8 -left-2 md:-left-4 lg:-left-10 text-5xl md:text-7xl text-red-600 font-serif leading-none select-none">&ldquo;</span>
+                  <blockquote class="relative bg-white border-2 border-red-200 rounded-lg p-4 md:p-8 pt-6 md:pt-8">
+                    <p class="text-gray-600 text-sm md:text-lg italic leading-relaxed">
+                      <%= testimonial.quote %>
+                    </p>
+                    <%# Speech bubble tail - pointing down on mobile/tablet, pointing right on desktop %>
+                    <%# Mobile/tablet: pointing down from bottom-left (more to right on tablet to align with avatar) %>
+                    <span class="lg:hidden absolute -bottom-4 left-6 md:left-16 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[16px] border-t-red-200"></span>
+                    <span class="lg:hidden absolute -bottom-[14px] left-[26px] md:left-[66px] w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[14px] border-t-white"></span>
+                    <%# Desktop: pointing right toward user %>
+                    <span class="hidden lg:block absolute -right-4 bottom-6 w-0 h-0 border-t-[12px] border-t-transparent border-b-[12px] border-b-transparent border-l-[16px] border-l-red-200"></span>
+                    <span class="hidden lg:block absolute -right-[14px] bottom-[26px] w-0 h-0 border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent border-l-[14px] border-l-white"></span>
+                  </blockquote>
+                </div>
 
-              <%# User tile %>
-              <div class="flex-1 basis-0 flex items-end [&_.group]:w-full">
-                <%= render "users/user_tile", user: testimonial.user, frameless: true, avatar_size: "w-36 h-[130px]" %>
+                <%# User tile - extra top margin on mobile/tablet to account for speech bubble tail %>
+                <div class="lg:flex-1 lg:basis-0 flex items-end mt-2 lg:mt-0">
+                  <%= render "users/user_tile", user: testimonial.user, frameless: true, avatar_size: "w-20 h-[72px] md:w-36 md:h-[130px]", compact: true %>
+                </div>
               </div>
             </div>
+          <% end %>
+        </div>
+
+        <%# Mobile navigation dots - only shown on mobile, hidden on tablet+ where arrows are shown %>
+        <% if testimonials.size > 1 %>
+          <div class="flex md:hidden justify-center items-center gap-2 mt-6">
+            <% testimonials.each_with_index do |_, dot_index| %>
+              <button type="button"
+                      class="w-2 h-2 rounded-full transition-colors cursor-pointer"
+                      data-testimonial-carousel-target="dot"
+                      data-action="testimonial-carousel#goToSlide"
+                      data-slide-index="<%= dot_index %>">
+              </button>
+            <% end %>
           </div>
         <% end %>
       </div>
 
-      <%# Right arrow %>
+      <%# Right arrow - hidden on mobile, shown on tablet+ %>
       <% if testimonials.size > 1 %>
         <button type="button"
-                class="self-center text-gray-300 hover:text-red-600 transition-colors cursor-pointer p-2"
+                class="hidden md:block self-center text-gray-300 hover:text-red-600 transition-colors cursor-pointer p-2"
                 data-action="testimonial-carousel#next">
-          <svg class="w-10 h-10 md:w-12 md:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7"></path>
           </svg>
         </button>
       <% else %>
-        <div></div>
+        <div class="hidden md:block"></div>
       <% end %>
 
     </div>

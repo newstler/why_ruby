@@ -160,6 +160,15 @@ module ApplicationHelper
     end
   end
 
+  def should_show_mobile_cta?
+    # Show CTA when nav is collapsed (below lg) if user is not signed in
+    # or if their testimonial is not published
+    return true unless user_signed_in?
+
+    # Check if user has a published testimonial
+    !current_user.testimonial&.published?
+  end
+
   # Generate the full formatted page title that matches the <title> tag format
   def full_page_title(page_title = nil)
     if page_title.present?

@@ -172,7 +172,12 @@
     <% end %>
 
     <!-- Tab Navigation -->
+    <% has_projects = @ruby_repos.any? %>
+    <% has_posts = @user.published_posts_count > 0 %>
+    <% has_comments = @user.published_comments_count > 0 %>
+    <% if has_projects || has_posts || has_comments %>
     <nav class="flex flex-wrap gap-x-6 lg:gap-x-8 gap-y-2 mt-6" aria-label="Tabs">
+      <% if has_projects %>
       <a href="#"
          data-tabs-target="tab"
          data-tabs-name="projects"
@@ -185,7 +190,9 @@
           <%= @ruby_repos.size %>
         </span>
       </a>
+      <% end %>
 
+      <% if has_posts %>
       <a href="#"
          data-tabs-target="tab"
          data-tabs-name="posts"
@@ -198,7 +205,9 @@
           <%= @user.published_posts_count %>
         </span>
       </a>
+      <% end %>
 
+      <% if has_comments %>
       <a href="#"
          data-tabs-target="tab"
          data-tabs-name="comments"
@@ -211,11 +220,15 @@
           <%= @user.published_comments_count %>
         </span>
       </a>
+      <% end %>
     </nav>
+    <% end %>
 
     <!-- Tab Panels -->
+    <% if has_projects || has_posts || has_comments %>
     <div class="mt-8">
       <!-- Projects Tab Panel -->
+      <% if has_projects %>
       <div data-tabs-target="panel" data-tabs-name="projects" role="tabpanel" class="hidden">
         <% if @ruby_repos.any? %>
           <div class="space-y-4">
@@ -294,8 +307,10 @@
           </div>
         <% end %>
       </div>
+      <% end %>
 
       <!-- Posts Tab Panel -->
+      <% if has_posts %>
       <div data-tabs-target="panel" data-tabs-name="posts" role="tabpanel" class="hidden">
         <% if @posts.any? %>
           <div class="space-y-4">
@@ -365,8 +380,10 @@
           </div>
         <% end %>
       </div>
+      <% end %>
 
       <!-- Comments Tab Panel -->
+      <% if has_comments %>
       <div data-tabs-target="panel" data-tabs-name="comments" role="tabpanel" class="hidden">
         <% if @comments && @comments.any? %>
           <div class="space-y-4">
@@ -436,7 +453,9 @@
           </div>
         <% end %>
       </div>
+      <% end %>
     </div>
+    <% end %>
   </div>
 </div>
 </div>

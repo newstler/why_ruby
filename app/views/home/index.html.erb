@@ -4,6 +4,13 @@
 <div>
   <%# Testimonial Carousel %>
   <%= render "home/testimonial_carousel", testimonials: @testimonials %>
+
+  <%# Mobile CTA - shown below lg breakpoint when user has no published testimonial %>
+  <% if should_show_mobile_cta? %>
+    <div class="lg:hidden flex justify-center mt-10 mb-2">
+      <%= render "shared/github_signin_button" %>
+    </div>
+  <% end %>
 </div>
 
 <!-- Success Stories Floating Logos (Full Width) -->
