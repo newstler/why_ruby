@@ -36,6 +36,12 @@ namespace :db do
 
       id_mappings[table] = {}
 
+      # Skip tables that don't exist in this database
+      unless ActiveRecord::Base.connection.table_exists?(table)
+        puts "  #{table}: SKIPPED (table doesn't exist)"
+        next
+      end
+
       ActiveRecord::Base.connection.execute("SELECT id FROM #{table}").each do |row|
         old_id = row["id"]
         new_id = generate_uuid7
@@ -78,10 +84,12 @@ namespace :db do
           post_id: id_mappings[:posts]
         })
 
-        # Testimonials depend on users
-        update_primary_keys_and_fks(:testimonials, id_mappings[:testimonials], {
-          user_id: id_mappings[:users]
-        })
+        # Testimonials depend on users (skip if table doesn't exist)
+        if ActiveRecord::Base.connection.table_exists?(:testimonials) && id_mappings[:testimonials]&.any?
+          update_primary_keys_and_fks(:testimonials, id_mappings[:testimonials], {
+            user_id: id_mappings[:users]
+          })
+        end
 
         # ActiveStorage attachments depend on blobs and polymorphic record
         update_active_storage_attachments(id_mappings)

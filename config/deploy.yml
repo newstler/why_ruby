@@ -7,10 +7,10 @@ image: why_ruby
 # Deploy to these servers.
 servers:
   web:
-    - new.whyruby.info
+    - whyruby.info
   # job:
   #   hosts:
-  #     - new.whyruby.info
+  #     - whyruby.info
   #   cmd: bin/jobs
 
 # Enable SSL auto certification via Let's Encrypt and allow for multiple apps on a single web server.
@@ -19,7 +19,7 @@ servers:
 # Note: If using Cloudflare, set encryption mode in SSL/TLS setting to "Full" to enable CF-to-app encryption.
 proxy:
   ssl: true
-  host: new.whyruby.info
+  host: whyruby.info
 
 # Use local registry for image storage.
 registry:
