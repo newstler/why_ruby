@@ -1,7 +1,7 @@
 published:
-  id: "01TESTTESTIMONIAL001"
-  user_id: "01TESTTESTIMONIAL101"
-  quote: "I love Ruby because it makes coding joyful."
+  id: "01961a2a-c0de-7000-8000-000000000001"
+  user_id: "01961a2a-c0de-7000-8000-000000000101"
+  quote: "I love Ruby because it makes coding joyful. Ruby has transformed my development experience with its elegant syntax and expressive power that makes every day a pleasure."
   heading: "Joy"
   subheading: "Code with happiness"
   body_text: "Ruby brings joy to developers with its elegant syntax and developer-friendly design."
@@ -11,9 +11,9 @@ published:
   position: 1
 
 unpublished:
-  id: "01TESTTESTIMONIAL002"
-  user_id: "01TESTTESTIMONIAL102"
-  quote: "Ruby is okay I guess."
+  id: "01961a2a-c0de-7000-8000-000000000002"
+  user_id: "01961a2a-c0de-7000-8000-000000000102"
+  quote: "Ruby is okay I guess. It has some nice features that make development somewhat enjoyable, though I'm still learning to appreciate all of its capabilities and the joy it brings."
   heading: ~
   subheading: ~
   body_text: ~

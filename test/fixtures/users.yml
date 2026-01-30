@@ -1,5 +1,5 @@
 user_with_testimonial:
-  id: "01TESTTESTIMONIAL101"
+  id: "01961a2a-c0de-7000-8000-000000000101"
   username: "rubyist1"
   email: "rubyist1@example.com"
   github_id: "900001"
@@ -10,7 +10,7 @@ user_with_testimonial:
   published_comments_count: 0
 
 user_without_testimonial:
-  id: "01TESTTESTIMONIAL102"
+  id: "01961a2a-c0de-7000-8000-000000000102"
   username: "rubyist2"
   email: "rubyist2@example.com"
   github_id: "900002"
@@ -21,7 +21,7 @@ user_without_testimonial:
   published_comments_count: 0
 
 admin_user:
-  id: "01TESTTESTIMONIAL103"
+  id: "01961a2a-c0de-7000-8000-000000000103"
   username: "admin_test"
   email: "admin@example.com"
   github_id: "900003"
@@ -32,7 +32,7 @@ admin_user:
   published_comments_count: 15
 
 user_no_testimonial:
-  id: "01TESTTESTIMONIAL104"
+  id: "01961a2a-c0de-7000-8000-000000000104"
   username: "norubylove"
   email: "norubylove@example.com"
   github_id: "900004"

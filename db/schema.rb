@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_01_27_231338) do
+ActiveRecord::Schema[8.2].define(version: 2026_01_30_204723) do
   create_table "_litestream_lock", id: false, force: :cascade do |t|
     t.integer "id"
   end
@@ -19,7 +19,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_01_27_231338) do
     t.integer "seq"
   end
 
-  create_table "active_storage_attachments", id: :string, force: :cascade do |t|
+  create_table "active_storage_attachments", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
     t.string "blob_id", null: false
     t.datetime "created_at", null: false
     t.string "name", null: false
@@ -29,7 +29,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_01_27_231338) do
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
 
-  create_table "active_storage_blobs", id: :string, force: :cascade do |t|
+  create_table "active_storage_blobs", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
     t.bigint "byte_size", null: false
     t.string "checksum"
     t.string "content_type"
@@ -41,13 +41,13 @@ ActiveRecord::Schema[8.2].define(version: 2026_01_27_231338) do
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
-  create_table "active_storage_variant_records", id: :string, force: :cascade do |t|
+  create_table "active_storage_variant_records", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
     t.string "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "admins", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
+  create_table "admins", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -59,7 +59,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_01_27_231338) do
     t.index ["reset_password_token"], name: "index_admins_on_reset_password_token", unique: true
   end
 
-  create_table "categories", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
+  create_table "categories", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
     t.boolean "is_success_story", default: false, null: false
@@ -73,7 +73,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_01_27_231338) do
     t.index ["slug"], name: "index_categories_on_slug"
   end
 
-  create_table "comments", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
+  create_table "comments", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
     t.text "body", null: false
     t.datetime "created_at", null: false
     t.string "post_id", null: false
@@ -97,7 +97,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_01_27_231338) do
     t.index ["sluggable_type", "sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_type_and_sluggable_id"
   end
 
-  create_table "posts", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
+  create_table "posts", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
     t.string "category_id", null: false
     t.text "content"
     t.datetime "created_at", null: false
@@ -133,7 +133,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_01_27_231338) do
     t.index ["tag_id"], name: "index_posts_tags_on_tag_id"
   end
 
-  create_table "reports", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
+  create_table "reports", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
     t.string "post_id", null: false
@@ -145,7 +145,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_01_27_231338) do
     t.index ["user_id"], name: "index_reports_on_user_id"
   end
 
-  create_table "tags", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
+  create_table "tags", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name", null: false
     t.string "slug"
@@ -154,7 +154,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_01_27_231338) do
     t.index ["slug"], name: "index_tags_on_slug"
   end
 
-  create_table "testimonials", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
+  create_table "testimonials", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
     t.integer "ai_attempts", default: 0
     t.text "ai_feedback"
     t.text "body_text"
@@ -174,7 +174,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_01_27_231338) do
     t.check_constraint "length(quote) >= 140 AND length(quote) <= 320", name: "quote_length_check"
   end
 
-  create_table "users", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
+  create_table "users", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
     t.string "avatar_url"
     t.text "bio"
     t.string "company"
