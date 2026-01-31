@@ -1,6 +1,22 @@
 <%# Set page title %>
 <% content_for(:title) { user_meta_title(@user) } %>
 
+<%# Override header logo for community pages %>
+<% content_for :header_logo do %>
+  <%= link_to users_path, class: "text-4xl font-black text-red-600 whitespace-nowrap inline-flex items-center" do %>
+    Ruby <%= image_tag "heart.webp", class: "h-12 w-12 mx-1 inline-block", alt: "" %> Community
+  <% end %>
+<% end %>
+
+<%# Override nav menu for community pages %>
+<% content_for :header_nav do %>
+  <%= link_to "Why Ruby?", "https://whyruby.info", class: "text-gray-600 hover:bg-gray-100 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
+<% end %>
+
+<% content_for :header_nav_mobile do %>
+  <%= link_to "Why Ruby?", "https://whyruby.info", class: "text-gray-600 hover:bg-gray-100 block px-3 py-2 rounded-md text-base font-medium" %>
+<% end %>
+
 <%# Override meta tags for this user profile %>
 <% content_for :head do %>
   <!-- SEO Meta Tags -->

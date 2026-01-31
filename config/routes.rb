@@ -1,6 +1,10 @@
 Rails.application.routes.draw do
   devise_for :users, controllers: { omniauth_callbacks: "users/omniauth_callbacks" }
 
+  constraints host: "rubycommunity.org" do
+    root "users#index", as: :rubycommunity_root
+  end
+
   # Add sign out route for OmniAuth-only authentication
   devise_scope :user do
     delete "sign_out", to: "users/sessions#destroy", as: :destroy_user_session

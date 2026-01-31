@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
   def index
     @users = User.includes(:posts, :comments)
+    @total_users_count = User.count
 
     # Apply filters if present
     if params[:location].present?
