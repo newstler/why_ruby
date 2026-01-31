@@ -274,7 +274,8 @@ Devise.setup do |config|
   config.omniauth :github,
     Rails.application.credentials.dig(:github, :client_id),
     Rails.application.credentials.dig(:github, :client_secret),
-    scope: "user:email,read:user"
+    scope: "user:email,read:user",
+    callback_url: Rails.env.production? ? "https://whyruby.info/users/auth/github/callback" : nil
 
   # Fix for CSRF issues with OmniAuth
   config.omniauth_path_prefix = "/users/auth"
