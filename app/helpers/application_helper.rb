@@ -229,12 +229,17 @@ module ApplicationHelper
     return path if request.host == host
 
     if user_signed_in?
-      # Sync session to target domain
-      token = current_user.generate_cross_domain_token!
+      # Sync session to target domain (memoize token for this request)
+      token = cross_domain_token_for_request
       "https://#{host}/auth/receive?token=#{token}&return_to=#{path}"
     else
       "https://#{host}#{path}"
     end
+  end
+
+  # Memoize token per request so multiple links use the same token
+  def cross_domain_token_for_request
+    @cross_domain_token ||= current_user.generate_cross_domain_token!
   end
 
   # Helper for community index URL (works in dev and prod)
