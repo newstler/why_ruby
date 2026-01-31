@@ -134,7 +134,7 @@
                 <% end %>
               <% end %>
 
-              <%= link_to "Community", "https://rubycommunity.org",
+              <%= link_to "Community", community_index_url,
                   class: "#{community_menu_active? ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
 
               <% if user_signed_in? %>
@@ -176,7 +176,7 @@
                     </div>
                   <% end %>
                   <div class="py-1">
-                    <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none cursor-pointer" %>
+                    <%= button_to "Sign out", destroy_user_session_path, method: :delete, data: { turbo: false }, class: "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none cursor-pointer" %>
                   </div>
                 </div>
               </div>
@@ -215,7 +215,7 @@
                         class: "#{category_menu_active?(category) ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} block px-3 py-2 rounded-md text-base font-medium" %>
                   <% end %>
                 <% end %>
-                <%= link_to "Community", "https://rubycommunity.org",
+                <%= link_to "Community", community_index_url,
                     class: "#{community_menu_active? ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} block px-3 py-2 rounded-md text-base font-medium" %>
               <% end %>
             </div>
@@ -253,7 +253,7 @@
                   <% if current_user.admin? %>
                     <%= link_to "Admin Panel", "/avo", class: "block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-100" %>
                   <% end %>
-                  <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-100" %>
+                  <%= button_to "Sign out", destroy_user_session_path, method: :delete, data: { turbo: false }, class: "block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-100" %>
                 </div>
               </div>
             <% else %>

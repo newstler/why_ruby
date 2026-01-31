@@ -124,4 +124,26 @@ class User < ApplicationRecord
       end
     end
   end
+
+  # Cross-domain session sync methods
+  def generate_cross_domain_token!
+    token = SecureRandom.urlsafe_base64(32)
+    update_columns(
+      cross_domain_token: token,
+      cross_domain_token_expires_at: 5.minutes.from_now
+    )
+    token
+  end
+
+  def self.authenticate_cross_domain_token(token)
+    return nil if token.blank?
+
+    user = find_by(cross_domain_token: token)
+    return nil unless user
+    return nil if user.cross_domain_token_expires_at < Time.current
+
+    # Invalidate token (one-time use)
+    user.update_columns(cross_domain_token: nil, cross_domain_token_expires_at: nil)
+    user
+  end
 end

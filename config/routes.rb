@@ -1,8 +1,14 @@
 Rails.application.routes.draw do
   devise_for :users, controllers: { omniauth_callbacks: "users/omniauth_callbacks" }
 
-  constraints host: "rubycommunity.org" do
+  # Cross-domain auth routes (must be early)
+  get "auth/receive", to: "auth#receive"
+  get "auth/sign_out_receive", to: "auth#sign_out_receive"
+
+  # Community domain routes - users at root level (/:username)
+  constraints host: Rails.application.config.x.domains.community do
     root "users#index", as: :rubycommunity_root
+    get ":id", to: "users#show", as: :rubycommunity_user, constraints: { id: /[^\/]+/ }
   end
 
   # Add sign out route for OmniAuth-only authentication

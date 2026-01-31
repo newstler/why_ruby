@@ -217,4 +217,50 @@ module ApplicationHelper
       post_path("uncategorized", post)
     end
   end
+
+  # Cross-domain URL helper with session sync
+  def cross_domain_url(domain_type, path = "/")
+    return path unless Rails.env.production?
+
+    domains = Rails.application.config.x.domains
+    host = (domain_type == :primary) ? domains.primary : domains.community
+
+    # If already on target domain, just return the path
+    return path if request.host == host
+
+    if user_signed_in?
+      # Sync session to target domain
+      token = current_user.generate_cross_domain_token!
+      "https://#{host}/auth/receive?token=#{token}&return_to=#{path}"
+    else
+      "https://#{host}#{path}"
+    end
+  end
+
+  # Helper for community index URL (works in dev and prod)
+  def community_index_url
+    return users_path unless Rails.env.production?
+
+    domain = Rails.application.config.x.domains.community
+
+    # In production on community domain, just go to root
+    return "/" if request.host == domain
+
+    # On primary domain, cross-domain to community
+    if user_signed_in?
+      token = current_user.generate_cross_domain_token!
+      "https://#{domain}/auth/receive?token=#{token}&return_to=/"
+    else
+      "https://#{domain}/"
+    end
+  end
+
+  # Helper for community user profile URLs
+  def community_user_url(user)
+    if Rails.env.production?
+      "https://#{Rails.application.config.x.domains.community}/#{user.to_param}"
+    else
+      user_path(user)
+    end
+  end
 end

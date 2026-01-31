@@ -8,7 +8,7 @@
 <% mobile = local_assigns.fetch(:mobile, false) %>
 <% extra_classes = local_assigns.fetch(:extra_classes, "") %>
 
-<%= button_to user_github_omniauth_authorize_path,
+<%= button_to github_auth_with_return_path,
     method: :post,
     data: { turbo: false },
     class: "inline-flex items-center #{mobile ? 'w-full justify-center' : ''} gap-2 px-4 py-2 border border-transparent #{mobile ? 'text-base' : 'text-sm'} font-medium rounded-md text-white bg-red-600 hover:bg-red-700 cursor-pointer transition-colors #{extra_classes}" do %>

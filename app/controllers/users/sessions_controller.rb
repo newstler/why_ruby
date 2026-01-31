@@ -1,36 +1,57 @@
 class Users::SessionsController < Devise::SessionsController
-  COMMUNITY_HOST = "rubycommunity.org".freeze
-  PRIMARY_HOST = "whyruby.info".freeze
-
   def github_auth
     # Store the return_to path in session
     session[:return_to] = params[:return_to] if params[:return_to].present?
 
-    # If on community domain, redirect through primary domain for OAuth (passing host via params since cookies don't cross domains)
-    if request.host == COMMUNITY_HOST
-      redirect_to "https://#{PRIMARY_HOST}/sign_in_github?from_host=#{COMMUNITY_HOST}", allow_other_host: true
-    elsif params[:from_host] == COMMUNITY_HOST
-      # Came from community domain via redirect - store in session now that we're on primary domain
-      session[:return_to_host] = COMMUNITY_HOST
-      redirect_to user_github_omniauth_authorize_path, allow_other_host: true
-    else
-      redirect_to user_github_omniauth_authorize_path, allow_other_host: true
-    end
+    # Detect if signing in from community pages (to redirect to profile after sign in)
+    session[:from_community] = from_community_page?
+
+    redirect_to user_github_omniauth_authorize_path, allow_other_host: true
   end
 
   def destroy
+    domains = Rails.application.config.x.domains
+
+    # Determine where to redirect after sign out
+    # Community pages -> community index, otherwise -> home
+    return_to_path = from_community_page? ? users_path : "/"
+
+    other_host = (request.host == domains.community) ? domains.primary : domains.community
+    current_host = request.host
+
+    # Generate token for cross-domain sign out
+    token = current_user&.generate_cross_domain_token!
+
     signed_out = (Devise.sign_out_all_scopes ? sign_out : sign_out(resource_name))
     set_flash_message! :notice, :signed_out if signed_out
-    respond_to_on_destroy
+
+    if Rails.env.production? && token
+      # Sign out on other domain, then come back to this domain
+      # On community domain, users_path is "/" (root); on primary domain it's "/community"
+      prod_return_path = (current_host == domains.community) ? "/" : "/community"
+      final_destination = "https://#{current_host}#{from_community_page? ? prod_return_path : '/'}"
+      redirect_to "https://#{other_host}/auth/sign_out_receive?token=#{token}&return_to=#{CGI.escape(final_destination)}", allow_other_host: true
+    else
+      redirect_to return_to_path
+    end
   end
 
   private
 
-  def respond_to_on_destroy
-    if request.host == COMMUNITY_HOST
-      redirect_to "https://#{COMMUNITY_HOST}/community"
-    else
-      redirect_to root_path
+  def from_community_page?
+    domains = Rails.application.config.x.domains
+    # Check if on community domain
+    return true if request.host == domains.community
+
+    # Check if current path or referer is a community path
+    return true if request.path.start_with?("/community")
+
+    # Check referer for community pages (for sign-in button clicks)
+    if request.referer.present?
+      referer_uri = URI.parse(request.referer) rescue nil
+      return true if referer_uri && (referer_uri.host == domains.community || referer_uri.path.start_with?("/community"))
     end
+
+    false
   end
 end
