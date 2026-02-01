@@ -1,5 +1,5 @@
-<%# Set page title %>
-<% content_for(:title) { t('meta.users.index.title') } %>
+<%# Set page title for community index - just "Ruby Community" %>
+<% content_for(:full_title) { t('meta.community.site_name') } %>
 
 <%= render "users/community_nav" %>
 
@@ -13,7 +13,7 @@
   <!-- Open Graph / Facebook Meta Tags -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="<%= users_url %>">
-  <meta property="og:title" content="<%= community_page_title(t('meta.users.index.title')) %>">
+  <meta property="og:title" content="<%= t('meta.community.site_name') %>">
   <meta property="og:description" content="<%= t('meta.users.index.summary') %>">
   <meta property="og:image" content="<%= versioned_og_image_url("og-image-community.png") %>">
   <meta property="og:site_name" content="<%= t('meta.community.site_name') %>">
@@ -22,7 +22,7 @@
   <!-- Twitter Card Meta Tags -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="<%= users_url %>">
-  <meta name="twitter:title" content="<%= community_page_title(t('meta.users.index.title')) %>">
+  <meta name="twitter:title" content="<%= t('meta.community.site_name') %>">
   <meta name="twitter:description" content="<%= t('meta.users.index.summary') %>">
   <meta name="twitter:image" content="<%= versioned_og_image_url("og-image-community.png") %>">
   <meta name="twitter:site" content="<%= t('meta.social.twitter_site') %>">

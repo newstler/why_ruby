@@ -1,5 +1,5 @@
-<%# Set page title %>
-<% content_for(:title) { user_meta_title(@user) } %>
+<%# Set page title for community user profile %>
+<% content_for(:full_title) { community_page_title(user_meta_title(@user)) } %>
 
 <%= render "users/community_nav" %>
 

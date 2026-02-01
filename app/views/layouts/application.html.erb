@@ -6,8 +6,12 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     
     <!-- Page Title -->
-    <% page_title = yield(:title).presence %>
-    <title><%= page_title ? "Why Ruby? — #{page_title}" : "Why Ruby?" %></title>
+    <% if content_for?(:full_title) %>
+      <title><%= yield(:full_title) %></title>
+    <% else %>
+      <% page_title = yield(:title).presence %>
+      <title><%= page_title ? "Why Ruby? — #{page_title}" : "Why Ruby?" %></title>
+    <% end %>
     
     <!-- Rails Security Tags -->
     <%= csrf_meta_tags %>
@@ -107,7 +111,8 @@
   <body class="bg-gray-50 min-h-screen flex flex-col">
     <nav class="bg-white shadow-sm sticky top-0 z-50 py-4" data-controller="mobile-menu" data-action="click@window->mobile-menu#hide">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-center items-center h-16">
+        <% centered_mobile_nav = controller_name == 'users' && ['index', 'show'].include?(action_name) %>
+        <div class="flex items-center h-16 <%= centered_mobile_nav ? 'justify-center' : 'justify-between' %>">
           <% if content_for?(:nav_minimal) %>
             <!-- Minimal nav - just centered logo -->
             <div class="flex-shrink-0">
