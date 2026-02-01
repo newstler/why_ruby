@@ -81,14 +81,14 @@
             <!-- Third line: Company and Location -->
             <div class="flex items-center gap-4 text-sm text-gray-400">
               <% if @user.company.present? %>
-                <%= link_to users_path(company: @user.company), class: "flex items-center hover:text-gray-600 transition-colors" do %>
+                <%= link_to community_index_path(company: @user.company), class: "flex items-center hover:text-gray-600 transition-colors" do %>
                   <%= inline_svg_tag "building.svg", class: "w-4 h-4 mr-1" %>
                   <%= @user.company %>
                 <% end %>
               <% end %>
 
               <% if @user.location.present? %>
-                <%= link_to users_path(location: @user.location), class: "flex items-center hover:text-gray-600 transition-colors" do %>
+                <%= link_to community_index_path(location: @user.location), class: "flex items-center hover:text-gray-600 transition-colors" do %>
                   <%= inline_svg_tag "location.svg", class: "w-4 h-4 mr-1" %>
                   <%= @user.location %>
                 <% end %>
@@ -146,14 +146,14 @@
           <!-- Company and Location -->
           <div class="flex items-center gap-4 text-sm text-gray-400">
             <% if @user.company.present? %>
-              <%= link_to users_path(company: @user.company), class: "flex items-center hover:text-gray-600 transition-colors" do %>
+              <%= link_to community_index_path(company: @user.company), class: "flex items-center hover:text-gray-600 transition-colors" do %>
                 <%= inline_svg_tag "building.svg", class: "w-4 h-4 mr-1" %>
                 <%= @user.company %>
               <% end %>
             <% end %>
 
             <% if @user.location.present? %>
-              <%= link_to users_path(location: @user.location), class: "flex items-center hover:text-gray-600 transition-colors" do %>
+              <%= link_to community_index_path(location: @user.location), class: "flex items-center hover:text-gray-600 transition-colors" do %>
                 <%= inline_svg_tag "location.svg", class: "w-4 h-4 mr-1" %>
                 <%= @user.location %>
               <% end %>
