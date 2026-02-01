@@ -56,6 +56,10 @@ gem "anthropic", "~> 1.6.0"
 # Pagination
 gem "kaminari", "~> 1.2"
 
+# IP Geolocation (for analytics country code)
+gem "geocoder", "~> 1.8"
+gem "maxminddb", "~> 0.1"
+
 # Friendly URLs
 gem "friendly_id", "~> 5.5"
 

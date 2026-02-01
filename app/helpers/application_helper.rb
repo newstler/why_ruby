@@ -1,5 +1,18 @@
 module ApplicationHelper
   include ImageHelper
+
+  # Get client country code for analytics (ISO 3166-1 alpha-2, e.g., "US", "DE", "CA")
+  def client_country_code
+    return @client_country_code if defined?(@client_country_code)
+
+    @client_country_code = begin
+      result = Geocoder.search(request.remote_ip).first
+      result&.country_code&.upcase
+    rescue => e
+      Rails.logger.warn "Geocoder lookup failed: #{e.message}"
+      nil
+    end
+  end
   def markdown_to_html(markdown_text)
     return "" if markdown_text.blank?
 

@@ -75,6 +75,7 @@ builder:
   # Pass secrets to the Docker build process
   secrets:
     - RAILS_MASTER_KEY
+    - MAXMIND_LICENSE_KEY
 
   # # Build image via remote server (useful for faster amd64 builds on arm64 computers)
   # remote: ssh://docker@docker-builder-server

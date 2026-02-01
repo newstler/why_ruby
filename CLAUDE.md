@@ -221,6 +221,24 @@ openai:
 2. Set callback URL: `http://localhost:3000/users/auth/github/callback`
 3. Add credentials to development credentials file
 
+### GeoLite2 Database (for analytics country tracking)
+
+The GeoLite2 database is used for IP geolocation (analytics country code). It's not redistributable, so it's gitignored and downloaded during Docker build.
+
+**Development setup:**
+1. Create a free MaxMind account: https://www.maxmind.com/en/geolite2/signup
+2. Generate a license key: https://www.maxmind.com/en/accounts/current/license-key
+3. Download GeoLite2-Country database and place at: `db/GeoLite2-Country.mmdb`
+
+**Production setup:**
+Add to production credentials (`rails credentials:edit --environment production`):
+```yaml
+maxmind:
+  license_key: your_license_key
+```
+
+The Dockerfile automatically downloads the database during build if `MAXMIND_LICENSE_KEY` is provided.
+
 ### Deployment
 
 - Configured for Kamal 2 deployment (see `config/deploy.yml`)

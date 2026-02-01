@@ -85,12 +85,13 @@
     <%= javascript_importmap_tags %>
     
     <!-- Nullitics Analytics (privacy-first, no cookies, GDPR compliant) -->
-    <script type="text/javascript">new Image().src='https://nullitics.com/n.gif?u=' + encodeURI(location.href) + '&r=' + encodeURI(document.referrer) + '&d=' + screen.width;</script>
+    <% country_code = client_country_code %>
+    <script type="text/javascript">new Image().src='https://nullitics.com/n.gif?u=' + encodeURI(location.href) + '&r=' + encodeURI(document.referrer) + '&d=' + screen.width<%= "&c=#{country_code}" if country_code.present? %>;</script>
   </head>
 
   <body class="bg-gray-50 min-h-screen flex flex-col">
     <!-- Nullitics noscript fallback -->
-    <noscript><img src="https://nullitics.com/n.gif?u=<%= request.original_url %>" alt="" style="position:absolute;left:-9999px" /></noscript>
+    <noscript><img src="https://nullitics.com/n.gif?u=<%= request.original_url %><%= "&c=#{country_code}" if country_code.present? %>" alt="" style="position:absolute;left:-9999px" /></noscript>
 
     <nav class="bg-white shadow-sm sticky top-0 z-50 py-4" data-controller="mobile-menu" data-action="click@window->mobile-menu#hide">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
