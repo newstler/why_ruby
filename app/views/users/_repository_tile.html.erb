@@ -8,79 +8,83 @@
 <% hidden ||= false %>
 <% user ||= nil %>
 
-<div class="group bg-white shadow-md rounded-lg p-6 hover:shadow-2xl hover:scale-[1.02] transform transition-all duration-300 ease-out relative <%= 'grayscale' if hidden %>">
-  <%= link_to repository[:url], target: "_blank", rel: "noopener", class: "block" do %>
-    <!-- Repository Name with Stars -->
-    <div class="flex items-start justify-between mb-2">
-      <h3 class="text-xl font-semibold text-gray-900 group-hover:text-red-600 transition-colors flex-1">
-        <%= repository[:name] %>
-      </h3>
-      <% if repository[:stars] && repository[:stars] > 0 %>
-        <span class="flex items-center text-gray-600 ml-2">
-          <%= inline_svg_tag "star.svg", class: "w-4 h-4 mr-1 text-yellow-500" %>
-          <span class="font-semibold"><%= repository[:stars] %></span>
-        </span>
-      <% end %>
-    </div>
-
-    <!-- Repository Description -->
-    <% if repository[:description].present? %>
-      <p class="text-gray-600 mb-4">
-        <%= repository[:description] %>
-      </p>
-    <% end %>
-
-    <!-- Repository Metrics -->
-    <div class="space-y-2">
-      <!-- Topics/Tags if present -->
-      <% if repository[:topics] && repository[:topics].any? %>
-        <div class="flex flex-wrap gap-1 mb-2">
-          <% repository[:topics].take(4).each do |topic| %>
-            <span class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"><%= topic %></span>
-          <% end %>
-          <% if repository[:topics].size > 4 %>
-            <span class="text-xs text-gray-500">+<%= repository[:topics].size - 4 %></span>
-          <% end %>
-        </div>
-      <% end %>
-
-      <!-- Stats row -->
-      <div class="flex items-center justify-between text-xs text-gray-500">
-        <div class="flex items-center gap-4">
-          <% if repository[:forks_count] && repository[:forks_count] > 0 %>
-            <span class="flex items-center">
-              <%= inline_svg_tag "fork.svg", class: "w-3.5 h-3.5 mr-1" %>
-              <%= t("users.repository_tile.forks", count: repository[:forks_count]) %>
-            </span>
-          <% end %>
-
-          <% if repository[:size] && repository[:size] > 0 %>
-            <span class="flex items-center">
-              <%= inline_svg_tag "file.svg", class: "w-3.5 h-3.5 mr-1" %>
-              <%= t("users.repository_tile.size", size: number_to_human_size(repository[:size] * 1024)) %>
-            </span>
-          <% end %>
-        </div>
-
-        <!-- Last commit aligned to the right -->
-        <% if repository[:pushed_at].present? %>
-          <span class="text-gray-400">
-            <%= t("users.repository_tile.last_commit", time_ago: time_ago_in_words(Time.parse(repository[:pushed_at]))) %>
+<%# Outer wrapper for positioning - button is outside grayscale filter %>
+<div class="group relative">
+  <%# Content div with optional grayscale %>
+  <div class="bg-white shadow-md rounded-lg p-6 hover:shadow-2xl group-hover:scale-[1.02] transform transition-all duration-300 ease-out <%= 'grayscale' if hidden %>">
+    <%= link_to repository[:url], target: "_blank", rel: "noopener", class: "block" do %>
+      <!-- Repository Name with Stars -->
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="text-xl font-semibold text-gray-900 group-hover:text-red-600 transition-colors flex-1">
+          <%= repository[:name] %>
+        </h3>
+        <% if repository[:stars] && repository[:stars] > 0 %>
+          <span class="flex items-center text-gray-600 ml-2">
+            <%= inline_svg_tag "star.svg", class: "w-4 h-4 mr-1 text-yellow-500" %>
+            <span class="font-semibold"><%= repository[:stars] %></span>
           </span>
         <% end %>
       </div>
-    </div>
-  <% end %>
 
-  <%# Hide/Unhide button - only for profile owner %>
+      <!-- Repository Description -->
+      <% if repository[:description].present? %>
+        <p class="text-gray-600 mb-4">
+          <%= repository[:description] %>
+        </p>
+      <% end %>
+
+      <!-- Repository Metrics -->
+      <div class="space-y-2">
+        <!-- Topics/Tags if present -->
+        <% if repository[:topics] && repository[:topics].any? %>
+          <div class="flex flex-wrap gap-1 mb-2">
+            <% repository[:topics].take(4).each do |topic| %>
+              <span class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"><%= topic %></span>
+            <% end %>
+            <% if repository[:topics].size > 4 %>
+              <span class="text-xs text-gray-500">+<%= repository[:topics].size - 4 %></span>
+            <% end %>
+          </div>
+        <% end %>
+
+        <!-- Stats row -->
+        <div class="flex items-center justify-between text-xs text-gray-500">
+          <div class="flex items-center gap-4">
+            <% if repository[:forks_count] && repository[:forks_count] > 0 %>
+              <span class="flex items-center">
+                <%= inline_svg_tag "fork.svg", class: "w-3.5 h-3.5 mr-1" %>
+                <%= t("users.repository_tile.forks", count: repository[:forks_count]) %>
+              </span>
+            <% end %>
+
+            <% if repository[:size] && repository[:size] > 0 %>
+              <span class="flex items-center">
+                <%= inline_svg_tag "file.svg", class: "w-3.5 h-3.5 mr-1" %>
+                <%= t("users.repository_tile.size", size: number_to_human_size(repository[:size] * 1024)) %>
+              </span>
+            <% end %>
+          </div>
+
+          <!-- Last commit aligned to the right -->
+          <% if repository[:pushed_at].present? %>
+            <span class="text-gray-400">
+              <%= t("users.repository_tile.last_commit", time_ago: time_ago_in_words(Time.parse(repository[:pushed_at]))) %>
+            </span>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Hide/Unhide button - OUTSIDE grayscale div, only for profile owner %>
   <% if user && user_signed_in? && current_user == user %>
-    <div class="absolute top-2 right-2">
+    <div class="absolute top-2 right-2 z-10">
       <% if hidden %>
         <%= button_to unhide_repo_user_settings_path,
             method: :post,
             params: { repo_url: repository[:url] },
-            class: "p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition-colors opacity-0 group-hover:opacity-100",
-            title: "Unhide repository",
+            class: "p-1.5 rounded-full bg-gray-100 hover:bg-red-100 text-gray-500 hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer",
+            title: "Show repository",
             data: { turbo_stream: true } do %>
           <%= inline_svg_tag "eye.svg", class: "w-4 h-4" %>
         <% end %>
@@ -88,7 +92,7 @@
         <%= button_to hide_repo_user_settings_path,
             method: :post,
             params: { repo_url: repository[:url] },
-            class: "p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition-colors opacity-0 group-hover:opacity-100",
+            class: "p-1.5 rounded-full bg-gray-100 hover:bg-red-100 text-gray-500 hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer",
             title: "Hide repository",
             data: { turbo_stream: true } do %>
           <%= inline_svg_tag "eye-off.svg", class: "w-4 h-4" %>

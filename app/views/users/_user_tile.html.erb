@@ -5,12 +5,13 @@
     - frameless: (optional) if true, removes card styling (shadow, background, padding)
     - avatar_size: (optional) custom avatar size (e.g., "w-32 h-[115px]")
     - compact: (optional) if true, uses smaller text sizes on mobile
+    - badge_size: (optional) "small" for compact badge on avatar (default), or nil for normal size
 %>
 
 <%= link_to community_user_url(user), class: "group block #{local_assigns[:frameless] ? '' : 'bg-white shadow rounded-lg p-6 hover:shadow-lg'} transition-shadow" do %>
   <div class="flex <%= local_assigns[:frameless] ? 'items-center' : 'items-start' %> gap-4">
     <!-- Avatar -->
-    <%= render "shared/gem_avatar", user: user, size: local_assigns[:avatar_size] || "w-24 h-[86px]", text_size: "text-3xl" %>
+    <%= render "shared/gem_avatar", user: user, size: local_assigns[:avatar_size] || "w-24 h-[86px]", text_size: "text-3xl", badge_size: local_assigns.key?(:badge_size) ? local_assigns[:badge_size] : "small" %>
 
     <div class="flex flex-col justify-center flex-1 min-w-0">
       <!-- Name and Stars -->

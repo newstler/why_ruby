@@ -1,0 +1,106 @@
+<div id="projects_panel">
+<% if ruby_repos.any? %>
+  <div class="space-y-4">
+    <!-- Desktop: 3 columns -->
+    <div class="hidden lg:flex gap-6">
+      <% column1_repos, column2_repos, column3_repos = [], [], [] %>
+      <% ruby_repos.each_with_index do |repo, index| %>
+        <% [column1_repos, column2_repos, column3_repos][index % 3] << repo %>
+      <% end %>
+      <% [column1_repos, column2_repos, column3_repos].each do |column_repos| %>
+        <div class="flex-1 space-y-6">
+          <% column_repos.each do |repository| %>
+            <%= render "users/repository_tile", repository: repository, user: user, hidden: false %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Tablet: 2 columns -->
+    <div class="hidden md:flex lg:hidden gap-6">
+      <% column1_repos, column2_repos = [], [] %>
+      <% ruby_repos.each_with_index do |repo, index| %>
+        <% [column1_repos, column2_repos][index % 2] << repo %>
+      <% end %>
+      <% [column1_repos, column2_repos].each do |column_repos| %>
+        <div class="flex-1 space-y-6">
+          <% column_repos.each do |repository| %>
+            <%= render "users/repository_tile", repository: repository, user: user, hidden: false %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Mobile: 1 column -->
+    <div class="md:hidden space-y-6">
+      <% ruby_repos.each do |repository| %>
+        <%= render "users/repository_tile", repository: repository, user: user, hidden: false %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<%# Hidden repositories section - only shown to profile owner %>
+<% if hidden_repos.present? && user_signed_in? && current_user == user %>
+  <div class="mt-12">
+    <h3 class="text-sm font-semibold text-gray-300 tracking-wide uppercase mb-6 text-center">Hidden</h3>
+
+    <!-- Desktop: 3 columns -->
+    <div class="hidden lg:flex gap-6">
+      <% column1_repos, column2_repos, column3_repos = [], [], [] %>
+      <% hidden_repos.each_with_index do |repo, index| %>
+        <% [column1_repos, column2_repos, column3_repos][index % 3] << repo %>
+      <% end %>
+      <% [column1_repos, column2_repos, column3_repos].each do |column_repos| %>
+        <div class="flex-1 space-y-6">
+          <% column_repos.each do |repository| %>
+            <%= render "users/repository_tile", repository: repository, user: user, hidden: true %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Tablet: 2 columns -->
+    <div class="hidden md:flex lg:hidden gap-6">
+      <% column1_repos, column2_repos = [], [] %>
+      <% hidden_repos.each_with_index do |repo, index| %>
+        <% [column1_repos, column2_repos][index % 2] << repo %>
+      <% end %>
+      <% [column1_repos, column2_repos].each do |column_repos| %>
+        <div class="flex-1 space-y-6">
+          <% column_repos.each do |repository| %>
+            <%= render "users/repository_tile", repository: repository, user: user, hidden: true %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Mobile: 1 column -->
+    <div class="md:hidden space-y-6">
+      <% hidden_repos.each do |repository| %>
+        <%= render "users/repository_tile", repository: repository, user: user, hidden: true %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<%# View all link - shown after both visible and hidden repos %>
+<% if ruby_repos.any? && user.github_ruby_repositories_url.present? %>
+  <div class="mt-8 text-center">
+    <%= link_to t("users.show.view_all_repositories"), safe_external_url(user.github_ruby_repositories_url),
+        target: "_blank", rel: "noopener", class: "text-gray-400 hover:text-gray-600" %>
+  </div>
+<% end %>
+
+<% if ruby_repos.empty? && hidden_repos.empty? %>
+  <div class="bg-white shadow rounded-lg p-8 text-center">
+    <p class="text-gray-600"><%= t("users.show.no_ruby_projects") %></p>
+    <% if user.github_profile_url.present? %>
+      <p class="mt-2">
+        <%= link_to t("users.show.view_github_profile"), safe_external_url(user.github_profile_url),
+            target: "_blank", rel: "noopener", class: "text-gray-600 hover:text-gray-800" %>
+      </p>
+    <% end %>
+  </div>
+<% end %>
+</div>
