@@ -10,20 +10,20 @@
   <meta name="keywords" content="<%= user_meta_keywords(@user) %>">
   <meta name="author" content="<%= user_meta_title(@user) %>">
   <link rel="canonical" href="<%= user_url(@user) %>">
-  
+
   <!-- Open Graph / Facebook Meta Tags -->
   <meta property="og:type" content="profile">
   <meta property="og:url" content="<%= user_url(@user) %>">
-  <meta property="og:title" content="<%= full_page_title(user_meta_title(@user)) %>">
+  <meta property="og:title" content="<%= community_page_title(user_meta_title(@user)) %>">
   <meta property="og:description" content="<%= user_meta_description(@user) %>">
   <meta property="og:image" content="<%= user_meta_image_url(@user) %>">
-  <meta property="og:site_name" content="<%= t('meta.site.name') %>">
+  <meta property="og:site_name" content="<%= t('meta.community.site_name') %>">
   <meta property="og:locale" content="<%= I18n.locale.to_s.gsub('-', '_') %>">
-  
+
   <!-- Twitter Card Meta Tags -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="<%= user_url(@user) %>">
-  <meta name="twitter:title" content="<%= full_page_title(user_meta_title(@user)) %>">
+  <meta name="twitter:title" content="<%= community_page_title(user_meta_title(@user)) %>">
   <meta name="twitter:description" content="<%= user_meta_description(@user) %>">
   <meta name="twitter:image" content="<%= user_meta_image_url(@user) %>">
   <meta name="twitter:site" content="<%= t('meta.social.twitter_site') %>">

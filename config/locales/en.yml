@@ -62,6 +62,8 @@ en:
         create_new: "Create new tag:"
   
   meta:
+    community:
+      site_name: "Ruby Community"
     default:
       title: "Why Ruby?"
       summary: "Join the Ruby community! Discover why developers love Ruby, share your experiences, and explore resources for learning and mastering Ruby and Rails."

@@ -19,7 +19,7 @@ module UsersHelper
     if user.avatar_url.present?
       user.avatar_url
     else
-      versioned_og_image_url
+      versioned_og_image_url("og-image-community.png")
     end
   end
 end

@@ -13,18 +13,18 @@
   <!-- Open Graph / Facebook Meta Tags -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="<%= users_url %>">
-  <meta property="og:title" content="<%= full_page_title(t('meta.users.index.title')) %>">
+  <meta property="og:title" content="<%= community_page_title(t('meta.users.index.title')) %>">
   <meta property="og:description" content="<%= t('meta.users.index.summary') %>">
-  <meta property="og:image" content="<%= versioned_og_image_url %>">
-  <meta property="og:site_name" content="<%= t('meta.site.name') %>">
+  <meta property="og:image" content="<%= versioned_og_image_url("og-image-community.png") %>">
+  <meta property="og:site_name" content="<%= t('meta.community.site_name') %>">
   <meta property="og:locale" content="<%= I18n.locale.to_s.gsub('-', '_') %>">
 
   <!-- Twitter Card Meta Tags -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="<%= users_url %>">
-  <meta name="twitter:title" content="<%= full_page_title(t('meta.users.index.title')) %>">
+  <meta name="twitter:title" content="<%= community_page_title(t('meta.users.index.title')) %>">
   <meta name="twitter:description" content="<%= t('meta.users.index.summary') %>">
-  <meta name="twitter:image" content="<%= versioned_og_image_url %>">
+  <meta name="twitter:image" content="<%= versioned_og_image_url("og-image-community.png") %>">
   <meta name="twitter:site" content="<%= t('meta.social.twitter_site') %>">
   <meta name="twitter:creator" content="<%= t('meta.social.twitter_creator') %>">
 <% end %>

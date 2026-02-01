@@ -179,23 +179,19 @@ module ApplicationHelper
   end
 
   # Generate versioned URL for OG image to bust social media caches
-  # Can accept a custom path for resource-specific images or use default
-  def versioned_og_image_url(custom_path = nil)
-    if custom_path
-      # For custom paths (like post-specific images), just append a version parameter
-      # The version will be handled by the resource itself (e.g., post.updated_at)
-      custom_path
-    else
-      # For the default og-image.png, use file modification time as version
-      og_image_path = Rails.root.join("public", "og-image.webp")
-      version = if File.exist?(og_image_path)
-        File.mtime(og_image_path).to_i.to_s
-      else
-        # Fallback to app version or deployment timestamp
-        Rails.application.config.assets.version || Time.current.to_i.to_s
-      end
+  # Pass a filename to use a different image (e.g., "og-image-community.png")
+  def versioned_og_image_url(filename = "og-image.png")
+    og_image_path = Rails.root.join("public", filename)
+    version = File.exist?(og_image_path) ? File.mtime(og_image_path).to_i.to_s : Time.current.to_i.to_s
+    "#{request.base_url}/#{filename}?v=#{version}"
+  end
 
-      "#{request.base_url}/og-image.png?v=#{version}"
+  # Generate the full page title for community pages (Ruby Community branding)
+  def community_page_title(page_title = nil)
+    if page_title.present?
+      "Ruby Community — #{page_title}"
+    else
+      "Ruby Community"
     end
   end
 
