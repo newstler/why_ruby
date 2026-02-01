@@ -19,13 +19,7 @@ module PostsHelper
   def post_meta_image_url(post)
     if post.featured_image.attached?
       # Generate the resource-specific image URL with version parameter
-      base_url = if post.category
-        "#{request.base_url}/#{post.category.to_param}/#{post.to_param}/og-image.webp"
-      else
-        # Fallback for posts without category (shouldn't happen normally)
-        "#{request.base_url}/uncategorized/#{post.to_param}/og-image.webp"
-      end
-      # Add version parameter based on post's updated_at timestamp
+      base_url = "#{request.base_url}/#{post.category.to_param}/#{post.to_param}/og-image.webp"
       "#{base_url}?v=#{post.updated_at.to_i}"
     else
       # Use the default versioned OG image

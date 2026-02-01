@@ -88,7 +88,23 @@ module ApplicationHelper
   end
 
   def post_link_url(post)
-    post.link? ? safe_external_url(post.url) : post_path_for(post)
+    if post.link?
+      safe_external_url(post.url)
+    else
+      # In production, always link to primary domain for posts
+      if Rails.env.production?
+        primary_domain_post_url(post)
+      else
+        post_path_for(post)
+      end
+    end
+  end
+
+  # Generate full URL to post on primary domain (whyruby.info)
+  # Used to ensure posts always link to the content domain, not the community domain
+  def primary_domain_post_url(post)
+    domain = Rails.application.config.x.domains.primary
+    "https://#{domain}/#{post.category.to_param}/#{post.to_param}"
   end
 
   def post_link_options(post)
@@ -210,21 +226,11 @@ module ApplicationHelper
 
   # URL helpers for the new routing structure
   def post_url_for(post)
-    if post.category
-      post_url(post.category, post)
-    else
-      # Fallback for posts without category
-      post_url("uncategorized", post)
-    end
+    post_url(post.category, post)
   end
 
   def post_path_for(post)
-    if post.category
-      post_path(post.category, post)
-    else
-      # Fallback for posts without category
-      post_path("uncategorized", post)
-    end
+    post_path(post.category, post)
   end
 
   # Cross-domain URL helper with session sync

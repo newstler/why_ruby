@@ -10,12 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_01_31_183723) do
+ActiveRecord::Schema[8.2].define(version: 2026_02_01_205733) do
   create_table "_litestream_lock", id: false, force: :cascade do |t|
     t.integer "id"
   end
 
-  create_table "_litestream_seq", force: :cascade do |t|
+  create_table "_litestream_seq", id: :integer, default: nil, force: :cascade do |t|
     t.integer "seq"
   end
 
@@ -162,7 +162,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_01_31_183723) do
     t.string "heading"
     t.integer "position"
     t.boolean "published", default: false
-    t.text "quote", null: false
+    t.text "quote"
     t.string "reject_reason"
     t.string "subheading"
     t.datetime "updated_at", null: false
@@ -171,7 +171,6 @@ ActiveRecord::Schema[8.2].define(version: 2026_01_31_183723) do
     t.index ["position"], name: "index_testimonials_on_position"
     t.index ["published"], name: "index_testimonials_on_published"
     t.index ["user_id"], name: "index_testimonials_on_user_id", unique: true
-    t.check_constraint "length(quote) >= 140 AND length(quote) <= 320", name: "quote_length_check"
   end
 
   create_table "users", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|

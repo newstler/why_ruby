@@ -272,11 +272,6 @@ class PostsController < ApplicationController
   end
 
   def post_path_for(post)
-    if post.category
-      post_path(post.category, post)
-    else
-      # Fallback for posts without category (shouldn't happen in normal flow)
-      post_path("uncategorized", post)
-    end
+    post_path(post.category, post)
   end
 end

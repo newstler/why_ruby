@@ -200,11 +200,7 @@ class Avo::Resources::Post < Avo::BaseResource
       format_using: -> do
         # Generate the OG image URL
         og_url = if record.featured_image.attached?
-          if record.category
-            "#{view_context.request.base_url}/#{record.category.to_param}/#{record.to_param}/og-image.png?v=#{record.updated_at.to_i}"
-          else
-            "#{view_context.request.base_url}/uncategorized/#{record.to_param}/og-image.png?v=#{record.updated_at.to_i}"
-          end
+          "#{view_context.request.base_url}/#{record.category.to_param}/#{record.to_param}/og-image.png?v=#{record.updated_at.to_i}"
         else
           # Default OG image with version based on file modification time
           og_image_path = Rails.root.join("public", "og-image.png")

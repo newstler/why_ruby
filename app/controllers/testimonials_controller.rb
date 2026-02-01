@@ -5,7 +5,7 @@ class TestimonialsController < ApplicationController
     @testimonial = current_user.build_testimonial(testimonial_params)
 
     if @testimonial.save
-      @processing = true
+      @processing = @testimonial.quote.present?
       respond_to do |format|
         format.turbo_stream
         format.html { redirect_to user_path(current_user), notice: "Your testimonial has been submitted for processing." }
@@ -28,7 +28,7 @@ class TestimonialsController < ApplicationController
     @testimonial = current_user.testimonial
 
     if @testimonial.update(testimonial_params)
-      @processing = @testimonial.saved_change_to_quote?
+      @processing = @testimonial.saved_change_to_quote? && @testimonial.quote.present?
       respond_to do |format|
         format.turbo_stream
         format.html { redirect_to user_path(current_user), notice: "Your testimonial has been updated and resubmitted for processing." }

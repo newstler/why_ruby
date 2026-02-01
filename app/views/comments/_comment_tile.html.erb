@@ -1,4 +1,5 @@
-<%= link_to post_path_for(comment.post) + "#comment-#{comment.id}", class: "block" do %>
+<% comment_url = Rails.env.production? ? primary_domain_post_url(comment.post) : post_path_for(comment.post) %>
+<%= link_to "#{comment_url}#comment-#{comment.id}", class: "block" do %>
   <div class="bg-white shadow rounded-lg p-6 hover:shadow-md transition-shadow">
     <div class="space-y-3">
       <!-- Post Title -->

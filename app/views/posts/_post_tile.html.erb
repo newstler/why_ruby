@@ -38,11 +38,7 @@
     <div class="flex items-center justify-between mb-2">
       <div>
         <% unless post.success_story? %>
-          <% if post.category %>
-            <span class="text-sm text-gray-500"><%= post.category.name %></span>
-          <% else %>
-            <span class="text-sm text-gray-400 italic">Uncategorized</span>
-          <% end %>
+          <span class="text-sm text-gray-500"><%= post.category.name %></span>
         <% end %>
       </div>
       <% if post.link? && (domain = extract_domain(post.url)) %>
