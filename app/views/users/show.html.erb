@@ -44,41 +44,37 @@
         <div class="flex items-center gap-6">
           <%= render "users/profile_avatar", user: @user, wrapper_id: "profile_avatar_desktop", size: "w-36 h-[130px]", text_size: "text-5xl" %>
 
+          <% total_stars = @user.total_github_stars.to_i %>
           <div class="flex flex-col justify-center flex-1">
-            <!-- First line: Name, stars, and social links -->
-            <div class="flex items-baseline gap-3 mb-2">
-              <h1 class="text-4xl font-black text-gray-900"><%= @user.display_name %></h1>
+            <!-- First line: Name, social links, and stars -->
+            <div class="flex items-baseline justify-between gap-3 mb-2">
+              <div class="flex items-baseline gap-3">
+                <h1 class="text-4xl font-black text-gray-900"><%= @user.display_name %></h1>
 
-              <% total_stars = @user.total_github_stars.to_i %>
-              <% if total_stars > 0 %>
-                <span class="flex items-center text-amber-500 whitespace-nowrap flex-shrink-0">
-                  <%= inline_svg_tag "star.svg", class: "w-5 h-5 mr-1" %>
-                  <span class="font-semibold text-gray-500 text-lg"><%= total_stars %></span>
-                </span>
-              <% end %>
-
-              <!-- Social Links -->
-              <% if @user.social_links.any? %>
-                <div class="flex items-center gap-2 pb-1">
-                  <% @user.social_links.each do |platform, url| %>
-                    <% next unless url.present? %>
-                    <%= link_to url, target: "_blank", rel: "noopener", class: "text-gray-400 hover:text-gray-600" do %>
-                      <% case platform %>
-                      <% when :github %>
-                        <%= inline_svg_tag "github.svg", class: "w-5 h-5" %>
-                      <% when :twitter %>
-                        <%= inline_svg_tag "twitter.svg", class: "w-5 h-5" %>
-                      <% when :website %>
-                        <%= inline_svg_tag "globe.svg", class: "w-5 h-5" %>
-                      <% when :linkedin %>
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                        </svg>
+                <!-- Social Links -->
+                <% if @user.social_links.any? %>
+                  <div class="flex items-center gap-2 pb-1">
+                    <% @user.social_links.each do |platform, url| %>
+                      <% next unless url.present? %>
+                      <%= link_to url, target: "_blank", rel: "noopener", class: "text-gray-400 hover:text-gray-600" do %>
+                        <% case platform %>
+                        <% when :github %>
+                          <%= inline_svg_tag "github.svg", class: "w-5 h-5" %>
+                        <% when :twitter %>
+                          <%= inline_svg_tag "twitter.svg", class: "w-5 h-5" %>
+                        <% when :website %>
+                          <%= inline_svg_tag "globe.svg", class: "w-5 h-5" %>
+                        <% when :linkedin %>
+                          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                          </svg>
+                        <% end %>
                       <% end %>
                     <% end %>
-                  <% end %>
-                </div>
-              <% end %>
+                  </div>
+                <% end %>
+              </div>
+              <%= render "users/profile_stars", user: @user %>
             </div>
             
             <!-- Second line: Bio -->
@@ -104,8 +100,9 @@
             </div>
           </div>
 
+          <!-- Right side: Settings (only for owner) -->
           <% if current_user == @user %>
-            <div class="ml-auto self-center">
+            <div class="ml-auto self-start pl-8">
               <%= render "users/profile_settings", user: @user %>
             </div>
           <% end %>
@@ -120,9 +117,17 @@
             <%= render "users/profile_avatar", user: @user, wrapper_id: "profile_avatar_mobile", size: "w-28 h-[100px]", text_size: "text-4xl" %>
             
             <div class="flex-1">
-              <!-- Name and social links -->
-              <h1 class="text-3xl font-bold text-gray-900 mb-1"><%= @user.display_name %></h1>
-              
+              <!-- Name and stars row -->
+              <div class="flex items-baseline justify-between gap-2 mb-1">
+                <h1 class="text-3xl font-bold text-gray-900"><%= @user.display_name %></h1>
+                <% if total_stars > 0 %>
+                  <span class="flex items-center text-amber-500 whitespace-nowrap flex-shrink-0">
+                    <%= inline_svg_tag "star.svg", class: "w-5 h-5 mr-1" %>
+                    <span class="font-bold text-gray-600 text-lg"><%= total_stars %></span>
+                  </span>
+                <% end %>
+              </div>
+
               <!-- Social Links -->
               <% if @user.social_links.any? %>
                 <div class="flex items-center gap-2">

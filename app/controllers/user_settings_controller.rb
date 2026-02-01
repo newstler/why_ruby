@@ -38,6 +38,7 @@ class UserSettingsController < ApplicationController
   private
 
   def render_projects_update
+    current_user.reload # Reload to get updated stars count
     @ruby_repos = current_user.visible_ruby_repositories
     @hidden_repos = current_user.hidden_ruby_repositories
 
@@ -45,7 +46,8 @@ class UserSettingsController < ApplicationController
       format.turbo_stream do
         render turbo_stream: [
           turbo_stream.replace("projects_panel", partial: "users/projects_panel", locals: { ruby_repos: @ruby_repos, hidden_repos: @hidden_repos, user: current_user }),
-          turbo_stream.update("projects_count", html: @ruby_repos.size.to_s)
+          turbo_stream.update("projects_count", html: @ruby_repos.size.to_s),
+          turbo_stream.replace("profile_stars", partial: "users/profile_stars", locals: { user: current_user })
         ]
       end
       format.html { redirect_to user_path(current_user) }
