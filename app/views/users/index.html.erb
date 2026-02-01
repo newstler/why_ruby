@@ -40,14 +40,14 @@
           <span class="flex items-center gap-x-1 text-sm rounded-full bg-gray-100 px-3 py-2">
             <span class="text-gray-400">Working at:</span>
             <span class="text-gray-700 font-medium"><%= @filter_company %></span>
-            <%= link_to "×", users_path(location: @filter_location, sort: @sort, dir: @dir), class: "ml-1 text-gray-400 hover:text-gray-600 text-lg leading-none" %>
+            <%= link_to "×", community_index_path(location: @filter_location, sort: @sort, dir: @dir), class: "ml-1 text-gray-400 hover:text-gray-600 text-lg leading-none" %>
           </span>
         <% end %>
         <% if @filter_location.present? %>
           <span class="flex items-center gap-x-1 text-sm rounded-full bg-gray-100 px-3 py-2">
             <span class="text-gray-400">Located in:</span>
             <span class="text-gray-700 font-medium"><%= @filter_location %></span>
-            <%= link_to "×", users_path(company: @filter_company, sort: @sort, dir: @dir), class: "ml-1 text-gray-400 hover:text-gray-600 text-lg leading-none" %>
+            <%= link_to "×", community_index_path(company: @filter_company, sort: @sort, dir: @dir), class: "ml-1 text-gray-400 hover:text-gray-600 text-lg leading-none" %>
           </span>
         <% end %>
       </div>
@@ -99,7 +99,7 @@
                  # Defaults: az -> asc, others -> desc
                  key == 'az' ? 'asc' : 'desc'
                end
-               link_to label, users_path(sort: key, dir: dir, location: filters[:location], company: filters[:company]), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none cursor-pointer"
+               link_to label, community_index_path(sort: key, dir: dir, location: filters[:location], company: filters[:company]), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none cursor-pointer"
              end %>
 
           <%= sort_link('users.index.sort.top', 'users.index.sort.top_reverse', 'top', @sort, @dir, { location: @filter_location, company: @filter_company }) %>
@@ -189,7 +189,7 @@
     <!-- Pagination (hidden, used for infinite scroll) -->
     <div id="infinite-scroll-pagination" data-infinite-scroll-target="pagination" class="hidden">
       <% if @users.total_pages > 1 && !@users.last_page? %>
-        <%= link_to "Next", users_path(page: @users.next_page, sort: @sort, dir: @dir, location: @filter_location, company: @filter_company), rel: "next" %>
+        <%= link_to "Next", community_index_path(page: @users.next_page, sort: @sort, dir: @dir, location: @filter_location, company: @filter_company), rel: "next" %>
       <% end %>
     </div>
 

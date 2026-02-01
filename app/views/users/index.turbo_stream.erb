@@ -63,7 +63,7 @@
 <%= turbo_stream.replace "infinite-scroll-pagination" do %>
   <div id="infinite-scroll-pagination" data-infinite-scroll-target="pagination" class="hidden">
     <% if @users.total_pages > 1 && !@users.last_page? %>
-      <%= link_to "Next", users_path(page: @users.next_page, sort: @sort, dir: @dir, location: @filter_location, company: @filter_company), rel: "next" %>
+      <%= link_to "Next", community_index_path(page: @users.next_page, sort: @sort, dir: @dir, location: @filter_location, company: @filter_company), rel: "next" %>
     <% end %>
   </div>
 <% end %>

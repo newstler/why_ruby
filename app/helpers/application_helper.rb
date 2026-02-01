@@ -256,6 +256,21 @@ module ApplicationHelper
     end
   end
 
+  # Helper for community index path with query params (for pagination/filtering)
+  # On community domain in production, uses root path. Otherwise uses /community.
+  def community_index_path(params = {})
+    base_path = if Rails.env.production? && request.host == Rails.application.config.x.domains.community
+      "/"
+    else
+      "/community"
+    end
+
+    return base_path if params.blank?
+
+    query = params.compact.to_query
+    query.present? ? "#{base_path}?#{query}" : base_path
+  end
+
   # Helper for community user profile URLs (for navigation links)
   def community_user_url(user)
     if Rails.env.production?
