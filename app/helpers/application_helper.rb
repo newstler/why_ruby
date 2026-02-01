@@ -202,6 +202,44 @@ module ApplicationHelper
     markdown_to_html(markdown_text).html_safe
   end
 
+  # Linkify URLs and GitHub @mentions in user bio text
+  # - URLs like "example.com" become clickable links
+  # - @username becomes a link to https://github.com/username
+  def linkify_bio(text)
+    return "" if text.blank?
+
+    # Escape HTML to prevent XSS
+    escaped = ERB::Util.html_escape(text)
+
+    # Pattern for GitHub @mentions
+    github_pattern = /(?<=\s|^)@([a-zA-Z0-9](?:[a-zA-Z0-9\-]*[a-zA-Z0-9])?)/
+
+    # Pattern for URLs (with or without protocol)
+    # Excludes trailing punctuation like commas and periods used in prose
+    url_pattern = %r{
+      (?:https?://)?                    # Optional protocol
+      (?:www\.)?                        # Optional www
+      [a-zA-Z0-9][a-zA-Z0-9\-]*         # Domain name
+      \.[a-zA-Z]{2,}                    # TLD
+      (?:/[^\s,.<>]*)?                  # Optional path (stops at whitespace, comma, period, angle brackets)
+    }x
+
+    # Replace GitHub @mentions first
+    result = escaped.gsub(github_pattern) do |match|
+      username = Regexp.last_match(1)
+      %(<a href="https://github.com/#{username}" target="_blank" rel="noopener" class="underline hover:text-red-600 transition-colors">#{match}</a>)
+    end
+
+    # Replace URLs (skip github.com since @mentions already handled)
+    result = result.gsub(url_pattern) do |match|
+      next match if match.include?("github.com")
+      url = match.start_with?("http") ? match : "https://#{match}"
+      %(<a href="#{url}" target="_blank" rel="noopener" class="underline hover:text-red-600 transition-colors">#{match}</a>)
+    end
+
+    result.html_safe
+  end
+
   def has_success_stories?
     # Cache the result for the request to avoid multiple DB queries
     if Category.success_story_category
