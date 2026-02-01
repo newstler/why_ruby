@@ -107,7 +107,19 @@
   <body class="bg-gray-50 min-h-screen flex flex-col">
     <nav class="bg-white shadow-sm sticky top-0 z-50 py-4" data-controller="mobile-menu" data-action="click@window->mobile-menu#hide">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
+        <div class="flex justify-center items-center h-16">
+          <% if content_for?(:nav_minimal) %>
+            <!-- Minimal nav - just centered logo -->
+            <div class="flex-shrink-0">
+              <% if content_for?(:header_logo) %>
+                <%= yield(:header_logo) %>
+              <% else %>
+                <%= link_to root_path, class: "text-4xl font-black text-red-600 whitespace-nowrap inline-flex items-center" do %>
+                  Why <%= image_tag "heart.webp", class: "h-12 w-12 mx-1 inline-block", alt: "" %> Ruby?
+                <% end %>
+              <% end %>
+            </div>
+          <% else %>
           <!-- Logo on the left -->
           <div class="flex-shrink-0 lg:flex-1">
             <% if content_for?(:header_logo) %>
@@ -118,7 +130,7 @@
               <% end %>
             <% end %>
           </div>
-          
+
           <!-- Desktop navigation - hidden on mobile and tablets in portrait -->
           <div class="hidden lg:flex justify-center items-center space-x-4">
             <% if content_for?(:header_nav) %>
@@ -187,8 +199,8 @@
           
           <!-- Mobile menu button -->
           <div class="lg:hidden">
-            <button type="button" 
-                    class="text-gray-500 hover:text-gray-600 focus:outline-none focus:text-gray-600 p-3 -mr-3 rounded-md touch-manipulation" 
+            <button type="button"
+                    class="text-gray-500 hover:text-gray-600 focus:outline-none focus:text-gray-600 p-3 -mr-3 rounded-md touch-manipulation"
                     data-action="click->mobile-menu#toggle"
                     aria-label="Toggle navigation menu"
                     aria-expanded="false"
@@ -196,8 +208,10 @@
               <%= inline_svg_tag "menu.svg", class: "h-6 w-6" %>
             </button>
           </div>
+          <% end %> <%# end nav_minimal if/else %>
         </div>
         
+        <% unless content_for?(:nav_minimal) %>
         <!-- Mobile menu -->
         <div class="hidden lg:hidden" data-mobile-menu-target="menu">
           <div class="pt-4 pb-3 border-t border-gray-200">
@@ -219,7 +233,7 @@
                     class: "#{community_menu_active? ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} block px-3 py-2 rounded-md text-base font-medium" %>
               <% end %>
             </div>
-            
+
             <% if user_signed_in? %>
               <!-- New post button -->
               <div class="mt-3 px-2">
@@ -233,7 +247,7 @@
                   New Post
                 <% end %>
               </div>
-              
+
               <!-- User section -->
               <div class="mt-3 border-t border-gray-200 pt-3">
                 <div class="flex items-center px-5">
@@ -263,6 +277,7 @@
             <% end %>
           </div>
         </div>
+        <% end %>
       </div>
     </nav>
 

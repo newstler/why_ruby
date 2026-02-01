@@ -1,21 +1,7 @@
 <%# Set page title %>
 <% content_for(:title) { t('meta.users.index.title') } %>
 
-<%# Override header logo for community pages %>
-<% content_for :header_logo do %>
-  <%= link_to community_index_url, class: "text-4xl font-black text-red-600 whitespace-nowrap inline-flex items-center" do %>
-    Ruby <%= image_tag "heart.webp", class: "h-12 w-12 mx-1 inline-block", alt: "" %> Community
-  <% end %>
-<% end %>
-
-<%# Override nav menu for community pages %>
-<% content_for :header_nav do %>
-  <%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "text-gray-600 hover:bg-gray-100 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
-<% end %>
-
-<% content_for :header_nav_mobile do %>
-  <%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "text-gray-600 hover:bg-gray-100 block px-3 py-2 rounded-md text-base font-medium" %>
-<% end %>
+<%= render "users/community_nav" %>
 
 <%# Override meta tags for community page %>
 <% content_for :head do %>
@@ -46,15 +32,36 @@
 <div class="space-y-8">
   <!-- Sticky Header (positioned below main nav) - sticky on tablets (min-width: 768px AND min-height: 600px) but not horizontal phones -->
   <div class="sticky-tablet top-24 z-10 -mx-4 px-4 md:-mx-6 md:px-6 lg:-mx-8 lg:px-8 pt-8 -mt-8 pb-8 md:bg-gradient-to-b md:from-gray-50 md:from-85% md:to-transparent">
-    <div class="md:flex md:items-center md:justify-between w-full">
-    <p class="text-left text-lg text-gray-600 md:flex-1 min-w-0">
-      <% if user_signed_in? %>
-        <%= t('users.index.description', count: @total_users_count) %>
-      <% else %>
-        <%= link_to t('users.index.join'), github_auth_with_return_path, class: "underline hover:text-red-600 transition-colors" %>
-        <%= t('users.index.join_suffix', count: @total_users_count) %>
-      <% end %>
-    </p>
+    <div class="md:flex md:items-end md:justify-between w-full">
+    <% if @filter_location.present? || @filter_company.present? %>
+      <%# When filtering, show filter badges instead of description %>
+      <div class="flex items-center gap-2 md:flex-1 min-w-0">
+        <% if @filter_company.present? %>
+          <span class="flex items-center gap-x-1 text-sm rounded-full bg-gray-100 px-3 py-2">
+            <span class="text-gray-400">Working at:</span>
+            <span class="text-gray-700 font-medium"><%= @filter_company %></span>
+            <%= link_to "×", users_path(location: @filter_location, sort: @sort, dir: @dir), class: "ml-1 text-gray-400 hover:text-gray-600 text-lg leading-none" %>
+          </span>
+        <% end %>
+        <% if @filter_location.present? %>
+          <span class="flex items-center gap-x-1 text-sm rounded-full bg-gray-100 px-3 py-2">
+            <span class="text-gray-400">Located in:</span>
+            <span class="text-gray-700 font-medium"><%= @filter_location %></span>
+            <%= link_to "×", users_path(company: @filter_company, sort: @sort, dir: @dir), class: "ml-1 text-gray-400 hover:text-gray-600 text-lg leading-none" %>
+          </span>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="text-lg text-gray-600 md:flex-1 min-w-0">
+        <% if user_signed_in? %>
+          <%= t('users.index.description', count: @total_users_count) %>.
+          <br>
+          <%= link_to "Share why you love Ruby", user_path(current_user), class: "underline hover:text-red-600 transition-colors" %> and your quote will be featured on <%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "underline hover:text-red-600 transition-colors whitespace-nowrap" %>
+        <% else %>
+          <%= button_to github_auth_with_return_path, method: :post, data: { turbo: false }, form: { class: "inline mr-1" }, class: "inline-flex items-center px-4 py-1.5 text-base font-medium rounded-md text-white bg-red-600 hover:bg-red-700 cursor-pointer transition-colors" do %>Join<% end %> <%= @total_users_count %> developers from around the world who are passionate about Ruby. <%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "ml-1 underline hover:text-red-600 transition-colors whitespace-nowrap" %>
+        <% end %>
+      </div>
+    <% end %>
 
     <div class="relative md:ml-auto mt-2 md:mt-0 flex-shrink-0" data-controller="dropdown">
       <button type="button" class="flex items-center gap-x-1 text-sm rounded-full cursor-pointer bg-gray-100 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 px-3 py-2" data-action="click->dropdown#toggle click@window->dropdown#hide">
@@ -108,31 +115,6 @@
     </div>
   </div>
   </div>
-
-  <!-- Active Filters -->
-  <% if @filter_location.present? || @filter_company.present? %>
-    <div class="bg-gray-50 rounded-lg py-4">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="text-sm text-gray-600">Filtering by:</span>
-          <% if @filter_location.present? %>
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white border border-gray-300">
-              <%= inline_svg_tag "location.svg", class: "w-3.5 h-3.5 mr-1 text-gray-500" %>
-              <%= @filter_location %>
-              <%= link_to "×", users_path(company: @filter_company), class: "ml-2 text-gray-400 hover:text-gray-600 text-lg leading-none" %>
-            </span>
-          <% end %>
-          <% if @filter_company.present? %>
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white border border-gray-300">
-              <%= inline_svg_tag "building.svg", class: "w-3.5 h-3.5 mr-1 text-gray-500" %>
-              <%= @filter_company %>
-              <%= link_to "×", users_path(location: @filter_location), class: "ml-2 text-gray-400 hover:text-gray-600 text-lg leading-none" %>
-            </span>
-          <% end %>
-        </div>
-      </div>
-    </div>
-  <% end %>
 
   <!-- Community Members Grid with Infinite Scroll -->
   <div data-controller="infinite-scroll" class="!-mt-6">
@@ -230,9 +212,9 @@
     </div>
   <% else %>
     <div class="mt-8 mb-8 text-center">
-      <%= link_to t('users.index.join_community'),
-          github_auth_with_return_path,
-          class: "text-gray-400 hover:text-gray-600 transition-colors" %>
+      <%= button_to github_auth_with_return_path, method: :post, data: { turbo: false }, class: "text-gray-400 hover:text-gray-600 transition-colors cursor-pointer" do %>
+        <%= t('users.index.join_community') %>
+      <% end %>
     </div>
   <% end %>
 </div>
