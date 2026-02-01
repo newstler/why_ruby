@@ -15,7 +15,7 @@
 - **Service Type**: Ruby programming language advocacy and community platform
 - **Operator**: Iurii Sidorov (Autónomo)
 - **Tax ID (VAT)**: ESY9716566T
-- **Registered Address**: Barcelona, Spain
+- **Registered Address**: Girona, Spain
 - **Contact Email**: hey@yurisidorov.com
 
 ## Nature of Service
@@ -67,7 +67,7 @@ As a beta service:
 
 ## Applicable Law and Jurisdiction
 
-This website is governed by Spanish and European Union law. Any disputes shall be submitted to the courts of Barcelona, Spain.
+This website is governed by Spanish and European Union law. Any disputes shall be submitted to the courts of Girona, Spain.
 
 ## Contact Information
 

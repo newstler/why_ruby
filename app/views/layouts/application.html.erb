@@ -84,36 +84,14 @@
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
     
-    <!-- Google Analytics (Last) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-55VPDFY7NM"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      // Set consent defaults to denied (no cookies)
-      gtag('consent', 'default', {
-        ad_storage: 'denied',
-        analytics_storage: 'denied',
-        functionality_storage: 'denied',
-        personalization_storage: 'denied',
-        security_storage: 'granted' // security cookies are allowed
-      });
-
-      gtag('config', 'G-55VPDFY7NM', {
-        anonymize_ip: true,              // Mask IP address
-        allow_ad_personalization_signals: false,
-        allow_google_signals: false,
-        client_storage: 'none',          // Force no cookies
-        transport_type: 'beacon',        // Use navigator.sendBeacon
-        cookie_flags: 'max-age=0'        // Prevent accidental cookies
-      });
-    </script>
-
-    <script defer data-domain="whyruby.info" src="https://plausible.io/js/script.js"></script>
+    <!-- Nullitics Analytics (privacy-first, no cookies, GDPR compliant) -->
+    <script type="text/javascript">new Image().src='https://nullitics.com/n.gif?u=' + encodeURI(location.href) + '&r=' + encodeURI(document.referrer) + '&d=' + screen.width;</script>
   </head>
 
   <body class="bg-gray-50 min-h-screen flex flex-col">
+    <!-- Nullitics noscript fallback -->
+    <noscript><img src="https://nullitics.com/n.gif?u=<%= request.original_url %>" alt="" style="position:absolute;left:-9999px" /></noscript>
+
     <nav class="bg-white shadow-sm sticky top-0 z-50 py-4" data-controller="mobile-menu" data-action="click@window->mobile-menu#hide">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <% centered_mobile_nav = controller_name == 'users' && ['index', 'show'].include?(action_name) %>

@@ -34,16 +34,13 @@ This information is automatically refreshed from GitHub each time you sign in to
 ### Cross-Domain Authentication
 When you sign in on one domain, we use a secure, short-lived token (valid for 30 seconds, single-use) to synchronize your session across both domains. This token is transmitted via URL parameter and immediately invalidated after use. No additional personal data is collected during this process.
 
-### Analytics Data (via Cookieless Google Analytics)
-We collect anonymized usage data to improve our service using Google Analytics 4 in cookieless mode:
-- Pages you visit and time spent on each page
-- Your browser type and operating system
-- Your approximate geographic location (country/city level)
+### Analytics Data (via Nullitics)
+We collect minimal, anonymized usage data to improve our service using [Nullitics](https://nullitics.com), a privacy-first analytics service:
+- Pages you visit
 - How you arrived at our site (referrer)
-- Device type (desktop, mobile, tablet)
-- User interactions and click events
+- Screen width (for responsive design optimization)
 
-This data is collected through Google Analytics 4 without using cookies. The analytics system uses privacy-preserving methods and does not store any data on your device. All collected data is anonymous and cannot be linked to your personal identity.
+Nullitics does not use cookies, does not store IP addresses, and does not collect any personally identifiable information. Their servers are located in the Netherlands and they are fully compliant with GDPR, ePrivacy, PECR, CCPA, and COPPA.
 
 ## How We Use Your Information
 
@@ -69,7 +66,7 @@ Your GitHub username, avatar, and profile information (name, bio, location, comp
 
 We use the following third-party services that may process your data:
 - **GitHub**: For authentication and profile data
-- **Google Analytics 4 (Cookieless)**: For website usage analytics (data is anonymized and no cookies are used)
+- **Nullitics**: For privacy-first website analytics (no cookies, no IP storage, GDPR compliant)
 
 These services have their own privacy policies and data handling practices. We encourage you to review their privacy policies.
 
@@ -92,9 +89,7 @@ To exercise these rights, contact us at hey@yurisidorov.com
 We use cookies only for essential website functionality:
 - **Essential cookies**: User authentication, session management, and security features
 
-**Analytics without cookies**: We use Google Analytics 4 in cookieless mode to understand website usage and improve our services. This implementation does not require cookies and respects your privacy by default.
-
-You can control cookie settings through your browser preferences. Since our analytics does not use cookies, no opt-out is required for analytics tracking.
+**Analytics without cookies**: We use Nullitics for website analytics. Nullitics does not use cookies, does not store IP addresses, and is fully compliant with GDPR, ePrivacy, PECR, CCPA, and COPPA. No cookie consent banner is required.
 
 We do not use cookies for advertising or marketing purposes.
 
