@@ -1,6 +1,8 @@
 # Cookie Policy
 
-**Last updated: August 14, 2025**
+**Last updated: February 1, 2026**
+
+This Cookie Policy applies to both **whyruby.info** and **rubycommunity.org**.
 
 ## What Are Cookies
 
@@ -17,6 +19,13 @@ These cookies are essential for the website to function properly:
 - **Authentication cookies**: Remember your GitHub login status
 - **Security cookies**: Protect against cross-site request forgery (CSRF)
 - **Preference cookies**: Remember your settings and preferences
+
+### Cross-Domain Session Tokens
+To provide seamless authentication across both whyruby.info and rubycommunity.org, we use secure, short-lived tokens (not cookies) to synchronize your login status. These tokens:
+- Are transmitted via URL parameter, not stored as cookies
+- Expire after 30 seconds and can only be used once
+- Are immediately deleted after successful session synchronization
+- Contain only your user identifier, no additional personal data
 
 ### Analytics (No Cookies Required)
 We use Google Analytics 4 in cookieless mode to understand how visitors use our website and improve our services. This implementation:

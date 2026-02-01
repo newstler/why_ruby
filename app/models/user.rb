@@ -130,7 +130,7 @@ class User < ApplicationRecord
     token = SecureRandom.urlsafe_base64(32)
     update_columns(
       cross_domain_token: token,
-      cross_domain_token_expires_at: 5.minutes.from_now
+      cross_domain_token_expires_at: 30.seconds.from_now
     )
     token
   end

@@ -1,6 +1,8 @@
 # Privacy Policy
 
-**Last updated: August 14, 2025**
+**Last updated: February 1, 2026**
+
+This Privacy Policy applies to both **whyruby.info** and **rubycommunity.org**, which are operated as a unified service under the same data controller.
 
 ## Information We Collect
 
@@ -28,6 +30,9 @@ This information is automatically refreshed from GitHub each time you sign in to
 ### Technical Information
 - Basic server logs for security and performance monitoring
 - Your IP address for security and geographic analysis
+
+### Cross-Domain Authentication
+When you sign in on one domain, we use a secure, short-lived token (valid for 30 seconds, single-use) to synchronize your session across both domains. This token is transmitted via URL parameter and immediately invalidated after use. No additional personal data is collected during this process.
 
 ### Analytics Data (via Cookieless Google Analytics)
 We collect anonymized usage data to improve our service using Google Analytics 4 in cookieless mode:

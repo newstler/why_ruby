@@ -35,7 +35,7 @@
     <div class="md:flex md:items-end md:justify-between w-full">
     <% if @filter_location.present? || @filter_company.present? %>
       <%# When filtering, show filter badges instead of description %>
-      <div class="flex items-center gap-2 md:flex-1 min-w-0">
+      <div class="flex items-center gap-2 md:flex-1 min-w-0 md:pr-6">
         <% if @filter_company.present? %>
           <span class="flex items-center gap-x-1 text-sm rounded-full bg-gray-100 px-3 py-2">
             <span class="text-gray-400">Working at:</span>
@@ -52,18 +52,17 @@
         <% end %>
       </div>
     <% else %>
-      <div class="text-lg text-gray-600 md:flex-1 min-w-0">
+      <div class="text-lg text-gray-600 md:flex-1 min-w-0 md:pr-6">
         <% if user_signed_in? %>
-          <%= t('users.index.description', count: @total_users_count) %>.
-          <br>
-          <%= link_to "Share why you love Ruby", user_path(current_user), class: "underline hover:text-red-600 transition-colors" %> and your quote will be featured on <%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "underline hover:text-red-600 transition-colors whitespace-nowrap" %>
+          <div><%= t('users.index.description', count: @total_users_count) %>.</div>
+          <div class="mt-4 md:mt-1"><%= link_to "Share why you love Ruby", user_path(current_user), class: "underline hover:text-red-600 transition-colors" %> and your quote will be featured on <%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "underline hover:text-red-600 transition-colors whitespace-nowrap" %></div>
         <% else %>
           <%= button_to github_auth_with_return_path, method: :post, data: { turbo: false }, form: { class: "inline mr-1" }, class: "inline-flex items-center px-4 py-1.5 text-base font-medium rounded-md text-white bg-red-600 hover:bg-red-700 cursor-pointer transition-colors" do %>Join<% end %> <%= @total_users_count %> developers from around the world who are passionate about Ruby. <%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "ml-1 underline hover:text-red-600 transition-colors whitespace-nowrap" %>
         <% end %>
       </div>
     <% end %>
 
-    <div class="relative md:ml-auto mt-2 md:mt-0 flex-shrink-0" data-controller="dropdown">
+    <div class="relative md:ml-auto mt-8 md:mt-0 flex-shrink-0" data-controller="dropdown">
       <button type="button" class="flex items-center gap-x-1 text-sm rounded-full cursor-pointer bg-gray-100 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 px-3 py-2" data-action="click->dropdown#toggle click@window->dropdown#hide">
         <span class="text-gray-400"><%= t('users.index.sort_label') %>:</span>
         <span class="text-gray-700 font-medium">
@@ -83,7 +82,7 @@
         <%= inline_svg_tag "chevron-down.svg", class: "ml-1 h-5 w-5 text-gray-400" %>
       </button>
 
-      <div class="hidden absolute mt-2 w-64 divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none left-0 md:left-auto md:right-0 origin-top-left md:origin-top-right" data-dropdown-target="menu">
+      <div class="hidden absolute z-50 mt-2 w-64 divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none left-0 md:left-auto md:right-0 origin-top-left md:origin-top-right" data-dropdown-target="menu">
         <div class="py-1">
           <% # Helper to compute label and dir per option, showing the opposite for current based on direction %>
           <% def sort_link(label_key, reverse_label_key, key, current_sort, current_dir, filters)
@@ -117,7 +116,7 @@
   </div>
 
   <!-- Community Members Grid with Infinite Scroll -->
-  <div data-controller="infinite-scroll" class="!-mt-6">
+  <div data-controller="infinite-scroll" class="!-mt-10 md:!-mt-6">
     <%# Split users into 3 columns for desktop, maintaining left-to-right reading order %>
     <% column1_users = [] %>
     <% column2_users = [] %>
@@ -189,8 +188,8 @@
 
     <!-- Pagination (hidden, used for infinite scroll) -->
     <div id="infinite-scroll-pagination" data-infinite-scroll-target="pagination" class="hidden">
-      <% if @users.total_pages > 1 %>
-        <%= paginate @users %>
+      <% if @users.total_pages > 1 && !@users.last_page? %>
+        <%= link_to "Next", users_path(page: @users.next_page, sort: @sort, dir: @dir, location: @filter_location, company: @filter_company), rel: "next" %>
       <% end %>
     </div>
 
@@ -203,7 +202,7 @@
   <!-- Community CTA -->
   <% if user_signed_in? %>
     <div class="mt-8 mb-8 text-center">
-      <% tweet_text = "Join us and share what you love about Ruby! https://whyruby.info" %>
+      <% tweet_text = "Explore Ruby developers' open source projects and connect with the community! Join us → https://rubycommunity.org" %>
       <%= link_to t('users.index.invite_friends'),
           "https://x.com/intent/tweet?text=#{CGI.escape(tweet_text)}",
           target: "_blank",

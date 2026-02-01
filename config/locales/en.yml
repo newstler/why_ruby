@@ -96,7 +96,7 @@ en:
       show:
         title: "%{display_name} (@%{username})"
         summary_with_bio: "%{bio}"
-        summary_without_bio: "View %{display_name}'s profile and contributions to the Ruby community on WhyRuby.info"
+        summary_without_bio: "View %{display_name}'s profile and contributions to the Ruby community on RubyCommunity.org"
         keywords: "%{username}, Ruby developer, Ruby community, profile"
   
   users:

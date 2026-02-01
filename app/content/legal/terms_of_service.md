@@ -1,10 +1,10 @@
 # Terms of Service
 
-**Last updated: August 14, 2025**
+**Last updated: February 1, 2026**
 
 ## Acceptance of Terms
 
-By accessing and using this Ruby advocacy website, you accept and agree to be bound by these Terms of Service.
+By accessing and using whyruby.info or rubycommunity.org (collectively, "the Service"), you accept and agree to be bound by these Terms of Service. Both websites are operated as a unified platform and these terms apply equally to both.
 
 ## Description of Service
 

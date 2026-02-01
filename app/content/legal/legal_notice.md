@@ -1,6 +1,6 @@
 # Legal Notice (Aviso Legal)
 
-**Last updated: August 10, 2025**
+**Last updated: February 1, 2026**
 
 > ⚠️ **Beta Service Notice**  
 > This service is currently in beta testing and is not fully operational. Features may change, and service interruptions may occur. Please use with caution and do not rely on it for critical or time-sensitive matters.
@@ -9,7 +9,9 @@
 
 ## Website Information
 
-- **Website**: https://whyruby.info
+- **Websites**:
+  - https://whyruby.info (Ruby advocacy and content platform)
+  - https://rubycommunity.org (Ruby community member directory)
 - **Service Type**: Ruby programming language advocacy and community platform
 - **Operator**: Iurii Sidorov (Autónomo)
 - **Tax ID (VAT)**: ESY9716566T
