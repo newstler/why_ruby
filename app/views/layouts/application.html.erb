@@ -49,9 +49,14 @@
     
     <!-- PWA and Mobile App Meta Tags -->
     <meta name="theme-color" content="#dc2626">
-    <meta name="application-name" content="<%= t('meta.site.application_name') %>">
+    <% if content_for?(:full_title) %>
+      <meta name="application-name" content="<%= t('meta.community.site_name') %>">
+      <meta name="apple-mobile-web-app-title" content="<%= t('meta.community.site_name') %>">
+    <% else %>
+      <meta name="application-name" content="<%= t('meta.site.application_name') %>">
+      <meta name="apple-mobile-web-app-title" content="<%= t('meta.site.apple_app_title') %>">
+    <% end %>
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="<%= t('meta.site.apple_app_title') %>">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="msapplication-TileColor" content="#dc2626">
     <meta name="msapplication-TileImage" content="/android-chrome-192x192.png">

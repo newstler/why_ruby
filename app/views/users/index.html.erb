@@ -8,11 +8,11 @@
   <!-- SEO Meta Tags -->
   <meta name="description" content="<%= t('meta.users.index.summary') %>">
   <meta name="keywords" content="<%= t('meta.users.index.keywords') %>">
-  <link rel="canonical" href="<%= users_url %>">
+  <link rel="canonical" href="<%= community_root_canonical_url %>">
 
   <!-- Open Graph / Facebook Meta Tags -->
   <meta property="og:type" content="website">
-  <meta property="og:url" content="<%= users_url %>">
+  <meta property="og:url" content="<%= community_root_canonical_url %>">
   <meta property="og:title" content="<%= t('meta.community.site_name') %>">
   <meta property="og:description" content="<%= t('meta.users.index.summary') %>">
   <meta property="og:image" content="<%= versioned_og_image_url("og-image-community.png") %>">
@@ -21,7 +21,7 @@
 
   <!-- Twitter Card Meta Tags -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:url" content="<%= users_url %>">
+  <meta name="twitter:url" content="<%= community_root_canonical_url %>">
   <meta name="twitter:title" content="<%= t('meta.community.site_name') %>">
   <meta name="twitter:description" content="<%= t('meta.users.index.summary') %>">
   <meta name="twitter:image" content="<%= versioned_og_image_url("og-image-community.png") %>">
@@ -55,7 +55,7 @@
       <div class="text-lg text-gray-600 md:flex-1 min-w-0 md:pr-6">
         <% if user_signed_in? %>
           <div><%= t('users.index.description', count: @total_users_count) %>.</div>
-          <div class="mt-4 md:mt-1"><%= link_to "Share why you love Ruby", user_path(current_user), class: "underline hover:text-red-600 transition-colors" %> and your quote will be featured on <%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "underline hover:text-red-600 transition-colors whitespace-nowrap" %></div>
+          <div class="mt-4 md:mt-1">Share why you love Ruby on <%= link_to "your profile page", user_path(current_user), class: "underline hover:text-red-600 transition-colors" %> and your quote will be featured on <%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "underline hover:text-red-600 transition-colors whitespace-nowrap" %></div>
         <% else %>
           <%= button_to github_auth_with_return_path, method: :post, data: { turbo: false }, form: { class: "inline mr-1" }, class: "inline-flex items-center px-4 py-1.5 text-base font-medium rounded-md text-white bg-red-600 hover:bg-red-700 cursor-pointer transition-colors" do %>Join<% end %> <%= @total_users_count %> developers from around the world who are passionate about Ruby. <%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "ml-1 underline hover:text-red-600 transition-colors whitespace-nowrap" %>
         <% end %>

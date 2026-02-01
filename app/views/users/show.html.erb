@@ -9,11 +9,11 @@
   <meta name="description" content="<%= user_meta_description(@user) %>">
   <meta name="keywords" content="<%= user_meta_keywords(@user) %>">
   <meta name="author" content="<%= user_meta_title(@user) %>">
-  <link rel="canonical" href="<%= user_url(@user) %>">
+  <link rel="canonical" href="<%= community_user_canonical_url(@user) %>">
 
   <!-- Open Graph / Facebook Meta Tags -->
   <meta property="og:type" content="profile">
-  <meta property="og:url" content="<%= user_url(@user) %>">
+  <meta property="og:url" content="<%= community_user_canonical_url(@user) %>">
   <meta property="og:title" content="<%= community_page_title(user_meta_title(@user)) %>">
   <meta property="og:description" content="<%= user_meta_description(@user) %>">
   <meta property="og:image" content="<%= user_meta_image_url(@user) %>">
@@ -22,7 +22,7 @@
 
   <!-- Twitter Card Meta Tags -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:url" content="<%= user_url(@user) %>">
+  <meta name="twitter:url" content="<%= community_user_canonical_url(@user) %>">
   <meta name="twitter:title" content="<%= community_page_title(user_meta_title(@user)) %>">
   <meta name="twitter:description" content="<%= user_meta_description(@user) %>">
   <meta name="twitter:image" content="<%= user_meta_image_url(@user) %>">
@@ -43,8 +43,8 @@
       <div class="hidden md:block">
         <div class="flex items-center gap-6">
           <%= render "shared/gem_avatar", user: @user, size: "w-36 h-[130px]", text_size: "text-5xl" %>
-          
-          <div class="flex flex-col justify-center">
+
+          <div class="flex flex-col justify-center flex-1">
             <!-- First line: Name and social links -->
             <div class="flex items-baseline gap-3 mb-2">
               <h1 class="text-4xl font-black text-gray-900"><%= @user.display_name %></h1>
@@ -95,6 +95,10 @@
               <% end %>
             </div>
           </div>
+
+          <% if current_user == @user %>
+            <%= button_to "Sign out", destroy_user_session_path, method: :delete, data: { turbo: false }, form: { class: "ml-auto self-start" }, class: "px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors cursor-pointer" %>
+          <% end %>
         </div>
       </div>
 
@@ -155,6 +159,12 @@
               <% end %>
             <% end %>
           </div>
+
+          <% if current_user == @user %>
+            <div class="mt-4">
+              <%= button_to "Sign out", destroy_user_session_path, method: :delete, data: { turbo: false }, class: "px-3 py-1.5 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors cursor-pointer" %>
+            </div>
+          <% end %>
         </div>
       </div>
     </div>

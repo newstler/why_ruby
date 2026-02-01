@@ -256,12 +256,34 @@ module ApplicationHelper
     end
   end
 
-  # Helper for community user profile URLs
+  # Helper for community user profile URLs (for navigation links)
   def community_user_url(user)
     if Rails.env.production?
       "https://#{Rails.application.config.x.domains.community}/#{user.to_param}"
     else
       user_path(user)
+    end
+  end
+
+  # Canonical URL for community root (for meta tags)
+  # Production: https://rubycommunity.org/
+  # Development: http://localhost:3003/community
+  def community_root_canonical_url
+    if Rails.env.production?
+      "https://#{Rails.application.config.x.domains.community}/"
+    else
+      users_url
+    end
+  end
+
+  # Canonical URL for community user profile (for meta tags)
+  # Production: https://rubycommunity.org/username
+  # Development: http://localhost:3003/community/username
+  def community_user_canonical_url(user)
+    if Rails.env.production?
+      "https://#{Rails.application.config.x.domains.community}/#{user.to_param}"
+    else
+      user_url(user)
     end
   end
 end
