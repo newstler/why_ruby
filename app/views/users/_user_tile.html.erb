@@ -37,15 +37,15 @@
         <% if user.company.present? || user.location.present? %>
           <div class="flex flex-wrap items-center gap-x-3 gap-y-0.5 <%= local_assigns[:compact] ? 'text-[10px] md:text-xs' : 'text-xs' %> text-gray-400 -ml-0.5">
             <% if user.company.present? %>
-              <span class="flex items-center gap-1 whitespace-nowrap">
-                <%= inline_svg_tag "building.svg", class: "w-3.5 h-3.5 text-gray-300" %>
+              <span class="flex items-start gap-1">
+                <%= inline_svg_tag "building.svg", class: "w-3.5 h-3.5 text-gray-300 flex-shrink-0 mt-0.5" %>
                 <span><%= user.company %></span>
               </span>
             <% end %>
 
             <% if user.location.present? %>
-              <span class="flex items-center gap-1 whitespace-nowrap">
-                <%= inline_svg_tag "location.svg", class: "w-3.5 h-3.5 text-gray-300" %>
+              <span class="flex items-start gap-1">
+                <%= inline_svg_tag "location.svg", class: "w-3.5 h-3.5 text-gray-300 flex-shrink-0 mt-0.5" %>
                 <span><%= user.location %></span>
               </span>
             <% end %>
