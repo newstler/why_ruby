@@ -45,7 +45,7 @@ class UserSettingsController < ApplicationController
       format.turbo_stream do
         render turbo_stream: [
           turbo_stream.replace("projects_panel", partial: "users/projects_panel", locals: { ruby_repos: @ruby_repos, hidden_repos: @hidden_repos, user: current_user }),
-          turbo_stream.replace("projects_count", html: @ruby_repos.size.to_s)
+          turbo_stream.update("projects_count", html: @ruby_repos.size.to_s)
         ]
       end
       format.html { redirect_to user_path(current_user) }

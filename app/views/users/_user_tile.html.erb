@@ -52,7 +52,7 @@
           </div>
         <% end %>
 
-        <% ruby_repos_count = user.ruby_repositories.size %>
+        <% ruby_repos_count = user.github_repos_count.to_i %>
         <% has_stats = ruby_repos_count > 0 || user.published_posts_count > 0 || user.published_comments_count > 0 %>
         <% if has_stats %>
           <div class="flex items-center gap-2.5 <%= local_assigns[:compact] ? 'text-[10px] md:text-xs' : 'text-xs' %> text-gray-500">
