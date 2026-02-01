@@ -234,10 +234,11 @@ The GeoLite2 database is used for IP geolocation (analytics country code). It's 
 Add to production credentials (`rails credentials:edit --environment production`):
 ```yaml
 maxmind:
+  account_id: your_account_id  # Find at top of MaxMind license key page
   license_key: your_license_key
 ```
 
-The Dockerfile automatically downloads the database during build if `MAXMIND_LICENSE_KEY` is provided.
+The Dockerfile automatically downloads the database during build if both `MAXMIND_ACCOUNT_ID` and `MAXMIND_LICENSE_KEY` are provided. Note: MaxMind API changed in May 2024 to require both credentials.
 
 ### Deployment
 
