@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   def index
-    @users = User.includes(:posts, :comments)
-    @total_users_count = User.count
+    @users = User.visible.includes(:posts, :comments)
+    @total_users_count = User.visible.count
 
     # Apply filters if present
     if params[:location].present?
@@ -56,6 +56,12 @@ class UsersController < ApplicationController
   def show
     @user = User.friendly.find(params[:id])
 
+    # Handle non-public profiles (only owner can view)
+    unless @user.public? || (user_signed_in? && current_user == @user)
+      redirect_to users_path, alert: "This profile is private."
+      return
+    end
+
     # Load posts with pagination support
     # Show unpublished posts only to the owner
     @posts = if user_signed_in? && current_user == @user
@@ -77,6 +83,13 @@ class UsersController < ApplicationController
                             .limit(9)
 
     # Get Ruby repositories for projects tab
-    @ruby_repos = @user.ruby_repositories
+    # Owner sees visible + hidden repos, others only see visible
+    if user_signed_in? && current_user == @user
+      @ruby_repos = @user.visible_ruby_repositories
+      @hidden_repos = @user.hidden_ruby_repositories
+    else
+      @ruby_repos = @user.visible_ruby_repositories
+      @hidden_repos = []
+    end
   end
 end

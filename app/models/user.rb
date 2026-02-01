@@ -27,6 +27,7 @@ class User < ApplicationRecord
     where("published_posts_count >= ? AND published_comments_count >= ?", 3, 10)
   }
   scope :admins, -> { where(role: :admin) }
+  scope :visible, -> { where(public: true) }
 
   # Devise modules for GitHub OAuth
   devise :omniauthable, omniauth_providers: [ :github ]
@@ -52,6 +53,58 @@ class User < ApplicationRecord
   rescue JSON::ParserError, ArgumentError => e
     Rails.logger.error "Error parsing repositories: #{e.message}"
     []
+  end
+
+  # Get visible repositories (excludes hidden)
+  def visible_ruby_repositories
+    return ruby_repositories if hidden_repo_urls.empty?
+    ruby_repositories.reject { |repo| hidden_repo_urls.include?(repo[:url]) }
+  end
+
+  # Get hidden repositories only
+  def hidden_ruby_repositories
+    return [] if hidden_repo_urls.empty?
+    ruby_repositories.select { |repo| hidden_repo_urls.include?(repo[:url]) }
+  end
+
+  # Parse hidden repos JSON (memoized for performance)
+  def hidden_repo_urls
+    @hidden_repo_urls ||= begin
+      return [] if hidden_repos.blank?
+      JSON.parse(hidden_repos)
+    rescue JSON::ParserError
+      []
+    end
+  end
+
+  # Clear memoization when hidden_repos changes
+  def hidden_repos=(value)
+    @hidden_repo_urls = nil
+    write_attribute(:hidden_repos, value)
+  end
+
+  # Add repo to hidden list
+  def hide_repository!(repo_url)
+    return if hidden_repo_urls.include?(repo_url)
+    update!(hidden_repos: (hidden_repo_urls + [ repo_url ]).to_json)
+    recalculate_visible_stats!
+  end
+
+  # Remove repo from hidden list (unhide)
+  def unhide_repository!(repo_url)
+    return unless hidden_repo_urls.include?(repo_url)
+    new_urls = hidden_repo_urls - [ repo_url ]
+    update!(hidden_repos: new_urls.empty? ? nil : new_urls.to_json)
+    recalculate_visible_stats!
+  end
+
+  # Recalculate stats based on visible repos only
+  def recalculate_visible_stats!
+    repos = visible_ruby_repositories
+    update!(
+      github_repos_count: repos.size,
+      github_stars_sum: repos.sum { |r| r[:stars].to_i }
+    )
   end
 
   def total_github_stars

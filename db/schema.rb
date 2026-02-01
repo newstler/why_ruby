@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_02_01_205733) do
+ActiveRecord::Schema[8.2].define(version: 2026_02_01_215807) do
   create_table "_litestream_lock", id: false, force: :cascade do |t|
     t.integer "id"
   end
@@ -186,9 +186,12 @@ ActiveRecord::Schema[8.2].define(version: 2026_02_01_205733) do
     t.text "github_repos"
     t.integer "github_repos_count"
     t.integer "github_stars_sum"
+    t.text "hidden_repos"
     t.string "linkedin"
     t.string "location"
     t.string "name"
+    t.boolean "open_to_work", default: false, null: false
+    t.boolean "public", default: true, null: false
     t.integer "published_comments_count", default: 0, null: false
     t.integer "published_posts_count", default: 0, null: false
     t.integer "role", default: 0, null: false

@@ -65,6 +65,14 @@ Rails.application.routes.draw do
   # Testimonials (singular resource - one per user)
   resource :testimonial, only: [ :create, :update ]
 
+  # User settings routes
+  resource :user_settings, only: [], controller: "user_settings" do
+    post :toggle_public, on: :collection
+    post :toggle_open_to_work, on: :collection
+    post :hide_repo, on: :collection
+    post :unhide_repo, on: :collection
+  end
+
   # Legal pages (must be before catch-all routes)
   get "legal/privacy", to: "legal#show", defaults: { page: "privacy_policy" }, as: :privacy_policy
   get "legal/terms", to: "legal#show", defaults: { page: "terms_of_service" }, as: :terms_of_service

@@ -97,7 +97,9 @@
           </div>
 
           <% if current_user == @user %>
-            <%= button_to "Sign out", destroy_user_session_path, method: :delete, data: { turbo: false }, form: { class: "ml-auto self-start" }, class: "px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors cursor-pointer" %>
+            <div class="ml-auto self-start">
+              <%= render "users/profile_settings", user: @user %>
+            </div>
           <% end %>
         </div>
       </div>
@@ -162,7 +164,7 @@
 
           <% if current_user == @user %>
             <div class="mt-4">
-              <%= button_to "Sign out", destroy_user_session_path, method: :delete, data: { turbo: false }, class: "px-3 py-1.5 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors cursor-pointer" %>
+              <%= render "users/profile_settings", user: @user %>
             </div>
           <% end %>
         </div>
@@ -184,7 +186,7 @@
     <% end %>
 
     <!-- Tab Navigation -->
-    <% has_projects = @ruby_repos.any? %>
+    <% has_projects = @ruby_repos.any? || @hidden_repos.any? %>
     <% has_posts = @user.published_posts_count > 0 %>
     <% has_comments = @user.published_comments_count > 0 %>
     <% if has_projects || has_posts || has_comments %>
@@ -198,7 +200,7 @@
          role="tab"
          aria-selected="false">
         <span>Projects</span>
-        <span class="bg-gray-100 text-gray-700 px-2 lg:px-2.5 py-0.5 rounded-full text-xs lg:text-base font-semibold">
+        <span id="projects_count" class="bg-gray-100 text-gray-700 px-2 lg:px-2.5 py-0.5 rounded-full text-xs lg:text-base font-semibold">
           <%= @ruby_repos.size %>
         </span>
       </a>
@@ -240,84 +242,11 @@
     <% if has_projects || has_posts || has_comments %>
     <div class="mt-8">
       <!-- Projects Tab Panel -->
-      <% if has_projects %>
+      <% if has_projects || @hidden_repos.any? %>
       <div data-tabs-target="panel" data-tabs-name="projects" role="tabpanel" class="hidden">
-        <% if @ruby_repos.any? %>
-          <div class="space-y-4">
-            <!-- Desktop: 3 columns -->
-            <div class="hidden lg:flex gap-6">
-              <% # Split repositories into 3 columns for desktop, maintaining left-to-right reading order %>
-              <% column1_repos = [] %>
-              <% column2_repos = [] %>
-              <% column3_repos = [] %>
-              
-              <% @ruby_repos.each_with_index do |repo, index| %>
-                <% case index % 3 %>
-                <% when 0 %>
-                  <% column1_repos << repo %>
-                <% when 1 %>
-                  <% column2_repos << repo %>
-                <% when 2 %>
-                  <% column3_repos << repo %>
-                <% end %>
-              <% end %>
-              
-              <% [column1_repos, column2_repos, column3_repos].each do |column_repos| %>
-                <div class="flex-1 space-y-6">
-                  <% column_repos.each do |repository| %>
-                    <%= render 'users/repository_tile', repository: repository %>
-                  <% end %>
-                </div>
-              <% end %>
-            </div>
-            
-            <!-- Tablet: 2 columns -->
-            <div class="hidden md:flex lg:hidden gap-6">
-              <% column1_repos = [] %>
-              <% column2_repos = [] %>
-              
-              <% @ruby_repos.each_with_index do |repo, index| %>
-                <% if index % 2 == 0 %>
-                  <% column1_repos << repo %>
-                <% else %>
-                  <% column2_repos << repo %>
-                <% end %>
-              <% end %>
-              
-              <% [column1_repos, column2_repos].each do |column_repos| %>
-                <div class="flex-1 space-y-6">
-                  <% column_repos.each do |repository| %>
-                    <%= render 'users/repository_tile', repository: repository %>
-                  <% end %>
-                </div>
-              <% end %>
-            </div>
-            
-            <!-- Mobile: 1 column -->
-            <div class="md:hidden space-y-6">
-              <% @ruby_repos.each do |repository| %>
-                <%= render 'users/repository_tile', repository: repository %>
-              <% end %>
-            </div>
-            
-            <% if @user.github_ruby_repositories_url.present? %>
-              <div class="mt-8 text-center">
-                <%= link_to t('users.show.view_all_repositories'), safe_external_url(@user.github_ruby_repositories_url), 
-                    target: "_blank", rel: "noopener", class: "text-gray-400 hover:text-gray-600" %>
-              </div>
-            <% end %>
-          </div>
-        <% else %>
-          <div class="bg-white shadow rounded-lg p-8 text-center">
-            <p class="text-gray-600"><%= t('users.show.no_ruby_projects') %></p>
-            <% if @user.github_profile_url.present? %>
-              <p class="mt-2">
-                <%= link_to t('users.show.view_github_profile'), safe_external_url(@user.github_profile_url), 
-                    target: "_blank", rel: "noopener", class: "text-gray-600 hover:text-gray-800" %>
-              </p>
-            <% end %>
-          </div>
-        <% end %>
+        <div id="projects_panel">
+          <%= render "users/projects_panel", ruby_repos: @ruby_repos, hidden_repos: @hidden_repos, user: @user %>
+        </div>
       </div>
       <% end %>
 

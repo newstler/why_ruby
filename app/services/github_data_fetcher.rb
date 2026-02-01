@@ -82,8 +82,11 @@ class GithubDataFetcher
     # Store repos as JSON in the github_repos field and update stars sum
     repos = fetch_ruby_repositories(github_username)
     if repos.present?
-      stars_sum = repos.sum { |r| r[:stars].to_i }
-      repos_count = repos.size
+      # Store all repos, but only count visible ones in stats
+      hidden_urls = user.hidden_repo_urls
+      visible_repos = repos.reject { |r| hidden_urls.include?(r[:url]) }
+      stars_sum = visible_repos.sum { |r| r[:stars].to_i }
+      repos_count = visible_repos.size
       user.update!(github_repos: repos.to_json, github_stars_sum: stars_sum, github_repos_count: repos_count)
     end
   rescue => e

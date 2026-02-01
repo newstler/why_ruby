@@ -107,6 +107,28 @@ module ApplicationHelper
     "https://#{domain}/#{post.category.to_param}/#{post.to_param}"
   end
 
+  # Generate edit post URL on primary domain
+  # Used to ensure edit links always go to whyruby.info, not the community domain
+  def primary_domain_edit_post_url(post)
+    if Rails.env.production?
+      domain = Rails.application.config.x.domains.primary
+      "https://#{domain}/posts/#{post.to_param}/edit"
+    else
+      edit_post_path(post)
+    end
+  end
+
+  # Generate delete post URL on primary domain
+  # Used to ensure delete actions always go to whyruby.info, not the community domain
+  def primary_domain_destroy_post_url(post)
+    if Rails.env.production?
+      domain = Rails.application.config.x.domains.primary
+      "https://#{domain}/posts/#{post.to_param}"
+    else
+      post_destroy_path(post)
+    end
+  end
+
   def post_link_options(post)
     post.link? ? { target: "_blank", rel: "noopener" } : {}
   end

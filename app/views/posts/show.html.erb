@@ -60,11 +60,11 @@
         
         <% if user_signed_in? && (@post.user.present? && @post.user == current_user || current_user.admin?) %>
           <div class="flex items-center space-x-3">
-            <%= link_to edit_post_path(@post), class: "text-sm text-gray-400 hover:text-black flex items-center gap-1.5 transition-colors" do %>
+            <%= link_to primary_domain_edit_post_url(@post), class: "text-sm text-gray-400 hover:text-black flex items-center gap-1.5 transition-colors" do %>
               <%= inline_svg_tag "edit.svg", class: "w-4 h-4" %>
               <span>Edit</span>
             <% end %>
-            <%= button_to post_destroy_path(@post), method: :delete, data: { turbo: false }, form: { class: "inline", onsubmit: "return confirm('Are you sure?')" }, class: "text-sm text-gray-400 hover:text-red-600 border-0 bg-transparent cursor-pointer p-0 flex items-center gap-1.5 transition-colors" do %>
+            <%= button_to primary_domain_destroy_post_url(@post), method: :delete, data: { turbo: false }, form: { class: "inline", onsubmit: "return confirm('Are you sure?')" }, class: "text-sm text-gray-400 hover:text-red-600 border-0 bg-transparent cursor-pointer p-0 flex items-center gap-1.5 transition-colors" do %>
               <%= inline_svg_tag "delete.svg", class: "w-4 h-4" %>
               <span>Delete</span>
             <% end %>
