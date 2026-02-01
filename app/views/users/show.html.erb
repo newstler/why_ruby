@@ -103,7 +103,7 @@
           <!-- Right side: Settings (only for owner) -->
           <% if current_user == @user %>
             <div class="ml-auto self-start pl-8">
-              <%= render "users/profile_settings", user: @user %>
+              <%= render "users/profile_settings", user: @user, wrapper_id: "profile_settings_desktop" %>
             </div>
           <% end %>
         </div>
@@ -177,7 +177,7 @@
 
           <% if current_user == @user %>
             <div class="mt-4">
-              <%= render "users/profile_settings", user: @user %>
+              <%= render "users/profile_settings", user: @user, wrapper_id: "profile_settings_mobile" %>
             </div>
           <% end %>
         </div>
