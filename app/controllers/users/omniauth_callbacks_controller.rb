@@ -37,7 +37,8 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
       token = @user.generate_cross_domain_token!
 
       # Build full URL for final destination
-      final_url = "https://#{current_host}#{final_destination}"
+      # If final_destination is already a full URL (from user_profile_path), use it directly
+      final_url = final_destination.start_with?("https://") ? final_destination : "https://#{current_host}#{final_destination}"
 
       # Redirect to other domain to sync session, passing final destination
       "https://#{other_host}/auth/receive?token=#{token}&return_to=#{CGI.escape(final_url)}"
@@ -48,10 +49,10 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
 
   def user_profile_path
     # In development: /community/:username
-    # In production on community domain: /:username
+    # In production: always go to rubycommunity.org/:username
     domains = Rails.application.config.x.domains
-    if Rails.env.production? && request.host == domains.community
-      "/#{@user.to_param}"
+    if Rails.env.production?
+      "https://#{domains.community}/#{@user.to_param}"
     else
       "/community/#{@user.to_param}"
     end
