@@ -7,7 +7,7 @@
     - compact: (optional) if true, uses smaller text sizes on mobile
 %>
 
-<%= link_to user_path(user), class: "group block #{local_assigns[:frameless] ? '' : 'bg-white shadow rounded-lg p-6 hover:shadow-lg'} transition-shadow" do %>
+<%= link_to community_user_url(user), class: "group block #{local_assigns[:frameless] ? '' : 'bg-white shadow rounded-lg p-6 hover:shadow-lg'} transition-shadow" do %>
   <div class="flex <%= local_assigns[:frameless] ? 'items-center' : 'items-start' %> gap-4">
     <!-- Avatar -->
     <%= render "shared/gem_avatar", user: user, size: local_assigns[:avatar_size] || "w-24 h-[86px]", text_size: "text-3xl" %>
