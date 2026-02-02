@@ -11,8 +11,9 @@
   <%# Navigation buttons + Sign in - same style as main nav %>
   <%# Sticky on tablet+ (min-width: 640px AND min-height: 500px) but not horizontal phones %>
   <div data-controller="sticky-nav">
-    <div class="mt-16" data-sticky-nav-target="nav">
-      <div class="flex flex-wrap justify-center items-center gap-2">
+    <div class="mt-16 mb-16" data-sticky-nav-target="nav">
+      <%# Desktop/Tablet: show all buttons %>
+      <div class="hidden [@media(min-width:640px)_and_(min-height:500px)]:flex flex-wrap justify-center items-center gap-2">
         <% Category.with_posts.ordered.each do |category| %>
           <% next if category.is_success_story? && !has_success_stories? %>
           <%= link_to category.name, category_path(category),
@@ -20,6 +21,36 @@
         <% end %>
         <%= link_to "Community", community_index_url,
             class: "text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
+        <% if should_show_mobile_cta? %>
+          <%= render "shared/github_signin_button" %>
+        <% end %>
+      </div>
+
+      <%# Mobile: hamburger menu + sign in button %>
+      <div class="[@media(min-width:640px)_and_(min-height:500px)]:hidden flex justify-center items-center gap-3">
+        <div class="relative" data-controller="dropdown" data-action="click@window->dropdown#hide">
+          <button type="button"
+                  class="text-gray-600 bg-gray-100 hover:bg-gray-200 p-2 rounded-md cursor-pointer"
+                  data-action="click->dropdown#toggle"
+                  aria-label="Open navigation menu">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+
+          <div class="hidden absolute left-0 mt-2 w-48 rounded-md bg-white shadow-lg ring-1 ring-black/5 z-50" data-dropdown-target="menu">
+            <div class="py-1">
+              <% Category.with_posts.ordered.each do |category| %>
+                <% next if category.is_success_story? && !has_success_stories? %>
+                <%= link_to category.name, category_path(category),
+                    class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
+              <% end %>
+              <%= link_to "Community", community_index_url,
+                  class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
+            </div>
+          </div>
+        </div>
+
         <% if should_show_mobile_cta? %>
           <%= render "shared/github_signin_button" %>
         <% end %>

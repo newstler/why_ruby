@@ -59,7 +59,8 @@ export default class extends Controller {
     const originalTop = this.isSticky ? this.placeholder.getBoundingClientRect().top : navRect.top
 
     // Should stick when the nav would scroll past the header
-    const shouldStick = originalTop <= headerHeight
+    // Add small buffer to prevent visual jump
+    const shouldStick = originalTop <= headerHeight + 8
 
     if (shouldStick && !this.isSticky) {
       this.stick(headerHeight)
@@ -76,7 +77,9 @@ export default class extends Controller {
     // Create placeholder to maintain layout
     this.placeholder = document.createElement("div")
     this.placeholder.style.height = `${rect.height}px`
-    this.placeholder.style.marginTop = this.navTarget.style.marginTop || window.getComputedStyle(this.navTarget).marginTop
+    const computedStyle = window.getComputedStyle(this.navTarget)
+    this.placeholder.style.marginTop = computedStyle.marginTop
+    this.placeholder.style.marginBottom = computedStyle.marginBottom
     this.navTarget.parentNode.insertBefore(this.placeholder, this.navTarget)
 
     // Make nav fixed with gradient matching Tailwind's md:bg-gradient-to-b md:from-gray-50 md:from-85% md:to-transparent
