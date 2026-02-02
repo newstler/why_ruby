@@ -89,10 +89,10 @@
     <!-- Nullitics noscript fallback -->
     <noscript><img src="https://nullitics.com/n.gif?u=<%= request.original_url %><%= "&c=#{country_code}" if country_code.present? %>" alt="" style="position:absolute;left:-9999px" /></noscript>
 
-    <% community_nav = controller_name == 'users' && ['index', 'show'].include?(action_name) %>
+    <% community_nav = content_for?(:nav_community_style) || (controller_name == 'users' && ['index', 'show'].include?(action_name)) %>
     <nav class="<%= community_nav ? 'bg-gray-50 pt-4 [@media(min-width:640px)_and_(min-height:500px)]:pt-6' : 'bg-white shadow-sm py-4' %> sticky top-0 z-50" data-controller="mobile-menu" data-action="click@window->mobile-menu#hide">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <% centered_mobile_nav = controller_name == 'users' && ['index', 'show'].include?(action_name) %>
+        <% centered_mobile_nav = content_for?(:nav_community_style) || (controller_name == 'users' && ['index', 'show'].include?(action_name)) %>
         <div class="flex items-center <%= centered_mobile_nav ? 'h-14 [@media(min-width:640px)_and_(min-height:500px)]:h-20 justify-center' : 'h-16 justify-between' %>">
           <% if content_for?(:nav_minimal) %>
             <!-- Minimal nav - just centered logo -->

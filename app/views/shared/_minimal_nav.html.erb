@@ -1,0 +1,15 @@
+<%# Minimal nav partial - centered logo only, no nav links or signin button %>
+<%# Usage: render "shared/minimal_nav", before_heart: "Why", after_heart: "Ruby?", url: root_path %>
+
+<%# Enable community-style nav styling (gray bg, centered, divider) %>
+<% content_for :nav_community_style, true %>
+
+<%# Override header logo with custom text %>
+<% content_for :header_logo do %>
+  <%= link_to url, class: "group text-3xl [@media(min-width:640px)_and_(min-height:500px)]:text-5xl font-black text-red-600 whitespace-nowrap inline-flex items-center" do %>
+    <%= before_heart %> <%= image_tag "heart.webp", class: "h-10 w-10 [@media(min-width:640px)_and_(min-height:500px)]:h-16 [@media(min-width:640px)_and_(min-height:500px)]:w-16 mx-1 inline-block animate-heartbeat", alt: "" %> <%= after_heart %>
+  <% end %>
+<% end %>
+
+<%# Enable minimal nav mode (just centered logo, no nav links) %>
+<% content_for :nav_minimal, true %>

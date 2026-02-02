@@ -1,10 +1,15 @@
 require "test_helper"
 
 class TestimonialTest < ActiveSupport::TestCase
-  test "validates presence of quote" do
-    testimonial = Testimonial.new(user: users(:user_no_testimonial))
+  test "validates quote length minimum 140 characters" do
+    testimonial = Testimonial.new(user: users(:user_no_testimonial), quote: "Too short")
     assert_not testimonial.valid?
-    assert_includes testimonial.errors[:quote], "can't be blank"
+    assert testimonial.errors[:quote].any? { |e| e.include?("too short") }
+  end
+
+  test "allows blank quote" do
+    testimonial = Testimonial.new(user: users(:user_no_testimonial), quote: "")
+    assert testimonial.valid?
   end
 
   test "validates uniqueness of user_id" do

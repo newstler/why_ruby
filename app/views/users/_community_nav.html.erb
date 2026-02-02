@@ -1,9 +1,2 @@
-<%# Override header logo for community pages %>
-<% content_for :header_logo do %>
-  <%= link_to community_index_url, class: "group text-3xl [@media(min-width:640px)_and_(min-height:500px)]:text-5xl font-black text-red-600 whitespace-nowrap inline-flex items-center" do %>
-    Ruby <%= image_tag "heart.webp", class: "h-10 w-10 [@media(min-width:640px)_and_(min-height:500px)]:h-16 [@media(min-width:640px)_and_(min-height:500px)]:w-16 mx-1 inline-block animate-heartbeat", alt: "" %> Community
-  <% end %>
-<% end %>
-
-<%# Minimal nav - only centered logo, no nav links or signin button %>
-<% content_for :nav_minimal, true %>
+<%# Community nav - uses shared minimal nav partial %>
+<%= render "shared/minimal_nav", before_heart: "Ruby", after_heart: "Community", url: community_index_url %>

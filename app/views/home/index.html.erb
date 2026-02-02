@@ -1,16 +1,26 @@
 <%# Set page title for home page %>
 <% content_for(:title) { "Discover why Ruby continues to be a beloved language for developers worldwide" } %>
 
+<%# Use minimal nav (centered logo only, community-style styling) %>
+<%= render "shared/minimal_nav", before_heart: "Why", after_heart: "Ruby?", url: root_path %>
+
 <div>
   <%# Testimonial Carousel %>
   <%= render "home/testimonial_carousel", testimonials: @testimonials %>
 
-  <%# Mobile CTA - shown below lg breakpoint when user has no published testimonial %>
-  <% if should_show_mobile_cta? %>
-    <div class="lg:hidden flex justify-center mt-10 mb-2">
+  <%# Navigation buttons + Sign in - same style as main nav %>
+  <div class="flex flex-wrap justify-center items-center gap-2 mt-16">
+    <% Category.with_posts.ordered.each do |category| %>
+      <% next if category.is_success_story? && !has_success_stories? %>
+      <%= link_to category.name, category_path(category),
+          class: "text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
+    <% end %>
+    <%= link_to "Community", community_index_url,
+        class: "text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
+    <% if should_show_mobile_cta? %>
       <%= render "shared/github_signin_button" %>
-    </div>
-  <% end %>
+    <% end %>
+  </div>
 </div>
 
 <!-- Success Stories Floating Logos (Full Width) -->
