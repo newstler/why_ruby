@@ -63,7 +63,7 @@
 <% if @success_stories.count >= 5 %>
   <div class="py-8 md:py-16 bg-gray-50 my-4 md:my-8">
     <h2 class="text-center text-sm font-semibold text-gray-300 tracking-wide uppercase mb-6 md:mb-12">
-      Read success stories from
+      Read <%= link_to "success stories", category_path(Category.success_story_category), class: "text-gray-500 hover:text-red-600 transition-colors" %> from
     </h2>
     <div class="relative logo-carousel-container" data-controller="logo-carousel">
       <div class="overflow-hidden relative">

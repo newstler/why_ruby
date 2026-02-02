@@ -1,6 +1,6 @@
-<div id="<%= local_assigns[:wrapper_id] || 'profile_settings' %>" class="space-y-3">
+<div id="<%= local_assigns[:wrapper_id] || 'profile_settings' %>" class="md:space-y-3">
   <%# Public Profile Toggle %>
-  <div class="flex items-center justify-between gap-4">
+  <div class="flex items-center justify-between gap-4 py-3 md:py-0 border-t border-gray-100 md:border-t-0">
     <span class="text-sm font-medium text-gray-500">Public profile</span>
     <%= button_to toggle_public_user_settings_path,
         method: :post,
@@ -13,7 +13,7 @@
   </div>
 
   <%# Open to Work Toggle %>
-  <div class="flex items-center justify-between gap-4">
+  <div class="flex items-center justify-between gap-4 py-3 md:py-0 border-t border-gray-100 md:border-t-0">
     <span class="text-sm font-medium text-gray-500">Open to work</span>
     <%= button_to toggle_open_to_work_user_settings_path,
         method: :post,
@@ -26,8 +26,10 @@
   </div>
 
   <%# Sign Out Button %>
-  <%= button_to "Sign out", destroy_user_session_path,
-      method: :delete,
-      data: { turbo: false },
-      class: "w-full px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors cursor-pointer text-center" %>
+  <div class="md:pt-0">
+    <%= button_to "Sign out", destroy_user_session_path,
+        method: :delete,
+        data: { turbo: false },
+        class: "w-full px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors cursor-pointer text-center" %>
+  </div>
 </div>
