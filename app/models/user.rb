@@ -125,6 +125,16 @@ class User < ApplicationRecord
     name.presence || username
   end
 
+  # Newsletter tracking
+  def received_newsletter?(version)
+    (newsletters_received || []).include?(version)
+  end
+
+  def record_newsletter_sent!(version)
+    current = newsletters_received || []
+    update!(newsletters_received: current + [ version ]) unless current.include?(version)
+  end
+
   def github_profile_url
     "https://github.com/#{username}"
   end

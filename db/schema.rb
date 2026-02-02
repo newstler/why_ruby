@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_02_02_154818) do
+ActiveRecord::Schema[8.2].define(version: 2026_02_02_233047) do
   create_table "_litestream_lock", id: false, force: :cascade do |t|
     t.integer "id"
   end
@@ -192,6 +192,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_02_02_154818) do
     t.string "linkedin"
     t.string "location"
     t.string "name"
+    t.json "newsletters_received", default: []
     t.boolean "open_to_work", default: false, null: false
     t.boolean "public", default: true, null: false
     t.integer "published_comments_count", default: 0, null: false

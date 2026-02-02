@@ -38,6 +38,7 @@ Rails.application.configure do
 
   # Set host to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "example.com" }
+  config.action_mailer.default_options = { from: "hey@yurisidorov.com" }
 
   # Print deprecation notices to the stderr.
   config.active_support.deprecation = :stderr
