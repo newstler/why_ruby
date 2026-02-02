@@ -62,12 +62,12 @@
             Share why you love Ruby on <%= link_to "your profile", user_path(current_user), class: "text-gray-700 underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors" %> and get featured on <%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "text-gray-700 underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors whitespace-nowrap" %>
           </p>
         <% else %>
-          <div class="mb-4">
-            <%= button_to github_auth_with_return_path, method: :post, data: { turbo: false }, form: { class: "inline" }, class: "inline-flex items-center px-6 py-2.5 text-xl md:text-2xl font-bold rounded-lg text-white bg-red-600 hover:bg-red-700 cursor-pointer transition-colors shadow-sm" do %>Join<% end %>
-          </div>
-          <div class="flex items-baseline gap-3 md:gap-4 mb-3">
-            <span class="text-5xl md:text-6xl lg:text-7xl font-black text-red-600 tabular-nums"><%= number_with_delimiter(@total_users_count) %></span>
-            <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">developers</h1>
+          <div class="flex items-center gap-3 md:gap-4 mb-3">
+            <%= button_to github_auth_with_return_path, method: :post, data: { turbo: false }, class: "px-6 py-3 text-2xl md:text-3xl font-bold rounded-xl text-white bg-red-600 hover:bg-red-700 cursor-pointer transition-colors shadow-sm" do %>Join<% end %>
+            <div class="flex items-baseline gap-3 md:gap-4">
+              <span class="text-5xl md:text-6xl lg:text-7xl font-black text-red-600 tabular-nums"><%= number_with_delimiter(@total_users_count) %></span>
+              <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">developers</h1>
+            </div>
           </div>
           <p class="text-lg md:text-xl text-gray-500 max-w-2xl">
             who are passionate about Ruby. <%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "text-gray-700 underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors whitespace-nowrap" %>
