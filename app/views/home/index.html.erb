@@ -9,17 +9,22 @@
   <%= render "home/testimonial_carousel", testimonials: @testimonials %>
 
   <%# Navigation buttons + Sign in - same style as main nav %>
-  <div class="flex flex-wrap justify-center items-center gap-2 mt-16">
-    <% Category.with_posts.ordered.each do |category| %>
-      <% next if category.is_success_story? && !has_success_stories? %>
-      <%= link_to category.name, category_path(category),
-          class: "text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
-    <% end %>
-    <%= link_to "Community", community_index_url,
-        class: "text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
-    <% if should_show_mobile_cta? %>
-      <%= render "shared/github_signin_button" %>
-    <% end %>
+  <%# Sticky on tablet+ (min-width: 640px AND min-height: 500px) but not horizontal phones %>
+  <div data-controller="sticky-nav">
+    <div class="mt-16" data-sticky-nav-target="nav">
+      <div class="flex flex-wrap justify-center items-center gap-2">
+        <% Category.with_posts.ordered.each do |category| %>
+          <% next if category.is_success_story? && !has_success_stories? %>
+          <%= link_to category.name, category_path(category),
+              class: "text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
+        <% end %>
+        <%= link_to "Community", community_index_url,
+            class: "text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
+        <% if should_show_mobile_cta? %>
+          <%= render "shared/github_signin_button" %>
+        <% end %>
+      </div>
+    </div>
   </div>
 </div>
 
