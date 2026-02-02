@@ -7,8 +7,8 @@
       </h3>
       <% if local_assigns[:editable] %>
         <button data-action="testimonial-edit#edit"
-                class="text-sm text-gray-400 hover:text-red-600 transition-colors cursor-pointer">
-          Edit
+                class="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer ml-2">
+          <%= inline_svg_tag "pencil.svg", class: "w-8 h-8 md:w-10 md:h-10" %>
         </button>
       <% end %>
     </div>

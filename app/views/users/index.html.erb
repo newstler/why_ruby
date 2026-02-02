@@ -31,7 +31,7 @@
 
 <div class="space-y-8">
   <!-- Sticky Header (positioned below main nav) - sticky on tablets (min-width: 768px AND min-height: 600px) but not horizontal phones -->
-  <div class="sticky-tablet top-24 z-10 -mx-4 px-4 md:-mx-6 md:px-6 lg:-mx-8 lg:px-8 pt-8 -mt-8 pb-8 md:bg-gradient-to-b md:from-gray-50 md:from-85% md:to-transparent">
+  <div class="sticky-tablet top-32 z-40 -mx-4 px-4 md:-mx-6 md:px-6 lg:-mx-8 lg:px-8 pt-10 -mt-10 pb-12 md:bg-gradient-to-b md:from-gray-50 md:from-85% md:to-transparent">
     <div class="md:flex md:items-end md:justify-between w-full">
     <% if @filter_location.present? || @filter_company.present? %>
       <%# When filtering, show filter badges instead of description %>
@@ -52,12 +52,26 @@
         <% end %>
       </div>
     <% else %>
-      <div class="text-lg text-gray-600 md:flex-1 min-w-0 md:pr-6">
+      <div class="md:flex-1 min-w-0 md:pr-6">
         <% if user_signed_in? %>
-          <div><%= t('users.index.description', count: @total_users_count) %>.</div>
-          <div class="mt-4 md:mt-1">Share why you love Ruby on <%= link_to "your profile page", user_path(current_user), class: "underline hover:text-red-600 transition-colors" %> and your quote will be featured on <%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "underline hover:text-red-600 transition-colors whitespace-nowrap" %></div>
+          <div class="flex items-baseline gap-3 md:gap-4 mb-3">
+            <span class="text-5xl md:text-6xl lg:text-7xl font-black text-red-600 tabular-nums"><%= number_with_delimiter(@total_users_count) %></span>
+            <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">Ruby developers</h1>
+          </div>
+          <p class="text-lg md:text-xl text-gray-500 max-w-2xl">
+            Share why you love Ruby on <%= link_to "your profile", user_path(current_user), class: "text-gray-700 underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors" %> and get featured on <%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "text-gray-700 underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors whitespace-nowrap" %>
+          </p>
         <% else %>
-          <%= button_to github_auth_with_return_path, method: :post, data: { turbo: false }, form: { class: "inline mr-1" }, class: "inline-flex items-center px-4 py-1.5 text-base font-medium rounded-md text-white bg-red-600 hover:bg-red-700 cursor-pointer transition-colors" do %>Join<% end %> <%= @total_users_count %> developers from around the world who are passionate about Ruby. <%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "ml-1 underline hover:text-red-600 transition-colors whitespace-nowrap" %>
+          <div class="mb-4">
+            <%= button_to github_auth_with_return_path, method: :post, data: { turbo: false }, form: { class: "inline" }, class: "inline-flex items-center px-6 py-2.5 text-xl md:text-2xl font-bold rounded-lg text-white bg-red-600 hover:bg-red-700 cursor-pointer transition-colors shadow-sm" do %>Join<% end %>
+          </div>
+          <div class="flex items-baseline gap-3 md:gap-4 mb-3">
+            <span class="text-5xl md:text-6xl lg:text-7xl font-black text-red-600 tabular-nums"><%= number_with_delimiter(@total_users_count) %></span>
+            <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">developers</h1>
+          </div>
+          <p class="text-lg md:text-xl text-gray-500 max-w-2xl">
+            who are passionate about Ruby. <%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "text-gray-700 underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors whitespace-nowrap" %>
+          </p>
         <% end %>
       </div>
     <% end %>

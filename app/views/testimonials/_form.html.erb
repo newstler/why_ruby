@@ -1,10 +1,11 @@
 <%# Testimonial form partial - shown to profile owner %>
 <% processing = local_assigns[:processing] %>
 <div class="bg-white rounded-lg shadow p-4 md:p-6" data-controller="char-counter" data-char-counter-min-value="140" data-char-counter-max-value="320">
-  <div class="flex items-baseline justify-between mb-4">
+  <div class="flex items-baseline justify-between mb-2">
     <h2 class="text-xl md:text-2xl font-bold text-gray-900">Why do you love Ruby?</h2>
     <span data-char-counter-target="counter" class="hidden md:inline-block text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-400"></span>
   </div>
+  <p class="text-sm text-gray-400 mb-4">This will be featured on the home page of <%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "underline hover:text-gray-600 transition-colors" %> website.</p>
 
   <% if testimonial.persisted? %>
     <%= form_with model: testimonial, url: testimonial_path, method: :patch do |f| %>

@@ -6,9 +6,10 @@
   <% has_quote = testimonial&.quote.present? %>
   <% show_display = has_quote && testimonial.published? %>
 
+  <h2 class="text-sm md:text-xl font-bold text-gray-300 mb-16 md:mb-16 lg:mb-14">loves Ruby because of...</h2>
+
   <%# Display: shown when testimonial is published %>
   <div data-testimonial-edit-target="display" class="<%= 'hidden' unless show_display %>">
-    <h2 class="text-sm md:text-xl font-bold text-gray-300 mb-8 md:mb-8 lg:mb-4">loves Ruby because of...</h2>
     <% if show_display %>
       <%= render "testimonials/testimonial", testimonial: testimonial, editable: true %>
     <% end %>

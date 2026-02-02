@@ -30,7 +30,7 @@
   <meta name="twitter:creator" content="<%= t('meta.social.twitter_creator') %>">
 <% end %>
 
-<div class="space-y-8">
+<div class="space-y-8 mt-6">
   <!-- Tabbed Content Section -->
   <div data-controller="tabs">
     <!-- User Info + Testimonial Row -->
@@ -193,7 +193,7 @@
       <%= render "testimonials/section", testimonial: testimonial, user: @user %>
     <% elsif testimonial&.published? %>
       <div class="md:mt-6 lg:mt-6 mb-10 md:mb-12 lg:mb-8">
-        <h2 class="text-sm md:text-xl font-bold text-gray-300 mb-8 md:mb-8 lg:mb-4">loves Ruby because of...</h2>
+        <h2 class="text-sm md:text-xl font-bold text-gray-300 mb-16 md:mb-16 lg:mb-14">loves Ruby because of...</h2>
         <%= render "testimonials/testimonial", testimonial: testimonial %>
       </div>
     <% end %>
@@ -203,7 +203,7 @@
     <% has_posts = @user.published_posts_count > 0 %>
     <% has_comments = @user.published_comments_count > 0 %>
     <% if has_projects || has_posts || has_comments %>
-    <nav class="flex flex-wrap gap-x-6 lg:gap-x-8 gap-y-2 mt-6" aria-label="Tabs">
+    <nav class="flex flex-wrap gap-x-6 lg:gap-x-8 gap-y-2 mt-14" aria-label="Tabs">
       <% if has_projects %>
       <a href="#"
          data-tabs-target="tab"
