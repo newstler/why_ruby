@@ -89,7 +89,8 @@
     <!-- Nullitics noscript fallback -->
     <noscript><img src="https://nullitics.com/n.gif?u=<%= request.original_url %><%= "&c=#{country_code}" if country_code.present? %>" alt="" style="position:absolute;left:-9999px" /></noscript>
 
-    <nav class="bg-white shadow-sm sticky top-0 z-50 py-4" data-controller="mobile-menu" data-action="click@window->mobile-menu#hide">
+    <% community_nav = controller_name == 'users' && ['index', 'show'].include?(action_name) %>
+    <nav class="<%= community_nav ? 'bg-gray-50' : 'bg-white shadow-sm' %> sticky top-0 z-50 py-4" data-controller="mobile-menu" data-action="click@window->mobile-menu#hide">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <% centered_mobile_nav = controller_name == 'users' && ['index', 'show'].include?(action_name) %>
         <div class="flex items-center h-16 <%= centered_mobile_nav ? 'justify-center' : 'justify-between' %>">
@@ -264,6 +265,11 @@
         </div>
         <% end %>
       </div>
+      <% if community_nav %>
+        <svg class="mt-4 w-2/3 mx-auto" height="10" viewBox="0 0 100 10" preserveAspectRatio="none">
+          <ellipse cx="50" cy="5" rx="50" ry="5" fill="rgba(156, 163, 175, 0.5)"/>
+        </svg>
+      <% end %>
     </nav>
 
     <% if notice.present? %>

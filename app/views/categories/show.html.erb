@@ -40,25 +40,10 @@
   <div class="space-y-4">
     <% if @posts.any? %>
       <div class="hidden lg:flex gap-6">
-        <% # Split posts into 3 columns for desktop, maintaining left-to-right reading order %>
-        <% column1_posts = [] %>
-        <% column2_posts = [] %>
-        <% column3_posts = [] %>
-        
-        <% @posts.each_with_index do |post, index| %>
-          <% case index % 3 %>
-          <% when 0 %>
-            <% column1_posts << post %>
-          <% when 1 %>
-            <% column2_posts << post %>
-          <% when 2 %>
-            <% column3_posts << post %>
-          <% end %>
-        <% end %>
-        
         <% # Desktop: 3 columns - add button goes in the column where the next post would be %>
+        <% columns = distribute_to_columns(@posts, num_columns: 3) %>
         <% add_button_column = @posts.size % 3 %>
-        <% [column1_posts, column2_posts, column3_posts].each_with_index do |column_posts, col_index| %>
+        <% columns.each_with_index do |column_posts, col_index| %>
           <div class="flex-1 space-y-6">
             <% column_posts.each do |post| %>
               <%= render 'posts/post_tile', post: post %>
@@ -69,23 +54,12 @@
           </div>
         <% end %>
       </div>
-      
+
       <% # Tablet: 2 columns %>
       <div class="hidden md:flex lg:hidden gap-6">
-        <% column1_posts = [] %>
-        <% column2_posts = [] %>
-        
-        <% @posts.each_with_index do |post, index| %>
-          <% if index % 2 == 0 %>
-            <% column1_posts << post %>
-          <% else %>
-            <% column2_posts << post %>
-          <% end %>
-        <% end %>
-        
-        <% # Tablet: add button goes in the column where the next post would be %>
+        <% columns = distribute_to_columns(@posts, num_columns: 2) %>
         <% add_button_column = @posts.size % 2 %>
-        <% [column1_posts, column2_posts].each_with_index do |column_posts, col_index| %>
+        <% columns.each_with_index do |column_posts, col_index| %>
           <div class="flex-1 space-y-6">
             <% column_posts.each do |post| %>
               <%= render 'posts/post_tile', post: post %>

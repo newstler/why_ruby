@@ -1,6 +1,6 @@
 class Comment < ApplicationRecord
   # Associations
-  belongs_to :post
+  belongs_to :post, counter_cache: true
   belongs_to :user
 
   # Validations

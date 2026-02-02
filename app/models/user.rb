@@ -16,6 +16,9 @@ class User < ApplicationRecord
   # Normalizations (strip whitespace from GitHub data)
   normalizes :name, :bio, :company, :location, :website, :twitter, with: ->(value) { value.strip.presence }
 
+  # Callbacks
+  before_save :precompute_bio_html, if: :will_save_change_to_bio?
+
   # Validations
   validates :github_id, presence: true, uniqueness: true
   validates :username, presence: true, uniqueness: true
@@ -198,5 +201,45 @@ class User < ApplicationRecord
     # Invalidate token (one-time use)
     user.update_columns(cross_domain_token: nil, cross_domain_token_expires_at: nil)
     user
+  end
+
+  # Linkify URLs and GitHub @mentions in bio text
+  # Returns precomputed HTML for display
+  def self.linkify_bio(text)
+    return "" if text.blank?
+
+    # Escape HTML to prevent XSS
+    escaped = ERB::Util.html_escape(text)
+
+    # Pattern for GitHub @mentions
+    github_pattern = /(?<=\s|^)@([a-zA-Z0-9](?:[a-zA-Z0-9\-]*[a-zA-Z0-9])?)/
+
+    # Pattern for URLs (with or without protocol)
+    url_pattern = %r{
+      (?:https?://)?                    # Optional protocol
+      (?:www\.)?                        # Optional www
+      [a-zA-Z0-9][a-zA-Z0-9\-]*         # Domain name
+      \.[a-zA-Z]{2,}                    # TLD
+      (?:/[^\s,.<>]*)?                  # Optional path
+    }x
+
+    # Replace GitHub @mentions first
+    result = escaped.gsub(github_pattern) do |match|
+      username = Regexp.last_match(1)
+      %(<a href="https://github.com/#{username}" target="_blank" rel="noopener" class="underline hover:text-red-600 transition-colors">#{match}</a>)
+    end
+
+    # Replace URLs (skip github.com since @mentions already handled)
+    result.gsub(url_pattern) do |match|
+      next match if match.include?("github.com")
+      url = match.start_with?("http") ? match : "https://#{match}"
+      %(<a href="#{url}" target="_blank" rel="noopener" class="underline hover:text-red-600 transition-colors">#{match}</a>)
+    end
+  end
+
+  private
+
+  def precompute_bio_html
+    self.bio_html = self.class.linkify_bio(bio)
   end
 end

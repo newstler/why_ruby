@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_02_01_215807) do
+ActiveRecord::Schema[8.2].define(version: 2026_02_02_154818) do
   create_table "_litestream_lock", id: false, force: :cascade do |t|
     t.integer "id"
   end
@@ -99,6 +99,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_02_01_215807) do
 
   create_table "posts", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
     t.string "category_id", null: false
+    t.integer "comments_count", default: 0, null: false
     t.text "content"
     t.datetime "created_at", null: false
     t.json "image_variants"
@@ -176,6 +177,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_02_01_215807) do
   create_table "users", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
     t.string "avatar_url"
     t.text "bio"
+    t.text "bio_html"
     t.string "company"
     t.datetime "created_at", null: false
     t.string "cross_domain_token"

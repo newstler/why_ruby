@@ -208,10 +208,10 @@ class PostsController < ApplicationController
     # Handle category/post route
     if params[:category_id]
       @category = Category.friendly.find(params[:category_id])
-      @post = @category.posts.includes(:tags).friendly.find(params[:id])
+      @post = @category.posts.includes(:tags, :user, :category).friendly.find(params[:id])
     # Handle direct post access (for edit, destroy, etc.)
     else
-      @post = Post.includes(:tags).friendly.find(params[:id])
+      @post = Post.includes(:tags, :user, :category).friendly.find(params[:id])
     end
 
     # Only allow viewing unpublished posts by their owner or admin

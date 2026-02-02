@@ -15,10 +15,10 @@
       <!-- Meta Information -->
       <div class="flex items-center justify-between text-xs text-gray-500">
         <span><%= time_ago_in_words(comment.created_at) %> ago</span>
-        <% if comment.post.comments.published.count > 1 %>
+        <% if comment.post.comments_count > 1 %>
           <span class="flex items-center space-x-1">
             <%= inline_svg_tag "comment.svg", class: "w-3 h-3" %>
-            <span><%= comment.post.comments.published.count %> comments</span>
+            <span><%= comment.post.comments_count %> comments</span>
           </span>
         <% end %>
       </div>

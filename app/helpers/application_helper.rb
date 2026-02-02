@@ -5,7 +5,7 @@ module ApplicationHelper
   def client_country_code
     return @client_country_code if defined?(@client_country_code)
 
-    @client_country_code = begin
+    @client_country_code = Rails.cache.fetch("geo:#{request.remote_ip}", expires_in: 1.hour) do
       result = Geocoder.search(request.remote_ip).first
       result&.country_code&.upcase
     rescue => e
@@ -13,32 +13,37 @@ module ApplicationHelper
       nil
     end
   end
+  # Class-level memoized markdown renderer for performance
+  def self.markdown_renderer
+    @markdown_renderer ||= begin
+      renderer = Redcarpet::Render::HTML.new(
+        filter_html: true,
+        hard_wrap: true,
+        link_attributes: { rel: "nofollow", target: "_blank" }
+      )
+
+      Redcarpet::Markdown.new(renderer,
+        autolink: true,
+        tables: true,
+        fenced_code_blocks: true,
+        disable_indented_code_blocks: true,
+        strikethrough: true,
+        lax_spacing: true,
+        space_after_headers: true,
+        superscript: true,
+        underline: true,
+        highlight: true,
+        quote: true,
+        footnotes: true
+      )
+    end
+  end
+
   def markdown_to_html(markdown_text)
     return "" if markdown_text.blank?
 
-    renderer = Redcarpet::Render::HTML.new(
-      filter_html: true,
-      hard_wrap: true,
-      link_attributes: { rel: "nofollow", target: "_blank" }
-    )
-
-    markdown = Redcarpet::Markdown.new(renderer,
-      autolink: true,
-      tables: true,
-      fenced_code_blocks: true,
-      disable_indented_code_blocks: true,
-      strikethrough: true,
-      lax_spacing: true,
-      space_after_headers: true,
-      superscript: true,
-      underline: true,
-      highlight: true,
-      quote: true,
-      footnotes: true
-    )
-
     # Render markdown and apply syntax highlighting
-    html = markdown.render(markdown_text)
+    html = ApplicationHelper.markdown_renderer.render(markdown_text)
 
     # Apply syntax highlighting to code blocks
     doc = Nokogiri::HTML::DocumentFragment.parse(html)
@@ -267,12 +272,16 @@ module ApplicationHelper
     end
   end
 
+  # Cache OG image versions at boot time for performance
+  OG_IMAGE_VERSIONS = Hash.new do |hash, filename|
+    path = Rails.root.join("public", filename)
+    hash[filename] = File.exist?(path) ? File.mtime(path).to_i.to_s : Time.current.to_i.to_s
+  end
+
   # Generate versioned URL for OG image to bust social media caches
   # Pass a filename to use a different image (e.g., "og-image-community.png")
   def versioned_og_image_url(filename = "og-image.png")
-    og_image_path = Rails.root.join("public", filename)
-    version = File.exist?(og_image_path) ? File.mtime(og_image_path).to_i.to_s : Time.current.to_i.to_s
-    "#{request.base_url}/#{filename}?v=#{version}"
+    "#{request.base_url}/#{filename}?v=#{OG_IMAGE_VERSIONS[filename]}"
   end
 
   # Generate the full page title for community pages (Ruby Community branding)

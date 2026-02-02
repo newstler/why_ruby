@@ -53,10 +53,10 @@
       <h3 class="text-xl font-semibold <%= post.published? ? 'text-gray-900 group-hover:text-red-600' : 'text-gray-500' %> transition-colors">
         <%= post.title %>
       </h3>
-      <% if post.comments.any? %>
+      <% if post.comments_count > 0 %>
         <div class="flex items-center space-x-1 text-sm text-gray-500 flex-shrink-0">
           <%= inline_svg_tag "comment.svg", class: "w-4 h-4" %>
-          <span><%= post.comments.count %></span>
+          <span><%= post.comments_count %></span>
         </div>
       <% end %>
     </div>

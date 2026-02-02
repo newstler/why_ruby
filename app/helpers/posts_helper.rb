@@ -1,4 +1,12 @@
 module PostsHelper
+  # Distribute posts into columns for masonry-style layout
+  # Returns an array of arrays, one per column
+  def distribute_to_columns(posts, num_columns: 3)
+    columns = Array.new(num_columns) { [] }
+    posts.each_with_index { |post, i| columns[i % num_columns] << post }
+    columns
+  end
+
   def post_meta_title(post)
     if post.success_story?
       "#{post.title} Success Story"
@@ -12,7 +20,7 @@ module PostsHelper
   end
 
   def post_meta_keywords(post)
-    categories_and_tags = [ post.category&.name, post.tags.pluck(:name) ].compact.flatten.join(", ")
+    categories_and_tags = [ post.category&.name, post.tags.map(&:name) ].compact.flatten.join(", ")
     categories_and_tags.presence ? "#{categories_and_tags}, Ruby, Rails" : t("meta.default.keywords")
   end
 

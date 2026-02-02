@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   def index
-    @users = User.visible.includes(:posts, :comments)
+    @users = User.visible
     @total_users_count = User.visible.count
 
     # Apply filters if present
