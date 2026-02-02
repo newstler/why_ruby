@@ -100,8 +100,8 @@
               <% if content_for?(:header_logo) %>
                 <%= yield(:header_logo) %>
               <% else %>
-                <%= link_to root_path, class: "text-4xl font-black text-red-600 whitespace-nowrap inline-flex items-center" do %>
-                  Why <%= image_tag "heart.webp", class: "h-12 w-12 mx-1 inline-block", alt: "" %> Ruby?
+                <%= link_to root_path, class: "group text-4xl font-black text-red-600 whitespace-nowrap inline-flex items-center" do %>
+                  Why <%= image_tag "heart.webp", class: "h-12 w-12 mx-1 inline-block animate-heartbeat", alt: "" %> Ruby?
                 <% end %>
               <% end %>
             </div>
@@ -111,8 +111,8 @@
             <% if content_for?(:header_logo) %>
               <%= yield(:header_logo) %>
             <% else %>
-              <%= link_to root_path, class: "#{community_nav ? 'text-4xl lg:text-5xl' : 'text-4xl'} font-black text-red-600 whitespace-nowrap inline-flex items-center" do %>
-                Why <%= image_tag "heart.webp", class: "#{community_nav ? 'h-16 w-16' : 'h-12 w-12'} mx-1 inline-block", alt: "" %> Ruby?
+              <%= link_to root_path, class: "group #{community_nav ? 'text-4xl lg:text-5xl' : 'text-4xl'} font-black text-red-600 whitespace-nowrap inline-flex items-center" do %>
+                Why <%= image_tag "heart.webp", class: "#{community_nav ? 'h-16 w-16' : 'h-12 w-12'} mx-1 inline-block animate-heartbeat", alt: "" %> Ruby?
               <% end %>
             <% end %>
           </div>
