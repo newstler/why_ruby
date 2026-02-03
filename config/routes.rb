@@ -73,6 +73,9 @@ Rails.application.routes.draw do
     post :unhide_repo, on: :collection
   end
 
+  # Newsletter unsubscribe
+  get "newsletter/unsubscribe/:token", to: "newsletter_unsubscribes#show", as: :newsletter_unsubscribe
+
   # Legal pages (must be before catch-all routes)
   get "legal/privacy", to: "legal#show", defaults: { page: "privacy_policy" }, as: :privacy_policy
   get "legal/terms", to: "legal#show", defaults: { page: "terms_of_service" }, as: :terms_of_service

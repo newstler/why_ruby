@@ -135,6 +135,10 @@ class User < ApplicationRecord
     update!(newsletters_received: current + [ version ]) unless current.include?(version)
   end
 
+  def newsletter_unsubscribe_token
+    signed_id(purpose: :newsletter_unsubscribe, expires_in: nil)
+  end
+
   def github_profile_url
     "https://github.com/#{username}"
   end

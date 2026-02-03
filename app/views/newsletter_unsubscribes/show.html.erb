@@ -1,0 +1,14 @@
+<div class="max-w-2xl mx-auto py-16 px-4">
+  <% if @success %>
+    <div class="text-center">
+      <h1 class="text-3xl font-bold text-gray-900 mb-4">Unsubscribed</h1>
+      <p class="text-gray-600 mb-8">You've been unsubscribed from WhyRuby newsletter updates.</p>
+      <p class="text-gray-500 text-sm">Changed your mind? Just sign in and update your preferences.</p>
+    </div>
+  <% else %>
+    <div class="text-center">
+      <h1 class="text-3xl font-bold text-gray-900 mb-4">Invalid Link</h1>
+      <p class="text-gray-600">This unsubscribe link is invalid or has expired.</p>
+    </div>
+  <% end %>
+</div>

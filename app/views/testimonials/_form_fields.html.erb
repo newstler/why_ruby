@@ -1,11 +1,12 @@
 <% processing = local_assigns[:processing] %>
+<% controllers = local_assigns[:autofocus] ? "auto-resize autofocus" : "auto-resize" %>
 
 <%= f.text_area :quote,
     rows: 4,
     maxlength: 320,
     disabled: processing,
     placeholder: "I love Ruby because... (140-320 characters, or leave empty to unpublish)",
-    data: { controller: "auto-resize", char_counter_target: "input", action: "input->char-counter#update input->auto-resize#resize" },
+    data: { controller: controllers, char_counter_target: "input", action: "input->char-counter#update input->auto-resize#resize" },
     class: "w-full min-h-24 rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-gray-900 resize-none overflow-hidden #{processing ? 'opacity-50' : ''}" %>
 
 <div class="mt-2 md:hidden">

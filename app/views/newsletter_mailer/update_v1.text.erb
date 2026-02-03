@@ -12,7 +12,7 @@ I liked what I saw there. The testimonials. The gem-shaped frames around avatars
 
 Now on your profile you can write a couple of sentences, and with a little help of AI it becomes a beautiful testimonial on the home page. Go try it!
 
-https://whyruby.info/users/<%= @user.slug %>/edit
+https://whyruby.info/sign_in_github?return_to=https://rubycommunity.org/<%= @user.slug %>
 
 Along the way I fixed a bunch of bugs and added features some people asked for, like hiding repositories and profiles, or "Open to Work" badge. The design got a refresh too.
 
@@ -53,3 +53,5 @@ RubyCommunity.org https://rubycommunity.org
 --
 Yuri Sidorov
 https://whyruby.info
+
+Unsubscribe: https://whyruby.info/newsletter/unsubscribe/<%= @user.newsletter_unsubscribe_token %>

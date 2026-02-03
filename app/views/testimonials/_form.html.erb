@@ -10,11 +10,11 @@
   <% if testimonial.persisted? %>
     <%= form_with model: testimonial, url: testimonial_path, method: :patch do |f| %>
       <%= render "testimonials/form_fields", f: f, testimonial: testimonial,
-                 cancelable: local_assigns[:cancelable], processing: processing %>
+                 cancelable: local_assigns[:cancelable], processing: processing, autofocus: local_assigns[:autofocus] %>
     <% end %>
   <% else %>
     <%= form_with model: testimonial, url: testimonial_path do |f| %>
-      <%= render "testimonials/form_fields", f: f, testimonial: testimonial, processing: processing %>
+      <%= render "testimonials/form_fields", f: f, testimonial: testimonial, processing: processing, autofocus: local_assigns[:autofocus] %>
     <% end %>
   <% end %>
 </div>

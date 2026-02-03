@@ -7,7 +7,7 @@
     <img src="https://whyruby.info/heart.png" alt="Ruby Heart" width="200" style="max-width: 200px; height: auto;">
   </div>
 
-  <h1 style="color: #CC342D; margin-bottom: 24px; text-align: center;">The Big "Why Ruby?" Update</h1>
+  <h1 style="color: #dc2626; margin-bottom: 24px; text-align: center;">The Big "Why Ruby?" Update</h1>
 
   <p style="line-height: 1.6; margin-bottom: 16px;">A few weeks ago, the official Ruby website added a "Why Ruby?" section right on their home page. I looked at it and thought: do I even need to keep my site? And if I do, how should it look now?</p>
 
@@ -15,40 +15,44 @@
 
   <p style="line-height: 1.6; margin-bottom: 16px;"><strong>Now on your profile you can write a couple of sentences, and with a little help of AI it becomes a beautiful testimonial on the home page.</strong></p>
 
-  <p style="line-height: 1.6; margin-bottom: 24px;"><a href="https://whyruby.info/users/<%= @user.slug %>/edit" style="display: inline-block; background: #CC342D; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Go try it!</a></p>
+  <p style="line-height: 1.6; margin-bottom: 24px; text-align: center;"><a href="https://whyruby.info/sign_in_github?return_to=https://rubycommunity.org/<%= @user.slug %>" style="display: inline-block; background: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Go try it!</a></p>
 
   <p style="line-height: 1.6; margin-bottom: 16px;">Along the way I fixed a bunch of bugs and added features some people asked for, like hiding repositories and profiles, or "Open to Work" badge. The design got a refresh too.</p>
 
-  <h2 style="color: #CC342D; margin-top: 32px; margin-bottom: 16px;">The community section got popular</h2>
+  <h2 style="color: #dc2626; margin-top: 32px; margin-bottom: 16px;">The community section got popular</h2>
 
   <p style="line-height: 1.6; margin-bottom: 16px;">People were discovering each other's open source projects. The ratings, the profiles, the ability to find developers by company or location. This part of the site started to feel like it needed its own space.</p>
 
   <p style="line-height: 1.6; margin-bottom: 16px;">The idea was simple: a site centered on Ruby developers. A place to showcase your work, not just read about Ruby.</p>
 
-  <p style="line-height: 1.6; margin-bottom: 16px;"><strong>Now it has a new home: <a href="https://rubycommunity.org" style="color: #CC342D;">rubycommunity.org</a></strong></p>
+  <p style="line-height: 1.6; margin-bottom: 16px;"><strong>Now it has a new home: <a href="https://rubycommunity.org" style="color: #dc2626;">rubycommunity.org</a></strong></p>
 
   <p style="line-height: 1.6; margin-bottom: 16px;">Same app, same database. Sign in on one site and you're signed in on the other. But now there's a clear separation: whyruby.info for advocacy content and testimonials, rubycommunity.org for the community itself.</p>
 
   <p style="line-height: 1.6; margin-bottom: 16px;">More than 70 developers have already joined. I could have just scraped GitHub and added everyone myself, but that felt wrong. People should decide if they want to appear on the site. So please share this in your networks and invite your Ruby friends.</p>
 
-  <h2 style="color: #CC342D; margin-top: 32px; margin-bottom: 16px;">Ideas for the future</h2>
+  <h2 style="color: #dc2626; margin-top: 32px; margin-bottom: 16px;">Ideas for the future</h2>
 
   <p style="line-height: 1.6; margin-bottom: 16px;">I'm thinking about integrating with RubyEvents.org for conference talks, finding blog posts about repositories and showing them together, importing companies' open source contributions. We'll see what happens. If you have feedback or ideas, let me know!</p>
 
-  <h2 style="color: #CC342D; margin-top: 32px; margin-bottom: 16px;">A personal note</h2>
+  <h2 style="color: #dc2626; margin-top: 32px; margin-bottom: 16px;">A personal note</h2>
 
   <p style="line-height: 1.6; margin-bottom: 16px;">I've spent almost 20 years writing Ruby. Building products, integrating AI into workflows. Right now, I'm looking for my next role.</p>
 
   <p style="line-height: 1.6; margin-bottom: 16px;">If you know someone hiring, or if you're hiring, I'd love to hear from you.</p>
 
   <p style="line-height: 1.6; margin-top: 32px; margin-bottom: 16px;">
-    <a href="https://cal.com/yurisidorov" style="color: #CC342D; margin-right: 16px;">Hire me!</a> |
-    <a href="https://whyruby.info" style="color: #CC342D; margin: 0 16px;">WhyRuby.info</a> |
-    <a href="https://rubycommunity.org" style="color: #CC342D; margin-left: 16px;">RubyCommunity.org</a>
+    <a href="https://cal.com/yurisidorov" style="color: #dc2626; margin-right: 16px;">Hire me!</a> |
+    <a href="https://whyruby.info" style="color: #dc2626; margin: 0 16px;">WhyRuby.info</a> |
+    <a href="https://rubycommunity.org" style="color: #dc2626; margin-left: 16px;">RubyCommunity.org</a>
   </p>
 
   <p style="line-height: 1.6; margin-top: 32px; color: #666; font-size: 14px;">
     Yuri Sidorov<br>
     <a href="https://whyruby.info" style="color: #999;">WhyRuby.info</a>
+  </p>
+
+  <p style="line-height: 1.6; margin-top: 48px; padding-top: 24px; border-top: 1px solid #e5e7eb; color: #666; font-size: 12px; text-align: center;">
+    <a href="https://whyruby.info/newsletter/unsubscribe/<%= @user.newsletter_unsubscribe_token %>" style="color: #666; text-decoration: underline;">Unsubscribe from future emails</a>
   </p>
 </div>

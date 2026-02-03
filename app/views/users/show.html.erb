@@ -41,11 +41,11 @@
     <div>
       <!-- Desktop/Tablet layout -->
       <div class="hidden md:block">
-        <div class="flex items-center gap-6">
+        <div class="flex items-start gap-6">
           <%= render "users/profile_avatar", user: @user, wrapper_id: "profile_avatar_desktop", size: "w-36 h-[130px]", text_size: "text-5xl" %>
 
           <% total_stars = @user.total_github_stars.to_i %>
-          <div class="flex flex-col justify-center flex-1">
+          <div class="flex flex-col flex-1">
             <!-- First line: Name, social links, and stars -->
             <div class="flex items-baseline justify-between gap-3 mb-2">
               <div class="flex items-baseline gap-3">

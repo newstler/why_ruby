@@ -10,6 +10,7 @@ namespace :newsletter do
 
     users = User.where.not("email LIKE ?", "%@users.noreply.github.com")
                 .where.not(username: excluded_usernames)
+                .where(unsubscribed_from_newsletter: false)
 
     sent_count = 0
     skipped_count = 0
@@ -38,14 +39,18 @@ namespace :newsletter do
     excluded_noreply = User.where("email LIKE ?", "%@users.noreply.github.com").count
     excluded_specific = User.where(username: excluded_usernames).count
 
+    unsubscribed = User.where(unsubscribed_from_newsletter: true).count
+
     eligible_scope = User.where.not("email LIKE ?", "%@users.noreply.github.com")
                          .where.not(username: excluded_usernames)
+                         .where(unsubscribed_from_newsletter: false)
 
     eligible = eligible_scope.count
 
     puts "Total users: #{total}"
     puts "Excluded (noreply emails): #{excluded_noreply}"
     puts "Excluded (specific usernames): #{excluded_specific}"
+    puts "Unsubscribed: #{unsubscribed}"
     puts "Eligible recipients: #{eligible}"
 
     if version > 0

@@ -18,6 +18,6 @@
   <%# Form: shown when editing or processing %>
   <div data-testimonial-edit-target="form" class="<%= 'hidden' if show_display %>">
     <% form_testimonial = testimonial || user.build_testimonial %>
-    <%= render "testimonials/form", testimonial: form_testimonial, user: user, cancelable: show_display, processing: local_assigns[:processing] %>
+    <%= render "testimonials/form", testimonial: form_testimonial, user: user, cancelable: show_display, processing: local_assigns[:processing], autofocus: !show_display %>
   </div>
 </div>
