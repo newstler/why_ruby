@@ -15,7 +15,7 @@ class NewsletterMailer < ApplicationMailer
 
   def subject_for_version(version)
     {
-      1 => "Why Ruby? 2.0: Your Testimonials, New Features, and New Community Page"
+      1 => "Why Ruby? — Now With Your Testimonials"
     }[version] || "Why Ruby? Update"
   end
 end
