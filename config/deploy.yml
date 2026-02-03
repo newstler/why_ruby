@@ -58,6 +58,9 @@ aliases:
   dbc: app exec --interactive --reuse "bin/rails dbconsole"
 
 
+# Only keep 3 old containers on the server to save disk space.
+retain_containers: 3
+
 # Use a persistent storage volume for sqlite database files and local Active Storage files.
 # Recommended to change this to a mounted volume path that is backed up off server.
 volumes:
