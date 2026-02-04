@@ -130,6 +130,16 @@ The application uses a **catch-all routing strategy** for clean URLs:
 
 **Important**: Category and post routes use constraints and are defined at the END of routes.rb to avoid conflicts with explicit routes like `/admin`, `/community`, `/legal/*`, etc.
 
+### Multi-Domain Setup (Community)
+
+The app runs on two domains:
+- **whyruby.info** — main content site
+- **rubycommunity.org** — community/user profiles (production only)
+
+In development, community pages are served under `/community` on localhost. In production, they live at the root of rubycommunity.org (e.g. `rubycommunity.org/username`).
+
+**When linking to user profiles, always use `community_user_canonical_url(user)`** (or `community_root_canonical_url` for the index). These helpers resolve to the correct domain per environment. Never use `user_path`/`user_url` in user-facing links — those only produce the local `/community/...` paths.
+
 ### Services Layer
 
 Service objects in `app/services/` handle complex operations:

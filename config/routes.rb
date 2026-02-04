@@ -5,7 +5,10 @@ Rails.application.routes.draw do
   get "auth/receive", to: "auth#receive"
   get "auth/sign_out_receive", to: "auth#sign_out_receive"
 
-  # Community domain routes - users at root level (/:username)
+  # Production community domain: rubycommunity.org (users at root level /:username)
+  # Development fallback: localhost:3003/community/:id (see routes below)
+  # When linking to user profiles, use community_user_canonical_url(user) helper
+  # which resolves to the correct domain per environment.
   constraints host: Rails.application.config.x.domains.community do
     root "users#index", as: :rubycommunity_root
     get ":id", to: "users#show", as: :rubycommunity_user, constraints: { id: /[^\/]+/ }
@@ -33,7 +36,7 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  # Community routes
+  # Community routes — local development fallback for rubycommunity.org (see domain constraint above)
   get "community", to: "users#index", as: :users
   get "community/:id", to: "users#show", as: :user
 
@@ -69,6 +72,7 @@ Rails.application.routes.draw do
   resource :user_settings, only: [], controller: "user_settings" do
     post :toggle_public, on: :collection
     post :toggle_open_to_work, on: :collection
+    post :toggle_newsletter, on: :collection
     post :hide_repo, on: :collection
     post :unhide_repo, on: :collection
   end
