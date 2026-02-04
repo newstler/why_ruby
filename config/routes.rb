@@ -79,6 +79,7 @@ Rails.application.routes.draw do
 
   # Newsletter unsubscribe
   get "newsletter/unsubscribe/:token", to: "newsletter_unsubscribes#show", as: :newsletter_unsubscribe
+  get "newsletter/open/:token", to: "newsletter_opens#show", as: :newsletter_open
 
   # Legal pages (must be before catch-all routes)
   get "legal/privacy", to: "legal#show", defaults: { page: "privacy_policy" }, as: :privacy_policy

@@ -4,6 +4,7 @@ class NewsletterMailer < ApplicationMailer
   def update(user, version:)
     @user = user
     @version = version
+    @open_tracking_url = "https://whyruby.info/newsletter/open/#{@user.newsletter_open_token(version)}"
     mail(
       to: @user.email,
       subject: subject_for_version(version),

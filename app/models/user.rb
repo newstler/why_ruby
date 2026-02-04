@@ -135,6 +135,19 @@ class User < ApplicationRecord
     update!(newsletters_received: current + [ version ]) unless current.include?(version)
   end
 
+  def opened_newsletter?(version)
+    (newsletters_opened || []).include?(version)
+  end
+
+  def record_newsletter_opened!(version)
+    current = newsletters_opened || []
+    update!(newsletters_opened: current + [ version ]) unless current.include?(version)
+  end
+
+  def newsletter_open_token(version)
+    Rails.application.message_verifier("newsletter_open").generate({ user_id: id, version: version })
+  end
+
   def newsletter_unsubscribe_token
     signed_id(purpose: :newsletter_unsubscribe, expires_in: nil)
   end

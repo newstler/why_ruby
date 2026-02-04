@@ -56,6 +56,11 @@ class Avo::Resources::User < Avo::BaseResource
     field :created_at, as: :date_time, readonly: true
     field :updated_at, as: :date_time, readonly: true, hide_on: [ :index ]
 
+    # Newsletter
+    field :unsubscribed_from_newsletter, as: :boolean, readonly: true, hide_on: [ :index ]
+    field :newsletters_received, as: :text, readonly: true, hide_on: [ :index ], format_using: -> { value.is_a?(Array) ? value.join(", ") : value.to_s }
+    field :newsletters_opened, as: :text, readonly: true, hide_on: [ :index ], format_using: -> { value.is_a?(Array) ? value.join(", ") : value.to_s }
+
     # Associations - hide from index
     field :posts, as: :has_many, hide_on: [ :index ]
     field :comments, as: :has_many, hide_on: [ :index ]
