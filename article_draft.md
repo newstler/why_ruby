@@ -1,0 +1,33 @@
+# The Big "Why Ruby?" Update
+
+A few weeks ago, the official Ruby website added a ["Why Ruby?"](https://www.ruby-lang.org/en/#:~:text=Why%20Ruby) section right on their home page. I looked at it and thought: do I even need to keep my site? And if I do, how should it look now?
+
+I liked what I saw there. The testimonials. The gem-shaped frames around avatars. Vladimir Dementiev suggested letting everyone share why they love Ruby. So I stole the idea and half of the implementation.
+
+Now on your profile you can write a couple of sentences, and with a little help of AI it becomes a beautiful testimonial on the home page. Go try it!
+
+Along the way I fixed a bunch of bugs and added features some people asked for, like hiding repositories or "Open to Work" badge. The design got a refresh too.
+
+## The community section got popular
+
+People were discovering each other's open source projects. The ratings, the profiles, the ability to find developers by company or location. This part of the site started to feel like it needed its own space.
+
+The idea was simple: a site centered on Ruby developers. A place to showcase your work, not just read about Ruby.
+
+Now it has a new home: **rubycommunity.org**.
+
+Same app, same database. Sign in on one site and you're signed in on the other. But now there's a clear separation: whyruby.info for advocacy content and testimonials, rubycommunity.org for the community itself.
+
+More than 70 developers have already joined. I could have just scraped GitHub and added everyone myself, but that felt wrong. People should decide if they want to appear on the site. So please share this in your networks and invite your Ruby friends.
+
+## Ideas for the future
+
+I'm thinking about integrating with RubyEvents.org for conference talks, finding blog posts about repositories and showing them together, importing companies' open source contributions. We'll see what happens. If you have feedback or ideas, let me know!
+
+## A personal note
+
+I've spent almost 20 years writing Ruby. Building products, integrating AI into workflows. Right now, I'm looking for my next role.
+
+If you know someone hiring, or if you're hiring, I'd love to hear from you.
+
+[Hire me!](https://cal.com/yurisidorov) | [WhyRuby.info](https://whyruby.info) | [RubyCommunity.org](https://rubycommunity.org)
