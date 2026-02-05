@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <%= stylesheet_link_tag :app %>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 1200px;
+      height: 630px;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #fafafa;
+      position: relative;
+    }
+
+    .container {
+      width: 1200px;
+      height: 630px;
+      display: flex;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .left-section {
+      width: 460px;
+      padding: 52px 40px 48px 52px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
+      background: #fafafa;
+    }
+
+    .logo-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 28px;
+    }
+
+    .logo-row img {
+      width: 52px;
+      height: 52px;
+    }
+
+    .site-title {
+      font-size: 40px;
+      font-weight: 900;
+      color: #dc2626;
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+
+    .tagline {
+      font-size: 19px;
+      font-weight: 400;
+      color: #4b5563;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    .domain {
+      font-size: 20px;
+      font-weight: 700;
+      color: #6b7280;
+      letter-spacing: -0.2px;
+    }
+
+    .domain span {
+      color: #dc2626;
+    }
+
+    /* Right section: avatar grid */
+    .right-section {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background: #fafafa;
+    }
+
+    .avatar-grid {
+      position: absolute;
+      top: -20px;
+      left: 0;
+      right: -20px;
+      bottom: -20px;
+    }
+
+    .avatar-row {
+      display: flex;
+    }
+
+    .avatar-cell {
+      flex-shrink: 0;
+    }
+
+    /* Fade overlay on left edge */
+    .right-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100px;
+      height: 100%;
+      background: linear-gradient(to right, #fafafa, transparent);
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    /* Fade on bottom */
+    .right-section::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: linear-gradient(to top, #fafafa, transparent);
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    /* Hide RorVsWild badge */
+    [id^="rorvswild"], .rorvswild-badge, iframe[src*="rorvswild"] { display: none !important; }
+
+    /* Top fade */
+    .fade-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50px;
+      background: linear-gradient(to bottom, #fafafa, transparent);
+      z-index: 3;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="left-section">
+      <div class="logo-row">
+        <span class="site-title">Ruby</span>
+        <%= image_tag "heart.webp", style: "width: 52px; height: 52px;" %>
+        <span class="site-title">Community</span>
+      </div>
+
+      <div class="tagline">
+        Connect with passionate Ruby developers from around the world. Share your projects, stories, and why you love Ruby.
+      </div>
+
+      <div class="domain"><span>ruby</span>community.org</div>
+    </div>
+
+    <div class="right-section">
+      <div class="fade-top"></div>
+      <div class="avatar-grid">
+        <% cols = 7 %>
+        <% rows = 7 %>
+        <% users_list = @users.to_a %>
+        <% rows.times do |row| %>
+          <div class="avatar-row" style="display: flex; <%= row.odd? ? 'margin-left: 54px;' : '' %>">
+            <% cols.times do |col| %>
+              <% idx = (row * cols + col) % users_list.size %>
+              <%# w-[108px] h-[98px] — literal classes for Tailwind JIT %>
+              <div class="avatar-cell" style="width: 108px; height: 98px;">
+                <%= render "shared/gem_avatar", user: users_list[idx], size: "w-[108px] h-[98px]", show_open_to_work: false %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

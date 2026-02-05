@@ -81,6 +81,9 @@ Rails.application.routes.draw do
   get "newsletter/unsubscribe/:token", to: "newsletter_unsubscribes#show", as: :newsletter_unsubscribe
   get "newsletter/open/:token", to: "newsletter_opens#show", as: :newsletter_open
 
+  # OG image preview pages (for screenshotting)
+  get "og-image-community", to: "users#og_image"
+
   # Legal pages (must be before catch-all routes)
   get "legal/privacy", to: "legal#show", defaults: { page: "privacy_policy" }, as: :privacy_policy
   get "legal/terms", to: "legal#show", defaults: { page: "terms_of_service" }, as: :terms_of_service
