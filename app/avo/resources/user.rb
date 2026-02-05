@@ -58,8 +58,8 @@ class Avo::Resources::User < Avo::BaseResource
 
     # Newsletter
     field :unsubscribed_from_newsletter, as: :boolean, readonly: true, hide_on: [ :index ]
-    field :newsletters_received, as: :text, readonly: true, hide_on: [ :index ], format_using: -> { value.is_a?(Array) ? value.join(", ") : value.to_s }
-    field :newsletters_opened, as: :text, readonly: true, hide_on: [ :index ], format_using: -> { value.is_a?(Array) ? value.join(", ") : value.to_s }
+    field :newsletters_received, as: :text, readonly: true, hide_on: [ :index ], format_using: -> { value.is_a?(Array) ? value.map { |v| NewsletterMailer::SUBJECTS[v] || "v#{v}" }.join(", ") : value.to_s }
+    field :newsletters_opened, as: :text, readonly: true, hide_on: [ :index ], format_using: -> { value.is_a?(Array) ? value.map { |v| NewsletterMailer::SUBJECTS[v] || "v#{v}" }.join(", ") : value.to_s }
 
     # Associations - hide from index
     field :posts, as: :has_many, hide_on: [ :index ]
