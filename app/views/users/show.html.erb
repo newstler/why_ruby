@@ -92,7 +92,7 @@
               <% end %>
 
               <% if @user.location.present? %>
-                <%= link_to community_index_path(location: @user.location), class: "flex items-center hover:text-gray-600 transition-colors" do %>
+                <%= link_to community_index_path(location: @user.normalized_location || @user.location), class: "flex items-center hover:text-gray-600 transition-colors" do %>
                   <%= inline_svg_tag "location.svg", class: "w-4 h-4 mr-1" %>
                   <%= @user.location %>
                 <% end %>
@@ -168,7 +168,7 @@
             <% end %>
 
             <% if @user.location.present? %>
-              <%= link_to community_index_path(location: @user.location), class: "flex items-center hover:text-gray-600 transition-colors" do %>
+              <%= link_to community_index_path(location: @user.normalized_location || @user.location), class: "flex items-center hover:text-gray-600 transition-colors" do %>
                 <%= inline_svg_tag "location.svg", class: "w-4 h-4 mr-1" %>
                 <%= @user.location %>
               <% end %>
@@ -409,5 +409,6 @@
     </div>
     <% end %>
   </div>
+
 </div>
 </div>

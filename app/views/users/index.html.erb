@@ -44,9 +44,10 @@
           </span>
         <% end %>
         <% if @filter_location.present? %>
+          <% location_display = @filter_location.sub(/, ([A-Z]{2})$/) { ", #{country_name(Regexp.last_match(1))}" } %>
           <span class="flex items-center gap-x-1 text-sm rounded-full bg-gray-100 px-3 py-2">
             <span class="text-gray-400">Located in:</span>
-            <span class="text-gray-700 font-medium"><%= @filter_location %></span>
+            <span class="text-gray-700 font-medium"><%= location_display %></span>
             <%= link_to "×", community_index_path(company: @filter_company, sort: @sort, dir: @dir), class: "ml-1 text-gray-400 hover:text-gray-600 text-lg leading-none" %>
           </span>
         <% end %>
@@ -212,6 +213,23 @@
       <div id="infinite-scroll-sentinel" data-infinite-scroll-sentinel class="h-1"></div>
     <% end %>
   </div>
+
+  <%# Developers from other parts of the same country (when filtering by location) %>
+  <%# Only show this section when all main users are loaded (last page) %>
+  <% if @other_country_users&.any? %>
+    <% if @users.last_page? %>
+      <%= render 'users/other_country_section',
+                 other_country_users: @other_country_users,
+                 filter_country_code: @filter_country_code,
+                 sort: @sort,
+                 dir: @dir,
+                 filter_location: @filter_location,
+                 filter_company: @filter_company %>
+    <% else %>
+      <%# Placeholder - will be replaced when main users reach last page %>
+      <div id="other-country-section-placeholder"></div>
+    <% end %>
+  <% end %>
 
   <!-- Community CTA -->
   <% if user_signed_in? %>

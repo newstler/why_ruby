@@ -1,6 +1,24 @@
 module ApplicationHelper
   include ImageHelper
 
+  # Convert ISO country code to full name via i18n
+  def country_name(code)
+    return nil if code.blank?
+    I18n.t("countries.#{code.upcase}", default: code)
+  end
+
+  # Extract country code from normalized location (e.g., "New York, US" -> "US")
+  def country_code_from_location(normalized_location)
+    return nil if normalized_location.blank?
+    normalized_location.split(", ").last
+  end
+
+  # Get full country name from normalized location
+  def country_name_from_location(normalized_location)
+    code = country_code_from_location(normalized_location)
+    country_name(code)
+  end
+
   # Get client country code for analytics (ISO 3166-1 alpha-2, e.g., "US", "DE", "CA")
   def client_country_code
     return @client_country_code if defined?(@client_country_code)
