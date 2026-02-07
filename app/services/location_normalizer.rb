@@ -21,7 +21,14 @@ class LocationNormalizer
     result = photon_search(raw_location)
     return nil unless result
 
-    build_normalized_string(result)
+    normalized_string = build_normalized_string(result)
+    return nil unless normalized_string
+
+    {
+      normalized_location: normalized_string,
+      latitude: result.latitude,
+      longitude: result.longitude
+    }
   end
 
   private
@@ -34,13 +41,21 @@ class LocationNormalizer
     return nil unless response.is_a?(Net::HTTPSuccess)
 
     data = JSON.parse(response.body)
-    feature = data.dig("features", 0, "properties")
+    feature = data.dig("features", 0)
     return nil unless feature
 
+    properties = feature["properties"]
+    return nil unless properties
+
+    coordinates = feature.dig("geometry", "coordinates")
+    lon, lat = coordinates if coordinates.is_a?(Array) && coordinates.size >= 2
+
     OpenStruct.new(
-      city: feature["city"],
-      state: feature["state"],
-      country_code: feature["countrycode"]
+      city: properties["city"],
+      state: properties["state"],
+      country_code: properties["countrycode"],
+      latitude: lat&.to_f,
+      longitude: lon&.to_f
     )
   rescue StandardError => e
     Rails.logger.warn "Photon geocoding failed: #{e.message}"

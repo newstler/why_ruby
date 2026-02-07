@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_02_05_185437) do
+ActiveRecord::Schema[8.2].define(version: 2026_02_07_161806) do
   create_table "_litestream_lock", id: false, force: :cascade do |t|
     t.integer "id"
   end
@@ -189,8 +189,10 @@ ActiveRecord::Schema[8.2].define(version: 2026_02_05_185437) do
     t.integer "github_repos_count"
     t.integer "github_stars_sum"
     t.text "hidden_repos"
+    t.float "latitude"
     t.string "linkedin"
     t.string "location"
+    t.float "longitude"
     t.string "name"
     t.json "newsletters_opened", default: []
     t.json "newsletters_received", default: []
@@ -209,6 +211,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_02_05_185437) do
     t.index ["cross_domain_token"], name: "index_users_on_cross_domain_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["github_id"], name: "index_users_on_github_id", unique: true
+    t.index ["latitude", "longitude"], name: "index_users_on_coordinates"
     t.index ["normalized_location"], name: "index_users_on_normalized_location"
     t.index ["slug"], name: "index_users_on_slug"
     t.index ["username"], name: "index_users_on_username", unique: true

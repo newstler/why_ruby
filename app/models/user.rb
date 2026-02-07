@@ -19,6 +19,11 @@ class User < ApplicationRecord
   # Callbacks
   before_save :precompute_bio_html, if: :will_save_change_to_bio?
   after_save :enqueue_location_normalization, if: :saved_change_to_location?
+  after_commit :invalidate_map_cache, if: -> {
+    saved_change_to_latitude? || saved_change_to_longitude? ||
+    saved_change_to_public? || saved_change_to_avatar_url? ||
+    saved_change_to_open_to_work?
+  }
 
   # Validations
   validates :github_id, presence: true, uniqueness: true
@@ -286,7 +291,11 @@ class User < ApplicationRecord
     if location.present?
       NormalizeLocationJob.perform_later(id)
     else
-      update_columns(normalized_location: nil)
+      update_columns(normalized_location: nil, latitude: nil, longitude: nil)
     end
+  end
+
+  def invalidate_map_cache
+    Rails.cache.delete("community_map_data")
   end
 end

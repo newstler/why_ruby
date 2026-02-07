@@ -1,6 +1,24 @@
 <%# Set page title for community index - just "Ruby Community" %>
 <% content_for(:full_title) { t('meta.community.site_name') } %>
 
+<div class="-mt-8 -mx-4 sm:-mx-6 lg:-mx-8 mb-10"
+     data-controller="community-map"
+     data-community-map-data-url-value="<%= community_map_data_url %>">
+  <div data-community-map-target="container"
+       class="w-full h-[250px] sm:h-[350px] md:h-[400px] lg:h-[450px] bg-gray-100 overflow-hidden">
+    <div data-community-map-target="loading"
+         class="flex items-center justify-center h-full">
+      <div class="flex flex-col items-center gap-3 text-gray-400">
+        <svg class="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span class="text-sm">Loading community map...</span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <%= render "users/community_nav" %>
 
 <%# Override meta tags for community page %>
