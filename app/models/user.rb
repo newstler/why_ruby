@@ -41,7 +41,7 @@ class User < ApplicationRecord
     where(normalized_location: loc).or(where(normalized_location: nil, location: loc))
   }
   scope :from_country, ->(country_code) {
-    where("normalized_location LIKE ?", "%, #{country_code}")
+    where("normalized_location LIKE ? OR normalized_location = ?", "%, #{country_code}", country_code)
   }
 
   # Devise modules for GitHub OAuth
