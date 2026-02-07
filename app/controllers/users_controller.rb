@@ -30,6 +30,16 @@ class UsersController < ApplicationController
         @other_country_users = apply_sorting(@other_country_users)
         @other_country_users = @other_country_users.page(params[:other_page]).per(20)
       end
+
+      # Compute bounding box for map zoom-to-location
+      geo_bounds = User.visible
+                       .by_normalized_location(@filter_location)
+                       .where.not(latitude: nil, longitude: nil)
+                       .pick(Arel.sql("MIN(latitude)"), Arel.sql("MAX(latitude)"),
+                             Arel.sql("MIN(longitude)"), Arel.sql("MAX(longitude)"))
+      if geo_bounds&.all?(&:present?)
+        @filter_geo_bounds = { south: geo_bounds[0], north: geo_bounds[1], west: geo_bounds[2], east: geo_bounds[3] }
+      end
     end
 
     if params[:company].present?

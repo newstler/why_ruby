@@ -6,77 +6,86 @@
     - avatar_size: (optional) custom avatar size (e.g., "w-32 h-[115px]")
     - compact: (optional) if true, uses smaller text sizes on mobile
     - badge_size: (optional) "small" for compact badge on avatar (default), or nil for normal size
+    - minimal: (optional) if true, only shows avatar, name, stars, and company/location
 %>
 
-<%= link_to community_user_url(user), class: "group block #{local_assigns[:frameless] ? '' : 'bg-white shadow rounded-lg p-6 hover:shadow-lg'} transition-shadow" do %>
+<%= link_to community_user_url(user), class: "group block #{local_assigns[:frameless] ? '' : 'bg-white shadow rounded-lg p-6 hover:shadow-lg'} transition-shadow", data: { turbo_frame: "_top" } do %>
   <div class="flex <%= local_assigns[:frameless] ? 'items-center' : 'items-start' %> gap-4">
     <!-- Avatar -->
-    <%= render "shared/gem_avatar", user: user, size: local_assigns[:avatar_size] || "w-24 h-[86px]", text_size: "text-3xl", badge_size: local_assigns.key?(:badge_size) ? local_assigns[:badge_size] : "small" %>
+    <%= render "shared/gem_avatar", user: user, size: local_assigns[:avatar_size] || "w-24 h-[86px]", text_size: "text-3xl", badge_size: local_assigns.key?(:badge_size) ? local_assigns[:badge_size] : "small", **(local_assigns.key?(:show_open_to_work) ? { show_open_to_work: local_assigns[:show_open_to_work] } : {}), **(local_assigns.key?(:border_color) ? { border_color: local_assigns[:border_color] } : {}), **(local_assigns[:thick_border] ? { thick_border: true } : {}) %>
 
     <div class="flex flex-col justify-center flex-1 min-w-0">
       <!-- Name and Stars -->
       <div class="flex items-baseline gap-x-2 <%= local_assigns[:compact] ? 'flex-wrap' : 'justify-between' %>">
-        <h2 class="<%= local_assigns[:compact] ? 'text-base md:text-2xl' : 'text-2xl' %> font-bold text-gray-900 group-hover:text-red-600 transition-colors leading-none">
+        <h2 class="<%= local_assigns[:compact] ? 'text-base md:text-2xl' : 'text-2xl' %> font-bold <%= local_assigns[:minimal] ? 'text-gray-500' : 'text-gray-900' %> group-hover:text-red-600 transition-colors leading-none">
           <%= user.display_name %>
         </h2>
-        <% total_stars = user.respond_to?(:total_github_stars) ? user.total_github_stars.to_i : 0 %>
-        <% if total_stars > 0 %>
-          <span class="flex items-center text-amber-500 whitespace-nowrap flex-shrink-0 <%= local_assigns[:compact] ? 'text-xs md:text-sm' : 'text-sm' %>">
-            <%= inline_svg_tag "star.svg", class: local_assigns[:compact] ? "w-3 h-3 md:w-4 md:h-4 mr-0.5" : "w-4 h-4 mr-0.5" %>
-            <span class="font-semibold text-gray-500"><%= total_stars %></span>
-          </span>
+        <% unless local_assigns[:minimal] %>
+          <% total_stars = user.respond_to?(:total_github_stars) ? user.total_github_stars.to_i : 0 %>
+          <% if total_stars > 0 %>
+            <span class="flex items-center text-amber-500 whitespace-nowrap flex-shrink-0 <%= local_assigns[:compact] ? 'text-xs md:text-sm' : 'text-sm' %>">
+              <%= inline_svg_tag "star.svg", class: local_assigns[:compact] ? "w-3 h-3 md:w-4 md:h-4 mr-0.5" : "w-4 h-4 mr-0.5" %>
+              <span class="font-semibold text-gray-500"><%= total_stars %></span>
+            </span>
+          <% end %>
         <% end %>
       </div>
 
       <!-- Secondary info: Bio, Company/Location, Stats -->
       <div class="mt-1 space-y-0.5">
-        <% if user.bio.present? %>
-          <p class="<%= local_assigns[:compact] ? 'text-xs md:text-sm' : 'text-sm' %> text-gray-500 leading-tight mb-1"><%= user.bio %></p>
+        <% unless local_assigns[:minimal] %>
+          <% if user.bio.present? %>
+            <p class="<%= local_assigns[:compact] ? 'text-xs md:text-sm' : 'text-sm' %> text-gray-500 leading-tight mb-1"><%= user.bio %></p>
+          <% end %>
         <% end %>
 
-        <% if user.company.present? || user.location.present? %>
-          <div class="flex flex-wrap items-center gap-x-3 gap-y-0.5 <%= local_assigns[:compact] ? 'text-[10px] md:text-xs' : 'text-xs' %> text-gray-400 -ml-0.5">
-            <% if user.company.present? %>
-              <span class="flex items-start gap-1">
-                <%= inline_svg_tag "building.svg", class: "w-3.5 h-3.5 text-gray-300 flex-shrink-0 mt-0.5" %>
-                <span><%= user.company %></span>
-              </span>
-            <% end %>
+        <% unless local_assigns[:minimal] %>
+          <% if user.company.present? || user.location.present? %>
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-0.5 <%= local_assigns[:compact] ? 'text-[10px] md:text-xs' : 'text-xs' %> text-gray-400 -ml-0.5">
+              <% if user.company.present? %>
+                <span class="flex items-start gap-1">
+                  <%= inline_svg_tag "building.svg", class: "w-3.5 h-3.5 text-gray-300 flex-shrink-0 mt-0.5" %>
+                  <span><%= user.company %></span>
+                </span>
+              <% end %>
 
-            <% if user.location.present? %>
-              <span class="flex items-start gap-1">
-                <%= inline_svg_tag "location.svg", class: "w-3.5 h-3.5 text-gray-300 flex-shrink-0 mt-0.5" %>
-                <span><%= user.location %></span>
-              </span>
-            <% end %>
-          </div>
+              <% if user.location.present? %>
+                <span class="flex items-start gap-1">
+                  <%= inline_svg_tag "location.svg", class: "w-3.5 h-3.5 text-gray-300 flex-shrink-0 mt-0.5" %>
+                  <span><%= user.location %></span>
+                </span>
+              <% end %>
+            </div>
+          <% end %>
         <% end %>
 
-        <% ruby_repos_count = user.github_repos_count.to_i %>
-        <% has_stats = ruby_repos_count > 0 || user.published_posts_count > 0 || user.published_comments_count > 0 %>
-        <% if has_stats %>
-          <div class="flex items-center gap-2.5 <%= local_assigns[:compact] ? 'text-[10px] md:text-xs' : 'text-xs' %> text-gray-500">
-            <% if ruby_repos_count > 0 %>
-              <span>
-                <span class="font-semibold text-gray-700"><%= ruby_repos_count %></span>
-                <%= 'Project'.pluralize(ruby_repos_count) %>
-              </span>
-            <% end %>
+        <% unless local_assigns[:minimal] %>
+          <% ruby_repos_count = user.github_repos_count.to_i %>
+          <% has_stats = ruby_repos_count > 0 || user.published_posts_count > 0 || user.published_comments_count > 0 %>
+          <% if has_stats %>
+            <div class="flex items-center gap-2.5 <%= local_assigns[:compact] ? 'text-[10px] md:text-xs' : 'text-xs' %> text-gray-500">
+              <% if ruby_repos_count > 0 %>
+                <span>
+                  <span class="font-semibold text-gray-700"><%= ruby_repos_count %></span>
+                  <%= 'Project'.pluralize(ruby_repos_count) %>
+                </span>
+              <% end %>
 
-            <% if user.published_posts_count > 0 %>
-              <span>
-                <span class="font-semibold text-gray-700"><%= user.published_posts_count %></span>
-                <%= 'Post'.pluralize(user.published_posts_count) %>
-              </span>
-            <% end %>
+              <% if user.published_posts_count > 0 %>
+                <span>
+                  <span class="font-semibold text-gray-700"><%= user.published_posts_count %></span>
+                  <%= 'Post'.pluralize(user.published_posts_count) %>
+                </span>
+              <% end %>
 
-            <% if user.published_comments_count > 0 %>
-              <span>
-                <span class="font-semibold text-gray-700"><%= user.published_comments_count %></span>
-                <%= 'Comment'.pluralize(user.published_comments_count) %>
-              </span>
-            <% end %>
-          </div>
+              <% if user.published_comments_count > 0 %>
+                <span>
+                  <span class="font-semibold text-gray-700"><%= user.published_comments_count %></span>
+                  <%= 'Comment'.pluralize(user.published_comments_count) %>
+                </span>
+              <% end %>
+            </div>
+          <% end %>
         <% end %>
       </div>
     </div>
