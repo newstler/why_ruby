@@ -5,7 +5,8 @@ const GEM_PATH = "M56.6.55h86.84c6.79,0,13.13,3.39,16.9,9.04l36.26,54.34c5.26,7.
 export default class extends Controller {
   static targets = ["container", "loading"]
   static values = {
-    dataUrl: String
+    dataUrl: String,
+    fitBounds: { type: Object, default: {} }
   }
 
   connect() {
@@ -22,14 +23,25 @@ export default class extends Controller {
     }, { rootMargin: "200px" })
 
     this.observer.observe(this.containerTarget)
+
+    this.handleMapReset = () => this.resetView()
+    window.addEventListener("map:reset", this.handleMapReset)
   }
 
   disconnect() {
+    window.removeEventListener("map:reset", this.handleMapReset)
     if (this.observer) this.observer.disconnect()
     if (this.map) {
       this.map.remove()
       this.map = null
     }
+  }
+
+  resetView() {
+    if (!this.map) return
+    this.readyForBoundsUpdate = false
+    this.map.setView([30, 10], 2)
+    setTimeout(() => { this.readyForBoundsUpdate = true }, 600)
   }
 
   loadLeaflet() {
@@ -137,6 +149,15 @@ export default class extends Controller {
     })
 
     this.map.addLayer(cluster)
+
+    const fb = this.fitBoundsValue
+    if (fb && fb.south != null) {
+      this.map.fitBounds(
+        [[fb.south, fb.west], [fb.north, fb.east]],
+        { padding: [40, 40], maxZoom: 10 }
+      )
+    }
+
     this.readyForBoundsUpdate = true
   }
 
@@ -190,6 +211,10 @@ export default class extends Controller {
     const params = currentSrc
       ? new URL(currentSrc, window.location.origin).searchParams
       : new URLSearchParams(window.location.search)
+
+    // Drop location/company filters — manual map interaction overrides them
+    params.delete("location")
+    params.delete("company")
 
     // Clear stale bounds and page (reset to page 1 on bounds change)
     params.delete("south")

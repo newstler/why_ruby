@@ -3,7 +3,8 @@
 
 <div class="-mt-8 -mx-4 sm:-mx-6 lg:-mx-8 mb-10"
      data-controller="community-map"
-     data-community-map-data-url-value="<%= community_map_data_url %>">
+     data-community-map-data-url-value="<%= community_map_data_url %>"
+     <% if @filter_geo_bounds.present? %>data-community-map-fit-bounds-value="<%= @filter_geo_bounds.to_json %>"<% end %>>
   <div data-community-map-target="container"
        class="w-full h-[250px] sm:h-[350px] md:h-[400px] lg:h-[450px] bg-gray-100 overflow-hidden">
     <div data-community-map-target="loading"
@@ -53,53 +54,60 @@
 <div class="space-y-8">
   <!-- Sticky Header (positioned below main nav) - sticky on tablets (min-width: 768px AND min-height: 600px) but not horizontal phones -->
   <div class="sticky-tablet top-32 z-40 -mx-4 px-4 md:-mx-6 md:px-6 lg:-mx-8 lg:px-8 pt-10 -mt-10 pb-12 md:bg-gradient-to-b md:from-gray-50 md:from-85% md:to-transparent">
-    <div class="md:flex md:items-end md:justify-between w-full">
-    <% if @filter_location.present? || @filter_company.present? %>
-      <%# When filtering, show filter badges instead of description %>
-      <div class="flex items-center gap-2 md:flex-1 min-w-0 md:pr-6">
-        <% if @filter_company.present? %>
-          <span class="flex items-center gap-x-1 text-sm rounded-full bg-gray-100 px-3 py-2">
-            <span class="text-gray-400">Working at:</span>
-            <span class="text-gray-700 font-medium"><%= @filter_company %></span>
-            <%= link_to "×", community_index_path(location: @filter_location, sort: @sort, dir: @dir, **bounds_params), class: "ml-1 text-gray-400 hover:text-gray-600 text-lg leading-none" %>
-          </span>
-        <% end %>
-        <% if @filter_location.present? %>
-          <% location_display = @filter_location.sub(/, ([A-Z]{2})$/) { ", #{country_name(Regexp.last_match(1))}" } %>
-          <span class="flex items-center gap-x-1 text-sm rounded-full bg-gray-100 px-3 py-2">
-            <span class="text-gray-400">Located in:</span>
-            <span class="text-gray-700 font-medium"><%= location_display %></span>
-            <%= link_to "×", community_index_path(company: @filter_company, sort: @sort, dir: @dir, **bounds_params), class: "ml-1 text-gray-400 hover:text-gray-600 text-lg leading-none" %>
-          </span>
-        <% end %>
-      </div>
-    <% else %>
+    <div class="md:flex md:justify-between w-full">
       <div class="md:flex-1 min-w-0 md:pr-6">
-        <% area_phrase = @bounds.present? ? "from this area" : "from around the world" %>
         <% if user_signed_in? %>
           <div class="flex items-baseline gap-3 md:gap-4 mb-3">
             <span class="text-5xl md:text-6xl lg:text-7xl font-black text-red-600 tabular-nums"><%= number_with_delimiter(@total_users_count) %></span>
-            <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">Ruby developers</h1>
+            <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900"><%= t('users.index.developer_count', count: @total_users_count) %></h1>
           </div>
           <p class="text-lg md:text-xl text-gray-500 max-w-2xl">
-            <%= area_phrase %> who are passionate about Ruby. Share why you love it on <%= link_to "your profile", user_path(current_user), class: "text-gray-700 underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors" %> and get featured on&nbsp;<%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "text-gray-700 underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors whitespace-nowrap" %>
+            <% if @filter_location.present? %>
+              <% location_display = @filter_location.match?(/\A[A-Z]{2}\z/) ? country_name(@filter_location) : @filter_location.sub(/, ([A-Z]{2})$/) { ", #{country_name(Regexp.last_match(1))}" } %>
+              from <%= location_display %><%= link_to community_index_path(company: @filter_company, sort: @sort, dir: @dir), class: "inline-flex items-center justify-center w-5 h-5 ml-1.5 rounded-full bg-gray-200 text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors align-text-bottom", onclick: "window.dispatchEvent(new CustomEvent('map:reset'))" do %><%= inline_svg_tag "x-mark.svg", class: "w-2.5 h-2.5" %><% end %>
+            <% elsif @filter_company.present? %>
+              working at <%= @filter_company %><%= link_to community_index_path(location: @filter_location, sort: @sort, dir: @dir), class: "inline-flex items-center justify-center w-5 h-5 ml-1.5 rounded-full bg-gray-200 text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors align-text-bottom", onclick: "window.dispatchEvent(new CustomEvent('map:reset'))" do %><%= inline_svg_tag "x-mark.svg", class: "w-2.5 h-2.5" %><% end %>
+            <% elsif @bounds.present? %>
+              from this area
+            <% else %>
+              from around the world
+            <% end %>
+            who <%= t('users.index.passionate_verb', count: @total_users_count) %> passionate about Ruby.
+            <% unless current_user.testimonial&.published? %>
+              <br>Share why you love it on <%= link_to "your profile", community_user_url(current_user), class: "text-gray-700 underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors", data: { turbo_frame: "_top" } %> and get featured on&nbsp;<%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "text-gray-700 underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors whitespace-nowrap", data: { turbo_frame: "_top" } %>
+            <% end %>
           </p>
         <% else %>
           <div class="flex items-center gap-3 md:gap-4 mb-3">
             <%= button_to github_auth_with_return_path, method: :post, data: { turbo: false }, class: "px-6 py-3 text-2xl md:text-3xl font-bold rounded-xl text-white bg-red-600 hover:bg-red-700 cursor-pointer transition-colors shadow-sm" do %>Join<% end %>
             <div class="flex items-baseline gap-3 md:gap-4">
               <span class="text-5xl md:text-6xl lg:text-7xl font-black text-red-600 tabular-nums"><%= number_with_delimiter(@total_users_count) %></span>
-              <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">developers</h1>
+              <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900"><%= t('users.index.developer_count', count: @total_users_count) %></h1>
             </div>
           </div>
           <p class="text-lg md:text-xl text-gray-500 max-w-2xl">
-            <%= area_phrase %> who are passionate about Ruby. <%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "text-gray-700 underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors whitespace-nowrap" %>
+            <% if @filter_location.present? %>
+              <% location_display = @filter_location.match?(/\A[A-Z]{2}\z/) ? country_name(@filter_location) : @filter_location.sub(/, ([A-Z]{2})$/) { ", #{country_name(Regexp.last_match(1))}" } %>
+              from <%= location_display %><%= link_to community_index_path(company: @filter_company, sort: @sort, dir: @dir), class: "inline-flex items-center justify-center w-5 h-5 ml-1.5 rounded-full bg-gray-200 text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors align-text-bottom", onclick: "window.dispatchEvent(new CustomEvent('map:reset'))" do %><%= inline_svg_tag "x-mark.svg", class: "w-2.5 h-2.5" %><% end %>
+            <% elsif @filter_company.present? %>
+              working at <%= @filter_company %><%= link_to community_index_path(location: @filter_location, sort: @sort, dir: @dir), class: "inline-flex items-center justify-center w-5 h-5 ml-1.5 rounded-full bg-gray-200 text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors align-text-bottom", onclick: "window.dispatchEvent(new CustomEvent('map:reset'))" do %><%= inline_svg_tag "x-mark.svg", class: "w-2.5 h-2.5" %><% end %>
+            <% elsif @bounds.present? %>
+              from this area
+            <% else %>
+              from around the world
+            <% end %>
+            who <%= t('users.index.passionate_verb', count: @total_users_count) %> passionate about Ruby. <%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "text-gray-700 underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors whitespace-nowrap", data: { turbo_frame: "_top" } %>
           </p>
         <% end %>
       </div>
-    <% end %>
 
-    <div class="relative md:ml-auto mt-8 md:mt-0 flex-shrink-0" data-controller="dropdown">
+    <div class="flex-shrink-0 flex flex-col items-end md:justify-between mt-8 md:mt-0">
+      <% if user_signed_in? %>
+        <div class="hidden md:block mb-3 mt-2.5">
+          <%= render "users/user_tile", user: current_user, frameless: true, avatar_size: "w-10 h-9", compact: true, minimal: true, badge_size: "map" %>
+        </div>
+      <% end %>
+      <div class="relative" data-controller="dropdown">
       <button type="button" class="flex items-center gap-x-1 text-sm rounded-full cursor-pointer bg-gray-100 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 px-3 py-2" data-action="click->dropdown#toggle click@window->dropdown#hide">
         <span class="text-gray-400"><%= t('users.index.sort_label') %>:</span>
         <span class="text-gray-700 font-medium">
@@ -149,6 +157,7 @@
           <%= sort_link('users.index.sort.az', 'users.index.sort.az_reverse', 'az', @sort, @dir, filter_params) %>
         </div>
       </div>
+    </div>
     </div>
   </div>
   </div>

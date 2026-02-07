@@ -96,6 +96,9 @@
                   <%= inline_svg_tag "location.svg", class: "w-4 h-4 mr-1" %>
                   <%= @user.location %>
                 <% end %>
+                <% if @user.normalized_location.present? && @user.normalized_location != @user.location %>
+                  <span class="text-xs text-orange-400 ml-1">(<%= @user.normalized_location %>)</span>
+                <% end %>
               <% end %>
             </div>
           </div>
@@ -171,6 +174,9 @@
               <%= link_to community_index_path(location: @user.normalized_location || @user.location), class: "flex items-center hover:text-gray-600 transition-colors" do %>
                 <%= inline_svg_tag "location.svg", class: "w-4 h-4 mr-1" %>
                 <%= @user.location %>
+              <% end %>
+              <% if @user.normalized_location.present? && @user.normalized_location != @user.location %>
+                <span class="text-xs text-orange-400 ml-1">(<%= @user.normalized_location %>)</span>
               <% end %>
             <% end %>
           </div>
