@@ -1,5 +1,6 @@
 <%# Determine which section we're loading: main users or other country users %>
 <% loading_other_country = params[:other_page].present? %>
+<% bounds_params = @bounds || {} %>
 
 <% if loading_other_country && @other_country_users.present? %>
   <%# Loading more users for the "other parts of country" section %>
@@ -67,7 +68,7 @@
   <%= turbo_stream.replace "other-infinite-scroll-pagination" do %>
     <div id="other-infinite-scroll-pagination" data-infinite-scroll-target="pagination" class="hidden">
       <% if @other_country_users.total_pages > 1 && !@other_country_users.last_page? %>
-        <%= link_to "Next", community_index_path(other_page: @other_country_users.next_page, page: params[:page], sort: @sort, dir: @dir, location: @filter_location, company: @filter_company), rel: "next" %>
+        <%= link_to "Next", community_index_path(other_page: @other_country_users.next_page, page: params[:page], sort: @sort, dir: @dir, location: @filter_location, company: @filter_company, **bounds_params), rel: "next" %>
       <% end %>
     </div>
   <% end %>
@@ -145,7 +146,7 @@
   <%= turbo_stream.replace "infinite-scroll-pagination" do %>
     <div id="infinite-scroll-pagination" data-infinite-scroll-target="pagination" class="hidden">
       <% if @users.total_pages > 1 && !@users.last_page? %>
-        <%= link_to "Next", community_index_path(page: @users.next_page, sort: @sort, dir: @dir, location: @filter_location, company: @filter_company), rel: "next" %>
+        <%= link_to "Next", community_index_path(page: @users.next_page, sort: @sort, dir: @dir, location: @filter_location, company: @filter_company, **bounds_params), rel: "next" %>
       <% end %>
     </div>
   <% end %>
@@ -158,7 +159,7 @@
   <% end %>
 
   <%# When reaching the last page, inject the "other country" section if available %>
-  <% if @users.last_page? && @other_country_users&.any? %>
+  <% if @users.last_page? && @other_country_users&.any? && @bounds.blank? %>
     <%= turbo_stream.replace "other-country-section-placeholder" do %>
       <%= render 'users/other_country_section',
                  other_country_users: @other_country_users,
