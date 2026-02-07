@@ -437,3 +437,15 @@ input[type="checkbox"] {
 .translate-x-7 {
   transform: translateX(1.75rem);
 }
+
+/* Community map - contain Leaflet z-indices below the main nav (z-50) */
+[data-controller="community-map"] .leaflet-container {
+  z-index: 0;
+}
+
+/* Community map - reset Leaflet divIcon defaults for custom markers */
+.community-map-marker,
+.community-map-cluster {
+  background: none !important;
+  border: none !important;
+}

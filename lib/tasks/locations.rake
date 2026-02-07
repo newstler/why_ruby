@@ -12,16 +12,53 @@ namespace :locations do
     puts "Normalizing #{total} distinct locations..."
 
     distinct_locations.each_with_index do |raw_location, index|
-      # Rate limit: Nominatim requires max 1 req/sec
+      # Rate limit: Photon requires max 1 req/sec
       sleep(1.1) if index > 0
 
-      normalized = LocationNormalizer.normalize(raw_location)
-      User.where(location: raw_location).update_all(normalized_location: normalized)
+      result = LocationNormalizer.normalize(raw_location)
 
-      status = normalized || "(no match)"
-      puts "[#{index + 1}/#{total}] \"#{raw_location}\" → #{status}"
+      if result
+        User.where(location: raw_location).update_all(
+          normalized_location: result[:normalized_location],
+          latitude: result[:latitude],
+          longitude: result[:longitude]
+        )
+        puts "[#{index + 1}/#{total}] \"#{raw_location}\" → #{result[:normalized_location]} (#{result[:latitude]}, #{result[:longitude]})"
+      else
+        puts "[#{index + 1}/#{total}] \"#{raw_location}\" → (no match)"
+      end
     end
 
     puts "Done!"
+  end
+
+  desc "Backfill coordinates for users with normalized locations but no lat/lng"
+  task backfill_coordinates: :environment do
+    distinct_locations = User.where.not(location: [ nil, "" ])
+                             .where(latitude: nil)
+                             .distinct
+                             .pluck(:location)
+
+    total = distinct_locations.size
+    puts "Backfilling coordinates for #{total} distinct locations..."
+
+    distinct_locations.each_with_index do |raw_location, index|
+      sleep(1.1) if index > 0
+
+      result = LocationNormalizer.normalize(raw_location)
+
+      if result
+        User.where(location: raw_location).update_all(
+          normalized_location: result[:normalized_location],
+          latitude: result[:latitude],
+          longitude: result[:longitude]
+        )
+        puts "[#{index + 1}/#{total}] \"#{raw_location}\" → (#{result[:latitude]}, #{result[:longitude]})"
+      else
+        puts "[#{index + 1}/#{total}] \"#{raw_location}\" → (no match)"
+      end
+    end
+
+    puts "Done! #{User.where.not(latitude: nil).count} users now have coordinates."
   end
 end

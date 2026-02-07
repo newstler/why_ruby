@@ -386,6 +386,15 @@ module ApplicationHelper
     end
   end
 
+  # URL for community map data endpoint (works across domains)
+  def community_map_data_url
+    if Rails.env.production? && request.host == Rails.application.config.x.domains.community
+      "/map_data"
+    else
+      community_map_data_path
+    end
+  end
+
   # Canonical URL for community root (for meta tags)
   # Production: https://rubycommunity.org/
   # Development: http://localhost:3003/community

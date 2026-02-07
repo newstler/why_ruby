@@ -42,6 +42,28 @@ class UsersController < ApplicationController
     @users = @users.page(params[:page]).per(20)
   end
 
+  def map_data
+    data = Rails.cache.fetch("community_map_data", expires_in: 1.hour) do
+      User.visible
+          .where.not(latitude: nil, longitude: nil)
+          .select(:id, :slug, :username, :name, :avatar_url, :latitude, :longitude, :open_to_work)
+          .map { |u|
+            {
+              id: u.id,
+              name: u.display_name,
+              username: u.username,
+              avatar_url: u.avatar_url,
+              lat: u.latitude,
+              lng: u.longitude,
+              open_to_work: u.open_to_work,
+              profile_url: helpers.community_user_url(u)
+            }
+          }
+    end
+
+    render json: data
+  end
+
   def og_image
     @users = User.where(public: true)
                  .where.not(avatar_url: [ nil, "" ])

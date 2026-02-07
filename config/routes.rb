@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   # which resolves to the correct domain per environment.
   constraints host: Rails.application.config.x.domains.community do
     root "users#index", as: :rubycommunity_root
+    get "map_data", to: "users#map_data", as: :rubycommunity_map_data
     get ":id", to: "users#show", as: :rubycommunity_user, constraints: { id: /[^\/]+/ }
   end
 
@@ -38,6 +39,7 @@ Rails.application.routes.draw do
 
   # Community routes — local development fallback for rubycommunity.org (see domain constraint above)
   get "community", to: "users#index", as: :users
+  get "community/map_data", to: "users#map_data", as: :community_map_data
   get "community/:id", to: "users#show", as: :user
 
   # Tags route (keeping as resources for now)
