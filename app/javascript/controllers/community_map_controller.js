@@ -110,8 +110,8 @@ export default class extends Controller {
   createMarkers(users) {
     const cluster = L.markerClusterGroup({
       maxClusterRadius: 80,
-      disableClusteringAtZoom: 13,
       spiderfyOnMaxZoom: true,
+      spiderfyDistanceMultiplier: 2,
       showCoverageOnHover: false,
       iconCreateFunction: (c) => this.buildClusterIcon(c)
     })
@@ -144,10 +144,10 @@ export default class extends Controller {
 
     let badge = ""
     if (user.open_to_work) {
-      badge = `<div style="position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);background:#dc2626;color:white;font-size:5px;font-weight:bold;padding:1px 3px;border-radius:9999px;white-space:nowrap;text-transform:uppercase;letter-spacing:0.3px;line-height:1.2;">Open to work</div>`
+      badge = `<div style="position:absolute;bottom:4px;left:50%;transform:translateX(-50%);background:#dc2626;color:white;font-size:4px;font-weight:bold;padding:0.5px 2.5px;border-radius:9999px;white-space:nowrap;text-transform:uppercase;letter-spacing:0.3px;line-height:1.2;">Open to work</div>`
     }
 
-    return `<div style="cursor:pointer;transition:transform 0.2s;width:40px;height:36px;position:relative;" onmouseenter="this.style.transform='scale(1.3)';this.style.zIndex='10'" onmouseleave="this.style.transform='scale(1)';this.style.zIndex=''"><svg viewBox="0 0 200 180" width="40" height="36" style="overflow:visible;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.25))"><defs><clipPath id="${clipId}"><path d="${GEM_PATH}"/></clipPath></defs>${imageContent}<path d="${GEM_PATH}" fill="none" stroke="white" stroke-width="10"/><path d="${GEM_PATH}" fill="none" stroke="#dc2626" stroke-width="6"/></svg>${badge}</div>`
+    return `<div style="cursor:pointer;transition:transform 0.2s;width:40px;height:36px;position:relative;" onmouseenter="this.style.transform='scale(1.3)';this.style.zIndex='10'" onmouseleave="this.style.transform='scale(1)';this.style.zIndex=''"><svg viewBox="0 0 200 180" width="40" height="36" style="overflow:visible;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.25))"><defs><clipPath id="${clipId}"><path d="${GEM_PATH}"/></clipPath></defs>${imageContent}<path d="${GEM_PATH}" fill="none" stroke="white" stroke-width="14"/><path d="${GEM_PATH}" fill="none" stroke="#dc2626" stroke-width="8"/></svg>${badge}</div>`
   }
 
   buildClusterIcon(cluster) {
