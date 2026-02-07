@@ -72,6 +72,8 @@ export default class extends Controller {
   }
 
   initMap() {
+    this.readyForBoundsUpdate = false
+
     this.map = L.map(this.containerTarget, {
       center: [30, 10],
       zoom: 2,
@@ -89,6 +91,11 @@ export default class extends Controller {
     }).addTo(this.map)
 
     setTimeout(() => this.map.invalidateSize(), 100)
+
+    this.map.on("moveend", () => {
+      if (!this.readyForBoundsUpdate) return
+      this.onBoundsChange()
+    })
 
     this.loadMarkers()
   }
@@ -130,6 +137,7 @@ export default class extends Controller {
     })
 
     this.map.addLayer(cluster)
+    this.readyForBoundsUpdate = true
   }
 
   buildMarkerHtml(user) {
@@ -164,6 +172,47 @@ export default class extends Controller {
       iconSize: [size, height],
       iconAnchor: [size / 2, height / 2]
     })
+  }
+
+  onBoundsChange() {
+    if (this.boundsTimeout) clearTimeout(this.boundsTimeout)
+    this.boundsTimeout = setTimeout(() => this.updateContent(), 300)
+  }
+
+  updateContent() {
+    const frame = document.getElementById("community-content")
+    if (!frame) return
+
+    const baseUrl = this.contentBaseUrl()
+
+    // Preserve current sort/filter params from frame's last navigation or page URL
+    const currentSrc = frame.getAttribute("src")
+    const params = currentSrc
+      ? new URL(currentSrc, window.location.origin).searchParams
+      : new URLSearchParams(window.location.search)
+
+    // Clear stale bounds and page (reset to page 1 on bounds change)
+    params.delete("south")
+    params.delete("north")
+    params.delete("west")
+    params.delete("east")
+    params.delete("page")
+
+    if (this.map.getZoom() >= 3) {
+      const bounds = this.map.getBounds()
+      params.set("south", bounds.getSouth().toFixed(4))
+      params.set("north", bounds.getNorth().toFixed(4))
+      params.set("west", bounds.getWest().toFixed(4))
+      params.set("east", bounds.getEast().toFixed(4))
+    }
+
+    const query = params.toString()
+    frame.src = query ? `${baseUrl}?${query}` : baseUrl
+  }
+
+  contentBaseUrl() {
+    const url = this.dataUrlValue.replace("/map_data", "")
+    return url || "/"
   }
 
   hideLoading() {

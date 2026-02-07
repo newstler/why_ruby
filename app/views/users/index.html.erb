@@ -19,6 +19,9 @@
   </div>
 </div>
 
+<turbo-frame id="community-content">
+<% bounds_params = @bounds || {} %>
+
 <%= render "users/community_nav" %>
 
 <%# Override meta tags for community page %>
@@ -58,7 +61,7 @@
           <span class="flex items-center gap-x-1 text-sm rounded-full bg-gray-100 px-3 py-2">
             <span class="text-gray-400">Working at:</span>
             <span class="text-gray-700 font-medium"><%= @filter_company %></span>
-            <%= link_to "×", community_index_path(location: @filter_location, sort: @sort, dir: @dir), class: "ml-1 text-gray-400 hover:text-gray-600 text-lg leading-none" %>
+            <%= link_to "×", community_index_path(location: @filter_location, sort: @sort, dir: @dir, **bounds_params), class: "ml-1 text-gray-400 hover:text-gray-600 text-lg leading-none" %>
           </span>
         <% end %>
         <% if @filter_location.present? %>
@@ -66,19 +69,20 @@
           <span class="flex items-center gap-x-1 text-sm rounded-full bg-gray-100 px-3 py-2">
             <span class="text-gray-400">Located in:</span>
             <span class="text-gray-700 font-medium"><%= location_display %></span>
-            <%= link_to "×", community_index_path(company: @filter_company, sort: @sort, dir: @dir), class: "ml-1 text-gray-400 hover:text-gray-600 text-lg leading-none" %>
+            <%= link_to "×", community_index_path(company: @filter_company, sort: @sort, dir: @dir, **bounds_params), class: "ml-1 text-gray-400 hover:text-gray-600 text-lg leading-none" %>
           </span>
         <% end %>
       </div>
     <% else %>
       <div class="md:flex-1 min-w-0 md:pr-6">
+        <% area_phrase = @bounds.present? ? "from this area" : "from around the world" %>
         <% if user_signed_in? %>
           <div class="flex items-baseline gap-3 md:gap-4 mb-3">
             <span class="text-5xl md:text-6xl lg:text-7xl font-black text-red-600 tabular-nums"><%= number_with_delimiter(@total_users_count) %></span>
             <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">Ruby developers</h1>
           </div>
           <p class="text-lg md:text-xl text-gray-500 max-w-2xl">
-            Share why you love Ruby on <%= link_to "your profile", user_path(current_user), class: "text-gray-700 underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors" %> and get featured on&nbsp;<%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "text-gray-700 underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors whitespace-nowrap" %>
+            <%= area_phrase %> who are passionate about Ruby. Share why you love it on <%= link_to "your profile", user_path(current_user), class: "text-gray-700 underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors" %> and get featured on&nbsp;<%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "text-gray-700 underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors whitespace-nowrap" %>
           </p>
         <% else %>
           <div class="flex items-center gap-3 md:gap-4 mb-3">
@@ -89,7 +93,7 @@
             </div>
           </div>
           <p class="text-lg md:text-xl text-gray-500 max-w-2xl">
-            from around the world who are passionate about Ruby. <%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "text-gray-700 underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors whitespace-nowrap" %>
+            <%= area_phrase %> who are passionate about Ruby. <%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "text-gray-700 underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors whitespace-nowrap" %>
           </p>
         <% end %>
       </div>
@@ -132,16 +136,17 @@
                  # Defaults: az -> asc, others -> desc
                  key == 'az' ? 'asc' : 'desc'
                end
-               link_to label, community_index_path(sort: key, dir: dir, location: filters[:location], company: filters[:company]), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none cursor-pointer"
+               link_to label, community_index_path(sort: key, dir: dir, location: filters[:location], company: filters[:company], **filters.fetch(:bounds, {})), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none cursor-pointer"
              end %>
 
-          <%= sort_link('users.index.sort.top', 'users.index.sort.top_reverse', 'top', @sort, @dir, { location: @filter_location, company: @filter_company }) %>
-          <%= sort_link('users.index.sort.new', 'users.index.sort.new_reverse', 'new', @sort, @dir, { location: @filter_location, company: @filter_company }) %>
-          <%= sort_link('users.index.sort.projects', 'users.index.sort.projects_reverse', 'projects', @sort, @dir, { location: @filter_location, company: @filter_company }) %>
-          <%= sort_link('users.index.sort.posts', 'users.index.sort.posts_reverse', 'posts', @sort, @dir, { location: @filter_location, company: @filter_company }) %>
-          <%= sort_link('users.index.sort.comments', 'users.index.sort.comments_reverse', 'comments', @sort, @dir, { location: @filter_location, company: @filter_company }) %>
-          <%= sort_link('users.index.sort.stars', 'users.index.sort.stars_reverse', 'stars', @sort, @dir, { location: @filter_location, company: @filter_company }) %>
-          <%= sort_link('users.index.sort.az', 'users.index.sort.az_reverse', 'az', @sort, @dir, { location: @filter_location, company: @filter_company }) %>
+          <% filter_params = { location: @filter_location, company: @filter_company, bounds: bounds_params } %>
+          <%= sort_link('users.index.sort.top', 'users.index.sort.top_reverse', 'top', @sort, @dir, filter_params) %>
+          <%= sort_link('users.index.sort.new', 'users.index.sort.new_reverse', 'new', @sort, @dir, filter_params) %>
+          <%= sort_link('users.index.sort.projects', 'users.index.sort.projects_reverse', 'projects', @sort, @dir, filter_params) %>
+          <%= sort_link('users.index.sort.posts', 'users.index.sort.posts_reverse', 'posts', @sort, @dir, filter_params) %>
+          <%= sort_link('users.index.sort.comments', 'users.index.sort.comments_reverse', 'comments', @sort, @dir, filter_params) %>
+          <%= sort_link('users.index.sort.stars', 'users.index.sort.stars_reverse', 'stars', @sort, @dir, filter_params) %>
+          <%= sort_link('users.index.sort.az', 'users.index.sort.az_reverse', 'az', @sort, @dir, filter_params) %>
         </div>
       </div>
     </div>
@@ -222,7 +227,7 @@
     <!-- Pagination (hidden, used for infinite scroll) -->
     <div id="infinite-scroll-pagination" data-infinite-scroll-target="pagination" class="hidden">
       <% if @users.total_pages > 1 && !@users.last_page? %>
-        <%= link_to "Next", community_index_path(page: @users.next_page, sort: @sort, dir: @dir, location: @filter_location, company: @filter_company), rel: "next" %>
+        <%= link_to "Next", community_index_path(page: @users.next_page, sort: @sort, dir: @dir, location: @filter_location, company: @filter_company, **bounds_params), rel: "next" %>
       <% end %>
     </div>
 
@@ -234,7 +239,7 @@
 
   <%# Developers from other parts of the same country (when filtering by location) %>
   <%# Only show this section when all main users are loaded (last page) %>
-  <% if @other_country_users&.any? %>
+  <% if @other_country_users&.any? && @bounds.blank? %>
     <% if @users.last_page? %>
       <%= render 'users/other_country_section',
                  other_country_users: @other_country_users,
@@ -267,3 +272,4 @@
     </div>
   <% end %>
 </div>
+</turbo-frame>

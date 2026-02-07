@@ -1,7 +1,6 @@
 class UsersController < ApplicationController
   def index
     @users = User.visible
-    @total_users_count = User.visible.count
 
     # Sorting - set up early so it can be applied to both main and other country users
     @sort = params[:sort].presence || "top"
@@ -37,6 +36,22 @@ class UsersController < ApplicationController
       @users = @users.where(company: params[:company].strip)
       @filter_company = params[:company].strip
     end
+
+    # Map bounds filtering
+    if params[:south].present? && params[:north].present? && params[:west].present? && params[:east].present?
+      south, north = params[:south].to_f, params[:north].to_f
+      west, east = params[:west].to_f, params[:east].to_f
+      @bounds = { south: south, north: north, west: west, east: east }
+
+      @users = @users.where(latitude: south..north)
+      if west <= east
+        @users = @users.where(longitude: west..east)
+      else
+        @users = @users.where("longitude >= ? OR longitude <= ?", west, east)
+      end
+    end
+
+    @total_users_count = @users.count
 
     @users = apply_sorting(@users)
     @users = @users.page(params[:page]).per(20)
