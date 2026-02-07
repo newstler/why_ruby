@@ -55,7 +55,7 @@
   <!-- Sticky Header (positioned below main nav) - sticky on tablets (min-width: 768px AND min-height: 600px) but not horizontal phones -->
   <div class="sticky-tablet top-32 z-40 -mx-4 px-4 md:-mx-6 md:px-6 lg:-mx-8 lg:px-8 pt-10 -mt-10 pb-12 md:bg-gradient-to-b md:from-gray-50 md:from-85% md:to-transparent">
     <div class="md:flex md:justify-between w-full">
-      <div class="md:flex-1 min-w-0 md:pr-6">
+      <div class="md:flex-1 min-w-0 md:pr-6 md:flex md:flex-col md:justify-end">
         <% if user_signed_in? %>
           <div class="flex items-baseline gap-3 md:gap-4 mb-3">
             <span class="text-5xl md:text-6xl lg:text-7xl font-black text-red-600 tabular-nums"><%= number_with_delimiter(@total_users_count) %></span>
@@ -71,10 +71,6 @@
               from this area
             <% else %>
               from around the world
-            <% end %>
-            who <%= t('users.index.passionate_verb', count: @total_users_count) %> passionate about Ruby.
-            <% unless current_user.testimonial&.published? %>
-              <br>Share why you love it on <%= link_to "your profile", community_user_url(current_user), class: "text-gray-700 underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors", data: { turbo_frame: "_top" } %> and get featured on&nbsp;<%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "text-gray-700 underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors whitespace-nowrap", data: { turbo_frame: "_top" } %>
             <% end %>
           </p>
         <% else %>
@@ -96,18 +92,23 @@
             <% else %>
               from around the world
             <% end %>
-            who <%= t('users.index.passionate_verb', count: @total_users_count) %> passionate about Ruby. <%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "text-gray-700 underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors whitespace-nowrap", data: { turbo_frame: "_top" } %>
+            <% unless @filter_location.present? || @filter_company.present? %>
+              who <%= t('users.index.passionate_verb', count: @total_users_count) %> passionate about Ruby. <%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "text-gray-700 underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors whitespace-nowrap", data: { turbo_frame: "_top" } %>
+            <% end %>
           </p>
         <% end %>
       </div>
 
     <div class="flex-shrink-0 flex flex-col items-end md:justify-between mt-8 md:mt-0">
       <% if user_signed_in? %>
-        <div class="hidden md:block mb-3 mt-2.5">
+        <div class="hidden md:flex md:flex-col md:items-end mt-4 mb-1">
           <%= render "users/user_tile", user: current_user, frameless: true, avatar_size: "w-10 h-9", compact: true, minimal: true, badge_size: "map" %>
         </div>
+        <% unless current_user.testimonial&.published? %>
+          <p class="hidden md:block text-xs text-gray-400 text-right mb-3"><%= link_to "Share why you love Ruby", community_user_url(current_user), class: "underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors", data: { turbo_frame: "_top" } %><br>and get featured on&nbsp;<%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors whitespace-nowrap", data: { turbo_frame: "_top" } %></p>
+        <% end %>
       <% end %>
-      <div class="relative" data-controller="dropdown">
+      <div class="relative md:mt-auto" data-controller="dropdown">
       <button type="button" class="flex items-center gap-x-1 text-sm rounded-full cursor-pointer bg-gray-100 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 px-3 py-2" data-action="click->dropdown#toggle click@window->dropdown#hide">
         <span class="text-gray-400"><%= t('users.index.sort_label') %>:</span>
         <span class="text-gray-700 font-medium">

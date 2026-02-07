@@ -119,11 +119,26 @@ export default class extends Controller {
 
       const users = await response.json()
       this.hideLoading()
-      this.createMarkers(users)
+      this.createMarkers(this.filterUsers(users))
     } catch (error) {
       console.error("Community map error:", error)
       this.hideLoading()
     }
+  }
+
+  filterUsers(users) {
+    const params = new URLSearchParams(window.location.search)
+    const company = params.get("company")
+    const location = params.get("location")
+
+    let filtered = users
+    if (company) {
+      filtered = filtered.filter(u => u.company === company)
+    }
+    if (location) {
+      filtered = filtered.filter(u => u.normalized_location === location)
+    }
+    return filtered
   }
 
   createMarkers(users) {
