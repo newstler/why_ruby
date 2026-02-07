@@ -18,6 +18,7 @@ class User < ApplicationRecord
 
   # Callbacks
   before_save :precompute_bio_html, if: :will_save_change_to_bio?
+  after_save :enqueue_location_normalization, if: :saved_change_to_location?
 
   # Validations
   validates :github_id, presence: true, uniqueness: true
@@ -31,6 +32,12 @@ class User < ApplicationRecord
   }
   scope :admins, -> { where(role: :admin) }
   scope :visible, -> { where(public: true) }
+  scope :by_normalized_location, ->(loc) {
+    where(normalized_location: loc).or(where(normalized_location: nil, location: loc))
+  }
+  scope :from_country, ->(country_code) {
+    where("normalized_location LIKE ?", "%, #{country_code}")
+  }
 
   # Devise modules for GitHub OAuth
   devise :omniauthable, omniauth_providers: [ :github ]
@@ -123,6 +130,11 @@ class User < ApplicationRecord
 
   def display_name
     name.presence || username
+  end
+
+  def country_code
+    return nil if normalized_location.blank?
+    normalized_location.split(", ").last
   end
 
   # Newsletter tracking
@@ -268,5 +280,13 @@ class User < ApplicationRecord
 
   def precompute_bio_html
     self.bio_html = self.class.linkify_bio(bio)
+  end
+
+  def enqueue_location_normalization
+    if location.present?
+      NormalizeLocationJob.perform_later(id)
+    else
+      update_columns(normalized_location: nil)
+    end
   end
 end

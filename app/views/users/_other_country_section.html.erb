@@ -1,0 +1,88 @@
+<div id="other-country-section" class="mt-12">
+  <h2 class="text-xl font-bold text-gray-300 mb-6">
+    Developers from other parts of <%= country_name(filter_country_code) %>
+  </h2>
+
+  <div data-controller="infinite-scroll">
+    <%# Split into columns like the main grid %>
+    <% other_col1 = [] %>
+    <% other_col2 = [] %>
+    <% other_col3 = [] %>
+    <% other_country_users.each_with_index do |user, index| %>
+      <% case index % 3 %>
+      <% when 0 then other_col1 << user %>
+      <% when 1 then other_col2 << user %>
+      <% when 2 then other_col3 << user %>
+      <% end %>
+    <% end %>
+
+    <%# Desktop: 3 columns %>
+    <div id="other-users-grid-desktop" class="hidden lg:flex gap-6" data-infinite-scroll-target="entries">
+      <div id="other-users-column-lg-1" class="flex-1 basis-0 min-w-0 space-y-6">
+        <% other_col1.each do |user| %>
+          <%= render 'users/user_tile', user: user %>
+        <% end %>
+      </div>
+      <div id="other-users-column-lg-2" class="flex-1 basis-0 min-w-0 space-y-6">
+        <% other_col2.each do |user| %>
+          <%= render 'users/user_tile', user: user %>
+        <% end %>
+      </div>
+      <div id="other-users-column-lg-3" class="flex-1 basis-0 min-w-0 space-y-6">
+        <% other_col3.each do |user| %>
+          <%= render 'users/user_tile', user: user %>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Tablet: 2 columns %>
+    <% other_tab1 = [] %>
+    <% other_tab2 = [] %>
+    <% other_country_users.each_with_index do |user, index| %>
+      <% if index % 2 == 0 then other_tab1 << user else other_tab2 << user end %>
+    <% end %>
+
+    <div id="other-users-grid-tablet" class="hidden md:flex lg:hidden gap-6">
+      <div id="other-users-column-md-1" class="flex-1 basis-0 min-w-0 space-y-6">
+        <% other_tab1.each do |user| %>
+          <%= render 'users/user_tile', user: user %>
+        <% end %>
+      </div>
+      <div id="other-users-column-md-2" class="flex-1 basis-0 min-w-0 space-y-6">
+        <% other_tab2.each do |user| %>
+          <%= render 'users/user_tile', user: user %>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Mobile: 1 column %>
+    <div id="other-users-grid-mobile" class="md:hidden space-y-6">
+      <% other_country_users.each do |user| %>
+        <%= render 'users/user_tile', user: user %>
+      <% end %>
+    </div>
+
+    <!-- Loading indicator for other country users -->
+    <div data-infinite-scroll-target="loading" class="hidden mt-8 flex justify-center">
+      <div class="flex items-center gap-2 text-gray-500">
+        <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span>Loading more...</span>
+      </div>
+    </div>
+
+    <!-- Pagination for other country users (hidden, used for infinite scroll) -->
+    <div id="other-infinite-scroll-pagination" data-infinite-scroll-target="pagination" class="hidden">
+      <% if other_country_users.total_pages > 1 && !other_country_users.last_page? %>
+        <%= link_to "Next", community_index_path(other_page: other_country_users.next_page, page: params[:page], sort: sort, dir: dir, location: filter_location, company: filter_company), rel: "next" %>
+      <% end %>
+    </div>
+
+    <!-- Sentinel for intersection observer -->
+    <% unless other_country_users.last_page? %>
+      <div id="other-infinite-scroll-sentinel" data-infinite-scroll-sentinel class="h-1"></div>
+    <% end %>
+  </div>
+</div>
