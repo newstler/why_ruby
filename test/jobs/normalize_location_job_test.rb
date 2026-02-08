@@ -12,7 +12,7 @@ class NormalizeLocationJobTest < ActiveJob::TestCase
     WebMock.allow_net_connect!
   end
 
-  test "updates user normalized_location and coordinates" do
+  test "updates user normalized_location, coordinates, and timezone" do
     user = users(:user_with_testimonial)
     user.update_columns(location: "NYC")
 
@@ -24,11 +24,12 @@ class NormalizeLocationJobTest < ActiveJob::TestCase
     assert_equal "New York, US", user.normalized_location
     assert_in_delta 40.7128, user.latitude, 0.001
     assert_in_delta(-74.006, user.longitude, 0.001)
+    assert_equal "America/New_York", user.timezone
   end
 
   test "sets nil when geocoding fails" do
     user = users(:user_with_testimonial)
-    user.update_columns(location: "Universe", normalized_location: "Old, US", latitude: 1.0, longitude: 1.0)
+    user.update_columns(location: "Universe", normalized_location: "Old, US", latitude: 1.0, longitude: 1.0, timezone: "America/New_York")
 
     stub_photon_empty("Universe")
 
@@ -38,6 +39,7 @@ class NormalizeLocationJobTest < ActiveJob::TestCase
     assert_nil user.normalized_location
     assert_nil user.latitude
     assert_nil user.longitude
+    assert_nil user.timezone
   end
 
   test "handles non-existent user gracefully" do

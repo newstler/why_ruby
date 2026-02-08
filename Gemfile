@@ -63,6 +63,9 @@ gem "maxminddb", "~> 0.1"
 # Friendly URLs
 gem "friendly_id", "~> 5.5"
 
+# Timezone lookup from coordinates (offline, pure Ruby)
+gem "wheretz"
+
 # HTML/XML parsing
 gem "nokogiri", "~> 1.16"
 
