@@ -64,9 +64,9 @@
           <p class="text-lg md:text-xl text-gray-500 max-w-2xl">
             <% if @filter_location.present? %>
               <% location_display = @filter_location.match?(/\A[A-Z]{2}\z/) ? country_name(@filter_location) : @filter_location.sub(/, ([A-Z]{2})$/) { ", #{country_name(Regexp.last_match(1))}" } %>
-              from <%= location_display %><%= link_to community_index_path(company: @filter_company, sort: @sort, dir: @dir), class: "inline-flex items-center justify-center w-5 h-5 ml-1.5 rounded-full bg-gray-200 text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors align-text-bottom", onclick: "window.dispatchEvent(new CustomEvent('map:reset'))" do %><%= inline_svg_tag "x-mark.svg", class: "w-2.5 h-2.5" %><% end %>
+              from <%= location_display %><%= link_to community_index_path(company: @filter_company, sort: @sort, dir: @dir, open_to_work: @filter_open_to_work ? "1" : nil), class: "inline-flex items-center justify-center w-5 h-5 ml-1.5 rounded-full bg-gray-200 text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors align-text-bottom", onclick: "window.dispatchEvent(new CustomEvent('map:reset'))" do %><%= inline_svg_tag "x-mark.svg", class: "w-2.5 h-2.5" %><% end %>
             <% elsif @filter_company.present? %>
-              working at <%= @filter_company %><%= link_to community_index_path(location: @filter_location, sort: @sort, dir: @dir), class: "inline-flex items-center justify-center w-5 h-5 ml-1.5 rounded-full bg-gray-200 text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors align-text-bottom", onclick: "window.dispatchEvent(new CustomEvent('map:reset'))" do %><%= inline_svg_tag "x-mark.svg", class: "w-2.5 h-2.5" %><% end %>
+              working at <%= @filter_company %><%= link_to community_index_path(location: @filter_location, sort: @sort, dir: @dir, open_to_work: @filter_open_to_work ? "1" : nil), class: "inline-flex items-center justify-center w-5 h-5 ml-1.5 rounded-full bg-gray-200 text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors align-text-bottom", onclick: "window.dispatchEvent(new CustomEvent('map:reset'))" do %><%= inline_svg_tag "x-mark.svg", class: "w-2.5 h-2.5" %><% end %>
             <% elsif @bounds.present? %>
               from this area
             <% else %>
@@ -84,9 +84,9 @@
           <p class="text-lg md:text-xl text-gray-500 max-w-2xl">
             <% if @filter_location.present? %>
               <% location_display = @filter_location.match?(/\A[A-Z]{2}\z/) ? country_name(@filter_location) : @filter_location.sub(/, ([A-Z]{2})$/) { ", #{country_name(Regexp.last_match(1))}" } %>
-              from <%= location_display %><%= link_to community_index_path(company: @filter_company, sort: @sort, dir: @dir), class: "inline-flex items-center justify-center w-5 h-5 ml-1.5 rounded-full bg-gray-200 text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors align-text-bottom", onclick: "window.dispatchEvent(new CustomEvent('map:reset'))" do %><%= inline_svg_tag "x-mark.svg", class: "w-2.5 h-2.5" %><% end %>
+              from <%= location_display %><%= link_to community_index_path(company: @filter_company, sort: @sort, dir: @dir, open_to_work: @filter_open_to_work ? "1" : nil), class: "inline-flex items-center justify-center w-5 h-5 ml-1.5 rounded-full bg-gray-200 text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors align-text-bottom", onclick: "window.dispatchEvent(new CustomEvent('map:reset'))" do %><%= inline_svg_tag "x-mark.svg", class: "w-2.5 h-2.5" %><% end %>
             <% elsif @filter_company.present? %>
-              working at <%= @filter_company %><%= link_to community_index_path(location: @filter_location, sort: @sort, dir: @dir), class: "inline-flex items-center justify-center w-5 h-5 ml-1.5 rounded-full bg-gray-200 text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors align-text-bottom", onclick: "window.dispatchEvent(new CustomEvent('map:reset'))" do %><%= inline_svg_tag "x-mark.svg", class: "w-2.5 h-2.5" %><% end %>
+              working at <%= @filter_company %><%= link_to community_index_path(location: @filter_location, sort: @sort, dir: @dir, open_to_work: @filter_open_to_work ? "1" : nil), class: "inline-flex items-center justify-center w-5 h-5 ml-1.5 rounded-full bg-gray-200 text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors align-text-bottom", onclick: "window.dispatchEvent(new CustomEvent('map:reset'))" do %><%= inline_svg_tag "x-mark.svg", class: "w-2.5 h-2.5" %><% end %>
             <% elsif @bounds.present? %>
               from this area
             <% else %>
@@ -108,7 +108,21 @@
           <p class="hidden md:block text-xs text-gray-400 text-right mb-3"><%= link_to "Share why you love Ruby", community_user_url(current_user), class: "underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors", data: { turbo_frame: "_top" } %><br>and get featured on&nbsp;<%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors whitespace-nowrap", data: { turbo_frame: "_top" } %></p>
         <% end %>
       <% end %>
-      <div class="relative md:mt-auto" data-controller="dropdown">
+      <div class="flex items-center gap-6 md:mt-auto">
+      <%= link_to community_index_path(
+            open_to_work: @filter_open_to_work ? nil : "1",
+            sort: @sort, dir: @dir,
+            location: @filter_location, company: @filter_company,
+            **bounds_params
+          ),
+          class: "flex items-center gap-3",
+          data: { turbo_frame: "community-content" } do %>
+        <span class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out <%= @filter_open_to_work ? 'bg-red-600' : 'bg-gray-400' %>">
+          <span aria-hidden="true" class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out <%= @filter_open_to_work ? 'translate-x-4' : 'translate-x-0' %>"></span>
+        </span>
+        <span class="text-sm font-medium <%= @filter_open_to_work ? 'text-gray-700' : 'text-gray-400' %>">Open to work</span>
+      <% end %>
+      <div class="relative" data-controller="dropdown">
       <button type="button" class="flex items-center gap-x-1 text-sm rounded-full cursor-pointer bg-gray-100 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 px-3 py-2" data-action="click->dropdown#toggle click@window->dropdown#hide">
         <span class="text-gray-400"><%= t('users.index.sort_label') %>:</span>
         <span class="text-gray-700 font-medium">
@@ -145,10 +159,10 @@
                  # Defaults: az -> asc, others -> desc
                  key == 'az' ? 'asc' : 'desc'
                end
-               link_to label, community_index_path(sort: key, dir: dir, location: filters[:location], company: filters[:company], **filters.fetch(:bounds, {})), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none cursor-pointer"
+               link_to label, community_index_path(sort: key, dir: dir, location: filters[:location], company: filters[:company], open_to_work: filters[:open_to_work], **filters.fetch(:bounds, {})), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none cursor-pointer"
              end %>
 
-          <% filter_params = { location: @filter_location, company: @filter_company, bounds: bounds_params } %>
+          <% filter_params = { location: @filter_location, company: @filter_company, bounds: bounds_params, open_to_work: @filter_open_to_work ? "1" : nil } %>
           <%= sort_link('users.index.sort.top', 'users.index.sort.top_reverse', 'top', @sort, @dir, filter_params) %>
           <%= sort_link('users.index.sort.new', 'users.index.sort.new_reverse', 'new', @sort, @dir, filter_params) %>
           <%= sort_link('users.index.sort.projects', 'users.index.sort.projects_reverse', 'projects', @sort, @dir, filter_params) %>
@@ -158,6 +172,7 @@
           <%= sort_link('users.index.sort.az', 'users.index.sort.az_reverse', 'az', @sort, @dir, filter_params) %>
         </div>
       </div>
+    </div>
     </div>
     </div>
   </div>
@@ -237,7 +252,7 @@
     <!-- Pagination (hidden, used for infinite scroll) -->
     <div id="infinite-scroll-pagination" data-infinite-scroll-target="pagination" class="hidden">
       <% if @users.total_pages > 1 && !@users.last_page? %>
-        <%= link_to "Next", community_index_path(page: @users.next_page, sort: @sort, dir: @dir, location: @filter_location, company: @filter_company, **bounds_params), rel: "next" %>
+        <%= link_to "Next", community_index_path(page: @users.next_page, sort: @sort, dir: @dir, location: @filter_location, company: @filter_company, open_to_work: @filter_open_to_work ? "1" : nil, **bounds_params), rel: "next" %>
       <% end %>
     </div>
 
