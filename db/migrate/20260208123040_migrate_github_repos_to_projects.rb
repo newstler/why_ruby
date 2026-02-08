@@ -1,6 +1,8 @@
 class MigrateGithubReposToProjects < ActiveRecord::Migration[8.2]
   def up
-    today = Date.current
+    # Use yesterday so that the next GitHub update (which creates today's snapshots)
+    # immediately produces a visible stars_gained delta
+    yesterday = Date.yesterday
 
     User.where.not(github_repos: [ nil, "", "[]" ]).find_each do |user|
       repos = begin
@@ -32,7 +34,7 @@ class MigrateGithubReposToProjects < ActiveRecord::Migration[8.2]
         StarSnapshot.create!(
           project_id: project.id,
           stars: repo[:stars].to_i,
-          recorded_on: today
+          recorded_on: yesterday
         )
       end
 

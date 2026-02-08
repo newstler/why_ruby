@@ -23,7 +23,7 @@
             <%= inline_svg_tag "star.svg", class: "w-4 h-4 mr-1 text-yellow-500" %>
             <span class="font-semibold"><%= repository.stars %></span>
             <% if repository.stars_gained > 0 %>
-              <span class="absolute -top-2.5 -right-4 bg-green-500 text-white text-[10px] font-bold rounded-full px-1 min-w-[18px] text-center leading-[18px] shadow-sm">+<%= repository.stars_gained %></span>
+              <span class="absolute -top-2.5 -right-4 bg-green-500 text-white text-[10px] font-bold rounded-full px-1 min-w-[18px] text-center leading-[18px] shadow-sm" title="Stars gained since yesterday">+<%= repository.stars_gained %></span>
             <% end %>
           </span>
         <% end %>
