@@ -18,11 +18,13 @@ Now it has a new home: **rubycommunity.org**.
 
 Same app, same database. Sign in on one site and you're signed in on the other. But now there's a clear separation: whyruby.info for advocacy content and testimonials, rubycommunity.org for the community itself.
 
+It now features an interactive map of Ruby developers around the world, and daily star trends showing which projects are gaining traction right now.
+
 More than 70 developers have already joined. I could have just scraped GitHub and added everyone myself, but that felt wrong. People should decide if they want to appear on the site. So please share this in your networks and invite your Ruby friends.
 
 ## Ideas for the future
 
-Conference talk stats, dedicated project pages with collected blog posts about them, daily star trends so we can see what's hot right now, linking users to their companies' contributions, and so on. The project is [open source](https://github.com/newstler/why_ruby) and built for the community to own. PRs and ideas are welcome.
+Conference talk stats, dedicated project pages with collected blog posts about them, linking users to their companies' contributions, and so on. The project is [open source](https://github.com/newstler/why_ruby) and built for the community to own. PRs and ideas are welcome.
 
 ## A personal note
 
