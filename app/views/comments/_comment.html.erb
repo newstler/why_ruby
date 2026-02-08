@@ -4,9 +4,7 @@
     <div class="flex items-center space-x-2">
       <% if comment.user.present? %>
         <%= link_to community_user_url(comment.user), class: "flex items-center space-x-2" do %>
-          <% if comment.user.avatar_url.present? %>
-            <%= image_tag comment.user.avatar_url, alt: comment.user.display_name, class: "h-8 w-8 md:h-10 md:w-10 rounded-full" %>
-          <% end %>
+          <%= render "shared/gem_avatar", user: comment.user, size: "w-9 h-[32px] md:w-11 md:h-[39px]", text_size: "text-sm", show_open_to_work: false, thick_border: true %>
           <span class="text-sm font-semibold text-gray-900"><%= comment.user.display_name %></span>
         <% end %>
         <span class="text-xs text-gray-500"><%= format_comment_date(comment.created_at) %></span>
