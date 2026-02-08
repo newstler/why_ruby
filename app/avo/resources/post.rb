@@ -17,7 +17,7 @@ class Avo::Resources::Post < Avo::BaseResource
     ::Post.unscoped.friendly.find(id)
   rescue ActiveRecord::RecordNotFound
     # If not found, try to find by historical slug
-    slug_record = FriendlyId::Slug.where(sluggable_type: "Post", slug: id).first
+    slug_record = FriendlyId::Slug.find_by(sluggable_type: "Post", slug: id)
     if slug_record
       ::Post.unscoped.find(slug_record.sluggable_id)
     else

@@ -214,7 +214,7 @@ class Post < ApplicationRecord
   def url_uniqueness
     return unless url.present?
 
-    existing_post = Post.where(url: url).where.not(id: id).first
+    existing_post = Post.where(url: url).where.not(id: id).take
     if existing_post
       self.duplicate_post = existing_post
       errors.add(:url, "has already been posted")

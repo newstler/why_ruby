@@ -53,9 +53,7 @@
         <% # Desktop: 3 columns %>
         <% [column1_posts, column2_posts, column3_posts].each do |column_posts| %>
           <div class="flex-1 space-y-6">
-            <% column_posts.each do |post| %>
-              <%= render 'posts/post_tile', post: post %>
-            <% end %>
+            <%= render partial: 'posts/post_tile', collection: column_posts, as: :post %>
           </div>
         <% end %>
       </div>
@@ -75,18 +73,14 @@
         
         <% [column1_posts, column2_posts].each do |column_posts| %>
           <div class="flex-1 space-y-6">
-            <% column_posts.each do |post| %>
-              <%= render 'posts/post_tile', post: post %>
-            <% end %>
+            <%= render partial: 'posts/post_tile', collection: column_posts, as: :post %>
           </div>
         <% end %>
       </div>
       
       <% # Mobile: 1 column %>
       <div class="md:hidden space-y-6">
-        <% @posts.each do |post| %>
-          <%= render 'posts/post_tile', post: post %>
-        <% end %>
+        <%= render partial: 'posts/post_tile', collection: @posts, as: :post %>
       </div>
       
       <div class="mt-8">
