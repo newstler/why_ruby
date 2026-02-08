@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 // Connects to data-controller="tabs"
 export default class extends Controller {
-  static targets = ["tab", "panel"]
+  static targets = ["tab", "panel", "tabExtra"]
   static values = { active: String }
   
   connect() {
@@ -86,6 +86,15 @@ export default class extends Controller {
       }
     })
     
+    // Update tab extras (e.g. sort dropdowns shown only for specific tabs)
+    this.tabExtraTargets.forEach(extra => {
+      if (extra.dataset.tabsName === this.activeValue) {
+        extra.classList.remove("hidden")
+      } else {
+        extra.classList.add("hidden")
+      }
+    })
+
     // Update panels
     this.panelTargets.forEach(panel => {
       const isActive = panel.dataset.tabsName === this.activeValue

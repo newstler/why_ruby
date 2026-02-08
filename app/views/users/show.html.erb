@@ -206,7 +206,8 @@
     <% has_posts = @user.published_posts_count > 0 %>
     <% has_comments = @user.published_comments_count > 0 %>
     <% if has_projects || has_posts || has_comments %>
-    <nav class="flex flex-wrap gap-x-6 lg:gap-x-8 gap-y-2 mt-14" aria-label="Tabs">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between mt-14">
+    <nav class="flex flex-wrap gap-x-6 lg:gap-x-8 gap-y-2" aria-label="Tabs">
       <% if has_projects %>
       <a href="#"
          data-tabs-target="tab"
@@ -252,6 +253,54 @@
       </a>
       <% end %>
     </nav>
+
+    <% if has_projects && @ruby_repos.size > 1 %>
+      <%
+        project_sort_options = {
+          "fresh"    => { label: "Recently Active", reverse: "Least Recent" },
+          "trending" => { label: "Trending",        reverse: "Least Trending" },
+          "stars"    => { label: "Top Stars",        reverse: "Fewest Stars" },
+          "az"       => { label: "A-Z",              reverse: "Z-A" }
+        }
+        # Button label shows current state
+        current_opt = project_sort_options[@project_sort] || project_sort_options["fresh"]
+        closed_label = if @project_sort == "az"
+          @project_dir == "asc" ? current_opt[:label] : current_opt[:reverse]
+        else
+          @project_dir == "asc" ? current_opt[:reverse] : current_opt[:label]
+        end
+      %>
+      <div data-tabs-target="tabExtra" data-tabs-name="projects" class="hidden mt-3 md:mt-0 md:mb-3">
+        <div class="relative" data-controller="dropdown">
+          <button type="button" class="flex items-center gap-x-1 text-sm rounded-full cursor-pointer bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 px-3 py-2" data-action="click->dropdown#toggle click@window->dropdown#hide">
+            <span class="text-gray-400">Sort:</span>
+            <span class="text-gray-700 font-medium"><%= closed_label %></span>
+            <%= inline_svg_tag "chevron-down.svg", class: "ml-1 h-5 w-5 text-gray-400" %>
+          </button>
+
+          <div class="hidden absolute z-50 mt-2 w-48 divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none right-0 origin-top-right" data-dropdown-target="menu">
+            <div class="py-1">
+              <% project_sort_options.each do |key, opt| %>
+                <%
+                  is_current = (@project_sort == key)
+                  if is_current
+                    # Show opposite label; toggle direction
+                    menu_label = (@project_dir == "asc") ? opt[:label] : opt[:reverse]
+                    next_dir = (@project_dir == "asc") ? "desc" : "asc"
+                  else
+                    menu_label = opt[:label]
+                    next_dir = (key == "az") ? "asc" : "desc"
+                  end
+                %>
+                <%= link_to menu_label, user_path(@user, project_sort: key, project_dir: next_dir),
+                    class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none cursor-pointer" %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+    </div>
     <% end %>
 
     <!-- Tab Panels -->

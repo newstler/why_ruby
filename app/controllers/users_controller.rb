@@ -147,9 +147,34 @@ class UsersController < ApplicationController
       @ruby_repos = @user.visible_ruby_repositories
       @hidden_repos = []
     end
+
+    # Sort projects
+    @project_sort = params[:project_sort].presence || "fresh"
+    @project_dir = params[:project_dir] == "asc" ? "asc" : "desc"
+    @ruby_repos = sort_projects(@ruby_repos)
   end
 
   private
+
+  def sort_projects(repos)
+    ascending = @project_dir == "asc"
+    sorted = case @project_sort
+    when "trending"
+      repos.sort_by { |r| [ -r.stars_gained, -r.stars ] }
+    when "stars"
+      repos.sort_by { |r| -r.stars }
+    when "az"
+      repos.sort_by { |r| r.name.downcase }
+    else # "fresh"
+      repos
+    end
+    # az defaults to asc, others default to desc — reverse when opposite
+    if @project_sort == "az"
+      ascending ? sorted : sorted.reverse
+    else
+      ascending ? sorted.reverse : sorted
+    end
+  end
 
   def apply_sorting(scope)
     direction = @dir.to_sym
