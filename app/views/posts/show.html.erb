@@ -129,15 +129,13 @@
         <div class="flex items-center space-x-4">
           <div class="flex items-center space-x-3">
             <% if @post.user.present? %>
-              <% if @post.user.avatar_url.present? %>
-                <%= link_to community_user_url(@post.user), class: "text-base font-medium text-gray-900 hover:text-gray-700" do %>
-                  <%= image_tag @post.user.avatar_url, alt: @post.user.display_name, class: "h-10 w-10 rounded-full" %>
-                <% end %>
+              <%= link_to community_user_url(@post.user), class: "group flex items-center space-x-3" do %>
+                <%= render "shared/gem_avatar", user: @post.user, size: "w-12 h-[43px]", text_size: "text-lg", thick_border: true, badge_size: "tiny" %>
+                <div>
+                  <span class="text-base font-bold text-gray-900 group-hover:text-red-600 transition-colors"><%= @post.user.display_name %></span>
+                  <p class="text-sm text-gray-500"><%= format_post_date(@post.created_at) %></p>
+                </div>
               <% end %>
-              <div>
-                <%= link_to @post.user.display_name, community_user_url(@post.user), class: "text-base font-medium text-gray-900 hover:text-gray-700" %>
-                <p class="text-sm text-gray-500"><%= format_post_date(@post.created_at) %></p>
-              </div>
             <% else %>
               <div>
                 <span class="text-base font-medium text-gray-400 italic">[Deleted User]</span>

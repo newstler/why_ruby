@@ -71,9 +71,7 @@
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-2">
           <% if post.user.present? %>
-            <% if post.user.avatar_url.present? %>
-              <%= image_tag post.user.avatar_url, alt: post.user.display_name, class: "h-6 w-6 rounded-full" %>
-            <% end %>
+            <%= render "shared/gem_avatar", user: post.user, size: "w-7 h-[25px]", text_size: "text-xs", show_open_to_work: false, thick_border: true, border_color: "text-gray-200" %>
             <span class="text-sm text-gray-700"><%= post.user.display_name %></span>
           <% else %>
             <span class="text-sm text-gray-400 italic">[Deleted User]</span>

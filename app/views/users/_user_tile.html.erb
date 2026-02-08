@@ -12,7 +12,7 @@
 <%= link_to community_user_url(user), class: "group block #{local_assigns[:frameless] ? '' : 'bg-white shadow rounded-lg p-6 hover:shadow-lg'} transition-shadow", data: { turbo_frame: "_top" } do %>
   <div class="flex <%= local_assigns[:frameless] ? 'items-center' : 'items-start' %> gap-4">
     <!-- Avatar -->
-    <%= render "shared/gem_avatar", user: user, size: local_assigns[:avatar_size] || "w-24 h-[86px]", text_size: "text-3xl", badge_size: local_assigns.key?(:badge_size) ? local_assigns[:badge_size] : "small", **(local_assigns.key?(:show_open_to_work) ? { show_open_to_work: local_assigns[:show_open_to_work] } : {}), **(local_assigns.key?(:border_color) ? { border_color: local_assigns[:border_color] } : {}), **(local_assigns[:thick_border] ? { thick_border: true } : {}) %>
+    <%= render "shared/gem_avatar", user: user, size: local_assigns[:avatar_size] || "w-12 h-[43px]", text_size: "text-lg", badge_size: local_assigns.key?(:badge_size) ? local_assigns[:badge_size] : "tiny", thick_border: true, **(local_assigns.key?(:show_open_to_work) ? { show_open_to_work: local_assigns[:show_open_to_work] } : {}), **(local_assigns.key?(:border_color) ? { border_color: local_assigns[:border_color] } : {}) %>
 
     <div class="flex flex-col justify-center flex-1 min-w-0">
       <!-- Name and Stars -->
