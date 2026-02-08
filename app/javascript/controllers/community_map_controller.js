@@ -163,7 +163,11 @@ export default class extends Controller {
       filtered = filtered.filter(u => u.company === company)
     }
     if (location) {
-      filtered = filtered.filter(u => u.normalized_location === location)
+      if (location.includes(", ")) {
+        filtered = filtered.filter(u => u.normalized_location === location)
+      } else {
+        filtered = filtered.filter(u => u.normalized_location === location || (u.normalized_location && u.normalized_location.endsWith(`, ${location}`)))
+      }
     }
     if (openToWork === "1") {
       filtered = filtered.filter(u => u.open_to_work)
