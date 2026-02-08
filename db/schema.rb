@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_02_07_161806) do
+ActiveRecord::Schema[8.2].define(version: 2026_02_08_123040) do
   create_table "_litestream_lock", id: false, force: :cascade do |t|
     t.integer "id"
   end
@@ -134,6 +134,26 @@ ActiveRecord::Schema[8.2].define(version: 2026_02_07_161806) do
     t.index ["tag_id"], name: "index_posts_tags_on_tag_id"
   end
 
+  create_table "projects", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
+    t.boolean "archived", default: false, null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.integer "forks_count", default: 0, null: false
+    t.string "github_url", null: false
+    t.boolean "hidden", default: false, null: false
+    t.string "name", null: false
+    t.datetime "pushed_at"
+    t.integer "size", default: 0, null: false
+    t.integer "stars", default: 0, null: false
+    t.json "topics", default: []
+    t.datetime "updated_at", null: false
+    t.string "user_id", null: false
+    t.index ["archived"], name: "index_projects_on_archived"
+    t.index ["stars"], name: "index_projects_on_stars"
+    t.index ["user_id", "github_url"], name: "index_projects_on_user_id_and_github_url", unique: true
+    t.index ["user_id"], name: "index_projects_on_user_id"
+  end
+
   create_table "reports", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
@@ -144,6 +164,16 @@ ActiveRecord::Schema[8.2].define(version: 2026_02_07_161806) do
     t.index ["post_id"], name: "index_reports_on_post_id"
     t.index ["user_id", "post_id"], name: "index_reports_on_user_id_and_post_id", unique: true
     t.index ["user_id"], name: "index_reports_on_user_id"
+  end
+
+  create_table "star_snapshots", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "project_id", null: false
+    t.date "recorded_on", null: false
+    t.integer "stars", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_id", "recorded_on"], name: "index_star_snapshots_on_project_id_and_recorded_on", unique: true
+    t.index ["recorded_on"], name: "index_star_snapshots_on_recorded_on"
   end
 
   create_table "tags", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
@@ -203,6 +233,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_02_07_161806) do
     t.integer "published_posts_count", default: 0, null: false
     t.integer "role", default: 0, null: false
     t.string "slug"
+    t.integer "stars_gained", default: 0, null: false
     t.string "twitter"
     t.boolean "unsubscribed_from_newsletter", default: false, null: false
     t.datetime "updated_at", null: false
@@ -225,6 +256,8 @@ ActiveRecord::Schema[8.2].define(version: 2026_02_07_161806) do
   add_foreign_key "posts", "users"
   add_foreign_key "posts_tags", "posts"
   add_foreign_key "posts_tags", "tags"
+  add_foreign_key "projects", "users"
   add_foreign_key "reports", "posts"
   add_foreign_key "reports", "users"
+  add_foreign_key "star_snapshots", "projects"
 end

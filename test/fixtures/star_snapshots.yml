@@ -1,0 +1,29 @@
+rails_project_yesterday:
+  id: "01961a2a-c0de-7000-8000-000000000301"
+  project_id: "01961a2a-c0de-7000-8000-000000000201"
+  stars: 140
+  recorded_on: <%= 1.day.ago.to_date %>
+
+rails_project_today:
+  id: "01961a2a-c0de-7000-8000-000000000302"
+  project_id: "01961a2a-c0de-7000-8000-000000000201"
+  stars: 150
+  recorded_on: <%= Date.current %>
+
+admin_project_yesterday:
+  id: "01961a2a-c0de-7000-8000-000000000303"
+  project_id: "01961a2a-c0de-7000-8000-000000000204"
+  stars: 480
+  recorded_on: <%= 1.day.ago.to_date %>
+
+admin_project_today:
+  id: "01961a2a-c0de-7000-8000-000000000304"
+  project_id: "01961a2a-c0de-7000-8000-000000000204"
+  stars: 500
+  recorded_on: <%= Date.current %>
+
+hidden_project_today:
+  id: "01961a2a-c0de-7000-8000-000000000305"
+  project_id: "01961a2a-c0de-7000-8000-000000000202"
+  stars: 10
+  recorded_on: <%= Date.current %>

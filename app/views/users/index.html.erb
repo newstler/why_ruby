@@ -129,6 +129,7 @@
           <% effective_sort = (@sort == 'old' ? 'new' : @sort) %>
           <% effective_dir  = (@sort == 'old' ? 'asc' : @dir) %>
           <% closed_label = case effective_sort
+             when 'trending' then (effective_dir == 'asc' ? t('users.index.sort.trending_reverse') : t('users.index.sort.trending'))
              when 'new' then (effective_dir == 'asc' ? t('users.index.sort.new_reverse') : t('users.index.sort.new'))
              when 'projects' then (effective_dir == 'asc' ? t('users.index.sort.projects_reverse') : t('users.index.sort.projects'))
              when 'posts' then (effective_dir == 'asc' ? t('users.index.sort.posts_reverse') : t('users.index.sort.posts'))
@@ -164,6 +165,7 @@
 
           <% filter_params = { location: @filter_location, company: @filter_company, bounds: bounds_params, open_to_work: @filter_open_to_work ? "1" : nil } %>
           <%= sort_link('users.index.sort.top', 'users.index.sort.top_reverse', 'top', @sort, @dir, filter_params) %>
+          <%= sort_link('users.index.sort.trending', 'users.index.sort.trending_reverse', 'trending', @sort, @dir, filter_params) %>
           <%= sort_link('users.index.sort.new', 'users.index.sort.new_reverse', 'new', @sort, @dir, filter_params) %>
           <%= sort_link('users.index.sort.projects', 'users.index.sort.projects_reverse', 'projects', @sort, @dir, filter_params) %>
           <%= sort_link('users.index.sort.posts', 'users.index.sort.posts_reverse', 'posts', @sort, @dir, filter_params) %>

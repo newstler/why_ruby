@@ -155,6 +155,8 @@ class UsersController < ApplicationController
     direction = @dir.to_sym
 
     case @sort
+    when "trending"
+      scope.order(stars_gained: direction, github_stars_sum: direction)
     when "new"
       scope.order(created_at: direction)
     when "old"

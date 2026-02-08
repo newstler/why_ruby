@@ -1,7 +1,7 @@
 <%#
   Repository tile partial - displays a GitHub repository in a card format
   Locals:
-    - repository: the repository hash to display
+    - repository: a Project object to display
     - user: the user who owns the repository (optional)
     - hidden: boolean indicating if this is in the hidden section (default: false)
 %>
@@ -12,37 +12,40 @@
 <div class="group relative">
   <%# Content div with optional grayscale %>
   <div class="bg-white shadow-md rounded-lg p-6 hover:shadow-2xl group-hover:scale-[1.02] transform transition-all duration-300 ease-out <%= 'grayscale' if hidden %>">
-    <%= link_to repository[:url], target: "_blank", rel: "noopener", class: "block" do %>
+    <%= link_to repository.github_url, target: "_blank", rel: "noopener", class: "block" do %>
       <!-- Repository Name with Stars -->
       <div class="flex items-start justify-between mb-2">
         <h3 class="text-xl font-semibold text-gray-900 group-hover:text-red-600 transition-colors flex-1">
-          <%= repository[:name] %>
+          <%= repository.name %>
         </h3>
-        <% if repository[:stars] && repository[:stars] > 0 %>
-          <span class="flex items-center text-gray-600 ml-2">
+        <% if repository.stars > 0 %>
+          <span class="relative flex items-center text-gray-600 ml-2">
             <%= inline_svg_tag "star.svg", class: "w-4 h-4 mr-1 text-yellow-500" %>
-            <span class="font-semibold"><%= repository[:stars] %></span>
+            <span class="font-semibold"><%= repository.stars %></span>
+            <% if repository.stars_gained > 0 %>
+              <span class="absolute -top-2.5 -right-4 bg-green-500 text-white text-[10px] font-bold rounded-full px-1 min-w-[18px] text-center leading-[18px] shadow-sm">+<%= repository.stars_gained %></span>
+            <% end %>
           </span>
         <% end %>
       </div>
 
       <!-- Repository Description -->
-      <% if repository[:description].present? %>
+      <% if repository.description.present? %>
         <p class="text-gray-600 mb-4">
-          <%= repository[:description] %>
+          <%= repository.description %>
         </p>
       <% end %>
 
       <!-- Repository Metrics -->
       <div class="space-y-2">
         <!-- Topics/Tags if present -->
-        <% if repository[:topics] && repository[:topics].any? %>
+        <% if repository.topics.present? && repository.topics.any? %>
           <div class="flex flex-wrap gap-1 mb-2">
-            <% repository[:topics].take(4).each do |topic| %>
+            <% repository.topics.take(4).each do |topic| %>
               <span class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"><%= topic %></span>
             <% end %>
-            <% if repository[:topics].size > 4 %>
-              <span class="text-xs text-gray-500">+<%= repository[:topics].size - 4 %></span>
+            <% if repository.topics.size > 4 %>
+              <span class="text-xs text-gray-500">+<%= repository.topics.size - 4 %></span>
             <% end %>
           </div>
         <% end %>
@@ -50,25 +53,25 @@
         <!-- Stats row -->
         <div class="flex items-center justify-between text-xs text-gray-500">
           <div class="flex items-center gap-4">
-            <% if repository[:forks_count] && repository[:forks_count] > 0 %>
+            <% if repository.forks_count > 0 %>
               <span class="flex items-center">
                 <%= inline_svg_tag "fork.svg", class: "w-3.5 h-3.5 mr-1" %>
-                <%= t("users.repository_tile.forks", count: repository[:forks_count]) %>
+                <%= t("users.repository_tile.forks", count: repository.forks_count) %>
               </span>
             <% end %>
 
-            <% if repository[:size] && repository[:size] > 0 %>
+            <% if repository.size > 0 %>
               <span class="flex items-center">
                 <%= inline_svg_tag "file.svg", class: "w-3.5 h-3.5 mr-1" %>
-                <%= t("users.repository_tile.size", size: number_to_human_size(repository[:size] * 1024)) %>
+                <%= t("users.repository_tile.size", size: number_to_human_size(repository.size * 1024)) %>
               </span>
             <% end %>
           </div>
 
           <!-- Last commit aligned to the right -->
-          <% if repository[:pushed_at].present? %>
+          <% if repository.pushed_at.present? %>
             <span class="text-gray-400">
-              <%= t("users.repository_tile.last_commit", time_ago: time_ago_in_words(Time.parse(repository[:pushed_at]))) %>
+              <%= t("users.repository_tile.last_commit", time_ago: time_ago_in_words(repository.pushed_at)) %>
             </span>
           <% end %>
         </div>
@@ -82,7 +85,7 @@
       <% if hidden %>
         <%= button_to unhide_repo_user_settings_path,
             method: :post,
-            params: { repo_url: repository[:url] },
+            params: { repo_url: repository.github_url },
             class: "p-1.5 rounded-full bg-gray-100 hover:bg-red-100 text-gray-500 hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer",
             title: "Show repository",
             data: { turbo_stream: true, controller: "loading-button" } do %>
@@ -95,7 +98,7 @@
       <% else %>
         <%= button_to hide_repo_user_settings_path,
             method: :post,
-            params: { repo_url: repository[:url] },
+            params: { repo_url: repository.github_url },
             class: "p-1.5 rounded-full bg-gray-100 hover:bg-red-100 text-gray-500 hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer",
             title: "Hide repository",
             data: { turbo_stream: true, controller: "loading-button" } do %>

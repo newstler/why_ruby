@@ -172,25 +172,57 @@ class GithubDataFetcher
       github_data_updated_at: Time.current
     )
 
-    # Process repositories (already filtered by language:Ruby in search query)
-    ruby_repos = repos_data.map do |repo|
+    # Process repositories into Project records
+    repos = repos_data.map do |repo|
       {
         name: repo[:name],
         description: repo[:description],
         stars: repo[:stargazerCount],
-        url: repo[:url],
+        github_url: repo[:url],
         forks_count: repo.dig(:forks, :totalCount) || 0,
         size: repo[:diskUsage] || 0,
         topics: (repo.dig(:repositoryTopics, :nodes) || []).map { |t| t.dig(:topic, :name) }.compact,
         pushed_at: repo[:pushedAt]
       }
-    end.sort_by { |r| r[:pushed_at] }.reverse # Sort by most recently pushed
+    end
 
-    hidden_urls = user.hidden_repo_urls
-    visible_repos = ruby_repos.reject { |r| hidden_urls.include?(r[:url]) }
-    stars_sum = visible_repos.sum { |r| r[:stars].to_i }
-    repos_count = visible_repos.size
-    user.update!(github_repos: ruby_repos.to_json, github_stars_sum: stars_sum, github_repos_count: repos_count)
+    sync_projects!(user, repos)
+  end
+
+  # Sync GitHub repos to Project records with star snapshot tracking
+  def self.sync_projects!(user, repos_data)
+    current_urls = repos_data.map { |r| r[:github_url] || r[:url] }
+
+    # Soft-archive projects no longer returned by GitHub
+    user.projects.active.where.not(github_url: current_urls).update_all(archived: true)
+
+    repos_data.each do |repo_data|
+      url = repo_data[:github_url] || repo_data[:url]
+      project = user.projects.find_or_initialize_by(github_url: url)
+
+      project.assign_attributes(
+        name: repo_data[:name],
+        description: repo_data[:description],
+        stars: repo_data[:stars].to_i,
+        forks_count: repo_data[:forks_count].to_i,
+        size: repo_data[:size].to_i,
+        topics: repo_data[:topics] || [],
+        pushed_at: repo_data[:pushed_at].present? ? Time.parse(repo_data[:pushed_at].to_s) : nil,
+        archived: false
+      )
+
+      project.save!
+      project.record_snapshot!
+    end
+
+    # Recalculate cached stats on user
+    visible = user.projects.visible
+    gained = visible.sum { |p| p.stars_gained }
+    user.update!(
+      github_repos_count: visible.count,
+      github_stars_sum: visible.sum(:stars),
+      stars_gained: gained
+    )
   end
 
   # === Instance Methods for OAuth Sign-in (unchanged) ===
@@ -261,20 +293,14 @@ class GithubDataFetcher
   end
 
   def fetch_and_store_repositories
-    # Get username from auth_data if available, otherwise from user
     github_username = auth_data&.info&.nickname || user.username
-
     return unless github_username.present?
 
-    # Store repos as JSON in the github_repos field and update stars sum
     repos = fetch_ruby_repositories(github_username)
     if repos.present?
-      # Store all repos, but only count visible ones in stats
-      hidden_urls = user.hidden_repo_urls
-      visible_repos = repos.reject { |r| hidden_urls.include?(r[:url]) }
-      stars_sum = visible_repos.sum { |r| r[:stars].to_i }
-      repos_count = visible_repos.size
-      user.update!(github_repos: repos.to_json, github_stars_sum: stars_sum, github_repos_count: repos_count)
+      # Normalize key: REST API uses :url, sync_projects! expects :github_url
+      repos.each { |r| r[:github_url] ||= r.delete(:url) }
+      self.class.sync_projects!(user, repos)
     end
   rescue => e
     Rails.logger.error "Failed to fetch GitHub repositories for #{github_username}: #{e.message}"

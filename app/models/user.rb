@@ -9,6 +9,9 @@ class User < ApplicationRecord
   has_one :testimonial, dependent: :destroy
   has_many :published_posts, -> { published }, class_name: "Post"
   has_many :published_comments, -> { published }, class_name: "Comment"
+  has_many :projects, dependent: :destroy
+  has_many :visible_projects, -> { visible.by_pushed_at }, class_name: "Project"
+  has_many :hidden_projects, -> { hidden.active.by_pushed_at }, class_name: "Project"
 
   # Enums
   enum :role, { member: 0, admin: 1 }
@@ -56,81 +59,40 @@ class User < ApplicationRecord
     trusted?
   end
 
-  def ruby_repositories
-    return [] unless github_repos.present?
-
-    repos = JSON.parse(github_repos, symbolize_names: true)
-
-    # Repositories are already filtered for Ruby language and exclude forks
-    # during the fetch process in GithubDataFetcher
-    # Just sort by pushed_at descending (most recently pushed first)
-    repos.sort_by { |repo| repo[:pushed_at].present? ? -Time.parse(repo[:pushed_at]).to_i : 0 }
-  rescue JSON::ParserError, ArgumentError => e
-    Rails.logger.error "Error parsing repositories: #{e.message}"
-    []
-  end
-
-  # Get visible repositories (excludes hidden)
   def visible_ruby_repositories
-    return ruby_repositories if hidden_repo_urls.empty?
-    ruby_repositories.reject { |repo| hidden_repo_urls.include?(repo[:url]) }
+    visible_projects.to_a
   end
 
-  # Get hidden repositories only
   def hidden_ruby_repositories
-    return [] if hidden_repo_urls.empty?
-    ruby_repositories.select { |repo| hidden_repo_urls.include?(repo[:url]) }
+    hidden_projects.to_a
   end
 
-  # Parse hidden repos JSON (memoized for performance)
-  def hidden_repo_urls
-    @hidden_repo_urls ||= begin
-      return [] if hidden_repos.blank?
-      JSON.parse(hidden_repos)
-    rescue JSON::ParserError
-      []
-    end
-  end
-
-  # Clear memoization when hidden_repos changes
-  def hidden_repos=(value)
-    @hidden_repo_urls = nil
-    write_attribute(:hidden_repos, value)
-  end
-
-  # Add repo to hidden list
   def hide_repository!(repo_url)
-    return if hidden_repo_urls.include?(repo_url)
-    update!(hidden_repos: (hidden_repo_urls + [ repo_url ]).to_json)
+    project = projects.find_by(github_url: repo_url)
+    return unless project && !project.hidden?
+    project.update!(hidden: true)
     recalculate_visible_stats!
   end
 
-  # Remove repo from hidden list (unhide)
   def unhide_repository!(repo_url)
-    return unless hidden_repo_urls.include?(repo_url)
-    new_urls = hidden_repo_urls - [ repo_url ]
-    update!(hidden_repos: new_urls.empty? ? nil : new_urls.to_json)
+    project = projects.find_by(github_url: repo_url)
+    return unless project && project.hidden?
+    project.update!(hidden: false)
     recalculate_visible_stats!
   end
 
-  # Recalculate stats based on visible repos only
   def recalculate_visible_stats!
-    repos = visible_ruby_repositories
+    visible = projects.visible
+    gained = visible.sum { |p| p.stars_gained }
     update!(
-      github_repos_count: repos.size,
-      github_stars_sum: repos.sum { |r| r[:stars].to_i }
+      github_repos_count: visible.count,
+      github_stars_sum: visible.sum(:stars),
+      stars_gained: gained
     )
   end
 
   def total_github_stars
-    return github_stars_sum if respond_to?(:github_stars_sum) && github_stars_sum.present?
-
-    repos = ruby_repositories
-    return 0 if repos.blank?
-
-    repos.sum { |repo| repo[:stars].to_i }
-  rescue => _e
-    0
+    github_stars_sum.to_i
   end
 
   def display_name

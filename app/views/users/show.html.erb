@@ -121,9 +121,12 @@
               <div class="flex items-baseline justify-between gap-2 mb-1">
                 <h1 class="text-3xl font-bold text-gray-900"><%= @user.display_name %></h1>
                 <% if total_stars > 0 %>
-                  <span class="flex items-center text-amber-500 whitespace-nowrap flex-shrink-0">
+                  <span class="relative flex items-center text-amber-500 whitespace-nowrap flex-shrink-0">
                     <%= inline_svg_tag "star.svg", class: "w-5 h-5 mr-1" %>
                     <span class="font-bold text-gray-600 text-lg"><%= total_stars %></span>
+                    <% if @user.stars_gained.to_i > 0 %>
+                      <span class="absolute -top-2.5 -right-5 bg-green-500 text-white text-[10px] font-bold rounded-full px-1 min-w-[18px] text-center leading-[18px] shadow-sm">+<%= @user.stars_gained %></span>
+                    <% end %>
                   </span>
                 <% end %>
               </div>
