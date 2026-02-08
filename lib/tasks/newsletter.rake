@@ -54,7 +54,7 @@ namespace :newsletter do
         next
       end
 
-      tz_name = user.timezone.presence || "Etc/UTC"
+      tz_name = TimezoneResolver.normalize(user.timezone)
       tz = TZInfo::Timezone.get(tz_name)
       local_time = tz.local_time(target_date.year, target_date.month, target_date.day, 10, 10)
       utc_time = local_time.utc
@@ -99,7 +99,7 @@ namespace :newsletter do
         next
       end
 
-      tz_name = user.timezone.presence || "Etc/UTC"
+      tz_name = TimezoneResolver.normalize(user.timezone)
       tz_counts[tz_name] += 1
 
       tz = TZInfo::Timezone.get(tz_name)
@@ -144,6 +144,25 @@ namespace :newsletter do
     end
 
     puts "Done. Updated #{updated} users."
+  end
+
+  desc "Normalize legacy timezone identifiers (e.g. Europe/Kiev -> Europe/Kyiv). Usage: rails newsletter:normalize_timezones"
+  task normalize_timezones: :environment do
+    updated = 0
+
+    TimezoneResolver::LEGACY_IDENTIFIERS.each do |old_tz, new_tz|
+      count = User.where(timezone: old_tz).update_all(timezone: new_tz)
+      if count > 0
+        puts "  #{old_tz} -> #{new_tz}: #{count} users"
+        updated += count
+      end
+    end
+
+    if updated > 0
+      puts "Done. Normalized #{updated} users."
+    else
+      puts "No legacy timezone identifiers found."
+    end
   end
 
   desc "Preview how many users will receive the newsletter. Usage: rails newsletter:count[1]"

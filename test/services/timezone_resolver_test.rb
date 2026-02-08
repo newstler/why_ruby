@@ -34,4 +34,26 @@ class TimezoneResolverTest < ActiveSupport::TestCase
     result = TimezoneResolver.resolve(0.0, 0.0)
     assert_equal "Etc/UTC", result
   end
+
+  test "resolves Kyiv coordinates to canonical identifier" do
+    result = TimezoneResolver.resolve(50.45, 30.52)
+    assert_equal "Europe/Kyiv", result
+  end
+
+  test "normalize maps legacy Europe/Kiev to Europe/Kyiv" do
+    assert_equal "Europe/Kyiv", TimezoneResolver.normalize("Europe/Kiev")
+  end
+
+  test "normalize passes through valid identifiers" do
+    assert_equal "America/New_York", TimezoneResolver.normalize("America/New_York")
+  end
+
+  test "normalize returns Etc/UTC for blank" do
+    assert_equal "Etc/UTC", TimezoneResolver.normalize(nil)
+    assert_equal "Etc/UTC", TimezoneResolver.normalize("")
+  end
+
+  test "normalize returns Etc/UTC for unknown identifier" do
+    assert_equal "Etc/UTC", TimezoneResolver.normalize("Fake/Timezone")
+  end
 end
