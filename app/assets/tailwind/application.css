@@ -53,13 +53,22 @@
 }
 
 @layer utilities {
-  /* Sticky header that works on tablets but not horizontal phones */
-  /* Uses min-height to distinguish: horizontal phones ~375-430px tall, tablets 600px+ */
+  /* Sticky header: not on phones, not on horizontal tablets */
+  /* Horizontal phones: height < 600px → excluded */
+  /* Horizontal iPads: landscape with width ≤ 1366px → excluded (all iPads max out at 1366px CSS width) */
+  /* Desktops/laptops: typically 1440px+ wide → included */
+  /* Vertical tablets (portrait): always included at 768px+ width */
   .sticky-tablet {
     position: static;
   }
 
-  @media (min-width: 768px) and (min-height: 600px) {
+  @media (min-width: 768px) and (min-height: 600px) and (orientation: portrait) {
+    .sticky-tablet {
+      position: sticky;
+    }
+  }
+
+  @media (min-width: 1400px) and (min-height: 600px) {
     .sticky-tablet {
       position: sticky;
     }

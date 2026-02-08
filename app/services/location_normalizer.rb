@@ -2,10 +2,11 @@
 
 require "net/http"
 require "json"
-require "ostruct"
 
 class LocationNormalizer
   PHOTON_API = "https://photon.komoot.io/api/"
+
+  GeoResult = Data.define(:city, :state, :country_code, :latitude, :longitude)
 
   def self.normalize(raw_location)
     new.normalize(raw_location)
@@ -50,8 +51,8 @@ class LocationNormalizer
     coordinates = feature.dig("geometry", "coordinates")
     lon, lat = coordinates if coordinates.is_a?(Array) && coordinates.size >= 2
 
-    OpenStruct.new(
-      city: properties["city"],
+    GeoResult.new(
+      city: properties["city"] || (properties["type"] == "city" ? properties["name"] : nil),
       state: properties["state"],
       country_code: properties["countrycode"],
       latitude: lat&.to_f,

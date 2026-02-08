@@ -443,6 +443,15 @@ input[type="checkbox"] {
   z-index: 0;
 }
 
+/* Community map - style attribution links to match site design */
+[data-controller="community-map"] .leaflet-control-attribution a {
+  color: #9ca3af;
+  transition: color 0.15s;
+}
+[data-controller="community-map"] .leaflet-control-attribution a:hover {
+  color: #dc2626;
+}
+
 /* Community map - reset Leaflet divIcon defaults for custom markers */
 .community-map-marker,
 .community-map-cluster {
