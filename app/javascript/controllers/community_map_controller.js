@@ -199,12 +199,15 @@ export default class extends Controller {
 
     this.map.addLayer(this.clusterGroup)
 
-    const fb = this.fitBoundsValue
-    if (fb && fb.south != null) {
-      this.map.fitBounds(
-        [[fb.south, fb.west], [fb.north, fb.east]],
-        { padding: [40, 40], maxZoom: 10 }
-      )
+    if (!this.initialFitDone) {
+      this.initialFitDone = true
+      const fb = this.fitBoundsValue
+      if (fb && fb.south != null) {
+        this.map.fitBounds(
+          [[fb.south, fb.west], [fb.north, fb.east]],
+          { padding: [40, 40], maxZoom: 10 }
+        )
+      }
     }
 
     this.readyForBoundsUpdate = true
