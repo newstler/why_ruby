@@ -18,7 +18,7 @@ class Avo::Resources::Category < Avo::BaseResource
     ::Category.unscoped.friendly.find(id)
   rescue ActiveRecord::RecordNotFound
     # If not found, try to find by historical slug
-    slug_record = FriendlyId::Slug.where(sluggable_type: "Category", slug: id).order(id: :desc).first
+    slug_record = FriendlyId::Slug.where(sluggable_type: "Category", slug: id).order(id: :desc).take
     if slug_record
       ::Category.unscoped.find(slug_record.sluggable_id)
     else

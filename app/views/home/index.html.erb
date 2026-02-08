@@ -60,7 +60,7 @@
 </div>
 
 <!-- Success Stories Floating Logos (Full Width) -->
-<% if @success_stories.count >= 5 %>
+<% if @success_stories.size >= 5 %>
   <div class="py-8 md:py-16 bg-gray-50 my-4 md:my-8">
     <h2 class="text-center text-sm font-semibold text-gray-300 tracking-wide uppercase mb-6 md:mb-12">
       Read <%= link_to "success stories", category_path(Category.success_story_category), class: "text-gray-500 hover:text-red-600 transition-colors" %> from
@@ -129,9 +129,7 @@
       <% # Desktop: 3 columns %>
       <% distribute_to_columns(@posts, num_columns: 3).each do |column_posts| %>
         <div class="flex-1 space-y-6">
-          <% column_posts.each do |post| %>
-            <%= render 'posts/post_tile', post: post %>
-          <% end %>
+          <%= render partial: 'posts/post_tile', collection: column_posts, as: :post %>
         </div>
       <% end %>
     </div>
@@ -140,18 +138,14 @@
     <div class="hidden md:flex lg:hidden gap-6">
       <% distribute_to_columns(@posts, num_columns: 2).each do |column_posts| %>
         <div class="flex-1 space-y-6">
-          <% column_posts.each do |post| %>
-            <%= render 'posts/post_tile', post: post %>
-          <% end %>
+          <%= render partial: 'posts/post_tile', collection: column_posts, as: :post %>
         </div>
       <% end %>
     </div>
     
     <% # Mobile: 1 column %>
     <div class="md:hidden space-y-6">
-      <% @posts.each do |post| %>
-        <%= render 'posts/post_tile', post: post %>
-      <% end %>
+      <%= render partial: 'posts/post_tile', collection: @posts, as: :post %>
     </div>
     
     <div class="mt-12 mb-8 text-center">

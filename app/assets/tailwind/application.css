@@ -74,6 +74,13 @@
     }
   }
 
+  /* Shorter map on landscape tablets so header text below is visible */
+  @media (orientation: landscape) and (min-width: 768px) and (max-width: 1399px) {
+    .community-map-landscape {
+      height: 400px;
+    }
+  }
+
   @keyframes highlight-blink {
     0% { 
       background-color: theme(colors.red.200);

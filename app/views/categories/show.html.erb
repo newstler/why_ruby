@@ -45,9 +45,7 @@
         <% add_button_column = @posts.size % 3 %>
         <% columns.each_with_index do |column_posts, col_index| %>
           <div class="flex-1 space-y-6">
-            <% column_posts.each do |post| %>
-              <%= render 'posts/post_tile', post: post %>
-            <% end %>
+            <%= render partial: 'posts/post_tile', collection: column_posts, as: :post %>
             <% if col_index == add_button_column %>
               <%= render 'posts/add_post_tile', success_story: @category.is_success_story?, category: @category %>
             <% end %>
@@ -61,9 +59,7 @@
         <% add_button_column = @posts.size % 2 %>
         <% columns.each_with_index do |column_posts, col_index| %>
           <div class="flex-1 space-y-6">
-            <% column_posts.each do |post| %>
-              <%= render 'posts/post_tile', post: post %>
-            <% end %>
+            <%= render partial: 'posts/post_tile', collection: column_posts, as: :post %>
             <% if col_index == add_button_column %>
               <%= render 'posts/add_post_tile', success_story: @category.is_success_story?, category: @category %>
             <% end %>
@@ -73,9 +69,7 @@
 
       <% # Mobile: 1 column %>
       <div class="md:hidden space-y-6">
-        <% @posts.each do |post| %>
-          <%= render 'posts/post_tile', post: post %>
-        <% end %>
+        <%= render partial: 'posts/post_tile', collection: @posts, as: :post %>
         <%= render 'posts/add_post_tile', success_story: @category.is_success_story?, category: @category %>
       </div>
       

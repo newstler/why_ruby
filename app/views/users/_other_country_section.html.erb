@@ -21,19 +21,13 @@
     <%# Desktop: 3 columns %>
     <div id="other-users-grid-desktop" class="hidden lg:flex gap-6" data-infinite-scroll-target="entries">
       <div id="other-users-column-lg-1" class="flex-1 basis-0 min-w-0 space-y-6">
-        <% other_col1.each do |user| %>
-          <%= render 'users/user_tile', user: user %>
-        <% end %>
+        <%= render partial: 'users/user_tile', collection: other_col1, as: :user %>
       </div>
       <div id="other-users-column-lg-2" class="flex-1 basis-0 min-w-0 space-y-6">
-        <% other_col2.each do |user| %>
-          <%= render 'users/user_tile', user: user %>
-        <% end %>
+        <%= render partial: 'users/user_tile', collection: other_col2, as: :user %>
       </div>
       <div id="other-users-column-lg-3" class="flex-1 basis-0 min-w-0 space-y-6">
-        <% other_col3.each do |user| %>
-          <%= render 'users/user_tile', user: user %>
-        <% end %>
+        <%= render partial: 'users/user_tile', collection: other_col3, as: :user %>
       </div>
     </div>
 
@@ -46,22 +40,16 @@
 
     <div id="other-users-grid-tablet" class="hidden md:flex lg:hidden gap-6">
       <div id="other-users-column-md-1" class="flex-1 basis-0 min-w-0 space-y-6">
-        <% other_tab1.each do |user| %>
-          <%= render 'users/user_tile', user: user %>
-        <% end %>
+        <%= render partial: 'users/user_tile', collection: other_tab1, as: :user %>
       </div>
       <div id="other-users-column-md-2" class="flex-1 basis-0 min-w-0 space-y-6">
-        <% other_tab2.each do |user| %>
-          <%= render 'users/user_tile', user: user %>
-        <% end %>
+        <%= render partial: 'users/user_tile', collection: other_tab2, as: :user %>
       </div>
     </div>
 
     <%# Mobile: 1 column %>
     <div id="other-users-grid-mobile" class="md:hidden space-y-6">
-      <% other_country_users.each do |user| %>
-        <%= render 'users/user_tile', user: user %>
-      <% end %>
+      <%= render partial: 'users/user_tile', collection: other_country_users, as: :user %>
     </div>
 
     <!-- Loading indicator for other country users -->
