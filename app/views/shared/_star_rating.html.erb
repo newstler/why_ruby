@@ -1,0 +1,16 @@
+<%#
+  Star rating display partial
+  Locals:
+    - count: number of stars (required)
+    - gained: stars gained since yesterday (optional, default 0)
+    - compact: (optional) if true, uses smaller text sizes on mobile
+%>
+<% gained ||= 0 %>
+
+<span class="relative flex items-center text-amber-500 whitespace-nowrap flex-shrink-0 <%= local_assigns[:compact] ? 'text-xs md:text-sm' : 'text-sm' %>">
+  <%= inline_svg_tag "star.svg", class: local_assigns[:compact] ? "w-3 h-3 md:w-4 md:h-4 mr-0.5" : "w-4 h-4 mr-0.5" %>
+  <span class="font-semibold text-gray-500"><%= count %></span>
+  <% if gained > 0 %>
+    <span class="absolute -top-2.5 -right-4 bg-green-500 text-white text-[10px] font-bold rounded-full px-1 min-w-[18px] text-center leading-[18px] shadow-sm" title="Stars gained since yesterday">+<%= gained %></span>
+  <% end %>
+</span>
