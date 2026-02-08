@@ -47,6 +47,11 @@ class UsersController < ApplicationController
       @filter_company = params[:company].strip
     end
 
+    if params[:open_to_work] == "1"
+      @users = @users.where(open_to_work: true)
+      @filter_open_to_work = true
+    end
+
     # Map bounds filtering
     if params[:south].present? && params[:north].present? && params[:west].present? && params[:east].present?
       south, north = params[:south].to_f, params[:north].to_f

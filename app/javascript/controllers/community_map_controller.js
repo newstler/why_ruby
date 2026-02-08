@@ -11,6 +11,8 @@ export default class extends Controller {
 
   connect() {
     this.mapInitialized = false
+    this.allUsers = null
+    this.clusterGroup = null
 
     this.observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -26,10 +28,16 @@ export default class extends Controller {
 
     this.handleMapReset = () => this.resetView()
     window.addEventListener("map:reset", this.handleMapReset)
+
+    this.handleFrameLoad = (event) => {
+      if (event.target.id === "community-content") this.refilterMarkers()
+    }
+    document.addEventListener("turbo:frame-load", this.handleFrameLoad)
   }
 
   disconnect() {
     window.removeEventListener("map:reset", this.handleMapReset)
+    document.removeEventListener("turbo:frame-load", this.handleFrameLoad)
     if (this.observer) this.observer.disconnect()
     if (this.map) {
       this.map.remove()
@@ -121,19 +129,34 @@ export default class extends Controller {
       const response = await fetch(this.dataUrlValue)
       if (!response.ok) throw new Error("Failed to fetch map data")
 
-      const users = await response.json()
+      this.allUsers = await response.json()
       this.hideLoading()
-      this.createMarkers(this.filterUsers(users))
+      this.createMarkers(this.filterUsers(this.allUsers))
     } catch (error) {
       console.error("Community map error:", error)
       this.hideLoading()
     }
   }
 
+  refilterMarkers() {
+    if (!this.map || !this.allUsers) return
+    if (this.clusterGroup) {
+      this.map.removeLayer(this.clusterGroup)
+      this.clusterGroup = null
+    }
+    this.createMarkers(this.filterUsers(this.allUsers))
+  }
+
   filterUsers(users) {
-    const params = new URLSearchParams(window.location.search)
+    const frame = document.getElementById("community-content")
+    const src = frame && frame.getAttribute("src")
+    const params = src
+      ? new URL(src, window.location.origin).searchParams
+      : new URLSearchParams(window.location.search)
+
     const company = params.get("company")
     const location = params.get("location")
+    const openToWork = params.get("open_to_work")
 
     let filtered = users
     if (company) {
@@ -142,11 +165,14 @@ export default class extends Controller {
     if (location) {
       filtered = filtered.filter(u => u.normalized_location === location)
     }
+    if (openToWork === "1") {
+      filtered = filtered.filter(u => u.open_to_work)
+    }
     return filtered
   }
 
   createMarkers(users) {
-    const cluster = L.markerClusterGroup({
+    this.clusterGroup = L.markerClusterGroup({
       maxClusterRadius: 80,
       spiderfyOnMaxZoom: true,
       spiderfyDistanceMultiplier: 2,
@@ -164,10 +190,10 @@ export default class extends Controller {
 
       const marker = L.marker([user.lat, user.lng], { icon, title: user.name })
       marker.on("click", () => { window.location.href = user.profile_url })
-      cluster.addLayer(marker)
+      this.clusterGroup.addLayer(marker)
     })
 
-    this.map.addLayer(cluster)
+    this.map.addLayer(this.clusterGroup)
 
     const fb = this.fitBoundsValue
     if (fb && fb.south != null) {
