@@ -99,7 +99,7 @@
         <% end %>
       </div>
 
-    <div class="flex-shrink-0 flex flex-col items-end md:justify-between mt-8 md:mt-0">
+    <div class="flex-shrink-0 flex flex-col items-start sm:items-end md:justify-between mt-8 md:mt-0">
       <% if user_signed_in? %>
         <div class="hidden md:flex md:flex-col md:items-end mt-4 mb-1">
           <%= render "users/user_tile", user: current_user, frameless: true, avatar_size: "w-10 h-9", compact: true, minimal: true, badge_size: "map" %>
@@ -108,7 +108,7 @@
           <p class="hidden md:block text-xs text-gray-400 text-right mb-3"><%= link_to "Share why you love Ruby", community_user_url(current_user), class: "underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors", data: { turbo_frame: "_top" } %><br>and get featured on&nbsp;<%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors whitespace-nowrap", data: { turbo_frame: "_top" } %></p>
         <% end %>
       <% end %>
-      <div class="flex items-center gap-6 md:mt-auto">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6 md:mt-auto">
       <%= link_to community_index_path(
             open_to_work: @filter_open_to_work ? nil : "1",
             sort: @sort, dir: @dir,
