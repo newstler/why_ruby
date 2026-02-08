@@ -18,12 +18,17 @@ class UsersController < ApplicationController
 
     # Apply filters if present
     if params[:location].present?
-      @users = @users.by_normalized_location(params[:location].strip)
       @filter_location = params[:location].strip
+      is_country_only = !@filter_location.include?(", ")
 
-      # Extract country code and load users from other parts of the country
-      @filter_country_code = @filter_location.split(", ").last if @filter_location.include?(", ")
-      if @filter_country_code.present?
+      if is_country_only
+        # Country-only filter: include all users from that country
+        @users = @users.from_country(@filter_location)
+      else
+        @users = @users.by_normalized_location(@filter_location)
+
+        # Extract country code and load users from other parts of the country
+        @filter_country_code = @filter_location.split(", ").last
         @other_country_users = User.visible
                                    .from_country(@filter_country_code)
                                    .where.not(normalized_location: @filter_location)
@@ -32,8 +37,8 @@ class UsersController < ApplicationController
       end
 
       # Compute bounding box for map zoom-to-location
-      geo_bounds = User.visible
-                       .by_normalized_location(@filter_location)
+      filtered_users = is_country_only ? User.visible.from_country(@filter_location) : User.visible.by_normalized_location(@filter_location)
+      geo_bounds = filtered_users
                        .where.not(latitude: nil, longitude: nil)
                        .pick(Arel.sql("MIN(latitude)"), Arel.sql("MAX(latitude)"),
                              Arel.sql("MIN(longitude)"), Arel.sql("MAX(longitude)"))
