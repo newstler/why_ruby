@@ -40,7 +40,8 @@ export default class extends Controller {
   resetView() {
     if (!this.map) return
     this.readyForBoundsUpdate = false
-    this.map.setView([30, 10], 2)
+    const zoom = window.innerWidth < 640 ? 1 : 2
+    this.map.setView([30, 10], zoom)
     setTimeout(() => { this.readyForBoundsUpdate = true }, 600)
   }
 
@@ -86,10 +87,13 @@ export default class extends Controller {
   initMap() {
     this.readyForBoundsUpdate = false
 
+    const isMobile = window.innerWidth < 640
+    const initialZoom = isMobile ? 1 : 2
+
     this.map = L.map(this.containerTarget, {
       center: [30, 10],
-      zoom: 2,
-      minZoom: 2,
+      zoom: initialZoom,
+      minZoom: 1,
       maxZoom: 15,
       zoomControl: true,
       scrollWheelZoom: false,
