@@ -28,14 +28,16 @@ export default class extends Controller {
       colorClass = `${pill} bg-red-100 text-red-600`
     }
 
-    if (isValid) {
-      this.submitTarget.disabled = false
-      this.submitTarget.classList.remove("opacity-50", "cursor-not-allowed")
-      this.submitTarget.classList.add("cursor-pointer", "hover:bg-red-700")
-    } else {
-      this.submitTarget.disabled = true
-      this.submitTarget.classList.add("opacity-50", "cursor-not-allowed")
-      this.submitTarget.classList.remove("cursor-pointer", "hover:bg-red-700")
+    if (this.hasSubmitTarget) {
+      if (isValid) {
+        this.submitTarget.disabled = false
+        this.submitTarget.classList.remove("opacity-50", "cursor-not-allowed")
+        this.submitTarget.classList.add("cursor-pointer", "hover:bg-red-700")
+      } else {
+        this.submitTarget.disabled = true
+        this.submitTarget.classList.add("opacity-50", "cursor-not-allowed")
+        this.submitTarget.classList.remove("cursor-pointer", "hover:bg-red-700")
+      }
     }
 
     this.counterTargets.forEach(counter => {
