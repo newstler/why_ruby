@@ -21,6 +21,7 @@ class GenerateTestimonialFieldsJob < ApplicationJob
     unless parsed
       Rails.logger.error "Failed to generate testimonial fields for testimonial #{testimonial.id}"
       testimonial.update!(ai_feedback: "We couldn't process your testimonial right now. Please try again later.")
+      broadcast_update(testimonial)
       return
     end
 
@@ -36,6 +37,7 @@ class GenerateTestimonialFieldsJob < ApplicationJob
 
     unless parsed
       testimonial.update!(ai_feedback: "We couldn't process your testimonial right now. Please try again later.")
+      broadcast_update(testimonial)
       return
     end
 
@@ -48,6 +50,7 @@ class GenerateTestimonialFieldsJob < ApplicationJob
   rescue JSON::ParserError => e
     Rails.logger.error "Failed to parse AI response for testimonial #{testimonial.id}: #{e.message}"
     testimonial.update!(ai_feedback: "We couldn't process your testimonial right now. Please try again later.")
+    broadcast_update(testimonial)
   end
 
   private
@@ -98,6 +101,15 @@ class GenerateTestimonialFieldsJob < ApplicationJob
     end
 
     result ? JSON.parse(result) : nil
+  end
+
+  def broadcast_update(testimonial)
+    Turbo::StreamsChannel.broadcast_replace_to(
+      "testimonial_#{testimonial.id}",
+      target: "testimonial_section",
+      partial: "testimonials/section",
+      locals: { testimonial: testimonial, user: testimonial.user }
+    )
   end
 
   def heading_taken?(heading, testimonial_id)
