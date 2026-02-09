@@ -386,6 +386,21 @@ module ApplicationHelper
     end
   end
 
+  # Helper for community user path with query params (for sorting/filtering links)
+  # On community domain in production, uses /:id. Otherwise uses /community/:id.
+  def community_user_path(user, params = {})
+    base_path = if Rails.env.production? && request.host == Rails.application.config.x.domains.community
+      "/#{user.to_param}"
+    else
+      user_path(user)
+    end
+
+    return base_path if params.blank?
+
+    query = params.compact.to_query
+    query.present? ? "#{base_path}?#{query}" : base_path
+  end
+
   # URL for community map data endpoint (works across domains)
   def community_map_data_url
     if Rails.env.production? && request.host == Rails.application.config.x.domains.community

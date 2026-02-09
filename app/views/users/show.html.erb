@@ -292,7 +292,7 @@
                     next_dir = (key == "az") ? "asc" : "desc"
                   end
                 %>
-                <%= link_to menu_label, user_path(@user, project_sort: key, project_dir: next_dir),
+                <%= link_to menu_label, community_user_path(@user, project_sort: key, project_dir: next_dir),
                     class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none cursor-pointer" %>
               <% end %>
             </div>
