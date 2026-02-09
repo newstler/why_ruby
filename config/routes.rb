@@ -12,6 +12,9 @@ Rails.application.routes.draw do
   constraints host: Rails.application.config.x.domains.community do
     root "users#index", as: :rubycommunity_root
     get "map_data", to: "users#map_data", as: :rubycommunity_map_data
+    # Redirect /community paths that may linger from old links or crawlers
+    get "community", to: redirect("/", status: 301)
+    get "community/:id", to: redirect("/%{id}", status: 301), constraints: { id: /[^\/]+/ }
     get ":id", to: "users#show", as: :rubycommunity_user, constraints: { id: /[^\/]+/ }
   end
 
