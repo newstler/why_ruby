@@ -1,0 +1,56 @@
+Hi <%= @user.name&.split&.first || @user.username %>,
+
+I'm Yuri, the creator of WhyRuby.info. Thank you for signing up to the site! I wanted to share some updates with you.
+
+
+The Big "Why Ruby?" Update
+==========================
+
+A few weeks ago, the official Ruby website added a "Why Ruby?" section (https://www.ruby-lang.org/en/#:~:text=Why%20Ruby) right on its home page. I looked at it and thought: do I even need to keep my site? And if I do, how should it look now?
+
+Since the launch, the site has collected some nice articles and is now #1 in Google for "why ruby" — so I guess it's doing its job. But I loved the quotes idea from the official site. They immediately answer the main question. Vladimir Dementyev (https://twitter.com/palkan_tula) suggested letting everyone share why they love Ruby. So I stole the whole idea and put it right on the first screen :)
+
+Now, on your profile, you can write a couple of sentences, and with a little help of AI it becomes a beautiful testimonial on the home page. Go try it!
+
+https://whyruby.info/sign_in_github?return_to=https://rubycommunity.org/<%= @user.slug %>
+
+Along the way, I fixed a bunch of bugs and added features some people asked for, like hiding repositories or the "Open to Work" badge. The design got a refresh too.
+
+
+The community section got popular
+=================================
+
+Many of us have great open source projects, and the community page has become a nice place to see what each of us is working on and to support each other by voting on GitHub. People liked the ratings, the ability to discover contributions, to see what we give back to the community.
+
+This part of the site started to feel like it needed its own space. A site centered on Ruby developers. A place to showcase your work.
+
+Now it has a new home: rubycommunity.org
+https://rubycommunity.org
+
+Same app, same database. Sign in on one site and you're signed in on the other. But now there's a clear separation: whyruby.info for advocacy content and testimonials, rubycommunity.org for the community itself.
+
+It now features an interactive map of Ruby developers around the world, and daily star trends showing which projects are popular right now.
+
+More than 70 developers, including you, have already joined. I could have just scraped GitHub and added everyone myself, but that felt wrong. People should decide if they want to appear on the site. So please share this in your networks and invite your Ruby friends.
+
+
+Ideas for the future
+====================
+
+Conference talk stats, dedicated project pages with collected blog posts about them, linking users to their companies' contributions, and so on. The project is open source (https://github.com/newstler/why_ruby) and built for the community to own. PRs and ideas are welcome.
+
+
+A personal note
+===============
+
+I've spent almost 20 years writing Ruby. Built all kinds of products and this past year went deep into practical AI integration.
+
+I'm looking for work. If you're hiring or know someone who is, I'd love to chat: https://cal.com/yurisidorov
+
+Thanks for reading!
+
+--
+Yuri Sidorov
+yurisidorov.com | WhyRuby.info | RubyCommunity.org
+
+Unsubscribe: https://whyruby.info/newsletter/unsubscribe/<%= @user.newsletter_unsubscribe_token %>

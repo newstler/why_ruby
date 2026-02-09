@@ -15,7 +15,7 @@ class Avo::Resources::User < Avo::BaseResource
     ::User.unscoped.friendly.find(id)
   rescue ActiveRecord::RecordNotFound
     # If not found, try to find by historical slug
-    slug_record = FriendlyId::Slug.where(sluggable_type: "User", slug: id).first
+    slug_record = FriendlyId::Slug.find_by(sluggable_type: "User", slug: id)
     if slug_record
       ::User.unscoped.find(slug_record.sluggable_id)
     else
@@ -55,6 +55,11 @@ class Avo::Resources::User < Avo::BaseResource
     # Timestamps - only show created_at on index
     field :created_at, as: :date_time, readonly: true
     field :updated_at, as: :date_time, readonly: true, hide_on: [ :index ]
+
+    # Newsletter
+    field :unsubscribed_from_newsletter, as: :boolean, readonly: true, hide_on: [ :index ]
+    field :newsletters_received, as: :text, readonly: true, hide_on: [ :index ], format_using: -> { value.is_a?(Array) ? value.map { |v| NewsletterMailer::SUBJECTS[v] || "v#{v}" }.join(", ") : value.to_s }
+    field :newsletters_opened, as: :text, readonly: true, hide_on: [ :index ], format_using: -> { value.is_a?(Array) ? value.map { |v| NewsletterMailer::SUBJECTS[v] || "v#{v}" }.join(", ") : value.to_s }
 
     # Associations - hide from index
     field :posts, as: :has_many, hide_on: [ :index ]

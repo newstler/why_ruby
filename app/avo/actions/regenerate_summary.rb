@@ -14,10 +14,8 @@ class Avo::Actions::RegenerateSummary < Avo::BaseAction
               [ query ]  # Single record, wrap in array
     end
 
-    posts.each do |post|
-      # Queue summary regeneration with force flag to override existing summary
-      GenerateSummaryJob.perform_later(post, force: true)
-    end
+    jobs = posts.map { |post| GenerateSummaryJob.new(post, force: true) }
+    ActiveJob.perform_all_later(jobs)
 
     count = posts.is_a?(Array) ? posts.size : posts.count
     succeed "AI summary regeneration queued for #{count} #{'post'.pluralize(count)}."

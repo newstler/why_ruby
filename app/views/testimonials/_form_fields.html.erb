@@ -1,0 +1,48 @@
+<% processing = local_assigns[:processing] %>
+<% controllers = local_assigns[:autofocus] ? "auto-resize autofocus" : "auto-resize" %>
+
+<%= f.text_area :quote,
+    rows: 4,
+    maxlength: 320,
+    disabled: processing,
+    placeholder: "I love Ruby because... (140-320 characters, or leave empty to unpublish)",
+    data: { controller: controllers, char_counter_target: "input", action: "input->char-counter#update input->auto-resize#resize" },
+    class: "w-full min-h-24 rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-gray-900 resize-none overflow-hidden #{processing ? 'opacity-50' : ''}" %>
+
+<div class="mt-2 md:hidden">
+  <span data-char-counter-target="counter" class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-400"></span>
+</div>
+
+<div class="mt-4 flex flex-col md:flex-row md:items-center gap-3">
+  <div class="flex items-center gap-3">
+    <% if processing %>
+      <span class="inline-flex items-center px-4 md:px-6 py-2.5 md:py-3 border border-transparent text-sm md:text-base font-medium rounded-lg shadow-sm text-white bg-red-600 opacity-50 cursor-not-allowed">
+        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 md:h-5 md:w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Processing...
+      </span>
+    <% else %>
+      <%= f.submit "Save",
+          data: { char_counter_target: "submit" },
+          class: "inline-flex items-center px-4 md:px-6 py-2.5 md:py-3 border border-transparent text-sm md:text-base font-medium rounded-lg shadow-sm text-white bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors" %>
+      <% if local_assigns[:cancelable] %>
+        <button type="button" data-action="testimonial-edit#cancel"
+                class="inline-flex items-center px-4 md:px-6 py-2.5 md:py-3 border border-gray-300 text-sm md:text-base font-medium rounded-lg shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer transition-colors">
+          Cancel
+        </button>
+      <% end %>
+    <% end %>
+  </div>
+
+  <% if testimonial.persisted? && testimonial.ai_feedback.present? %>
+    <span class="text-sm <%= testimonial.published? ? 'text-green-600' : 'text-yellow-600' %>">
+      <% if testimonial.reject_reason == "generation" %>
+        We're refining the presentation of your testimonial. Please try saving again.
+      <% else %>
+        <%= testimonial.ai_feedback %>
+      <% end %>
+    </span>
+  <% end %>
+</div>

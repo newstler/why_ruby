@@ -1,29 +1,42 @@
-# WhyRuby.info - Ruby Advocacy Community Website
+# WhyRuby.info & RubyCommunity.org
 
-A community-driven Ruby advocacy website built with Ruby 4.0.0 and Rails 8.2 using the Solid Stack (SQLite, SolidQueue, SolidCache, SolidCable).
+Ruby advocacy site and developer community. Built with Ruby 4.0.1 and Rails 8.2 on the Solid Stack (SQLite, SolidQueue, SolidCache, SolidCable).
 
 ## Features
 
-### Core Features
-- **Universal Content Model**: Support for both articles (with markdown) and external links
-- **GitHub OAuth Authentication**: Sign in with GitHub account only
-- **Category System**: Dynamic categories managed through admin panel
-- **Tagging System**: HABTM relationship for content tagging
-- **Pinned Content**: Homepage featuring system with numbered positions
-- **AI-Generated Summaries**: Automatic content summarization via OpenAI
-- **Soft Deletion**: All records use archived flag instead of hard deletion
+### Content
+- **Universal Content Model**: Articles (markdown), external links, and success stories
+- **AI-Generated Summaries**: Automatic content summarization via OpenAI/Anthropic
+- **Category & Tagging System**: Dynamic categories and HABTM tags
+- **Markdown Support**: Full markdown rendering with syntax highlighting (Redcarpet + Rouge)
 
-### Community Features
+### Community (rubycommunity.org)
+- **Developer Profiles**: GitHub-synced profiles with bio, company, location, repositories
+- **Interactive Map**: Geocoded developer locations on a Leaflet.js world map
+- **Project Rankings**: GitHub repos with daily star trends and sorting (trending, top, new)
+- **Testimonials**: Users write why they love Ruby; AI generates headline/quote for the home page carousel
+- **Profile Settings**: Hide repositories, "Open to Work" badge, newsletter preferences
+
+### Multi-Domain
+- **whyruby.info**: Advocacy content, articles, success stories, testimonials
+- **rubycommunity.org**: Community profiles, map, project rankings
+- **Cross-domain auth**: OAuth via primary domain with single-use token session sync
+
+### Newsletter
+- **Timezone-aware delivery**: Sends at 10:10 AM local time per user
+- **Open tracking**: Pixel-based open tracking per version
+- **Unsubscribe**: One-click unsubscribe via token URL
+
+### Moderation
 - **Role-Based Access**: Member and admin roles
-- **Trusted User System**: Based on contribution count (3+ contents, 10+ comments)
+- **Trusted User System**: Based on contribution count (3+ posts, 10+ comments)
 - **Self-Regulation**: Trusted users can report inappropriate content
 - **Auto-Moderation**: Content auto-hidden after 3+ reports
-- **Markdown Support**: Full markdown rendering with syntax highlighting
 
 ## Setup
 
 ### Prerequisites
-- Ruby 4.0.0
+- Ruby 4.0.1
 - SQLite 3
 - Node.js (for JavaScript runtime)
 
@@ -79,12 +92,14 @@ Get credentials from:
 
 ## Running the Application
 
-Start the Rails server:
+Start the development server (runs Rails + Tailwind CSS watcher):
 ```bash
-rails server
+bin/dev
 ```
 
-Visit http://localhost:3000
+Visit http://localhost:3003
+
+**Important**: Always use `bin/dev` instead of `rails server`.
 
 ## Admin Access
 
@@ -100,24 +115,34 @@ Access the admin panel at `/admin`
 ## Architecture
 
 ### Models
-- **User**: GitHub OAuth authenticated users with roles
+- **User**: GitHub OAuth authenticated users with roles, geocoded location, timezone, profile settings
+- **Post**: Universal content model for articles, links, and success stories
 - **Category**: Content categories with position ordering
-- **Content**: Universal model for articles and links
 - **Tag**: Content tags with HABTM relationship
 - **Comment**: User comments on content
 - **Report**: Content reports from trusted users
+- **Testimonial**: User testimonials with AI-generated fields
+- **Project**: GitHub repositories with star counts and language
+- **StarSnapshot**: Daily star count snapshots for trend tracking
 
 ### Key Technologies
-- **Rails 8.1**: Latest Rails with Solid Stack
-- **SQLite with ULID**: Primary keys using ULID for better distribution
-- **Tailwind CSS 4**: Modern utility-first CSS framework
-- **Redcarpet + Rouge**: Markdown rendering with syntax highlighting
+- **Ruby 4.0.1 / Rails 8.2**: Latest Rails with Solid Stack
+- **SQLite with UUIDv7**: String primary keys for time-ordered uniqueness
+- **Tailwind CSS 4**: Utility-first CSS via `tailwindcss-rails`
+- **Hotwire (Turbo + Stimulus)**: Frontend interactivity, infinite scroll, interactive map
 - **Avo**: Admin interface for content management
 - **Kaminari**: Pagination
 - **SolidQueue**: Background job processing
+- **Leaflet.js**: Interactive community map
+- **Brakeman**: Security scanning (runs on every commit via lefthook)
 
 ### Background Jobs
 - `GenerateSummaryJob`: Creates AI summaries for new content
+- `GenerateTestimonialFieldsJob`: AI-generates headline, subheadline, and quote from testimonials
+- `ValidateTestimonialJob`: LLM-validates testimonial content
+- `UpdateGithubDataJob`: Refreshes user GitHub data via GraphQL API
+- `NormalizeLocationJob`: Geocodes user locations for the community map
+- `ScheduledNewsletterJob`: Timezone-aware newsletter delivery
 - `NotifyAdminJob`: Alerts admins when content is auto-hidden
 
 ## Development
@@ -127,10 +152,13 @@ Access the admin panel at `/admin`
 rails test
 ```
 
-### Code Style
+### Code Style & Security
 ```bash
-bundle exec rubocop
+bundle exec rubocop        # Lint
+bin/brakeman --no-pager     # Security scan
 ```
+
+Both run automatically on every commit via lefthook.
 
 ### Database Console
 ```bash

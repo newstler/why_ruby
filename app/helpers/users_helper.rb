@@ -1,4 +1,13 @@
 module UsersHelper
+  def linkify_company(company)
+    company.gsub(/@[\w-]+/) do |handle|
+      name = handle.delete_prefix("@")
+      link_to(handle, "https://github.com/#{name}", target: "_blank", rel: "noopener",
+        class: "text-gray-500 underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors",
+        data: { turbo_frame: "_top" })
+    end.html_safe
+  end
+
   def user_meta_title(user)
     user.display_name
   end
@@ -19,7 +28,7 @@ module UsersHelper
     if user.avatar_url.present?
       user.avatar_url
     else
-      versioned_og_image_url
+      versioned_og_image_url("og-image-community.png")
     end
   end
 end

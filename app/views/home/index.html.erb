@@ -1,54 +1,69 @@
 <%# Set page title for home page %>
 <% content_for(:title) { "Discover why Ruby continues to be a beloved language for developers worldwide" } %>
 
-<div class="space-y-16">
-  <!-- Hero Section -->
-  <div class="max-w-4xl  mx-auto flex flex-col items-center">
-    <%= image_tag "heart.webp", class: "w-32 md:w-64 h-32 md:h-64" %>
-    <p class="text-2xl md:text-6xl text-gray-600 font-bold text-center mt-8">
-      Discover why <span class="text-red-600">Ruby</span> continues to be a <span class="text-red-600">beloved language</span> for developers worldwide
-    </p>
+<%# Use minimal nav (centered logo only, community-style styling) %>
+<%= render "shared/minimal_nav", before_heart: "Why", after_heart: "Ruby?", url: root_path %>
 
-<!--    <p class="text-xl md:text-3xl text-gray-600 font-bold text-center mt-8">-->
-<!--      And share articles, tutorials, and resources with our community.-->
-<!--    </p>-->
-  </div>
+<div>
+  <%# Testimonial Carousel %>
+  <%= render "home/testimonial_carousel", testimonials: @testimonials %>
 
-  <!-- Pinned Posts -->
-  <% if @pinned_posts.any? %>
-    <div class="space-y-4">
-<!--      <h2 class="text-2xl font-bold text-gray-900">Featured Posts</h2>-->
-      <div class="hidden lg:flex gap-6">
-        <% # Split pinned posts into 3 columns for desktop, maintaining left-to-right order %>
-        <% pinned_cols = [[], [], []] %>
-        <% @pinned_posts.each_with_index do |post, index| %>
-          <% pinned_cols[index % 3] << post %>
+  <%# Navigation buttons + Sign in - same style as main nav %>
+  <%# Sticky on tablet+ (min-width: 640px AND min-height: 500px) but not horizontal phones %>
+  <div data-controller="sticky-nav">
+    <div class="mt-16 mb-16" data-sticky-nav-target="nav">
+      <%# Desktop/Tablet: show all buttons %>
+      <div class="hidden [@media(min-width:640px)_and_(min-height:500px)]:flex flex-wrap justify-center items-center gap-2">
+        <% Category.with_posts.ordered.each do |category| %>
+          <% next if category.is_success_story? && !has_success_stories? %>
+          <%= link_to category.name, category_path(category),
+              class: "text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
         <% end %>
-        
-        <% pinned_cols.each do |column_posts| %>
-          <div class="flex-1 space-y-6">
-            <% column_posts.each do |post| %>
-              <%= render 'posts/post_tile', post: post %>
-            <% end %>
-          </div>
+        <%= link_to "Community", community_index_url,
+            class: "text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
+        <% if should_show_mobile_cta? %>
+          <%= render "shared/github_signin_button" %>
         <% end %>
       </div>
-      
-      <% # Mobile view for pinned posts - simple grid %>
-      <div class="lg:hidden grid grid-cols-1 md:grid-cols-2 gap-6">
-        <% @pinned_posts.each do |post| %>
-          <%= render 'posts/post_tile', post: post %>
+
+      <%# Mobile: hamburger menu + sign in button %>
+      <div class="[@media(min-width:640px)_and_(min-height:500px)]:hidden flex justify-center items-center gap-3">
+        <div class="relative" data-controller="dropdown" data-action="click@window->dropdown#hide">
+          <button type="button"
+                  class="text-gray-600 bg-gray-100 hover:bg-gray-200 p-2 rounded-md cursor-pointer"
+                  data-action="click->dropdown#toggle"
+                  aria-label="Open navigation menu">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+
+          <div class="hidden absolute left-0 mt-2 w-48 rounded-md bg-white shadow-lg ring-1 ring-black/5 z-50" data-dropdown-target="menu">
+            <div class="py-1">
+              <% Category.with_posts.ordered.each do |category| %>
+                <% next if category.is_success_story? && !has_success_stories? %>
+                <%= link_to category.name, category_path(category),
+                    class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
+              <% end %>
+              <%= link_to "Community", community_index_url,
+                  class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
+            </div>
+          </div>
+        </div>
+
+        <% if should_show_mobile_cta? %>
+          <%= render "shared/github_signin_button" %>
         <% end %>
       </div>
     </div>
-  <% end %>
+  </div>
 </div>
 
 <!-- Success Stories Floating Logos (Full Width) -->
-<% if @success_stories.count >= 5 %>
-  <div class="py-8 md:py-16 bg-gray-50 my-8 md:my-16">
-    <h2 class="text-center text-sm font-semibold text-gray-600 tracking-wide uppercase mb-6 md:mb-12">
-      Success powered by Ruby
+<% if @success_stories.size >= 5 %>
+  <div class="py-8 md:py-16 bg-gray-50 my-4 md:my-8">
+    <h2 class="text-center text-sm font-semibold text-gray-300 tracking-wide uppercase mb-6 md:mb-12">
+      Read <%= link_to "success stories", category_path(Category.success_story_category), class: "text-gray-500 hover:text-red-600 transition-colors" %> from
     </h2>
     <div class="relative logo-carousel-container" data-controller="logo-carousel">
       <div class="overflow-hidden relative">
@@ -109,61 +124,28 @@
 
   <!-- Recent Posts -->
   <div class="space-y-4">
-    <h2 class="text-center text-sm font-semibold text-gray-600 tracking-wide uppercase my-8 md:my-16">Recent <span>♥️</span> shared</h2>
+    <h2 class="text-center text-sm font-semibold text-gray-300 tracking-wide uppercase my-8 md:my-16">Recent <span>♥️</span> shared</h2>
     <div class="hidden lg:flex gap-6">
-      <% # Split posts into 3 columns for desktop, maintaining left-to-right reading order %>
-      <% column1_posts = [] %>
-      <% column2_posts = [] %>
-      <% column3_posts = [] %>
-      
-      <% @posts.each_with_index do |post, index| %>
-        <% case index % 3 %>
-        <% when 0 %>
-          <% column1_posts << post %>
-        <% when 1 %>
-          <% column2_posts << post %>
-        <% when 2 %>
-          <% column3_posts << post %>
-        <% end %>
-      <% end %>
-      
       <% # Desktop: 3 columns %>
-      <% [column1_posts, column2_posts, column3_posts].each do |column_posts| %>
+      <% distribute_to_columns(@posts, num_columns: 3).each do |column_posts| %>
         <div class="flex-1 space-y-6">
-          <% column_posts.each do |post| %>
-            <%= render 'posts/post_tile', post: post %>
-          <% end %>
+          <%= render partial: 'posts/post_tile', collection: column_posts, as: :post %>
         </div>
       <% end %>
     </div>
-    
+
     <% # Tablet: 2 columns %>
     <div class="hidden md:flex lg:hidden gap-6">
-      <% column1_posts = [] %>
-      <% column2_posts = [] %>
-      
-      <% @posts.each_with_index do |post, index| %>
-        <% if index % 2 == 0 %>
-          <% column1_posts << post %>
-        <% else %>
-          <% column2_posts << post %>
-        <% end %>
-      <% end %>
-      
-      <% [column1_posts, column2_posts].each do |column_posts| %>
+      <% distribute_to_columns(@posts, num_columns: 2).each do |column_posts| %>
         <div class="flex-1 space-y-6">
-          <% column_posts.each do |post| %>
-            <%= render 'posts/post_tile', post: post %>
-          <% end %>
+          <%= render partial: 'posts/post_tile', collection: column_posts, as: :post %>
         </div>
       <% end %>
     </div>
     
     <% # Mobile: 1 column %>
     <div class="md:hidden space-y-6">
-      <% @posts.each do |post| %>
-        <%= render 'posts/post_tile', post: post %>
-      <% end %>
+      <%= render partial: 'posts/post_tile', collection: @posts, as: :post %>
     </div>
     
     <div class="mt-12 mb-8 text-center">

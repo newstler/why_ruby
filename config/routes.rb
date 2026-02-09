@@ -1,6 +1,23 @@
 Rails.application.routes.draw do
   devise_for :users, controllers: { omniauth_callbacks: "users/omniauth_callbacks" }
 
+  # Cross-domain auth routes (must be early)
+  get "auth/receive", to: "auth#receive"
+  get "auth/sign_out_receive", to: "auth#sign_out_receive"
+
+  # Production community domain: rubycommunity.org (users at root level /:username)
+  # Development fallback: localhost:3003/community/:id (see routes below)
+  # When linking to user profiles, use community_user_canonical_url(user) helper
+  # which resolves to the correct domain per environment.
+  constraints host: Rails.application.config.x.domains.community do
+    root "users#index", as: :rubycommunity_root
+    get "map_data", to: "users#map_data", as: :rubycommunity_map_data
+    # Redirect /community paths that may linger from old links or crawlers
+    get "community", to: redirect("/", status: 301)
+    get "community/:id", to: redirect("/%{id}", status: 301), constraints: { id: /[^\/]+/ }
+    get ":id", to: "users#show", as: :rubycommunity_user, constraints: { id: /[^\/]+/ }
+  end
+
   # Add sign out route for OmniAuth-only authentication
   devise_scope :user do
     delete "sign_out", to: "users/sessions#destroy", as: :destroy_user_session
@@ -23,8 +40,17 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  # Community routes
+  # In production, redirect /community paths on primary domain to rubycommunity.org
+  if Rails.env.production?
+    community_domain = Rails.application.config.x.domains.community
+    primary_host = { host: Rails.application.config.x.domains.primary }
+    get "community", to: redirect("https://#{community_domain}/", status: 301), constraints: primary_host
+    get "community/:id", to: redirect("https://#{community_domain}/%{id}", status: 301), constraints: primary_host
+  end
+
+  # Community routes — local development fallback for rubycommunity.org (see domain constraint above)
   get "community", to: "users#index", as: :users
+  get "community/map_data", to: "users#map_data", as: :community_map_data
   get "community/:id", to: "users#show", as: :user
 
   # Tags route (keeping as resources for now)
@@ -51,6 +77,25 @@ Rails.application.routes.draw do
   post "posts/:post_id/comments", to: "comments#create", as: :post_comments
   delete "posts/:post_id/comments/:id", to: "comments#destroy", as: :post_comment
   post "posts/:post_id/reports", to: "reports#create", as: :post_reports
+
+  # Testimonials (singular resource - one per user)
+  resource :testimonial, only: [ :create, :update ]
+
+  # User settings routes
+  resource :user_settings, only: [], controller: "user_settings" do
+    post :toggle_public, on: :collection
+    post :toggle_open_to_work, on: :collection
+    post :toggle_newsletter, on: :collection
+    post :hide_repo, on: :collection
+    post :unhide_repo, on: :collection
+  end
+
+  # Newsletter unsubscribe
+  get "newsletter/unsubscribe/:token", to: "newsletter_unsubscribes#show", as: :newsletter_unsubscribe
+  get "newsletter/open/:token", to: "newsletter_opens#show", as: :newsletter_open
+
+  # OG image preview pages (for screenshotting)
+  get "og-image-community", to: "users#og_image"
 
   # Legal pages (must be before catch-all routes)
   get "legal/privacy", to: "legal#show", defaults: { page: "privacy_policy" }, as: :privacy_policy

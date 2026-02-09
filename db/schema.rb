@@ -10,8 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_09_04_004652) do
-  create_table "active_storage_attachments", id: :string, force: :cascade do |t|
+ActiveRecord::Schema[8.2].define(version: 2026_02_08_192951) do
+  create_table "_litestream_lock", id: false, force: :cascade do |t|
+    t.integer "id"
+  end
+
+  create_table "_litestream_seq", id: :integer, default: nil, force: :cascade do |t|
+    t.integer "seq"
+  end
+
+  create_table "active_storage_attachments", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
     t.string "blob_id", null: false
     t.datetime "created_at", null: false
     t.string "name", null: false
@@ -21,7 +29,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_09_04_004652) do
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
 
-  create_table "active_storage_blobs", id: :string, force: :cascade do |t|
+  create_table "active_storage_blobs", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
     t.bigint "byte_size", null: false
     t.string "checksum"
     t.string "content_type"
@@ -33,13 +41,13 @@ ActiveRecord::Schema[8.1].define(version: 2025_09_04_004652) do
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
-  create_table "active_storage_variant_records", id: :string, force: :cascade do |t|
+  create_table "active_storage_variant_records", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
     t.string "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "admins", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
+  create_table "admins", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -51,7 +59,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_09_04_004652) do
     t.index ["reset_password_token"], name: "index_admins_on_reset_password_token", unique: true
   end
 
-  create_table "categories", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
+  create_table "categories", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
     t.boolean "is_success_story", default: false, null: false
@@ -65,7 +73,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_09_04_004652) do
     t.index ["slug"], name: "index_categories_on_slug"
   end
 
-  create_table "comments", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
+  create_table "comments", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
     t.text "body", null: false
     t.datetime "created_at", null: false
     t.string "post_id", null: false
@@ -89,8 +97,9 @@ ActiveRecord::Schema[8.1].define(version: 2025_09_04_004652) do
     t.index ["sluggable_type", "sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_type_and_sluggable_id"
   end
 
-  create_table "posts", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
+  create_table "posts", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
     t.string "category_id", null: false
+    t.integer "comments_count", default: 0, null: false
     t.text "content"
     t.datetime "created_at", null: false
     t.json "image_variants"
@@ -125,7 +134,27 @@ ActiveRecord::Schema[8.1].define(version: 2025_09_04_004652) do
     t.index ["tag_id"], name: "index_posts_tags_on_tag_id"
   end
 
-  create_table "reports", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
+  create_table "projects", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
+    t.boolean "archived", default: false, null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.integer "forks_count", default: 0, null: false
+    t.string "github_url", null: false
+    t.boolean "hidden", default: false, null: false
+    t.string "name", null: false
+    t.datetime "pushed_at"
+    t.integer "size", default: 0, null: false
+    t.integer "stars", default: 0, null: false
+    t.json "topics", default: []
+    t.datetime "updated_at", null: false
+    t.string "user_id", null: false
+    t.index ["archived"], name: "index_projects_on_archived"
+    t.index ["stars"], name: "index_projects_on_stars"
+    t.index ["user_id", "github_url"], name: "index_projects_on_user_id_and_github_url", unique: true
+    t.index ["user_id"], name: "index_projects_on_user_id"
+  end
+
+  create_table "reports", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
     t.string "post_id", null: false
@@ -137,7 +166,17 @@ ActiveRecord::Schema[8.1].define(version: 2025_09_04_004652) do
     t.index ["user_id"], name: "index_reports_on_user_id"
   end
 
-  create_table "tags", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
+  create_table "star_snapshots", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "project_id", null: false
+    t.date "recorded_on", null: false
+    t.integer "stars", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_id", "recorded_on"], name: "index_star_snapshots_on_project_id_and_recorded_on", unique: true
+    t.index ["recorded_on"], name: "index_star_snapshots_on_recorded_on"
+  end
+
+  create_table "tags", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name", null: false
     t.string "slug"
@@ -146,30 +185,66 @@ ActiveRecord::Schema[8.1].define(version: 2025_09_04_004652) do
     t.index ["slug"], name: "index_tags_on_slug"
   end
 
-  create_table "users", id: :string, default: -> { "ULID()" }, force: :cascade do |t|
+  create_table "testimonials", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
+    t.integer "ai_attempts", default: 0
+    t.text "ai_feedback"
+    t.text "body_text"
+    t.datetime "created_at", null: false
+    t.string "heading"
+    t.integer "position"
+    t.boolean "published", default: false
+    t.text "quote"
+    t.string "reject_reason"
+    t.string "subheading"
+    t.datetime "updated_at", null: false
+    t.string "user_id", null: false
+    t.index ["heading"], name: "index_testimonials_on_heading", unique: true
+    t.index ["position"], name: "index_testimonials_on_position"
+    t.index ["published"], name: "index_testimonials_on_published"
+    t.index ["user_id"], name: "index_testimonials_on_user_id", unique: true
+  end
+
+  create_table "users", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
     t.string "avatar_url"
     t.text "bio"
+    t.text "bio_html"
     t.string "company"
     t.datetime "created_at", null: false
+    t.string "cross_domain_token"
+    t.datetime "cross_domain_token_expires_at"
     t.string "email", null: false
     t.datetime "github_data_updated_at"
     t.integer "github_id", null: false
     t.text "github_repos"
     t.integer "github_repos_count"
     t.integer "github_stars_sum"
+    t.text "hidden_repos"
+    t.float "latitude"
     t.string "linkedin"
     t.string "location"
+    t.float "longitude"
     t.string "name"
+    t.json "newsletters_opened", default: []
+    t.json "newsletters_received", default: []
+    t.string "normalized_location"
+    t.boolean "open_to_work", default: false, null: false
+    t.boolean "public", default: true, null: false
     t.integer "published_comments_count", default: 0, null: false
     t.integer "published_posts_count", default: 0, null: false
     t.integer "role", default: 0, null: false
     t.string "slug"
+    t.integer "stars_gained", default: 0, null: false
+    t.string "timezone"
     t.string "twitter"
+    t.boolean "unsubscribed_from_newsletter", default: false, null: false
     t.datetime "updated_at", null: false
     t.string "username", null: false
     t.string "website"
+    t.index ["cross_domain_token"], name: "index_users_on_cross_domain_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["github_id"], name: "index_users_on_github_id", unique: true
+    t.index ["latitude", "longitude"], name: "index_users_on_coordinates"
+    t.index ["normalized_location"], name: "index_users_on_normalized_location"
     t.index ["slug"], name: "index_users_on_slug"
     t.index ["username"], name: "index_users_on_username", unique: true
   end
@@ -182,6 +257,8 @@ ActiveRecord::Schema[8.1].define(version: 2025_09_04_004652) do
   add_foreign_key "posts", "users"
   add_foreign_key "posts_tags", "posts"
   add_foreign_key "posts_tags", "tags"
+  add_foreign_key "projects", "users"
   add_foreign_key "reports", "posts"
   add_foreign_key "reports", "users"
+  add_foreign_key "star_snapshots", "projects"
 end

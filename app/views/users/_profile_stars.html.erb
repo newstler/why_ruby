@@ -1,0 +1,17 @@
+<%#
+  Profile stars display partial for Turbo Stream updates
+  Locals:
+    - user: the user to display stars for
+%>
+<div id="profile_stars">
+  <% total_stars = user.total_github_stars.to_i %>
+  <% if total_stars > 0 %>
+    <div class="relative inline-flex items-center text-amber-500">
+      <%= inline_svg_tag "star.svg", class: "w-6 h-6 mr-1.5" %>
+      <span class="font-bold text-gray-600 text-2xl"><%= total_stars %></span>
+      <% if user.stars_gained.to_i > 0 %>
+        <span class="absolute -top-3 -right-5 bg-green-500 text-white text-xs font-bold rounded-full px-1.5 min-w-[22px] text-center leading-[22px] shadow-sm" title="Stars gained since yesterday">+<%= user.stars_gained %></span>
+      <% end %>
+    </div>
+  <% end %>
+</div>

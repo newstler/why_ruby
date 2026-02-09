@@ -1,6 +1,8 @@
 # Cookie Policy
 
-**Last updated: August 14, 2025**
+**Last updated: February 1, 2026**
+
+This Cookie Policy applies to both **whyruby.info** and **rubycommunity.org**.
 
 ## What Are Cookies
 
@@ -18,12 +20,19 @@ These cookies are essential for the website to function properly:
 - **Security cookies**: Protect against cross-site request forgery (CSRF)
 - **Preference cookies**: Remember your settings and preferences
 
+### Cross-Domain Session Tokens
+To provide seamless authentication across both whyruby.info and rubycommunity.org, we use secure, short-lived tokens (not cookies) to synchronize your login status. These tokens:
+- Are transmitted via URL parameter, not stored as cookies
+- Expire after 30 seconds and can only be used once
+- Are immediately deleted after successful session synchronization
+- Contain only your user identifier, no additional personal data
+
 ### Analytics (No Cookies Required)
-We use Google Analytics 4 in cookieless mode to understand how visitors use our website and improve our services. This implementation:
-- Does not use any cookies for analytics tracking
-- Uses privacy-preserving methods to collect anonymous usage data
-- Tracks page views, session duration, and user interactions without storing data on your device
-- Complies with privacy regulations without requiring cookie consent
+We use [Nullitics](https://nullitics.com), a privacy-first analytics service, to understand how visitors use our website. Nullitics:
+- Does not use any cookies
+- Does not store IP addresses or personal data
+- Is fully compliant with GDPR, ePrivacy, PECR, CCPA, and COPPA
+- Does not require a cookie consent banner
 
 ### Cookies We Don't Use
 We do not use:
@@ -56,7 +65,7 @@ Disabling cookies may affect:
 We use the following third-party services that may set cookies:
 - **GitHub**: For authentication (see GitHub's privacy policy)
 
-Google Analytics operates in cookieless mode and does not set any cookies on your device.
+Nullitics does not use cookies or store any data on your device.
 
 These services operate according to their own privacy policies.
 

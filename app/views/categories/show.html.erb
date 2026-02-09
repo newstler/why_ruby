@@ -40,59 +40,37 @@
   <div class="space-y-4">
     <% if @posts.any? %>
       <div class="hidden lg:flex gap-6">
-        <% # Split posts into 3 columns for desktop, maintaining left-to-right reading order %>
-        <% column1_posts = [] %>
-        <% column2_posts = [] %>
-        <% column3_posts = [] %>
-        
-        <% @posts.each_with_index do |post, index| %>
-          <% case index % 3 %>
-          <% when 0 %>
-            <% column1_posts << post %>
-          <% when 1 %>
-            <% column2_posts << post %>
-          <% when 2 %>
-            <% column3_posts << post %>
-          <% end %>
-        <% end %>
-        
-        <% # Desktop: 3 columns %>
-        <% [column1_posts, column2_posts, column3_posts].each do |column_posts| %>
+        <% # Desktop: 3 columns - add button goes in the column where the next post would be %>
+        <% columns = distribute_to_columns(@posts, num_columns: 3) %>
+        <% add_button_column = @posts.size % 3 %>
+        <% columns.each_with_index do |column_posts, col_index| %>
           <div class="flex-1 space-y-6">
-            <% column_posts.each do |post| %>
-              <%= render 'posts/post_tile', post: post %>
+            <%= render partial: 'posts/post_tile', collection: column_posts, as: :post %>
+            <% if col_index == add_button_column %>
+              <%= render 'posts/add_post_tile', success_story: @category.is_success_story?, category: @category %>
             <% end %>
           </div>
         <% end %>
       </div>
-      
+
       <% # Tablet: 2 columns %>
       <div class="hidden md:flex lg:hidden gap-6">
-        <% column1_posts = [] %>
-        <% column2_posts = [] %>
-        
-        <% @posts.each_with_index do |post, index| %>
-          <% if index % 2 == 0 %>
-            <% column1_posts << post %>
-          <% else %>
-            <% column2_posts << post %>
-          <% end %>
-        <% end %>
-        
-        <% [column1_posts, column2_posts].each do |column_posts| %>
+        <% columns = distribute_to_columns(@posts, num_columns: 2) %>
+        <% add_button_column = @posts.size % 2 %>
+        <% columns.each_with_index do |column_posts, col_index| %>
           <div class="flex-1 space-y-6">
-            <% column_posts.each do |post| %>
-              <%= render 'posts/post_tile', post: post %>
+            <%= render partial: 'posts/post_tile', collection: column_posts, as: :post %>
+            <% if col_index == add_button_column %>
+              <%= render 'posts/add_post_tile', success_story: @category.is_success_story?, category: @category %>
             <% end %>
           </div>
         <% end %>
       </div>
-      
+
       <% # Mobile: 1 column %>
       <div class="md:hidden space-y-6">
-        <% @posts.each do |post| %>
-          <%= render 'posts/post_tile', post: post %>
-        <% end %>
+        <%= render partial: 'posts/post_tile', collection: @posts, as: :post %>
+        <%= render 'posts/add_post_tile', success_story: @category.is_success_story?, category: @category %>
       </div>
       
       <div class="mt-12 mb-8 text-center">

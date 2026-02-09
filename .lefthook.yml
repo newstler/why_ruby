@@ -13,3 +13,5 @@ pre-commit:
         fi
       # This runs RuboCop with auto-fix on the entire project
       # and automatically stages ALL fixed files
+    brakeman:
+      run: bin/brakeman --no-pager

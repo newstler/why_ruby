@@ -1,0 +1,56 @@
+<%#
+  Gem-shaped avatar partial
+  Locals:
+    - user: the user to display
+    - size: size class (e.g., "w-20 h-20", "w-32 h-32")
+    - text_size: text size for initials fallback (e.g., "text-3xl", "text-5xl")
+    - show_open_to_work: whether to show the "Open to Work" badge (default: true if user.open_to_work?)
+    - badge_size: "small" for compact badge, default is normal size
+    - thick_border: true for thicker borders (useful for small avatars in nav)
+%>
+<% avatar_id = "gem-avatar-#{user.id}" %>
+<% show_badge = local_assigns.key?(:show_open_to_work) ? show_open_to_work : user.open_to_work? %>
+<% small_badge = local_assigns[:badge_size] == "small" %>
+<% tiny_badge = local_assigns[:badge_size] == "tiny" %>
+<% map_badge = local_assigns[:badge_size] == "map" %>
+<% thick_border = local_assigns[:thick_border] == true %>
+<div class="<%= size %> flex-shrink-0 relative overflow-visible">
+  <svg class="absolute inset-[-3px] w-[calc(100%+6px)] h-[calc(100%+6px)]" viewBox="0 0 200 180" preserveAspectRatio="xMidYMid meet" overflow="visible">
+    <defs>
+      <clipPath id="<%= avatar_id %>">
+        <path d="M56.6.55h86.84c6.79,0,13.13,3.39,16.9,9.04l36.26,54.34c5.26,7.89,4.37,18.37-2.15,25.25l-79.68,84.14c-8.01,8.46-21.49,8.46-29.51,0L5.59,89.18c-6.52-6.88-7.41-17.36-2.15-25.25L39.7,9.59C43.47,3.94,49.81.55,56.6.55Z"/>
+      </clipPath>
+    </defs>
+    <% if user.avatar_url.present? %>
+      <image href="<%= user.avatar_url %>" width="200" height="180" clip-path="url(#<%= avatar_id %>)" preserveAspectRatio="xMidYMid slice"/>
+    <% else %>
+      <rect width="200" height="180" fill="#d1d5db" clip-path="url(#<%= avatar_id %>)"/>
+      <text x="100" y="100" text-anchor="middle" dominant-baseline="middle" fill="#374151" font-weight="bold" font-size="72">
+        <%= user.display_name.first.upcase %>
+      </text>
+    <% end %>
+    <!-- Inner white border -->
+    <path d="M56.6.55h86.84c6.79,0,13.13,3.39,16.9,9.04l36.26,54.34c5.26,7.89,4.37,18.37-2.15,25.25l-79.68,84.14c-8.01,8.46-21.49,8.46-29.51,0L5.59,89.18c-6.52-6.88-7.41-17.36-2.15-25.25L39.7,9.59C43.47,3.94,49.81.55,56.6.55Z" fill="none" stroke="white" stroke-width="<%= map_badge ? 14 : (thick_border ? 12 : 8) %>"/>
+    <!-- Outer colored border -->
+    <path class="<%= local_assigns[:border_color] || 'text-gray-200 group-hover:text-red-600 transition-colors' %>" d="M56.6.55h86.84c6.79,0,13.13,3.39,16.9,9.04l36.26,54.34c5.26,7.89,4.37,18.37-2.15,25.25l-79.68,84.14c-8.01,8.46-21.49,8.46-29.51,0L5.59,89.18c-6.52-6.88-7.41-17.36-2.15-25.25L39.7,9.59C43.47,3.94,49.81.55,56.6.55Z" fill="none" stroke="currentColor" stroke-width="<%= map_badge ? 8 : (thick_border ? 10 : 6) %>"/>
+  </svg>
+
+  <%# "Open to Work" badge - positioned at bottom of avatar %>
+  <% if show_badge %>
+    <% if map_badge %>
+      <div class="absolute -bottom-[1px] left-1/2 -translate-x-1/2 z-10">
+        <span class="inline-block px-[2.5px] py-[0.5px] text-[4px] font-bold uppercase tracking-wide text-white bg-red-600 rounded-full whitespace-nowrap" style="line-height:1.2;letter-spacing:0.3px;">Open to work</span>
+      </div>
+    <% elsif tiny_badge %>
+      <div class="absolute -bottom-[1px] left-1/2 -translate-x-1/2 z-10">
+        <span class="inline-block px-[3px] py-[0.5px] text-[5px] font-bold uppercase tracking-wide text-white bg-red-600 rounded-full whitespace-nowrap" style="line-height:1.2;letter-spacing:0.3px;">Open to work</span>
+      </div>
+    <% else %>
+      <div class="absolute <%= small_badge ? 'bottom-0' : 'bottom-1' %> left-1/2 -translate-x-1/2 z-10">
+        <span class="inline-block <%= small_badge ? 'px-1.5 py-px text-[8px]' : 'px-2 py-0.5 text-[10px]' %> font-bold uppercase tracking-wide text-white bg-red-600 rounded-full whitespace-nowrap shadow-sm">
+          Open to work
+        </span>
+      </div>
+    <% end %>
+  <% end %>
+</div>

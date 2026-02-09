@@ -1,5 +1,7 @@
-<%# Set page title %>
-<% content_for(:title) { user_meta_title(@user) } %>
+<%# Set page title for community user profile %>
+<% content_for(:full_title) { community_page_title(user_meta_title(@user)) } %>
+
+<%= render "users/community_nav" %>
 
 <%# Override meta tags for this user profile %>
 <% content_for :head do %>
@@ -7,157 +9,128 @@
   <meta name="description" content="<%= user_meta_description(@user) %>">
   <meta name="keywords" content="<%= user_meta_keywords(@user) %>">
   <meta name="author" content="<%= user_meta_title(@user) %>">
-  <link rel="canonical" href="<%= user_url(@user) %>">
-  
+  <link rel="canonical" href="<%= community_user_canonical_url(@user) %>">
+
   <!-- Open Graph / Facebook Meta Tags -->
   <meta property="og:type" content="profile">
-  <meta property="og:url" content="<%= user_url(@user) %>">
-  <meta property="og:title" content="<%= full_page_title(user_meta_title(@user)) %>">
+  <meta property="og:url" content="<%= community_user_canonical_url(@user) %>">
+  <meta property="og:title" content="<%= community_page_title(user_meta_title(@user)) %>">
   <meta property="og:description" content="<%= user_meta_description(@user) %>">
   <meta property="og:image" content="<%= user_meta_image_url(@user) %>">
-  <meta property="og:site_name" content="<%= t('meta.site.name') %>">
+  <meta property="og:site_name" content="<%= t('meta.community.site_name') %>">
   <meta property="og:locale" content="<%= I18n.locale.to_s.gsub('-', '_') %>">
-  
+
   <!-- Twitter Card Meta Tags -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:url" content="<%= user_url(@user) %>">
-  <meta name="twitter:title" content="<%= full_page_title(user_meta_title(@user)) %>">
+  <meta name="twitter:url" content="<%= community_user_canonical_url(@user) %>">
+  <meta name="twitter:title" content="<%= community_page_title(user_meta_title(@user)) %>">
   <meta name="twitter:description" content="<%= user_meta_description(@user) %>">
   <meta name="twitter:image" content="<%= user_meta_image_url(@user) %>">
   <meta name="twitter:site" content="<%= t('meta.social.twitter_site') %>">
   <meta name="twitter:creator" content="<%= t('meta.social.twitter_creator') %>">
 <% end %>
 
-<div class="space-y-8">
+<div class="space-y-8 mt-6">
   <!-- Tabbed Content Section -->
-  <div data-controller="tabs">
+  <div>
+    <!-- User Info + Testimonial Row -->
+    <div class="flex flex-col lg:flex-row lg:gap-8">
+      <!-- User Info (left side) -->
+      <div class="lg:flex-1 min-w-0">
     <!-- Tab Navigation with User Info -->
     <div>
-      <!-- Desktop layout: side by side -->
-      <div class="hidden lg:flex items-end justify-between gap-8">
-        <!-- User info on the left -->
-        <div class="flex items-center gap-6">
-          <% if @user.avatar_url.present? %>
-            <%= image_tag @user.avatar_url, alt: @user.display_name, class: "h-32 w-32 rounded-full flex-shrink-0" %>
-          <% else %>
-            <span class="h-32 w-32 rounded-full bg-gray-300 flex items-center justify-center text-5xl font-bold flex-shrink-0">
-              <%= @user.display_name.first.upcase %>
-            </span>
-          <% end %>
-          
-          <div class="flex flex-col justify-center">
-            <!-- First line: Name and social links -->
-            <div class="flex items-baseline gap-3 mb-2">
-              <h1 class="text-4xl font-black text-gray-900"><%= @user.display_name %></h1>
-              
-              <!-- Social Links -->
-              <% if @user.social_links.any? %>
-                <div class="flex items-center gap-2 pb-1">
-                  <% @user.social_links.each do |platform, url| %>
-                    <% next unless url.present? %>
-                    <%= link_to url, target: "_blank", rel: "noopener", class: "text-gray-400 hover:text-gray-600" do %>
-                      <% case platform %>
-                      <% when :github %>
-                        <%= inline_svg_tag "github.svg", class: "w-5 h-5" %>
-                      <% when :twitter %>
-                        <%= inline_svg_tag "twitter.svg", class: "w-5 h-5" %>
-                      <% when :website %>
-                        <%= inline_svg_tag "globe.svg", class: "w-5 h-5" %>
-                      <% when :linkedin %>
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                        </svg>
+      <!-- Desktop/Tablet layout -->
+      <div class="hidden md:block">
+        <div class="flex items-start gap-6">
+          <%= render "users/profile_avatar", user: @user, wrapper_id: "profile_avatar_desktop", size: "w-36 h-[130px]", text_size: "text-5xl" %>
+
+          <% total_stars = @user.total_github_stars.to_i %>
+          <div class="flex flex-col flex-1">
+            <!-- First line: Name, social links, and stars -->
+            <div class="flex items-baseline justify-between gap-3 mb-2">
+              <div class="flex items-baseline gap-3">
+                <h1 class="text-4xl font-black text-gray-900"><%= @user.display_name %></h1>
+
+                <!-- Social Links -->
+                <% if @user.social_links.any? %>
+                  <div class="flex items-center gap-2 pb-1">
+                    <% @user.social_links.each do |platform, url| %>
+                      <% next unless url.present? %>
+                      <%= link_to url, target: "_blank", rel: "noopener", class: "text-gray-400 hover:text-gray-600" do %>
+                        <% case platform %>
+                        <% when :github %>
+                          <%= inline_svg_tag "github.svg", class: "w-5 h-5" %>
+                        <% when :twitter %>
+                          <%= inline_svg_tag "twitter.svg", class: "w-5 h-5" %>
+                        <% when :website %>
+                          <%= inline_svg_tag "globe.svg", class: "w-5 h-5" %>
+                        <% when :linkedin %>
+                          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                          </svg>
+                        <% end %>
                       <% end %>
                     <% end %>
-                  <% end %>
-                </div>
-              <% end %>
+                  </div>
+                <% end %>
+              </div>
+              <%= render "users/profile_stars", user: @user %>
             </div>
             
             <!-- Second line: Bio -->
             <% if @user.bio.present? %>
-              <p class="text-gray-700 mb-2"><%= @user.bio %></p>
+              <p class="text-gray-700 mb-2 lg:max-w-[66%]"<% if current_user == @user %> title="To update your bio, company, location or contacts, edit them on GitHub — changes sync here automatically within a day."<% end %>><%= sanitize(@user.bio_html.presence || linkify_bio(@user.bio), tags: %w[a], attributes: %w[href target rel class]) %></p>
             <% end %>
-            
-            <!-- Third line: Location and Company -->
+
+            <!-- Third line: Company and Location -->
             <div class="flex items-center gap-4 text-sm text-gray-400">
-              <% if @user.location.present? %>
-                <%= link_to users_path(location: @user.location), class: "flex items-center hover:text-gray-600 transition-colors" do %>
-                  <%= inline_svg_tag "location.svg", class: "w-4 h-4 mr-1" %>
-                  <%= @user.location %>
-                <% end %>
-              <% end %>
-              
               <% if @user.company.present? %>
-                <%= link_to users_path(company: @user.company), class: "flex items-center hover:text-gray-600 transition-colors" do %>
+                <%= link_to community_index_path(company: @user.company), class: "flex items-center hover:text-gray-600 transition-colors" do %>
                   <%= inline_svg_tag "building.svg", class: "w-4 h-4 mr-1" %>
                   <%= @user.company %>
                 <% end %>
               <% end %>
+
+              <% if @user.location.present? %>
+                <%= link_to community_index_path(location: @user.normalized_location || @user.location), class: "flex items-center hover:text-gray-600 transition-colors" do %>
+                  <%= inline_svg_tag "location.svg", class: "w-4 h-4 mr-1" %>
+                  <%= @user.location %>
+                <% end %>
+              <% end %>
             </div>
           </div>
+
+          <!-- Right side: Settings (only for owner) -->
+          <% if current_user == @user %>
+            <div class="ml-auto self-start pl-8">
+              <%= render "users/profile_settings", user: @user, wrapper_id: "profile_settings_desktop" %>
+            </div>
+          <% end %>
         </div>
-        
-        <!-- Tabs on the right, aligned to bottom -->
-        <nav class="flex flex-wrap gap-x-8 gap-y-2 flex-shrink-0" aria-label="Tabs">
-          <a href="#"
-             data-tabs-target="tab"
-             data-tabs-name="projects"
-             data-action="click->tabs#switch"
-             class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-4 px-1 border-b-4 border-transparent font-semibold text-lg md:text-xl lg:text-2xl transition-all duration-200 flex items-center gap-2"
-             role="tab"
-             aria-selected="false">
-            <span>Projects</span>
-            <span class="bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full text-sm md:text-base font-semibold">
-              <%= @ruby_repos.size %>
-            </span>
-          </a>
-          
-          <a href="#"
-             data-tabs-target="tab"
-             data-tabs-name="posts"
-             data-action="click->tabs#switch"
-             class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-4 px-1 border-b-4 border-transparent font-semibold text-lg md:text-xl lg:text-2xl transition-all duration-200 flex items-center gap-2"
-             role="tab"
-             aria-selected="false">
-            <span>Posts</span>
-            <span id="posts-count-desktop" class="bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full text-sm md:text-base font-semibold">
-              <%= @user.published_posts_count %>
-            </span>
-          </a>
-          
-          <a href="#"
-             data-tabs-target="tab"
-             data-tabs-name="comments"
-             data-action="click->tabs#switch"
-             class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-4 px-1 border-b-4 border-transparent font-semibold text-lg md:text-xl lg:text-2xl transition-all duration-200 flex items-center gap-2"
-             role="tab"
-             aria-selected="false">
-            <span>Comments</span>
-            <span class="bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full text-sm md:text-base font-semibold">
-              <%= @user.published_comments_count %>
-            </span>
-          </a>
-        </nav>
       </div>
-      
-      <!-- Mobile/Tablet layout: stacked -->
-      <div class="lg:hidden">
+
+      <!-- Mobile layout: stacked -->
+      <div class="md:hidden">
         <!-- User info full width on top -->
-        <div class="mb-6">
+        <div class="mb-3 md:mb-6">
           <div class="flex items-center gap-4 mb-4">
-            <% if @user.avatar_url.present? %>
-              <%= image_tag @user.avatar_url, alt: @user.display_name, class: "h-24 w-24 rounded-full flex-shrink-0" %>
-            <% else %>
-              <span class="h-24 w-24 rounded-full bg-gray-300 flex items-center justify-center text-4xl font-bold flex-shrink-0">
-                <%= @user.display_name.first.upcase %>
-              </span>
-            <% end %>
+            <%= render "users/profile_avatar", user: @user, wrapper_id: "profile_avatar_mobile", size: "w-28 h-[100px]", text_size: "text-4xl" %>
             
             <div class="flex-1">
-              <!-- Name and social links -->
-              <h1 class="text-3xl font-bold text-gray-900 mb-1"><%= @user.display_name %></h1>
-              
+              <!-- Name and stars row -->
+              <div class="flex items-baseline justify-between gap-2 mb-1">
+                <h1 class="text-3xl font-bold text-gray-900"><%= @user.display_name %></h1>
+                <% if total_stars > 0 %>
+                  <span class="relative flex items-center text-amber-500 whitespace-nowrap flex-shrink-0">
+                    <%= inline_svg_tag "star.svg", class: "w-5 h-5 mr-1" %>
+                    <span class="font-bold text-gray-600 text-lg"><%= total_stars %></span>
+                    <% if @user.stars_gained.to_i > 0 %>
+                      <span class="absolute -top-2.5 -right-2 bg-green-500 text-white text-[10px] font-bold rounded-full px-1 min-w-[18px] text-center leading-[18px] shadow-sm" title="Stars gained since yesterday">+<%= @user.stars_gained %></span>
+                    <% end %>
+                  </span>
+                <% end %>
+              </div>
+
               <!-- Social Links -->
               <% if @user.social_links.any? %>
                 <div class="flex items-center gap-2">
@@ -185,154 +158,166 @@
           
           <!-- Bio -->
           <% if @user.bio.present? %>
-            <p class="text-gray-700 mb-3"><%= @user.bio %></p>
+            <p class="text-gray-700 mb-3"<% if current_user == @user %> title="To update your bio, company, location or contacts, edit them on GitHub — changes sync here automatically within a day."<% end %>><%= sanitize(@user.bio_html.presence || linkify_bio(@user.bio), tags: %w[a], attributes: %w[href target rel class]) %></p>
           <% end %>
-          
-          <!-- Location and Company -->
+
+          <!-- Company and Location -->
           <div class="flex items-center gap-4 text-sm text-gray-400">
-            <% if @user.location.present? %>
-              <%= link_to users_path(location: @user.location), class: "flex items-center hover:text-gray-600 transition-colors" do %>
-                <%= inline_svg_tag "location.svg", class: "w-4 h-4 mr-1" %>
-                <%= @user.location %>
-              <% end %>
-            <% end %>
-            
             <% if @user.company.present? %>
-              <%= link_to users_path(company: @user.company), class: "flex items-center hover:text-gray-600 transition-colors" do %>
+              <%= link_to community_index_path(company: @user.company), class: "flex items-center hover:text-gray-600 transition-colors" do %>
                 <%= inline_svg_tag "building.svg", class: "w-4 h-4 mr-1" %>
                 <%= @user.company %>
               <% end %>
             <% end %>
+
+            <% if @user.location.present? %>
+              <%= link_to community_index_path(location: @user.normalized_location || @user.location), class: "flex items-center hover:text-gray-600 transition-colors" do %>
+                <%= inline_svg_tag "location.svg", class: "w-4 h-4 mr-1" %>
+                <%= @user.location %>
+              <% end %>
+            <% end %>
           </div>
+
+          <% if current_user == @user %>
+            <div class="mt-4">
+              <%= render "users/profile_settings", user: @user, wrapper_id: "profile_settings_mobile" %>
+            </div>
+          <% end %>
         </div>
-        
-        <!-- Tabs left-aligned below -->
-        <nav class="flex gap-x-6" aria-label="Tabs">
-          <a href="#"
-             data-tabs-target="tab"
-             data-tabs-name="projects"
-             data-action="click->tabs#switch"
-             class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-3 px-1 border-b-2 border-transparent font-semibold text-base transition-all duration-200 flex items-center gap-2"
-             role="tab"
-             aria-selected="false">
-            <span>Projects</span>
-            <span class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full text-xs font-semibold">
-              <%= @ruby_repos.size %>
-            </span>
-          </a>
-          
-          <a href="#"
-             data-tabs-target="tab"
-             data-tabs-name="posts"
-             data-action="click->tabs#switch"
-             class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-3 px-1 border-b-2 border-transparent font-semibold text-base transition-all duration-200 flex items-center gap-2"
-             role="tab"
-             aria-selected="false">
-            <span>Posts</span>
-            <span id="posts-count-mobile" class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full text-xs font-semibold">
-              <%= @user.published_posts_count %>
-            </span>
-          </a>
-          
-          <a href="#"
-             data-tabs-target="tab"
-             data-tabs-name="comments"
-             data-action="click->tabs#switch"
-             class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-3 px-1 border-b-2 border-transparent font-semibold text-base transition-all duration-200 flex items-center gap-2"
-             role="tab"
-             aria-selected="false">
-            <span>Comments</span>
-            <span class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full text-xs font-semibold">
-              <%= @user.published_comments_count %>
-            </span>
-          </a>
-        </nav>
       </div>
     </div>
+      </div><!-- end user info left side -->
+
+    </div><!-- end flex row -->
+
+    <%# Testimonial Section %>
+    <% testimonial = @user.testimonial %>
+    <% if current_user == @user %>
+      <%= render "testimonials/section", testimonial: testimonial, user: @user %>
+    <% elsif testimonial&.published? %>
+      <div class="md:mt-6 lg:mt-6 mb-10 md:mb-12 lg:mb-8">
+        <h2 class="text-sm md:text-xl font-bold text-gray-300 mb-16 md:mb-16 lg:mb-14">loves Ruby because of...</h2>
+        <%= render "testimonials/testimonial", testimonial: testimonial %>
+      </div>
+    <% end %>
+
+    <turbo-frame id="profile-tabs" target="_top" data-turbo-action="advance">
+    <div data-controller="tabs">
+    <!-- Tab Navigation -->
+    <% has_projects = @ruby_repos.any? || @hidden_repos.any? %>
+    <% has_posts = @user.published_posts_count > 0 %>
+    <% has_comments = @user.published_comments_count > 0 %>
+    <% if has_projects || has_posts || has_comments %>
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between mt-14">
+    <nav class="flex flex-wrap gap-x-6 lg:gap-x-8 gap-y-2" aria-label="Tabs">
+      <% if has_projects %>
+      <a href="#"
+         data-tabs-target="tab"
+         data-tabs-name="projects"
+         data-action="click->tabs#switch"
+         class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-3 lg:py-4 px-1 border-b-2 lg:border-b-4 border-transparent font-semibold text-base lg:text-2xl transition-all duration-200 flex items-center gap-2"
+         role="tab"
+         aria-selected="false">
+        <span>Projects</span>
+        <span id="projects_count" class="bg-gray-100 text-gray-700 px-2 lg:px-2.5 py-0.5 rounded-full text-xs lg:text-base font-semibold">
+          <%= @ruby_repos.size %>
+        </span>
+      </a>
+      <% end %>
+
+      <% if has_posts %>
+      <a href="#"
+         data-tabs-target="tab"
+         data-tabs-name="posts"
+         data-action="click->tabs#switch"
+         class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-3 lg:py-4 px-1 border-b-2 lg:border-b-4 border-transparent font-semibold text-base lg:text-2xl transition-all duration-200 flex items-center gap-2"
+         role="tab"
+         aria-selected="false">
+        <span>Posts</span>
+        <span id="posts-count" class="bg-gray-100 text-gray-700 px-2 lg:px-2.5 py-0.5 rounded-full text-xs lg:text-base font-semibold">
+          <%= @user.published_posts_count %>
+        </span>
+      </a>
+      <% end %>
+
+      <% if has_comments %>
+      <a href="#"
+         data-tabs-target="tab"
+         data-tabs-name="comments"
+         data-action="click->tabs#switch"
+         class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-3 lg:py-4 px-1 border-b-2 lg:border-b-4 border-transparent font-semibold text-base lg:text-2xl transition-all duration-200 flex items-center gap-2"
+         role="tab"
+         aria-selected="false">
+        <span>Comments</span>
+        <span class="bg-gray-100 text-gray-700 px-2 lg:px-2.5 py-0.5 rounded-full text-xs lg:text-base font-semibold">
+          <%= @user.published_comments_count %>
+        </span>
+      </a>
+      <% end %>
+    </nav>
+
+    <% if has_projects && @ruby_repos.size > 1 %>
+      <%
+        project_sort_options = {
+          "fresh"    => { label: "Recently Active", reverse: "Least Recent" },
+          "trending" => { label: "Trending",        reverse: "Least Trending" },
+          "stars"    => { label: "Top Stars",        reverse: "Fewest Stars" },
+          "az"       => { label: "A-Z",              reverse: "Z-A" }
+        }
+        # Button label shows current state
+        current_opt = project_sort_options[@project_sort] || project_sort_options["fresh"]
+        closed_label = if @project_sort == "az"
+          @project_dir == "asc" ? current_opt[:label] : current_opt[:reverse]
+        else
+          @project_dir == "asc" ? current_opt[:reverse] : current_opt[:label]
+        end
+      %>
+      <div data-tabs-target="tabExtra" data-tabs-name="projects" class="hidden mt-3 md:mt-0 md:mb-3">
+        <div class="relative" data-controller="dropdown">
+          <button type="button" class="flex items-center gap-x-1 text-sm rounded-full cursor-pointer bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 px-3 py-2" data-action="click->dropdown#toggle click@window->dropdown#hide">
+            <span class="text-gray-400">Sort:</span>
+            <span class="text-gray-700 font-medium"><%= closed_label %></span>
+            <%= inline_svg_tag "chevron-down.svg", class: "ml-1 h-5 w-5 text-gray-400" %>
+          </button>
+
+          <div class="hidden absolute z-50 mt-2 w-48 divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none right-0 origin-top-right" data-dropdown-target="menu">
+            <div class="py-1">
+              <% project_sort_options.each do |key, opt| %>
+                <%
+                  is_current = (@project_sort == key)
+                  if is_current
+                    # Show opposite label; toggle direction
+                    menu_label = (@project_dir == "asc") ? opt[:label] : opt[:reverse]
+                    next_dir = (@project_dir == "asc") ? "desc" : "asc"
+                  else
+                    menu_label = opt[:label]
+                    next_dir = (key == "az") ? "asc" : "desc"
+                  end
+                %>
+                <%= link_to menu_label, community_user_path(@user, project_sort: key, project_dir: next_dir),
+                    class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none cursor-pointer",
+                    data: { turbo_frame: "profile-tabs" } %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+    </div>
+    <% end %>
 
     <!-- Tab Panels -->
+    <% if has_projects || has_posts || has_comments %>
     <div class="mt-8">
       <!-- Projects Tab Panel -->
+      <% if has_projects || @hidden_repos.any? %>
       <div data-tabs-target="panel" data-tabs-name="projects" role="tabpanel" class="hidden">
-        <% if @ruby_repos.any? %>
-          <div class="space-y-4">
-            <!-- Desktop: 3 columns -->
-            <div class="hidden lg:flex gap-6">
-              <% # Split repositories into 3 columns for desktop, maintaining left-to-right reading order %>
-              <% column1_repos = [] %>
-              <% column2_repos = [] %>
-              <% column3_repos = [] %>
-              
-              <% @ruby_repos.each_with_index do |repo, index| %>
-                <% case index % 3 %>
-                <% when 0 %>
-                  <% column1_repos << repo %>
-                <% when 1 %>
-                  <% column2_repos << repo %>
-                <% when 2 %>
-                  <% column3_repos << repo %>
-                <% end %>
-              <% end %>
-              
-              <% [column1_repos, column2_repos, column3_repos].each do |column_repos| %>
-                <div class="flex-1 space-y-6">
-                  <% column_repos.each do |repository| %>
-                    <%= render 'users/repository_tile', repository: repository %>
-                  <% end %>
-                </div>
-              <% end %>
-            </div>
-            
-            <!-- Tablet: 2 columns -->
-            <div class="hidden md:flex lg:hidden gap-6">
-              <% column1_repos = [] %>
-              <% column2_repos = [] %>
-              
-              <% @ruby_repos.each_with_index do |repo, index| %>
-                <% if index % 2 == 0 %>
-                  <% column1_repos << repo %>
-                <% else %>
-                  <% column2_repos << repo %>
-                <% end %>
-              <% end %>
-              
-              <% [column1_repos, column2_repos].each do |column_repos| %>
-                <div class="flex-1 space-y-6">
-                  <% column_repos.each do |repository| %>
-                    <%= render 'users/repository_tile', repository: repository %>
-                  <% end %>
-                </div>
-              <% end %>
-            </div>
-            
-            <!-- Mobile: 1 column -->
-            <div class="md:hidden space-y-6">
-              <% @ruby_repos.each do |repository| %>
-                <%= render 'users/repository_tile', repository: repository %>
-              <% end %>
-            </div>
-            
-            <% if @user.github_ruby_repositories_url.present? %>
-              <div class="mt-8 text-center">
-                <%= link_to t('users.show.view_all_repositories'), safe_external_url(@user.github_ruby_repositories_url), 
-                    target: "_blank", rel: "noopener", class: "text-gray-400 hover:text-gray-600" %>
-              </div>
-            <% end %>
-          </div>
-        <% else %>
-          <div class="bg-white shadow rounded-lg p-8 text-center">
-            <p class="text-gray-600"><%= t('users.show.no_ruby_projects') %></p>
-            <% if @user.github_profile_url.present? %>
-              <p class="mt-2">
-                <%= link_to t('users.show.view_github_profile'), safe_external_url(@user.github_profile_url), 
-                    target: "_blank", rel: "noopener", class: "text-gray-600 hover:text-gray-800" %>
-              </p>
-            <% end %>
-          </div>
-        <% end %>
+        <%= render "users/projects_panel", ruby_repos: @ruby_repos, hidden_repos: @hidden_repos, user: @user %>
       </div>
+      <% end %>
 
       <!-- Posts Tab Panel -->
+      <% if has_posts %>
       <div data-tabs-target="panel" data-tabs-name="posts" role="tabpanel" class="hidden">
         <% if @posts.any? %>
           <div class="space-y-4">
@@ -402,8 +387,10 @@
           </div>
         <% end %>
       </div>
+      <% end %>
 
       <!-- Comments Tab Panel -->
+      <% if has_comments %>
       <div data-tabs-target="panel" data-tabs-name="comments" role="tabpanel" class="hidden">
         <% if @comments && @comments.any? %>
           <div class="space-y-4">
@@ -473,6 +460,12 @@
           </div>
         <% end %>
       </div>
+      <% end %>
     </div>
+    <% end %>
+    </div>
+    </turbo-frame>
   </div>
+
+</div>
 </div>

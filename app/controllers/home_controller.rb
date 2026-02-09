@@ -13,5 +13,6 @@ class HomeController < ApplicationController
                            .published
                            .includes(:user)
                            .order(created_at: :desc)
+    @testimonials = Testimonial.published.includes(:user).order(Arel.sql("RANDOM()")).limit(20)
   end
 end

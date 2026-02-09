@@ -6,7 +6,7 @@ gem "rails", github: "rails/rails", branch: "main"
 gem "propshaft"
 # Use sqlite3 as the database for Active Record
 gem "sqlite3", ">= 2.1"
-gem "sqlite-ulid"
+gem "sqlean", "~> 0.2"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
@@ -56,8 +56,15 @@ gem "anthropic", "~> 1.6.0"
 # Pagination
 gem "kaminari", "~> 1.2"
 
+# IP Geolocation (for analytics country code)
+gem "geocoder", "~> 1.8"
+gem "maxminddb", "~> 0.1"
+
 # Friendly URLs
 gem "friendly_id", "~> 5.5"
+
+# Timezone lookup from coordinates (offline, pure Ruby)
+gem "wheretz"
 
 # HTML/XML parsing
 gem "nokogiri", "~> 1.16"
@@ -87,6 +94,7 @@ group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"
+  gem "webmock"
 end
 
 # Backup data to S3
@@ -94,3 +102,5 @@ gem "litestream", "~> 0.14.0"
 
 # Monitor performance
 gem "rorvswild", "~> 1.9"
+
+gem "tidewave", "~> 0.4.1", group: :development

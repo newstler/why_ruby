@@ -1,0 +1,23 @@
+<%# Testimonial section for profile owner - renders display or form based on state %>
+<div id="testimonial_section" class="md:mt-6 lg:mt-6 mb-10 md:mb-12 lg:mb-8" data-controller="testimonial-edit">
+  <% if testimonial&.persisted? %>
+    <%= turbo_stream_from "testimonial_#{testimonial.id}" %>
+  <% end %>
+  <% has_quote = testimonial&.quote.present? %>
+  <% show_display = has_quote && testimonial.published? %>
+
+  <h2 class="text-lg md:text-xl text-gray-300 mb-16 md:mb-16 lg:mb-14">loves Ruby because of...</h2>
+
+  <%# Display: shown when testimonial is published %>
+  <div data-testimonial-edit-target="display" class="<%= 'hidden' unless show_display %>">
+    <% if show_display %>
+      <%= render "testimonials/testimonial", testimonial: testimonial, editable: true %>
+    <% end %>
+  </div>
+
+  <%# Form: shown when editing or processing %>
+  <div data-testimonial-edit-target="form" class="<%= 'hidden' if show_display %>">
+    <% form_testimonial = testimonial || user.build_testimonial %>
+    <%= render "testimonials/form", testimonial: form_testimonial, user: user, cancelable: show_display, processing: local_assigns[:processing], autofocus: !show_display %>
+  </div>
+</div>

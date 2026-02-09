@@ -1,20 +1,9 @@
 class UsersController < ApplicationController
   def index
-    @users = User.includes(:posts, :comments)
+    @users = User.visible
 
-    # Apply filters if present
-    if params[:location].present?
-      @users = @users.where(location: params[:location])
-      @filter_location = params[:location]
-    end
-
-    if params[:company].present?
-      @users = @users.where(company: params[:company])
-      @filter_company = params[:company]
-    end
-
-    # Sorting
-    @sort = params[:sort].presence || "top"
+    # Sorting - set up early so it can be applied to both main and other country users
+    @sort = params[:sort].presence || "trending"
     @dir  = params[:dir] == "asc" ? "asc" : "desc"
 
     # Normalize legacy/alternate sort params to our toggle model
@@ -27,33 +16,112 @@ class UsersController < ApplicationController
       @dir = "desc"
     end
 
-    direction = @dir.to_sym
+    # Apply filters if present
+    if params[:location].present?
+      @filter_location = params[:location].strip
+      is_country_only = !@filter_location.include?(", ")
 
-    @users = case @sort
-    when "new"
-               @users.order(created_at: direction)
-    when "old"
-               @users.order(created_at: direction)
-    when "projects"
-               @users.order(github_repos_count: direction)
-    when "posts"
-               @users.order(published_posts_count: direction)
-    when "comments"
-               @users.order(published_comments_count: direction)
-    when "stars"
-               @users.order(github_stars_sum: direction)
-    when "az"
-               # Toggle A–Z vs Z–A using direction
-               @users.order(Arel.sql("COALESCE(name, username) #{direction == :asc ? 'ASC' : 'DESC'}"))
-    else
-               @users.order(github_stars_sum: direction, published_posts_count: direction, github_repos_count: direction)
+      if is_country_only
+        # Country-only filter: include all users from that country
+        @users = @users.from_country(@filter_location)
+      else
+        @users = @users.by_normalized_location(@filter_location)
+
+        # Extract country code and load users from other parts of the country
+        @filter_country_code = @filter_location.split(", ").last
+        @other_country_users = User.visible
+                                   .from_country(@filter_country_code)
+                                   .where.not(normalized_location: @filter_location)
+        @other_country_users = apply_sorting(@other_country_users)
+        @other_country_users = @other_country_users.page(params[:other_page]).per(20)
+      end
+
+      # Compute bounding box for map zoom-to-location
+      filtered_users = is_country_only ? User.visible.from_country(@filter_location) : User.visible.by_normalized_location(@filter_location)
+      geo_bounds = filtered_users
+                       .where.not(latitude: nil, longitude: nil)
+                       .pick(Arel.sql("MIN(latitude)"), Arel.sql("MAX(latitude)"),
+                             Arel.sql("MIN(longitude)"), Arel.sql("MAX(longitude)"))
+      if geo_bounds&.all?(&:present?)
+        @filter_geo_bounds = { south: geo_bounds[0], north: geo_bounds[1], west: geo_bounds[2], east: geo_bounds[3] }
+      end
     end
 
+    if params[:company].present?
+      @filter_company = params[:company].strip
+      company_tokens = @filter_company.split(/\s+/)
+      if company_tokens.size > 1
+        @users = @users.where(company_tokens.map { "company LIKE ?" }.join(" OR "), *company_tokens.map { |t| "%#{User.sanitize_sql_like(t)}%" })
+      else
+        @users = @users.where(company: @filter_company)
+      end
+    end
+
+    if params[:open_to_work] == "1"
+      @users = @users.where(open_to_work: true)
+      @filter_open_to_work = true
+    end
+
+    # Map bounds filtering
+    if params[:south].present? && params[:north].present? && params[:west].present? && params[:east].present?
+      south, north = params[:south].to_f, params[:north].to_f
+      west, east = params[:west].to_f, params[:east].to_f
+      @bounds = { south: south, north: north, west: west, east: east }
+
+      @users = @users.where(latitude: south..north)
+      if west <= east
+        @users = @users.where(longitude: west..east)
+      else
+        @users = @users.where("longitude >= ? OR longitude <= ?", west, east)
+      end
+    end
+
+    @total_users_count = @users.count
+
+    @users = apply_sorting(@users)
     @users = @users.page(params[:page]).per(20)
+  end
+
+  def map_data
+    data = Rails.cache.fetch("community_map_data", expires_in: 1.hour) do
+      User.visible
+          .where.not(latitude: nil, longitude: nil)
+          .select(:id, :slug, :username, :name, :avatar_url, :latitude, :longitude, :open_to_work, :company, :normalized_location)
+          .map { |u|
+            {
+              id: u.id,
+              name: u.display_name,
+              username: u.username,
+              avatar_url: u.avatar_url,
+              lat: u.latitude,
+              lng: u.longitude,
+              open_to_work: u.open_to_work,
+              company: u.company,
+              normalized_location: u.normalized_location,
+              profile_url: helpers.community_user_url(u)
+            }
+          }
+    end
+
+    render json: data
+  end
+
+  def og_image
+    @users = User.where(public: true)
+                 .where.not(avatar_url: [ nil, "" ])
+                 .order(Arel.sql("COALESCE(github_stars_sum, 0) + COALESCE(published_posts_count, 0) * 10 + COALESCE(published_comments_count, 0) DESC"))
+    @total_users_count = User.visible.count
+    render layout: false
   end
 
   def show
     @user = User.friendly.find(params[:id])
+
+    # Handle non-public profiles (only owner can view)
+    unless @user.public? || (user_signed_in? && current_user == @user)
+      redirect_to helpers.community_index_path, alert: "This profile is private."
+      return
+    end
 
     # Load posts with pagination support
     # Show unpublished posts only to the owner
@@ -76,6 +144,65 @@ class UsersController < ApplicationController
                             .limit(9)
 
     # Get Ruby repositories for projects tab
-    @ruby_repos = @user.ruby_repositories
+    # Owner sees visible + hidden repos, others only see visible
+    if user_signed_in? && current_user == @user
+      @ruby_repos = @user.visible_ruby_repositories
+      @hidden_repos = @user.hidden_ruby_repositories
+    else
+      @ruby_repos = @user.visible_ruby_repositories
+      @hidden_repos = []
+    end
+
+    # Sort projects
+    @project_sort = params[:project_sort].presence || "fresh"
+    @project_dir = params[:project_dir] == "asc" ? "asc" : "desc"
+    @ruby_repos = sort_projects(@ruby_repos)
+  end
+
+  private
+
+  def sort_projects(repos)
+    ascending = @project_dir == "asc"
+    sorted = case @project_sort
+    when "trending"
+      repos.sort_by { |r| [ -r.stars_gained, -r.stars ] }
+    when "stars"
+      repos.sort_by { |r| -r.stars }
+    when "az"
+      repos.sort_by { |r| r.name.downcase }
+    else # "fresh"
+      repos
+    end
+    # az defaults to asc, others default to desc — reverse when opposite
+    if @project_sort == "az"
+      ascending ? sorted : sorted.reverse
+    else
+      ascending ? sorted.reverse : sorted
+    end
+  end
+
+  def apply_sorting(scope)
+    direction = @dir.to_sym
+
+    case @sort
+    when "trending"
+      scope.order(stars_gained: direction, github_stars_sum: direction)
+    when "new"
+      scope.order(created_at: direction)
+    when "old"
+      scope.order(created_at: direction)
+    when "projects"
+      scope.order(github_repos_count: direction)
+    when "posts"
+      scope.order(published_posts_count: direction)
+    when "comments"
+      scope.order(published_comments_count: direction)
+    when "stars"
+      scope.order(github_stars_sum: direction)
+    when "az"
+      scope.order(Arel.sql("COALESCE(name, username) #{direction == :asc ? 'ASC' : 'DESC'}"))
+    else
+      scope.order(github_stars_sum: direction, published_posts_count: direction, github_repos_count: direction)
+    end
   end
 end

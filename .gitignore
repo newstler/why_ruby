@@ -46,3 +46,6 @@
 /config/credentials/development.key
 
 /config/credentials/production.key
+
+# MaxMind GeoLite2 database (download separately - not redistributable)
+/db/*.mmdb

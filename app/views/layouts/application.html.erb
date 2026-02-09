@@ -6,8 +6,12 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     
     <!-- Page Title -->
-    <% page_title = yield(:title).presence %>
-    <title><%= page_title ? "Why Ruby? — #{page_title}" : "Why Ruby?" %></title>
+    <% if content_for?(:full_title) %>
+      <title><%= yield(:full_title) %></title>
+    <% else %>
+      <% page_title = yield(:title).presence %>
+      <title><%= page_title ? "Why Ruby? — #{page_title}" : "Why Ruby?" %></title>
+    <% end %>
     
     <!-- Rails Security Tags -->
     <%= csrf_meta_tags %>
@@ -45,9 +49,14 @@
     
     <!-- PWA and Mobile App Meta Tags -->
     <meta name="theme-color" content="#dc2626">
-    <meta name="application-name" content="<%= t('meta.site.application_name') %>">
+    <% if content_for?(:full_title) %>
+      <meta name="application-name" content="<%= t('meta.community.site_name') %>">
+      <meta name="apple-mobile-web-app-title" content="<%= t('meta.community.site_name') %>">
+    <% else %>
+      <meta name="application-name" content="<%= t('meta.site.application_name') %>">
+      <meta name="apple-mobile-web-app-title" content="<%= t('meta.site.apple_app_title') %>">
+    <% end %>
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="<%= t('meta.site.apple_app_title') %>">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="msapplication-TileColor" content="#dc2626">
     <meta name="msapplication-TileImage" content="/android-chrome-192x192.png">
@@ -61,95 +70,90 @@
     <link href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@100..800&display=swap" rel="stylesheet">
     
     <!-- Favicons and Icons -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
-    <link rel="icon" type="image/png" href="/icon.png">
-    <link rel="icon" type="image/svg+xml" href="/icon.svg">
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
+    <link rel="shortcut icon" href="/favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
     
     
     <!-- Stylesheets and JavaScript -->
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
     
-    <!-- Google Analytics (Last) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-55VPDFY7NM"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      // Set consent defaults to denied (no cookies)
-      gtag('consent', 'default', {
-        ad_storage: 'denied',
-        analytics_storage: 'denied',
-        functionality_storage: 'denied',
-        personalization_storage: 'denied',
-        security_storage: 'granted' // security cookies are allowed
-      });
-
-      gtag('config', 'G-55VPDFY7NM', {
-        anonymize_ip: true,              // Mask IP address
-        allow_ad_personalization_signals: false,
-        allow_google_signals: false,
-        client_storage: 'none',          // Force no cookies
-        transport_type: 'beacon',        // Use navigator.sendBeacon
-        cookie_flags: 'max-age=0'        // Prevent accidental cookies
-      });
-    </script>
-
-    <script defer data-domain="whyruby.info" src="https://plausible.io/js/script.js"></script>
+    <!-- Nullitics Analytics (privacy-first, no cookies, GDPR compliant) -->
+    <% country_code = client_country_code %>
+    <script type="text/javascript">new Image().src='https://nullitics.com/n.gif?u=' + encodeURI(location.href) + '&r=' + encodeURI(document.referrer) + '&d=' + screen.width<%= "&c=#{country_code}" if country_code.present? %>;</script>
   </head>
 
   <body class="bg-gray-50 min-h-screen flex flex-col">
-    <nav class="bg-white shadow-sm sticky top-0 z-50 py-4" data-controller="mobile-menu" data-action="click@window->mobile-menu#hide">
+    <!-- Nullitics noscript fallback -->
+    <noscript><img src="https://nullitics.com/n.gif?u=<%= request.original_url %><%= "&c=#{country_code}" if country_code.present? %>" alt="" style="position:absolute;left:-9999px" /></noscript>
+
+    <% community_nav = content_for?(:nav_community_style) || (controller_name == 'users' && ['index', 'show'].include?(action_name)) %>
+    <nav class="<%= community_nav ? 'bg-gray-50 pt-4 [@media(min-width:640px)_and_(min-height:500px)]:pt-6' : 'bg-white shadow-sm py-4' %> sticky top-0 z-50" data-controller="mobile-menu" data-action="click@window->mobile-menu#hide">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
+        <% centered_mobile_nav = content_for?(:nav_community_style) || (controller_name == 'users' && ['index', 'show'].include?(action_name)) %>
+        <div class="flex items-center <%= centered_mobile_nav ? 'h-14 [@media(min-width:640px)_and_(min-height:500px)]:h-20 justify-center' : 'h-16 justify-between' %>">
+          <% if content_for?(:nav_minimal) %>
+            <!-- Minimal nav - just centered logo -->
+            <div class="flex-shrink-0">
+              <% if content_for?(:header_logo) %>
+                <%= yield(:header_logo) %>
+              <% else %>
+                <%= link_to root_path, class: "group text-4xl font-black text-red-600 whitespace-nowrap inline-flex items-center" do %>
+                  Why <%= image_tag "heart.webp", class: "h-12 w-12 mx-1 inline-block animate-heartbeat", alt: "" %> Ruby?
+                <% end %>
+              <% end %>
+            </div>
+          <% else %>
           <!-- Logo on the left -->
-          <div class="flex-shrink-0">
-            <%= link_to root_path, class: "text-4xl font-black text-red-600 whitespace-nowrap" do %>
-              Why Ruby?
-            <% end %>
-          </div>
-          
-          <!-- Desktop navigation - hidden on mobile and tablets in portrait -->
-          <div class="hidden lg:flex-1 lg:flex justify-center items-center space-x-4">
-            <% Category.with_posts.ordered.each do |category| %>
-              <% if category.is_success_story? && has_success_stories? %>
-                <%= link_to category.name, category_path(category),
-                    class: "#{category_menu_active?(category) ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
-              <% elsif !category.is_success_story? %>
-                <%= link_to category.name, category_path(category), 
-                    class: "#{category_menu_active?(category) ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
+          <div class="flex-shrink-0 lg:flex-1">
+            <% if content_for?(:header_logo) %>
+              <%= yield(:header_logo) %>
+            <% else %>
+              <%= link_to root_path, class: "group #{community_nav ? 'text-4xl lg:text-5xl' : 'text-4xl'} font-black text-red-600 whitespace-nowrap inline-flex items-center" do %>
+                Why <%= image_tag "heart.webp", class: "#{community_nav ? 'h-16 w-16' : 'h-12 w-12'} mx-1 inline-block animate-heartbeat", alt: "" %> Ruby?
               <% end %>
             <% end %>
+          </div>
 
-            <%= link_to "Community", users_path, 
-                class: "#{community_menu_active? ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
+          <!-- Desktop navigation - hidden on mobile and tablets in portrait -->
+          <div class="hidden lg:flex justify-center items-center space-x-4">
+            <% if content_for?(:header_nav) %>
+              <%= yield(:header_nav) %>
+            <% else %>
+              <% Category.with_posts.ordered.each do |category| %>
+                <% if category.is_success_story? && has_success_stories? %>
+                  <%= link_to category.name, category_path(category),
+                      class: "#{category_menu_active?(category) ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
+                <% elsif !category.is_success_story? %>
+                  <%= link_to category.name, category_path(category),
+                      class: "#{category_menu_active?(category) ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
+                <% end %>
+              <% end %>
 
-            <% if user_signed_in? %>
-              <% new_post_params = (@category&.is_success_story? || (controller_name == 'posts' && @post&.success_story?)) ? { type: 'success_story' } : {} %>
-              <%= link_to new_post_path(new_post_params), class: "p-2 text-gray-400 hover:text-gray-500 rounded-full hover:bg-gray-100" do %>
-                <%= inline_svg_tag "plus.svg", class: "h-6 w-6" %>
+              <%= link_to "Community", community_index_url,
+                  class: "#{community_menu_active? ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
+
+              <% if user_signed_in? %>
+                <%
+                  is_success_story = @category&.is_success_story? || (controller_name == 'posts' && @post&.success_story?)
+                  new_post_params = is_success_story ? { type: 'success_story' } : {}
+                  new_post_params[:category_id] = @category.id if @category.present? && !is_success_story
+                %>
+                <%= link_to new_post_path(new_post_params), class: "p-2 text-gray-400 hover:text-gray-500 rounded-full hover:bg-gray-100" do %>
+                  <%= inline_svg_tag "plus.svg", class: "h-6 w-6" %>
+                <% end %>
               <% end %>
             <% end %>
           </div>
           
           <!-- Desktop user section - hidden on mobile and tablets in portrait -->
-          <div class="hidden lg:flex items-center">
+          <div class="hidden lg:flex items-center lg:flex-1 lg:justify-end">
             <% if user_signed_in? %>
               <div class="relative" data-controller="dropdown">
-                <button type="button" class="flex items-center gap-x-1 text-sm rounded-full cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 p-2" data-action="click->dropdown#toggle click@window->dropdown#hide">
-                  <% if current_user.avatar_url.present? %>
-                    <%= image_tag current_user.avatar_url, alt: current_user.display_name, class: "h-8 w-8 rounded-full" %>
-                  <% else %>
-                    <span class="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
-                      <%= current_user.display_name.first.upcase %>
-                    </span>
-                  <% end %>
+                <button type="button" class="group flex items-center gap-x-1 text-sm rounded-full cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 p-2" data-action="click->dropdown#toggle click@window->dropdown#hide">
+                  <%= render "shared/gem_avatar", user: current_user, size: "w-8 h-8", show_open_to_work: false, thick_border: true %>
                   <span class="ml-2 text-gray-700 font-medium"><%= current_user.display_name %></span>
                   <%= inline_svg_tag "chevron-down.svg", class: "ml-1 h-5 w-5 text-gray-400" %>
                 </button>
@@ -164,7 +168,7 @@
                     </div>
                   <% end %>
                   <div class="py-1">
-                    <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none cursor-pointer" %>
+                    <%= button_to "Sign out", destroy_user_session_path, method: :delete, data: { turbo: false }, class: "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none cursor-pointer" %>
                   </div>
                 </div>
               </div>
@@ -175,8 +179,8 @@
           
           <!-- Mobile menu button -->
           <div class="lg:hidden">
-            <button type="button" 
-                    class="text-gray-500 hover:text-gray-600 focus:outline-none focus:text-gray-600 p-3 -mr-3 rounded-md touch-manipulation" 
+            <button type="button"
+                    class="text-gray-500 hover:text-gray-600 focus:outline-none focus:text-gray-600 p-3 -mr-3 rounded-md touch-manipulation"
                     data-action="click->mobile-menu#toggle"
                     aria-label="Toggle navigation menu"
                     aria-expanded="false"
@@ -184,46 +188,50 @@
               <%= inline_svg_tag "menu.svg", class: "h-6 w-6" %>
             </button>
           </div>
+          <% end %> <%# end nav_minimal if/else %>
         </div>
         
+        <% unless content_for?(:nav_minimal) %>
         <!-- Mobile menu -->
         <div class="hidden lg:hidden" data-mobile-menu-target="menu">
           <div class="pt-4 pb-3 border-t border-gray-200">
             <!-- Categories -->
             <div class="space-y-1 px-2">
-              <% Category.with_posts.ordered.limit(7).each do |category| %>
-                <% if category.is_success_story? && has_success_stories? %>
-                  <%= link_to category.name, category_path(category), 
-                      class: "#{category_menu_active?(category) ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} block px-3 py-2 rounded-md text-base font-medium" %>
-                <% elsif !category.is_success_story? %>
-                  <%= link_to category.name, category_path(category), 
-                      class: "#{category_menu_active?(category) ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} block px-3 py-2 rounded-md text-base font-medium" %>
+              <% if content_for?(:header_nav_mobile) %>
+                <%= yield(:header_nav_mobile) %>
+              <% else %>
+                <% Category.with_posts.ordered.limit(7).each do |category| %>
+                  <% if category.is_success_story? && has_success_stories? %>
+                    <%= link_to category.name, category_path(category),
+                        class: "#{category_menu_active?(category) ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} block px-3 py-2 rounded-md text-base font-medium" %>
+                  <% elsif !category.is_success_story? %>
+                    <%= link_to category.name, category_path(category),
+                        class: "#{category_menu_active?(category) ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} block px-3 py-2 rounded-md text-base font-medium" %>
+                  <% end %>
                 <% end %>
+                <%= link_to "Community", community_index_url,
+                    class: "#{community_menu_active? ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} block px-3 py-2 rounded-md text-base font-medium" %>
               <% end %>
-              <%= link_to "Community", users_path, 
-                  class: "#{community_menu_active? ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} block px-3 py-2 rounded-md text-base font-medium" %>
             </div>
-            
+
             <% if user_signed_in? %>
               <!-- New post button -->
               <div class="mt-3 px-2">
-                <% new_post_params = (@category&.is_success_story? || (controller_name == 'posts' && @post&.success_story?)) ? { type: 'success_story' } : {} %>
+                <%
+                  is_success_story = @category&.is_success_story? || (controller_name == 'posts' && @post&.success_story?)
+                  new_post_params = is_success_story ? { type: 'success_story' } : {}
+                  new_post_params[:category_id] = @category.id if @category.present? && !is_success_story
+                %>
                 <%= link_to new_post_path(new_post_params), class: "flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-100" do %>
                   <%= inline_svg_tag "plus.svg", class: "h-5 w-5 mr-2" %>
                   New Post
                 <% end %>
               </div>
-              
+
               <!-- User section -->
               <div class="mt-3 border-t border-gray-200 pt-3">
                 <div class="flex items-center px-5">
-                  <% if current_user.avatar_url.present? %>
-                    <%= image_tag current_user.avatar_url, alt: current_user.display_name, class: "h-10 w-10 rounded-full" %>
-                  <% else %>
-                    <span class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                      <%= current_user.display_name.first.upcase %>
-                    </span>
-                  <% end %>
+                  <%= render "shared/gem_avatar", user: current_user, size: "w-10 h-10", show_open_to_work: false, thick_border: true %>
                   <div class="ml-3">
                     <div class="text-base font-medium text-gray-800"><%= current_user.display_name %></div>
                   </div>
@@ -233,7 +241,7 @@
                   <% if current_user.admin? %>
                     <%= link_to "Admin Panel", "/avo", class: "block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-100" %>
                   <% end %>
-                  <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-100" %>
+                  <%= button_to "Sign out", destroy_user_session_path, method: :delete, data: { turbo: false }, class: "block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-100" %>
                 </div>
               </div>
             <% else %>
@@ -243,26 +251,64 @@
             <% end %>
           </div>
         </div>
+        <% end %>
       </div>
+      <% if community_nav %>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative h-[4px] mt-4 [@media(min-width:640px)_and_(min-height:500px)]:mt-6">
+          <svg class="absolute inset-0 w-full" height="4" viewBox="0 0 100 4" preserveAspectRatio="none" style="top: 2px;">
+            <ellipse cx="50" cy="2" rx="50" ry="2" fill="rgba(156, 163, 175, 0.5)"/>
+          </svg>
+          <svg class="absolute inset-0 w-full" height="4" viewBox="0 0 100 4" preserveAspectRatio="none">
+            <ellipse cx="50" cy="2" rx="50" ry="2" fill="#e5e7eb"/>
+          </svg>
+        </div>
+      <% end %>
     </nav>
 
-    <% if notice.present? %>
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-md">
-          <p class="text-sm text-green-700 text-center"><%= notice %></p>
-        </div>
-      </div>
-    <% end %>
-    
-    <% if alert.present? %>
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-md">
-          <p class="text-sm text-red-700 text-center"><%= alert %></p>
+    <% if notice.present? || alert.present? %>
+      <div class="fixed top-4 left-0 right-0 z-[100] pointer-events-none">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-end">
+          <div class="flex flex-col gap-3 max-w-sm w-full">
+        <% if notice.present? %>
+          <div class="pointer-events-auto bg-white border border-green-200 shadow-lg rounded-lg p-4 flex items-start gap-3 transition-all duration-300"
+               data-controller="flash"
+               data-flash-auto-dismiss-value="5000">
+            <div class="flex-shrink-0 text-green-500">
+              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            <p class="flex-1 text-sm text-gray-700"><%= notice %></p>
+            <button type="button" class="flex-shrink-0 text-gray-400 hover:text-gray-600 cursor-pointer" data-action="click->flash#dismiss">
+              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+              </svg>
+            </button>
+          </div>
+        <% end %>
+        <% if alert.present? %>
+          <div class="pointer-events-auto bg-white border border-red-200 shadow-lg rounded-lg p-4 flex items-start gap-3 transition-all duration-300"
+               data-controller="flash"
+               data-flash-auto-dismiss-value="5000">
+            <div class="flex-shrink-0 text-red-500">
+              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            <p class="flex-1 text-sm text-gray-700"><%= alert %></p>
+            <button type="button" class="flex-shrink-0 text-gray-400 hover:text-gray-600 cursor-pointer" data-action="click->flash#dismiss">
+              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+              </svg>
+            </button>
+          </div>
+        <% end %>
+          </div>
         </div>
       </div>
     <% end %>
 
-    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16 w-full">
       <%= yield %>
     </main>
 
@@ -273,18 +319,18 @@
         <div class="text-left text-xs text-gray-400 flex-1">
           <div class="lg:inline-block">
             <div class="lg:inline">&copy; <%= Date.current.year %>
-            <%= link_to "WhyRuby.info", "https://whyruby.info", class: "underline hover:text-gray-600 transition" %>.</div>
+            <%= link_to "Yuri Sidorov", "https://yurisidorov.com", class: "underline hover:text-gray-600 transition", target: "_blank", rel: "noopener" %> — <em><%= link_to "Hire me!", "https://cal.com/yurisidorov/", class: "underline hover:text-gray-600 transition", target: "_blank", rel: "noopener" %></em></div>
             <div class="lg:inline">Built with ❤️ in
-            <%= link_to "Ruby #{RUBY_VERSION}", "https://www.ruby-lang.org/", class: "underline hover:text-gray-600 transition" %>
+            <%= link_to "Ruby #{RUBY_VERSION}", "https://www.ruby-lang.org/", class: "underline hover:text-gray-600 transition", target: "_blank", rel: "noopener" %>
             on
-            <%= link_to "Rails #{Rails.version}", "https://rubyonrails.org", class: "underline hover:text-gray-600 transition" %>.</div>
+            <%= link_to "Rails #{Rails.version}", "https://rubyonrails.org", class: "underline hover:text-gray-600 transition", target: "_blank", rel: "noopener" %>.</div>
           </div>
           <div>This project is open source — <%= link_to "contribute on GitHub", "https://github.com/newstler/why_ruby", class: "underline hover:text-gray-600 transition", target: "_blank", rel: "noopener" %>. Monitored with <%= link_to "RorVsWild", "https://www.rorvswild.com/applications/136539/requests", class: "underline hover:text-gray-600 transition", target: "_blank", rel: "noopener" %>.</div>
         </div>
 
         <!-- Center column - narrower for logo -->
         <div class="px-8">
-          <%= link_to "https://yurisidorov.com", class: "group" do %>
+          <%= link_to "https://yurisidorov.com", class: "group", target: "_blank", rel: "noopener" do %>
             <%= inline_svg_tag "capedbot-logo.svg", class: "h-8 w-auto fill-[#8DA0AE] group-hover:fill-red-600 transition-colors duration-300" %>
           <% end %>
         </div>
@@ -292,13 +338,13 @@
         <!-- Right column -->
         <div class="text-xs text-right text-gray-400 flex-1">
           By using this site you agree with our
-          <%= link_to "cookie policy", cookie_policy_path, class: "underline hover:text-gray-600 transition" %>.
+          <%= link_to "cookie policy", main_site_url(cookie_policy_path), class: "underline hover:text-gray-600 transition" %>.
           <br />
-          <%= link_to "Privacy", privacy_policy_path, class: "underline hover:text-gray-600 transition" %>
+          <%= link_to "Privacy", main_site_url(privacy_policy_path), class: "underline hover:text-gray-600 transition" %>
           <span class="mx-1">•</span>
-          <%= link_to "Terms", terms_of_service_path, class: "underline hover:text-gray-600 transition" %>
+          <%= link_to "Terms", main_site_url(terms_of_service_path), class: "underline hover:text-gray-600 transition" %>
           <span class="mx-1">•</span>
-          <%= link_to "Legal", legal_notice_path, class: "underline hover:text-gray-600 transition" %>
+          <%= link_to "Legal", main_site_url(legal_notice_path), class: "underline hover:text-gray-600 transition" %>
         </div>
       </div>
 
@@ -306,29 +352,29 @@
       <div class="md:hidden space-y-6">
         <!-- Logo at top on mobile -->
         <div class="flex justify-center">
-          <%= link_to "https://yurisidorov.com", class: "group" do %>
+          <%= link_to "https://yurisidorov.com", class: "group", target: "_blank", rel: "noopener" do %>
             <%= inline_svg_tag "capedbot-logo.svg", class: "h-8 w-auto fill-[#8DA0AE] group-hover:fill-red-600 transition-colors duration-300" %>
           <% end %>
         </div>
 
         <!-- Copyright and project info -->
         <div class="text-center text-xs text-gray-400 space-y-1">
-          <div>&copy; <%= Date.current.year %> <%= link_to "WhyRuby.info", "https://whyruby.info", class: "underline hover:text-gray-600 transition" %>.</div>
-          <div>Built with ❤️ in <%= link_to "Ruby #{Ruby::VERSION}", "https://www.ruby-lang.org/", class: "underline hover:text-gray-600 transition" %>
-            on <%= link_to "Rails #{Rails.version}", "https://rubyonrails.org", class: "underline hover:text-gray-600 transition" %>.</div>
+          <div>&copy; <%= Date.current.year %> <%= link_to "Yuri Sidorov", "https://yurisidorov.com", class: "underline hover:text-gray-600 transition", target: "_blank", rel: "noopener" %> — <em><%= link_to "Hire me!", "https://cal.com/yurisidorov/", class: "underline hover:text-gray-600 transition", target: "_blank", rel: "noopener" %></em></div>
+          <div>Built with ❤️ in <%= link_to "Ruby #{Ruby::VERSION}", "https://www.ruby-lang.org/", class: "underline hover:text-gray-600 transition", target: "_blank", rel: "noopener" %>
+            on <%= link_to "Rails #{Rails.version}", "https://rubyonrails.org", class: "underline hover:text-gray-600 transition", target: "_blank", rel: "noopener" %>.</div>
           <div>This project is open source — <%= link_to "contribute on GitHub", "https://github.com/newstler/why_ruby", class: "underline hover:text-gray-600 transition", target: "_blank", rel: "noopener" %>.</div>
           <div>Monitored with <%= link_to "RorVsWild", "https://www.rorvswild.com/applications/136539/requests", class: "underline hover:text-gray-600 transition", target: "_blank", rel: "noopener" %>.</div>
         </div>
 
         <!-- Legal links -->
         <div class="text-center text-xs text-gray-400 space-y-1">
-          <div>By using this site you agree with our <%= link_to "cookie policy", cookie_policy_path, class: "underline hover:text-gray-600 transition" %>.</div>
+          <div>By using this site you agree with our <%= link_to "cookie policy", main_site_url(cookie_policy_path), class: "underline hover:text-gray-600 transition" %>.</div>
           <div>
-            <%= link_to "Privacy", privacy_policy_path, class: "underline hover:text-gray-600 transition" %>
+            <%= link_to "Privacy", main_site_url(privacy_policy_path), class: "underline hover:text-gray-600 transition" %>
             <span class="mx-1">•</span>
-            <%= link_to "Terms", terms_of_service_path, class: "underline hover:text-gray-600 transition" %>
+            <%= link_to "Terms", main_site_url(terms_of_service_path), class: "underline hover:text-gray-600 transition" %>
             <span class="mx-1">•</span>
-            <%= link_to "Legal", legal_notice_path, class: "underline hover:text-gray-600 transition" %>
+            <%= link_to "Legal", main_site_url(legal_notice_path), class: "underline hover:text-gray-600 transition" %>
           </div>
         </div>
       </div>

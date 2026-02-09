@@ -1,0 +1,11 @@
+<%#
+  Profile avatar wrapper for Turbo Stream updates
+  Locals:
+    - user: the user to display
+    - wrapper_id: ID for the wrapper div (for Turbo Stream targeting)
+    - size: size class for gem_avatar
+    - text_size: text size for gem_avatar
+%>
+<div id="<%= wrapper_id %>">
+  <%= render "shared/gem_avatar", user: user, size: size, text_size: text_size %>
+</div>

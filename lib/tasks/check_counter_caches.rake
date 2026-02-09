@@ -45,6 +45,26 @@ namespace :counter_caches do
       errors.concat(errors_comments)
     end
 
+    # Check posts.comments_count
+    puts "\n📊 Checking posts.comments_count..."
+    errors_comments_count = []
+    Post.find_each do |post|
+      actual_count = post.comments.count
+      cached_count = post.comments_count
+
+      if actual_count != cached_count
+        error_msg = "Post ##{post.id} (#{post.title[0..30]}...): cached=#{cached_count}, actual=#{actual_count}"
+        errors_comments_count << error_msg
+        puts "  ❌ #{error_msg}"
+      end
+    end
+
+    if errors_comments_count.empty?
+      puts "  ✅ All posts.comments_count values are correct"
+    else
+      errors.concat(errors_comments_count)
+    end
+
     # Check posts.reports_count
     puts "\n📊 Checking posts.reports_count..."
     errors_reports = []
@@ -74,9 +94,10 @@ namespace :counter_caches do
       puts "✅ All counter caches are correctly synchronized!"
     else
       puts "❌ Found #{errors.length} counter cache mismatches:"
-      puts "   - #{errors.select { |e| e.include?('published_posts_count') }.count} for published_posts_count"
-      puts "   - #{errors_comments.count} for published_comments_count"
-      puts "   - #{errors_reports.count} for reports_count"
+      puts "   - #{errors.select { |e| e.include?('published_posts_count') }.count} for users.published_posts_count"
+      puts "   - #{errors_comments.count} for users.published_comments_count"
+      puts "   - #{errors_comments_count.count} for posts.comments_count"
+      puts "   - #{errors_reports.count} for posts.reports_count"
       puts "\nRun 'rails counter_caches:fix' to fix these issues."
     end
   end
@@ -111,9 +132,18 @@ namespace :counter_caches do
       end
     end
 
+    # Fix posts.comments_count - Rails should handle this with counter_cache: true
+    puts "\n🔧 Fixing posts.comments_count..."
+    Post.find_each do |post|
+      Post.reset_counters(post.id, :comments)
+    end
+    puts "  Reset all posts.comments_count using Rails reset_counters"
+
     # Fix posts.reports_count - Rails should handle this with counter_cache: true
     puts "\n🔧 Fixing posts.reports_count..."
-    Post.reset_counters(Post.pluck(:id), :reports)
+    Post.find_each do |post|
+      Post.reset_counters(post.id, :reports)
+    end
     puts "  Reset all posts.reports_count using Rails reset_counters"
 
     puts "\n" + "="*80

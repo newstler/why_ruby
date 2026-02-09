@@ -35,6 +35,7 @@ class PostsController < ApplicationController
 
   def new
     @post = current_user.posts.build
+    @post.category_id = params[:category_id] if params[:category_id].present?
   end
 
   def create
@@ -207,10 +208,10 @@ class PostsController < ApplicationController
     # Handle category/post route
     if params[:category_id]
       @category = Category.friendly.find(params[:category_id])
-      @post = @category.posts.includes(:tags).friendly.find(params[:id])
+      @post = @category.posts.includes(:tags, :user, :category).friendly.find(params[:id])
     # Handle direct post access (for edit, destroy, etc.)
     else
-      @post = Post.includes(:tags).friendly.find(params[:id])
+      @post = Post.includes(:tags, :user, :category).friendly.find(params[:id])
     end
 
     # Only allow viewing unpublished posts by their owner or admin
@@ -271,11 +272,6 @@ class PostsController < ApplicationController
   end
 
   def post_path_for(post)
-    if post.category
-      post_path(post.category, post)
-    else
-      # Fallback for posts without category (shouldn't happen in normal flow)
-      post_path("uncategorized", post)
-    end
+    post_path(post.category, post)
   end
 end

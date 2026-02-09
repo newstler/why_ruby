@@ -15,10 +15,10 @@
   
   <% if user_signed_in? && (post.user == current_user || current_user.admin?) %>
     <div class="absolute top-4 right-4 flex items-center space-x-2 z-10">
-      <%= link_to edit_post_path(post), class: "text-gray-400 hover:text-gray-600 transition-colors p-1 bg-white rounded-full shadow-sm hover:shadow", title: "Edit" do %>
+      <%= link_to primary_domain_edit_post_url(post), class: "text-gray-400 hover:text-gray-600 transition-colors p-1 bg-white rounded-full shadow-sm hover:shadow", title: "Edit" do %>
         <%= inline_svg_tag "edit.svg", class: "w-4 h-4" %>
       <% end %>
-      <%= button_to post_destroy_path(post), method: :delete, data: { turbo_confirm: "Are you sure you want to delete this post?" }, class: "text-gray-400 hover:text-red-600 transition-colors p-1 bg-white rounded-full shadow-sm hover:shadow border-0 cursor-pointer", title: "Delete" do %>
+      <%= button_to primary_domain_destroy_post_url(post), method: :delete, data: { turbo_confirm: "Are you sure you want to delete this post?" }, class: "text-gray-400 hover:text-red-600 transition-colors p-1 bg-white rounded-full shadow-sm hover:shadow border-0 cursor-pointer", title: "Delete" do %>
         <%= inline_svg_tag "delete.svg", class: "w-4 h-4" %>
       <% end %>
     </div>
@@ -38,11 +38,7 @@
     <div class="flex items-center justify-between mb-2">
       <div>
         <% unless post.success_story? %>
-          <% if post.category %>
-            <span class="text-sm text-gray-500"><%= post.category.name %></span>
-          <% else %>
-            <span class="text-sm text-gray-400 italic">Uncategorized</span>
-          <% end %>
+          <span class="text-sm text-gray-500"><%= post.category.name %></span>
         <% end %>
       </div>
       <% if post.link? && (domain = extract_domain(post.url)) %>
@@ -57,10 +53,10 @@
       <h3 class="text-xl font-semibold <%= post.published? ? 'text-gray-900 group-hover:text-red-600' : 'text-gray-500' %> transition-colors">
         <%= post.title %>
       </h3>
-      <% if post.comments.any? %>
+      <% if post.comments_count > 0 %>
         <div class="flex items-center space-x-1 text-sm text-gray-500 flex-shrink-0">
           <%= inline_svg_tag "comment.svg", class: "w-4 h-4" %>
-          <span><%= post.comments.count %></span>
+          <span><%= post.comments_count %></span>
         </div>
       <% end %>
     </div>
@@ -75,9 +71,7 @@
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-2">
           <% if post.user.present? %>
-            <% if post.user.avatar_url.present? %>
-              <%= image_tag post.user.avatar_url, alt: post.user.display_name, class: "h-6 w-6 rounded-full" %>
-            <% end %>
+            <%= render "shared/gem_avatar", user: post.user, size: "w-7 h-[25px]", text_size: "text-xs", show_open_to_work: false, thick_border: true, border_color: "text-gray-200" %>
             <span class="text-sm text-gray-700"><%= post.user.display_name %></span>
           <% else %>
             <span class="text-sm text-gray-400 italic">[Deleted User]</span>

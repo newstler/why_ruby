@@ -8,7 +8,7 @@
 # For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
-ARG RUBY_VERSION=4.0.0
+ARG RUBY_VERSION=4.0.1
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
 # Rails app lives here
@@ -45,6 +45,21 @@ RUN bundle install && \
 
 # Copy application code
 COPY . .
+
+# Download MaxMind GeoLite2 database for IP geolocation (requires account ID and license key)
+# MaxMind API changed in May 2024 to require Basic Auth with account_id:license_key
+RUN --mount=type=secret,id=MAXMIND_ACCOUNT_ID \
+    --mount=type=secret,id=MAXMIND_LICENSE_KEY \
+    if [ -f /run/secrets/MAXMIND_ACCOUNT_ID ] && [ -f /run/secrets/MAXMIND_LICENSE_KEY ]; then \
+      ACCOUNT_ID="$(cat /run/secrets/MAXMIND_ACCOUNT_ID)" && \
+      LICENSE_KEY="$(cat /run/secrets/MAXMIND_LICENSE_KEY)" && \
+      curl -sL -u "${ACCOUNT_ID}:${LICENSE_KEY}" \
+        "https://download.maxmind.com/geoip/databases/GeoLite2-Country/download?suffix=tar.gz" | \
+      tar -xzf - --strip-components=1 -C db/ --wildcards "*/*.mmdb" && \
+      echo "GeoLite2 database downloaded successfully"; \
+    else \
+      echo "MAXMIND credentials not provided, skipping GeoLite2 download"; \
+    fi
 
 # Precompile bootsnap code for faster boot times
 RUN bundle exec bootsnap precompile app/ lib/

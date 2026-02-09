@@ -1,0 +1,38 @@
+<%# Shared testimonial display partial - used on home carousel and user profile %>
+<div>
+  <% if testimonial.heading.present? %>
+    <div class="flex items-baseline gap-2 md:gap-4 mb-4 md:mb-6">
+      <h3 class="text-4xl md:text-7xl font-serif italic text-red-600">
+        <%= testimonial.heading %>
+      </h3>
+      <% if local_assigns[:editable] %>
+        <button data-action="testimonial-edit#edit"
+                class="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer ml-2">
+          <%= inline_svg_tag "pencil.svg", class: "w-8 h-8 md:w-10 md:h-10" %>
+        </button>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="flex flex-col lg:flex-row lg:gap-8 lg:items-center">
+    <div class="lg:flex-1 min-w-0">
+      <% if testimonial.subheading.present? %>
+        <h4 class="text-xl md:text-3xl font-bold text-gray-900 leading-tight mb-2">
+          <%= raw testimonial.subheading.split('.').map { |s| s.strip }.reject(&:blank?).map { |s| ERB::Util.html_escape(s) + "." }.join("<br>") %>
+        </h4>
+      <% end %>
+
+      <% if testimonial.body_text.present? %>
+        <p class="text-gray-500 text-sm md:text-lg mt-4 md:mt-6 mb-6 lg:mb-0 max-w-3xl leading-relaxed"><%= testimonial.body_text %></p>
+      <% end %>
+    </div>
+
+    <blockquote class="relative lg:flex-1">
+      <span class="absolute -top-4 -left-2 text-5xl md:text-6xl text-gray-200 font-serif leading-none">&ldquo;</span>
+      <p class="text-red-600 text-sm md:text-xl italic pl-6 pr-6">
+        <%= testimonial.quote %>
+      </p>
+      <span class="absolute -bottom-6 -right-2 text-5xl md:text-6xl text-gray-200 font-serif leading-none">&rdquo;</span>
+    </blockquote>
+  </div>
+</div>

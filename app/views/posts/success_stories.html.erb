@@ -52,10 +52,15 @@
         <% end %>
       <% end %>
       
-      <% [column1_posts, column2_posts, column3_posts].each do |column_posts| %>
+      <% # Add button goes in the column where the next post would be %>
+      <% add_button_column = @posts.size % 3 %>
+      <% [column1_posts, column2_posts, column3_posts].each_with_index do |column_posts, col_index| %>
         <div class="flex-1 space-y-6">
           <% column_posts.each do |post| %>
             <%= render 'posts/post_tile', post: post %>
+          <% end %>
+          <% if col_index == add_button_column %>
+            <%= render 'posts/add_post_tile', success_story: true %>
           <% end %>
         </div>
       <% end %>
@@ -74,20 +79,26 @@
         <% end %>
       <% end %>
       
-      <% [column1_posts, column2_posts].each do |column_posts| %>
+      <% # Add button goes in the column where the next post would be %>
+      <% add_button_column = @posts.size % 2 %>
+      <% [column1_posts, column2_posts].each_with_index do |column_posts, col_index| %>
         <div class="flex-1 space-y-6">
           <% column_posts.each do |post| %>
             <%= render 'posts/post_tile', post: post %>
           <% end %>
+          <% if col_index == add_button_column %>
+            <%= render 'posts/add_post_tile', success_story: true %>
+          <% end %>
         </div>
       <% end %>
     </div>
-    
+
     <!-- Mobile: 1 column -->
     <div class="md:hidden space-y-6">
       <% @posts.each do |post| %>
         <%= render 'posts/post_tile', post: post %>
       <% end %>
+      <%= render 'posts/add_post_tile', success_story: true %>
     </div>
     
     <div class="mt-12 mb-8 text-center">

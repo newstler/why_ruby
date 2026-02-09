@@ -128,3 +128,73 @@
 
 #   puts "Created sample posts"
 # end
+
+# Seed testimonials (pre-published, no AI processing needed)
+if Testimonial.count == 0
+  # Need at least 4 users for testimonials
+  seed_users = []
+  [
+    { username: "matz", email: "matz@ruby-lang.org", github_id: "100001", name: "Yukihiro Matsumoto", bio: "Creator of Ruby", avatar_url: "https://avatars.githubusercontent.com/u/30281?v=4" },
+    { username: "dhh", email: "dhh@hey.com", github_id: "100002", name: "David Heinemeier Hansson", bio: "Creator of Ruby on Rails", company: "37signals", avatar_url: "https://avatars.githubusercontent.com/u/2741?v=4" },
+    { username: "pragdave", email: "dave@pragprog.com", github_id: "10648", name: "Dave Thomas", bio: "Author of The Pragmatic Programmer", company: "The Pragmatic Bookshelf", avatar_url: "https://avatars.githubusercontent.com/u/10648?v=4" },
+    { username: "AmandaPerino", email: "amanda@rubyonrails.org", github_id: "58528404", name: "Amanda Perino", bio: "Executive Director of Rails Foundation", company: "Rails Foundation", avatar_url: "https://avatars.githubusercontent.com/u/58528404?v=4" }
+  ].each do |attrs|
+    user = User.find_or_create_by!(github_id: attrs[:github_id]) do |u|
+      u.username = attrs[:username]
+      u.email = attrs[:email]
+      u.name = attrs[:name]
+      u.bio = attrs[:bio]
+      u.company = attrs[:company]
+      u.avatar_url = attrs[:avatar_url]
+    end
+    seed_users << user
+  end
+
+  testimonials_data = [
+    {
+      user: seed_users[0],
+      quote: "When I released Ruby to the world, I never imagined such a rich ecosystem would grow from it. Over 200,000 gems, Ruby on Rails, RSpec, Bundler—it was the community that created and nurtured all of these. My wish to 'make programmers happy' has been realized in ways I could never have achieved alone.",
+      heading: "Ecosystem",
+      subheading: "A language that grows with you",
+      body_text: "Ruby's rich ecosystem of gems and tools means you can build almost anything. From web applications to automation scripts, the community has created solutions for every need.",
+      published: true,
+      position: 1
+    },
+    {
+      user: seed_users[1],
+      quote: "Ruby is just the most beautiful programming language I have ever seen. And I pay a fair amount of attention to new programming languages that are coming up, new environments, new frameworks, and I've still yet to see anything that meets or beats Ruby in its pureness of its design.",
+      heading: "Simplicity",
+      subheading: "Beautiful code that reads like prose",
+      body_text: "Ruby's elegant syntax makes code a pleasure to read and write. It prioritizes developer happiness, letting you express ideas naturally without fighting the language.",
+      published: true,
+      position: 2
+    },
+    {
+      user: seed_users[2],
+      quote: "Ruby turns ideas into code fast. Its simplicity keeps me focused; its expressiveness lets me write the way I think. It feels like the language gets out of the way, leaving just me and the problem.",
+      heading: "Productivity",
+      subheading: "Ship faster, iterate quicker",
+      body_text: "Ruby and Rails together form an incredibly productive stack. What takes weeks in other languages can be built in days, without sacrificing code quality or maintainability.",
+      published: true,
+      position: 3
+    },
+    {
+      user: seed_users[3],
+      quote: "The Ruby community is filled with talent and creativity, developers attracted to Ruby's elegant syntax who program for the joy of it. It's a vibrant, welcoming community willing to share this love of programming with everyone.",
+      heading: "Community",
+      subheading: "Matz is nice and so we are nice",
+      body_text: "Ruby's community stands out for its warmth and inclusivity. From RubyConf to local meetups, Ruby developers support each other and welcome newcomers with open arms.",
+      published: true,
+      position: 4
+    }
+  ]
+
+  testimonials_data.each do |data|
+    user = data.delete(:user)
+    now = Time.current
+    # Use insert_all to skip callbacks (avoid AI processing for seeds)
+    Testimonial.insert_all([ data.merge(user_id: user.id, ai_attempts: 0, created_at: now, updated_at: now) ])
+  end
+
+  puts "Created #{Testimonial.count} testimonials"
+end

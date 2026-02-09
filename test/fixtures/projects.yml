@@ -1,0 +1,55 @@
+rails_project:
+  id: "01961a2a-c0de-7000-8000-000000000201"
+  user_id: "01961a2a-c0de-7000-8000-000000000101"
+  name: "awesome-rails-gem"
+  description: "A great Rails gem"
+  stars: 150
+  github_url: "https://github.com/rubyist1/awesome-rails-gem"
+  forks_count: 20
+  size: 5000
+  topics: '["rails", "ruby"]'
+  pushed_at: <%= 1.day.ago.to_fs(:db) %>
+  hidden: false
+  archived: false
+
+hidden_project:
+  id: "01961a2a-c0de-7000-8000-000000000202"
+  user_id: "01961a2a-c0de-7000-8000-000000000101"
+  name: "secret-project"
+  description: "A hidden project"
+  stars: 10
+  github_url: "https://github.com/rubyist1/secret-project"
+  forks_count: 0
+  size: 1000
+  topics: '["ruby"]'
+  pushed_at: <%= 3.days.ago.to_fs(:db) %>
+  hidden: true
+  archived: false
+
+archived_project:
+  id: "01961a2a-c0de-7000-8000-000000000203"
+  user_id: "01961a2a-c0de-7000-8000-000000000101"
+  name: "old-project"
+  description: "An archived project"
+  stars: 5
+  github_url: "https://github.com/rubyist1/old-project"
+  forks_count: 1
+  size: 500
+  topics: '[]'
+  pushed_at: <%= 30.days.ago.to_fs(:db) %>
+  hidden: false
+  archived: true
+
+admin_project:
+  id: "01961a2a-c0de-7000-8000-000000000204"
+  user_id: "01961a2a-c0de-7000-8000-000000000103"
+  name: "admin-tool"
+  description: "Admin's Ruby tool"
+  stars: 500
+  github_url: "https://github.com/admin_test/admin-tool"
+  forks_count: 50
+  size: 10000
+  topics: '["ruby", "cli"]'
+  pushed_at: <%= 2.hours.ago.to_fs(:db) %>
+  hidden: false
+  archived: false
