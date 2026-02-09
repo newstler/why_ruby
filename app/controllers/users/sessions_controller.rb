@@ -27,9 +27,9 @@ class Users::SessionsController < Devise::SessionsController
 
     if Rails.env.production? && token
       # Sign out on other domain, then come back to this domain
-      # On community domain, users_path is "/" (root); on primary domain it's "/community"
-      prod_return_path = (current_host == domains.community) ? "/" : "/community"
-      final_destination = "https://#{current_host}#{from_community_page? ? prod_return_path : '/'}"
+      # On community domain, return to root "/"; on primary domain, redirect to community domain root
+      prod_return_path = (current_host == domains.community) ? "/" : "https://#{domains.community}/"
+      final_destination = from_community_page? ? prod_return_path : "https://#{current_host}/"
       redirect_to "https://#{other_host}/auth/sign_out_receive?token=#{token}&return_to=#{CGI.escape(final_destination)}", allow_other_host: true
     else
       redirect_to return_to_path

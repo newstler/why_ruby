@@ -395,6 +395,16 @@ module ApplicationHelper
     end
   end
 
+  # Generate a full URL on the primary domain (whyruby.info) for a given path.
+  # Used for footer legal links that must resolve on both domains.
+  def main_site_url(path)
+    if Rails.env.production? && request.host == Rails.application.config.x.domains.community
+      "https://#{Rails.application.config.x.domains.primary}#{path}"
+    else
+      path
+    end
+  end
+
   # Canonical URL for community root (for meta tags)
   # Production: https://rubycommunity.org/
   # Development: http://localhost:3003/community

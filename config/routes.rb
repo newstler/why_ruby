@@ -37,6 +37,14 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
+  # In production, redirect /community paths on primary domain to rubycommunity.org
+  if Rails.env.production?
+    community_domain = Rails.application.config.x.domains.community
+    primary_host = { host: Rails.application.config.x.domains.primary }
+    get "community", to: redirect("https://#{community_domain}/", status: 301), constraints: primary_host
+    get "community/:id", to: redirect("https://#{community_domain}/%{id}", status: 301), constraints: primary_host
+  end
+
   # Community routes — local development fallback for rubycommunity.org (see domain constraint above)
   get "community", to: "users#index", as: :users
   get "community/map_data", to: "users#map_data", as: :community_map_data

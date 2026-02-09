@@ -160,7 +160,12 @@ export default class extends Controller {
 
     let filtered = users
     if (company) {
-      filtered = filtered.filter(u => u.company === company)
+      const tokens = company.trim().split(/\s+/)
+      if (tokens.length > 1) {
+        filtered = filtered.filter(u => u.company && tokens.some(t => u.company.includes(t)))
+      } else {
+        filtered = filtered.filter(u => u.company === company)
+      }
     }
     if (location) {
       if (location.includes(", ")) {
@@ -264,9 +269,8 @@ export default class extends Controller {
       ? new URL(currentSrc, window.location.origin).searchParams
       : new URLSearchParams(window.location.search)
 
-    // Drop location/company filters — manual map interaction overrides them
+    // Drop location filter — manual map interaction overrides it
     params.delete("location")
-    params.delete("company")
 
     // Clear stale bounds and page (reset to page 1 on bounds change)
     params.delete("south")

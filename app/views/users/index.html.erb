@@ -60,13 +60,16 @@
           <div class="flex items-baseline gap-3 md:gap-4 mb-3">
             <span class="text-5xl md:text-6xl lg:text-7xl font-black text-red-600 tabular-nums"><%= number_with_delimiter(@total_users_count) %></span>
             <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900"><%= t('users.index.developer_count', count: @total_users_count) %></h1>
+            <%= link_to community_user_url(current_user), class: "group sm:hidden ml-auto self-center", data: { turbo_frame: "_top" } do %>
+              <%= render "shared/gem_avatar", user: current_user, size: "w-10 h-9", badge_size: "map", thick_border: true %>
+            <% end %>
           </div>
           <p class="text-lg md:text-xl text-gray-500 max-w-2xl">
             <% if @filter_location.present? %>
               <% location_display = @filter_location.match?(/\A[A-Z]{2}\z/) ? country_name(@filter_location) : @filter_location.sub(/, ([A-Z]{2})$/) { ", #{country_name(Regexp.last_match(1))}" } %>
               from <%= location_display %><%= link_to community_index_path(company: @filter_company, sort: @sort, dir: @dir, open_to_work: @filter_open_to_work ? "1" : nil), class: "inline-flex items-center justify-center w-5 h-5 ml-1.5 rounded-full bg-gray-200 text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors align-text-bottom", onclick: "window.dispatchEvent(new CustomEvent('map:reset'))" do %><%= inline_svg_tag "x-mark.svg", class: "w-2.5 h-2.5" %><% end %>
             <% elsif @filter_company.present? %>
-              working at <%= @filter_company %><%= link_to community_index_path(location: @filter_location, sort: @sort, dir: @dir, open_to_work: @filter_open_to_work ? "1" : nil), class: "inline-flex items-center justify-center w-5 h-5 ml-1.5 rounded-full bg-gray-200 text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors align-text-bottom", onclick: "window.dispatchEvent(new CustomEvent('map:reset'))" do %><%= inline_svg_tag "x-mark.svg", class: "w-2.5 h-2.5" %><% end %>
+              working at <%= linkify_company(@filter_company) %><%= link_to community_index_path(location: @filter_location, sort: @sort, dir: @dir, open_to_work: @filter_open_to_work ? "1" : nil), class: "inline-flex items-center justify-center w-5 h-5 ml-1.5 rounded-full bg-gray-200 text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors align-text-bottom", onclick: "window.dispatchEvent(new CustomEvent('map:reset'))" do %><%= inline_svg_tag "x-mark.svg", class: "w-2.5 h-2.5" %><% end %>
             <% elsif @bounds.present? %>
               from this area
             <% else %>
@@ -86,7 +89,7 @@
               <% location_display = @filter_location.match?(/\A[A-Z]{2}\z/) ? country_name(@filter_location) : @filter_location.sub(/, ([A-Z]{2})$/) { ", #{country_name(Regexp.last_match(1))}" } %>
               from <%= location_display %><%= link_to community_index_path(company: @filter_company, sort: @sort, dir: @dir, open_to_work: @filter_open_to_work ? "1" : nil), class: "inline-flex items-center justify-center w-5 h-5 ml-1.5 rounded-full bg-gray-200 text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors align-text-bottom", onclick: "window.dispatchEvent(new CustomEvent('map:reset'))" do %><%= inline_svg_tag "x-mark.svg", class: "w-2.5 h-2.5" %><% end %>
             <% elsif @filter_company.present? %>
-              working at <%= @filter_company %><%= link_to community_index_path(location: @filter_location, sort: @sort, dir: @dir, open_to_work: @filter_open_to_work ? "1" : nil), class: "inline-flex items-center justify-center w-5 h-5 ml-1.5 rounded-full bg-gray-200 text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors align-text-bottom", onclick: "window.dispatchEvent(new CustomEvent('map:reset'))" do %><%= inline_svg_tag "x-mark.svg", class: "w-2.5 h-2.5" %><% end %>
+              working at <%= linkify_company(@filter_company) %><%= link_to community_index_path(location: @filter_location, sort: @sort, dir: @dir, open_to_work: @filter_open_to_work ? "1" : nil), class: "inline-flex items-center justify-center w-5 h-5 ml-1.5 rounded-full bg-gray-200 text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors align-text-bottom", onclick: "window.dispatchEvent(new CustomEvent('map:reset'))" do %><%= inline_svg_tag "x-mark.svg", class: "w-2.5 h-2.5" %><% end %>
             <% elsif @bounds.present? %>
               from this area
             <% else %>
@@ -101,8 +104,10 @@
 
     <div class="flex-shrink-0 flex flex-col items-start sm:items-end md:justify-between mt-8 md:mt-0">
       <% if user_signed_in? %>
-        <div class="hidden md:flex md:flex-col md:items-end mt-4 mb-1">
-          <%= render "users/user_tile", user: current_user, frameless: true, avatar_size: "w-10 h-9", compact: true, minimal: true, badge_size: "map" %>
+        <div class="hidden sm:flex sm:flex-col sm:items-end mt-4 mb-1">
+          <%= link_to community_user_url(current_user), class: "group", data: { turbo_frame: "_top" } do %>
+            <%= render "shared/gem_avatar", user: current_user, size: "w-10 h-9", badge_size: "map", thick_border: true %>
+          <% end %>
         </div>
         <% unless current_user.testimonial&.published? %>
           <p class="hidden md:block text-xs text-gray-400 text-right mb-3"><%= link_to "Share why you love Ruby", community_user_url(current_user), class: "underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors", data: { turbo_frame: "_top" } %><br>and get featured on&nbsp;<%= link_to "Why Ruby?", cross_domain_url(:primary, "/"), class: "underline decoration-gray-300 hover:decoration-red-500 hover:text-red-600 transition-colors whitespace-nowrap", data: { turbo_frame: "_top" } %></p>
@@ -164,8 +169,8 @@
              end %>
 
           <% filter_params = { location: @filter_location, company: @filter_company, bounds: bounds_params, open_to_work: @filter_open_to_work ? "1" : nil } %>
-          <%= sort_link('users.index.sort.top', 'users.index.sort.top_reverse', 'top', @sort, @dir, filter_params) %>
           <%= sort_link('users.index.sort.trending', 'users.index.sort.trending_reverse', 'trending', @sort, @dir, filter_params) %>
+          <%= sort_link('users.index.sort.top', 'users.index.sort.top_reverse', 'top', @sort, @dir, filter_params) %>
           <%= sort_link('users.index.sort.new', 'users.index.sort.new_reverse', 'new', @sort, @dir, filter_params) %>
           <%= sort_link('users.index.sort.projects', 'users.index.sort.projects_reverse', 'projects', @sort, @dir, filter_params) %>
           <%= sort_link('users.index.sort.posts', 'users.index.sort.posts_reverse', 'posts', @sort, @dir, filter_params) %>

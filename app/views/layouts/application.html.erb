@@ -338,13 +338,13 @@
         <!-- Right column -->
         <div class="text-xs text-right text-gray-400 flex-1">
           By using this site you agree with our
-          <%= link_to "cookie policy", cookie_policy_path, class: "underline hover:text-gray-600 transition" %>.
+          <%= link_to "cookie policy", main_site_url(cookie_policy_path), class: "underline hover:text-gray-600 transition" %>.
           <br />
-          <%= link_to "Privacy", privacy_policy_path, class: "underline hover:text-gray-600 transition" %>
+          <%= link_to "Privacy", main_site_url(privacy_policy_path), class: "underline hover:text-gray-600 transition" %>
           <span class="mx-1">•</span>
-          <%= link_to "Terms", terms_of_service_path, class: "underline hover:text-gray-600 transition" %>
+          <%= link_to "Terms", main_site_url(terms_of_service_path), class: "underline hover:text-gray-600 transition" %>
           <span class="mx-1">•</span>
-          <%= link_to "Legal", legal_notice_path, class: "underline hover:text-gray-600 transition" %>
+          <%= link_to "Legal", main_site_url(legal_notice_path), class: "underline hover:text-gray-600 transition" %>
         </div>
       </div>
 
@@ -368,13 +368,13 @@
 
         <!-- Legal links -->
         <div class="text-center text-xs text-gray-400 space-y-1">
-          <div>By using this site you agree with our <%= link_to "cookie policy", cookie_policy_path, class: "underline hover:text-gray-600 transition" %>.</div>
+          <div>By using this site you agree with our <%= link_to "cookie policy", main_site_url(cookie_policy_path), class: "underline hover:text-gray-600 transition" %>.</div>
           <div>
-            <%= link_to "Privacy", privacy_policy_path, class: "underline hover:text-gray-600 transition" %>
+            <%= link_to "Privacy", main_site_url(privacy_policy_path), class: "underline hover:text-gray-600 transition" %>
             <span class="mx-1">•</span>
-            <%= link_to "Terms", terms_of_service_path, class: "underline hover:text-gray-600 transition" %>
+            <%= link_to "Terms", main_site_url(terms_of_service_path), class: "underline hover:text-gray-600 transition" %>
             <span class="mx-1">•</span>
-            <%= link_to "Legal", legal_notice_path, class: "underline hover:text-gray-600 transition" %>
+            <%= link_to "Legal", main_site_url(legal_notice_path), class: "underline hover:text-gray-600 transition" %>
           </div>
         </div>
       </div>

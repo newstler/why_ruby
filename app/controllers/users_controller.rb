@@ -3,7 +3,7 @@ class UsersController < ApplicationController
     @users = User.visible
 
     # Sorting - set up early so it can be applied to both main and other country users
-    @sort = params[:sort].presence || "top"
+    @sort = params[:sort].presence || "trending"
     @dir  = params[:dir] == "asc" ? "asc" : "desc"
 
     # Normalize legacy/alternate sort params to our toggle model
@@ -48,8 +48,13 @@ class UsersController < ApplicationController
     end
 
     if params[:company].present?
-      @users = @users.where(company: params[:company].strip)
       @filter_company = params[:company].strip
+      company_tokens = @filter_company.split(/\s+/)
+      if company_tokens.size > 1
+        @users = @users.where(company_tokens.map { "company LIKE ?" }.join(" OR "), *company_tokens.map { |t| "%#{User.sanitize_sql_like(t)}%" })
+      else
+        @users = @users.where(company: @filter_company)
+      end
     end
 
     if params[:open_to_work] == "1"
@@ -114,7 +119,7 @@ class UsersController < ApplicationController
 
     # Handle non-public profiles (only owner can view)
     unless @user.public? || (user_signed_in? && current_user == @user)
-      redirect_to users_path, alert: "This profile is private."
+      redirect_to helpers.community_index_path, alert: "This profile is private."
       return
     end
 
