@@ -122,6 +122,8 @@ class GithubDataFetcher
     user_queries = users.each_with_index.map do |user, index|
       <<~GRAPHQL
         user_#{index}: user(login: "#{user.username}") {
+          login
+          email
           name
           bio
           company
@@ -162,6 +164,8 @@ class GithubDataFetcher
   def self.update_user_from_graphql(user, profile_data, repos_data)
     # Update profile fields
     user.update!(
+      username: profile_data[:login],
+      email: profile_data[:email] || user.email,
       name: profile_data[:name],
       bio: profile_data[:bio],
       company: profile_data[:company],
@@ -249,6 +253,8 @@ class GithubDataFetcher
     raw_info = auth_data.extra.raw_info
 
     user.update!(
+      username: auth_data.info.nickname,
+      email: auth_data.info.email,
       name: raw_info.name,
       bio: raw_info.bio,
       company: raw_info.company,
@@ -278,6 +284,8 @@ class GithubDataFetcher
       data = JSON.parse(response.body)
 
       user.update!(
+        username: data["login"],
+        email: data["email"] || user.email,
         name: data["name"],
         bio: data["bio"],
         company: data["company"],
