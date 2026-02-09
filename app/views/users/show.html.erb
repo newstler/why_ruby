@@ -192,7 +192,7 @@
                   <span class="text-gray-700 font-medium">Settings</span>
                   <%= inline_svg_tag "chevron-down.svg", class: "ml-1 h-5 w-5 text-gray-400" %>
                 </button>
-                <div class="hidden absolute z-50 mt-2 right-0 origin-top-right w-56 rounded-md bg-white shadow-lg ring-1 ring-black/5 p-3" data-dropdown-target="menu">
+                <div class="hidden absolute z-50 mt-2 left-0 origin-top-left w-56 rounded-md bg-white shadow-lg ring-1 ring-black/5 p-3" data-dropdown-target="menu">
                   <%= render "users/profile_settings", user: @user, wrapper_id: "profile_settings_mobile" %>
                 </div>
               </div>
