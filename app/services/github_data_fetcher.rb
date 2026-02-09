@@ -166,11 +166,11 @@ class GithubDataFetcher
     user.update!(
       username: profile_data[:login],
       email: profile_data[:email] || user.email,
-      name: profile_data[:name],
+      name: profile_data[:name] || user.name,
       bio: profile_data[:bio] || user.bio,
       company: profile_data[:company],
-      website: profile_data[:websiteUrl].presence,
-      twitter: profile_data[:twitterUsername].presence,
+      website: profile_data[:websiteUrl].presence || user.website,
+      twitter: profile_data[:twitterUsername].presence || user.twitter,
       location: profile_data[:location],
       avatar_url: profile_data[:avatarUrl],
       github_data_updated_at: Time.current
@@ -255,11 +255,11 @@ class GithubDataFetcher
     user.update!(
       username: auth_data.info.nickname,
       email: auth_data.info.email,
-      name: raw_info.name,
+      name: raw_info.name || user.name,
       bio: raw_info.bio || user.bio,
       company: raw_info.company,
-      website: raw_info.blog.presence,
-      twitter: raw_info.twitter_username.presence,
+      website: raw_info.blog.presence || user.website,
+      twitter: raw_info.twitter_username.presence || user.twitter,
       location: raw_info.location,
       avatar_url: auth_data.info.image
     )
@@ -286,11 +286,11 @@ class GithubDataFetcher
       user.update!(
         username: data["login"],
         email: data["email"] || user.email,
-        name: data["name"],
+        name: data["name"] || user.name,
         bio: data["bio"] || user.bio,
         company: data["company"],
-        website: data["blog"],
-        twitter: data["twitter_username"],
+        website: data["blog"].presence || user.website,
+        twitter: data["twitter_username"] || user.twitter,
         location: data["location"],
         avatar_url: data["avatar_url"]
       )
