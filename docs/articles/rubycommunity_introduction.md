@@ -1,10 +1,12 @@
+![Ruby Heart](https://whyruby.info/heart.png)
+
 # The Big "Why Ruby?" Update
 
 A few weeks ago, the official Ruby website added a ["Why Ruby?"](https://www.ruby-lang.org/en/#:~:text=Why%20Ruby) section right on its home page. I looked at it and thought: do I even need to keep my site? And if I do, how should it look now?
 
-Since the launch, the site has collected some nice articles and is now #1 in Google for "why ruby" — so I guess it's doing its job. But I loved the quotes idea from the official site. They immediately answer the main question. Vladimir Dementyev suggested letting everyone share why they love Ruby. So I stole the whole idea and put it right on the first screen 🤷‍♂️
+Since the launch, the site has collected some nice articles and is now #1 in Google for "why ruby" — so I guess it's doing its job. But I loved the quotes idea from the official site. They immediately answer the main question. [Vladimir Dementyev](https://twitter.com/palkan_tula) suggested letting everyone share why they love Ruby. So I stole the whole idea and put it right on the first screen 🤷‍♂️
 
-Now, on your profile, you can write a couple of sentences, and with a little help of AI it becomes a beautiful testimonial on the home page. Go try it!
+Now, on your profile, you can write a couple of sentences, and with a little help of AI it becomes a beautiful testimonial on the home page. [Go try it!](https://rubycommunity.org)
 
 Along the way, I fixed a bunch of bugs and added features some people asked for, like hiding repositories or the "Open to Work" badge. The design got a refresh too.
 
@@ -14,7 +16,7 @@ Many of us have great open source projects, and the community page has become a 
 
 This part of the site started to feel like it needed its own space. A site centered on Ruby developers. A place to showcase your work.
 
-Now it has a new home: **rubycommunity.org**.
+Now it has a new home: **[rubycommunity.org](https://rubycommunity.org)**.
 
 Same app, same database. Sign in on one site and you're signed in on the other. But now there's a clear separation: whyruby.info for advocacy content and testimonials, rubycommunity.org for the community itself.
 
@@ -30,6 +32,8 @@ Conference talk stats, dedicated project pages with collected blog posts about t
 
 I've spent almost 20 years writing Ruby. Built all kinds of products and this past year went deep into practical AI integration.
 
+![Yuri Sidorov](https://whyruby.info/yuri.png)
+
 I'm looking for work. If you're hiring or know someone who is, I'd love to [chat](https://cal.com/yurisidorov).
 
-[WhyRuby.info](https://whyruby.info) | [RubyCommunity.org](https://rubycommunity.org)
+[yurisidorov.com](https://yurisidorov.com) | [WhyRuby.info](https://whyruby.info) | [RubyCommunity.org](https://rubycommunity.org)
