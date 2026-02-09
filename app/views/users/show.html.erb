@@ -79,9 +79,9 @@
             
             <!-- Second line: Bio -->
             <% if @user.bio.present? %>
-              <p class="text-gray-700 mb-2 lg:max-w-[66%]"<% if current_user == @user %> title="To update your bio, company, location or contacts, edit them on GitHub — changes sync here automatically within a day."<% end %>><%= (@user.bio_html.presence || linkify_bio(@user.bio)).html_safe %></p>
+              <p class="text-gray-700 mb-2 lg:max-w-[66%]"<% if current_user == @user %> title="To update your bio, company, location or contacts, edit them on GitHub — changes sync here automatically within a day."<% end %>><%= sanitize(@user.bio_html.presence || linkify_bio(@user.bio), tags: %w[a], attributes: %w[href target rel class]) %></p>
             <% end %>
-            
+
             <!-- Third line: Company and Location -->
             <div class="flex items-center gap-4 text-sm text-gray-400">
               <% if @user.company.present? %>
@@ -158,9 +158,9 @@
           
           <!-- Bio -->
           <% if @user.bio.present? %>
-            <p class="text-gray-700 mb-3"<% if current_user == @user %> title="To update your bio, company, location or contacts, edit them on GitHub — changes sync here automatically within a day."<% end %>><%= (@user.bio_html.presence || linkify_bio(@user.bio)).html_safe %></p>
+            <p class="text-gray-700 mb-3"<% if current_user == @user %> title="To update your bio, company, location or contacts, edit them on GitHub — changes sync here automatically within a day."<% end %>><%= sanitize(@user.bio_html.presence || linkify_bio(@user.bio), tags: %w[a], attributes: %w[href target rel class]) %></p>
           <% end %>
-          
+
           <!-- Company and Location -->
           <div class="flex items-center gap-4 text-sm text-gray-400">
             <% if @user.company.present? %>
