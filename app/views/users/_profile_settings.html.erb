@@ -1,6 +1,6 @@
-<div id="<%= local_assigns[:wrapper_id] || 'profile_settings' %>" class="md:space-y-3">
+<div id="<%= local_assigns[:wrapper_id] || 'profile_settings' %>" class="space-y-0">
   <%# Public Profile Toggle %>
-  <div class="flex items-center justify-between gap-4 py-3 md:py-0 border-t border-gray-100 md:border-t-0">
+  <div class="flex items-center justify-between gap-4 py-3">
     <span class="text-sm font-medium text-gray-500">Public profile</span>
     <%= button_to toggle_public_user_settings_path,
         method: :post,
@@ -12,8 +12,21 @@
     <% end %>
   </div>
 
+  <%# Newsletter Toggle %>
+  <div class="flex items-center justify-between gap-4 py-3 border-t border-gray-100">
+    <span class="text-sm font-medium text-gray-500">Receive news</span>
+    <%= button_to toggle_newsletter_user_settings_path,
+        method: :post,
+        class: "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 #{user.unsubscribed_from_newsletter? ? 'bg-gray-400' : 'bg-red-600'}",
+        data: { turbo_stream: true } do %>
+      <span class="sr-only">Toggle newsletter subscription</span>
+      <span aria-hidden="true"
+            class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out <%= user.unsubscribed_from_newsletter? ? 'translate-x-0' : 'translate-x-4' %>"></span>
+    <% end %>
+  </div>
+
   <%# Open to Work Toggle %>
-  <div class="flex items-center justify-between gap-4 py-3 md:py-0 border-t border-gray-100 md:border-t-0">
+  <div class="flex items-center justify-between gap-4 py-3 border-t border-gray-100">
     <span class="text-sm font-medium text-gray-500">Open to work</span>
     <%= button_to toggle_open_to_work_user_settings_path,
         method: :post,
@@ -25,21 +38,8 @@
     <% end %>
   </div>
 
-  <%# Newsletter Toggle %>
-  <div class="flex items-center justify-between gap-4 py-3 md:py-0 border-t border-gray-100 md:border-t-0">
-    <span class="text-sm font-medium text-gray-500">Newsletter</span>
-    <%= button_to toggle_newsletter_user_settings_path,
-        method: :post,
-        class: "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 #{user.unsubscribed_from_newsletter? ? 'bg-gray-400' : 'bg-red-600'}",
-        data: { turbo_stream: true } do %>
-      <span class="sr-only">Toggle newsletter subscription</span>
-      <span aria-hidden="true"
-            class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out <%= user.unsubscribed_from_newsletter? ? 'translate-x-0' : 'translate-x-4' %>"></span>
-    <% end %>
-  </div>
-
   <%# Sign Out Button %>
-  <div class="md:pt-0">
+  <div class="pt-1">
     <%= button_to "Sign out", destroy_user_session_path,
         method: :delete,
         data: { turbo: false },
