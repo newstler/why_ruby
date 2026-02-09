@@ -1,6 +1,6 @@
-# WhyRuby.info - Ruby Advocacy Community Website
+# WhyRuby.info & RubyCommunity.org
 
-A community-driven Ruby advocacy website built with Ruby 4.0.1 and Rails 8.2 using the Solid Stack (SQLite, SolidQueue, SolidCache, SolidCable).
+Ruby advocacy site and developer community. Built with Ruby 4.0.1 and Rails 8.2 on the Solid Stack (SQLite, SolidQueue, SolidCache, SolidCable).
 
 ## Features
 
