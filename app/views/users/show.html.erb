@@ -32,7 +32,7 @@
 
 <div class="space-y-8 mt-6">
   <!-- Tabbed Content Section -->
-  <div data-controller="tabs">
+  <div>
     <!-- User Info + Testimonial Row -->
     <div class="flex flex-col lg:flex-row lg:gap-8">
       <!-- User Info (left side) -->
@@ -201,6 +201,8 @@
       </div>
     <% end %>
 
+    <turbo-frame id="profile-tabs" target="_top" data-turbo-action="advance">
+    <div data-controller="tabs">
     <!-- Tab Navigation -->
     <% has_projects = @ruby_repos.any? || @hidden_repos.any? %>
     <% has_posts = @user.published_posts_count > 0 %>
@@ -293,7 +295,8 @@
                   end
                 %>
                 <%= link_to menu_label, community_user_path(@user, project_sort: key, project_dir: next_dir),
-                    class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none cursor-pointer" %>
+                    class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none cursor-pointer",
+                    data: { turbo_frame: "profile-tabs" } %>
               <% end %>
             </div>
           </div>
@@ -460,6 +463,8 @@
       <% end %>
     </div>
     <% end %>
+    </div>
+    </turbo-frame>
   </div>
 
 </div>
