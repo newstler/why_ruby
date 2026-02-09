@@ -1,6 +1,6 @@
 class Avo::Resources::Project < Avo::BaseResource
   self.title = :name
-  self.includes = [ :user ]
+  self.includes = [ :user, :star_snapshots ]
   self.model_class = ::Project
   self.description = "Manage GitHub projects (repositories) for users"
   self.default_view_type = :table
@@ -34,7 +34,17 @@ class Avo::Resources::Project < Avo::BaseResource
         end
       end
 
-    field :stars, as: :number
+    field :stars, as: :number, only_on: [ :forms, :show ]
+    field :stars_with_trend,
+      as: :text,
+      name: "Stars",
+      only_on: [ :index ],
+      sortable: -> { query.order(stars: direction) },
+      format_using: -> do
+        gained = record.stars_gained
+        trend = gained > 0 ? content_tag(:span, " +#{gained}", class: "text-green-600") : ""
+        safe_join([ record.stars.to_s, trend ])
+      end
     field :github_url, as: :text, only_on: [ :forms ]
     field :github_url, as: :text, name: "GitHub", only_on: [ :index ],
       format_using: -> do
