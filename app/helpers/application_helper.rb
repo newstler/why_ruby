@@ -324,6 +324,9 @@ module ApplicationHelper
   def cross_domain_url(domain_type, path = "/")
     return path unless Rails.env.production?
 
+    # No Warden context (e.g. rendering from a background job broadcast)
+    return path unless respond_to?(:request) && request.present? && request.env["warden"].present?
+
     domains = Rails.application.config.x.domains
     host = (domain_type == :primary) ? domains.primary : domains.community
 

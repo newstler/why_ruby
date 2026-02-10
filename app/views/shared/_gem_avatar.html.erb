@@ -12,6 +12,7 @@
 <% show_badge = local_assigns.key?(:show_open_to_work) ? show_open_to_work : user.open_to_work? %>
 <% small_badge = local_assigns[:badge_size] == "small" %>
 <% tiny_badge = local_assigns[:badge_size] == "tiny" %>
+<% xs_badge = local_assigns[:badge_size] == "xs" %>
 <% map_badge = local_assigns[:badge_size] == "map" %>
 <% thick_border = local_assigns[:thick_border] == true %>
 <div class="<%= size %> flex-shrink-0 relative overflow-visible">
@@ -44,6 +45,10 @@
     <% elsif tiny_badge %>
       <div class="absolute -bottom-[1px] left-1/2 -translate-x-1/2 z-10">
         <span class="inline-block px-[3px] py-[0.5px] text-[5px] font-bold uppercase tracking-wide text-white bg-red-600 rounded-full whitespace-nowrap" style="line-height:1.2;letter-spacing:0.3px;">Open to work</span>
+      </div>
+    <% elsif xs_badge %>
+      <div class="absolute -bottom-[1px] md:bottom-1 left-1/2 -translate-x-1/2 z-10">
+        <span class="inline-block px-[3px] md:px-2 py-[0.5px] md:py-0.5 text-[5px] md:text-[10px] font-bold uppercase leading-[1.2] tracking-[0.3px] text-white bg-red-600 rounded-full whitespace-nowrap shadow-sm">Open to work</span>
       </div>
     <% else %>
       <div class="absolute <%= small_badge ? 'bottom-0' : 'bottom-1' %> left-1/2 -translate-x-1/2 z-10">

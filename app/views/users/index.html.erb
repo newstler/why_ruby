@@ -61,7 +61,7 @@
             <span class="text-5xl md:text-6xl lg:text-7xl font-black text-red-600 tabular-nums"><%= number_with_delimiter(@total_users_count) %></span>
             <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900"><%= t('users.index.developer_count', count: @total_users_count) %></h1>
             <%= link_to community_user_url(current_user), class: "group sm:hidden ml-auto self-center", data: { turbo_frame: "_top" } do %>
-              <%= render "shared/gem_avatar", user: current_user, size: "w-10 h-9", badge_size: "map", thick_border: true %>
+              <%= render "shared/gem_avatar", user: current_user, size: "w-12 h-[43px]", badge_size: "tiny", thick_border: true %>
             <% end %>
           </div>
           <p class="text-lg md:text-xl text-gray-500 max-w-2xl">
@@ -106,7 +106,7 @@
       <% if user_signed_in? %>
         <div class="hidden sm:flex sm:flex-col sm:items-end mt-4 mb-1">
           <%= link_to community_user_url(current_user), class: "group", data: { turbo_frame: "_top" } do %>
-            <%= render "shared/gem_avatar", user: current_user, size: "w-10 h-9", badge_size: "map", thick_border: true %>
+            <%= render "shared/gem_avatar", user: current_user, size: "w-12 h-[43px]", badge_size: "tiny", thick_border: true %>
           <% end %>
         </div>
         <% unless current_user.testimonial&.published? %>
@@ -128,8 +128,8 @@
         <span class="text-sm font-medium <%= @filter_open_to_work ? 'text-gray-700' : 'text-gray-400' %>">Open to work</span>
       <% end %>
       <div class="relative" data-controller="dropdown">
-      <button type="button" class="flex items-center gap-x-1 text-sm rounded-full cursor-pointer bg-gray-100 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 px-3 py-2" data-action="click->dropdown#toggle click@window->dropdown#hide">
-        <span class="text-gray-400"><%= t('users.index.sort_label') %>:</span>
+      <button type="button" class="flex items-center gap-x-2 text-sm rounded-full cursor-pointer bg-gray-100 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 px-3 py-2" data-action="click->dropdown#toggle click@window->dropdown#hide">
+        <%= inline_svg_tag "sort.svg", class: "w-4 h-4 text-gray-400" %>
         <span class="text-gray-700 font-medium">
           <% effective_sort = (@sort == 'old' ? 'new' : @sort) %>
           <% effective_dir  = (@sort == 'old' ? 'asc' : @dir) %>
@@ -145,7 +145,7 @@
              end %>
           <%= closed_label %>
         </span>
-        <%= inline_svg_tag "chevron-down.svg", class: "ml-1 h-5 w-5 text-gray-400" %>
+        <%= inline_svg_tag "chevron-down.svg", class: "h-5 w-5 text-gray-400" %>
       </button>
 
       <div class="hidden absolute z-50 mt-2 w-64 divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none left-0 md:left-auto md:right-0 origin-top-left md:origin-top-right" data-dropdown-target="menu">

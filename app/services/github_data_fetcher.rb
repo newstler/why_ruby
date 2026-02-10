@@ -166,11 +166,11 @@ class GithubDataFetcher
     user.update!(
       username: profile_data[:login],
       email: profile_data[:email] || user.email,
-      name: profile_data[:name],
-      bio: profile_data[:bio],
+      name: profile_data[:name] || user.name,
+      bio: profile_data[:bio] || user.bio,
       company: profile_data[:company],
-      website: profile_data[:websiteUrl].presence,
-      twitter: profile_data[:twitterUsername].presence,
+      website: profile_data[:websiteUrl].presence || user.website,
+      twitter: profile_data[:twitterUsername].presence || user.twitter,
       location: profile_data[:location],
       avatar_url: profile_data[:avatarUrl],
       github_data_updated_at: Time.current
@@ -190,11 +190,11 @@ class GithubDataFetcher
       }
     end
 
-    sync_projects!(user, repos)
+    sync_projects!(user, repos, force_snapshot: true)
   end
 
   # Sync GitHub repos to Project records with star snapshot tracking
-  def self.sync_projects!(user, repos_data)
+  def self.sync_projects!(user, repos_data, force_snapshot: false)
     current_urls = repos_data.map { |r| r[:github_url] || r[:url] }
 
     # Soft-archive projects no longer returned by GitHub
@@ -216,7 +216,7 @@ class GithubDataFetcher
       )
 
       project.save!
-      project.record_snapshot!
+      project.record_snapshot!(force: force_snapshot)
     end
 
     # Recalculate cached stats on user
@@ -255,11 +255,11 @@ class GithubDataFetcher
     user.update!(
       username: auth_data.info.nickname,
       email: auth_data.info.email,
-      name: raw_info.name,
-      bio: raw_info.bio,
+      name: raw_info.name || user.name,
+      bio: raw_info.bio || user.bio,
       company: raw_info.company,
-      website: raw_info.blog.presence,
-      twitter: raw_info.twitter_username.presence,
+      website: raw_info.blog.presence || user.website,
+      twitter: raw_info.twitter_username.presence || user.twitter,
       location: raw_info.location,
       avatar_url: auth_data.info.image
     )
@@ -286,11 +286,11 @@ class GithubDataFetcher
       user.update!(
         username: data["login"],
         email: data["email"] || user.email,
-        name: data["name"],
-        bio: data["bio"],
+        name: data["name"] || user.name,
+        bio: data["bio"] || user.bio,
         company: data["company"],
-        website: data["blog"],
-        twitter: data["twitter_username"],
+        website: data["blog"].presence || user.website,
+        twitter: data["twitter_username"] || user.twitter,
         location: data["location"],
         avatar_url: data["avatar_url"]
       )

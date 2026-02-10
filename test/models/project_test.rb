@@ -82,7 +82,7 @@ class ProjectTest < ActiveSupport::TestCase
   end
 
   test "record_snapshot creates new snapshot for today" do
-    project = projects(:hidden_project)
+    project = projects(:archived_project)
     project.update!(stars: 15)
 
     snapshot = project.record_snapshot!
@@ -91,11 +91,20 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal 15, snapshot.stars
   end
 
-  test "record_snapshot updates existing snapshot for today" do
-    initial_count = @project.star_snapshots.count
+  test "record_snapshot does not update existing snapshot for today by default" do
+    original_stars = @project.star_snapshots.find_by(recorded_on: Date.current).stars
     @project.update!(stars: 200)
 
     @project.record_snapshot!
+
+    assert_equal original_stars, @project.star_snapshots.find_by(recorded_on: Date.current).stars
+  end
+
+  test "record_snapshot with force updates existing snapshot for today" do
+    initial_count = @project.star_snapshots.count
+    @project.update!(stars: 200)
+
+    @project.record_snapshot!(force: true)
 
     assert_equal initial_count, @project.star_snapshots.count
     assert_equal 200, @project.star_snapshots.find_by(recorded_on: Date.current).stars
