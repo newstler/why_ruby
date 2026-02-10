@@ -128,7 +128,7 @@
         <span class="text-sm font-medium <%= @filter_open_to_work ? 'text-gray-700' : 'text-gray-400' %>">Open to work</span>
       <% end %>
       <div class="relative" data-controller="dropdown">
-      <button type="button" class="flex items-center gap-x-1 text-sm rounded-full cursor-pointer bg-gray-100 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 px-3 py-2" data-action="click->dropdown#toggle click@window->dropdown#hide">
+      <button type="button" class="flex items-center gap-x-2 text-sm rounded-full cursor-pointer bg-gray-100 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 px-3 py-2" data-action="click->dropdown#toggle click@window->dropdown#hide">
         <%= inline_svg_tag "sort.svg", class: "w-4 h-4 text-gray-400" %>
         <span class="text-gray-700 font-medium">
           <% effective_sort = (@sort == 'old' ? 'new' : @sort) %>
@@ -145,7 +145,7 @@
              end %>
           <%= closed_label %>
         </span>
-        <%= inline_svg_tag "chevron-down.svg", class: "ml-1 h-5 w-5 text-gray-400" %>
+        <%= inline_svg_tag "chevron-down.svg", class: "h-5 w-5 text-gray-400" %>
       </button>
 
       <div class="hidden absolute z-50 mt-2 w-64 divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none left-0 md:left-auto md:right-0 origin-top-left md:origin-top-right" data-dropdown-target="menu">

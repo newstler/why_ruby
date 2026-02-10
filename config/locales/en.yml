@@ -369,7 +369,7 @@ en:
       sort:
         top: "Top contributors"
         top_reverse: "Least contributors"
-        trending: "Trending"
+        trending: "Trending today"
         trending_reverse: "Least trending"
         new: "Newcomers"
         new_reverse: "Old members"

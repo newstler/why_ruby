@@ -18,9 +18,9 @@ class Project < ApplicationRecord
     [ snapshots.first - snapshots.last, 0 ].max
   end
 
-  def record_snapshot!
+  def record_snapshot!(force: false)
     snapshot = star_snapshots.find_or_initialize_by(recorded_on: Date.current)
-    snapshot.update!(stars: stars)
+    snapshot.update!(stars: stars) if snapshot.new_record? || force
     snapshot
   end
 end

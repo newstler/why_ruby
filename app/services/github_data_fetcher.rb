@@ -190,11 +190,11 @@ class GithubDataFetcher
       }
     end
 
-    sync_projects!(user, repos)
+    sync_projects!(user, repos, force_snapshot: true)
   end
 
   # Sync GitHub repos to Project records with star snapshot tracking
-  def self.sync_projects!(user, repos_data)
+  def self.sync_projects!(user, repos_data, force_snapshot: false)
     current_urls = repos_data.map { |r| r[:github_url] || r[:url] }
 
     # Soft-archive projects no longer returned by GitHub
@@ -216,7 +216,7 @@ class GithubDataFetcher
       )
 
       project.save!
-      project.record_snapshot!
+      project.record_snapshot!(force: force_snapshot)
     end
 
     # Recalculate cached stats on user
