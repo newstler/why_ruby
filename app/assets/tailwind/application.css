@@ -74,20 +74,6 @@
     }
   }
 
-  /* Badge xs: default 8px, overridden to 6px on portrait phones only */
-  /* Portrait iPhone: orientation portrait, width ≤ 479px, height ≥ 500px */
-  /* Excludes: landscape phones (orientation landscape + width 667px+), portrait tablets (width 768px+), desktops */
-  @media (orientation: portrait) and (max-width: 479px) and (min-height: 500px) {
-    .badge-xs-portrait {
-      font-size: 6px;
-      padding-left: 4px;
-      padding-right: 4px;
-    }
-    .badge-xs-portrait-pos {
-      bottom: -1px;
-    }
-  }
-
   /* Shorter map on landscape tablets so header text below is visible */
   @media (orientation: landscape) and (min-width: 768px) and (max-width: 1399px) {
     .community-map-landscape {
