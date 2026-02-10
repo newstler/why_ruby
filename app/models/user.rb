@@ -141,9 +141,9 @@ class User < ApplicationRecord
 
   def social_links
     links = {}
-    links[:website] = website if website.present?
+    links[:website] = ensure_protocol(website) if website.present?
     links[:twitter] = "https://twitter.com/#{twitter}" if twitter.present?
-    links[:linkedin] = linkedin if linkedin.present?
+    links[:linkedin] = ensure_protocol(linkedin) if linkedin.present?
     links[:github] = github_profile_url
     links
   end
@@ -244,6 +244,10 @@ class User < ApplicationRecord
   end
 
   private
+
+  def ensure_protocol(url)
+    url.match?(%r{\A https?:// }x) ? url : "https://#{url}"
+  end
 
   def precompute_bio_html
     self.bio_html = self.class.linkify_bio(bio)
