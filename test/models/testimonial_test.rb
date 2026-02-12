@@ -22,16 +22,15 @@ class TestimonialTest < ActiveSupport::TestCase
     assert_includes duplicate.errors[:user_id], "has already been taken"
   end
 
-  test "validates uniqueness of heading allowing nil" do
+  test "allows duplicate headings" do
     existing = testimonials(:published)
     other_user = users(:user_no_testimonial)
     new_testimonial = Testimonial.new(
       user: other_user,
-      quote: "My quote",
+      quote: "I love Ruby because it makes programming feel like poetry. The syntax reads so naturally that you can focus on solving problems instead of fighting the language. It truly is a joy.",
       heading: existing.heading
     )
-    assert_not new_testimonial.valid?
-    assert_includes new_testimonial.errors[:heading], "has already been taken"
+    assert new_testimonial.valid?
   end
 
   test "allows nil heading" do

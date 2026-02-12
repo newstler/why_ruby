@@ -21,11 +21,10 @@ class ValidateTestimonialJob < ApplicationJob
       VALIDATION RULES:
       1. First check the user's QUOTE against the content policy. If it violates (including being negative about Ruby), reject immediately with reject_reason "quote".
       2. If the quote is fine, check the AI-generated fields (heading/subheading/body). ONLY reject generation if there is a CLEAR problem:
-         - The heading duplicates an existing one listed below
          - The body contradicts or misrepresents the quote
          - The subheading is nonsensical or unrelated
          - The content is factually wrong about Ruby
-         Do NOT reject just because the fields could be "better" or "more creative". Good enough is good enough — publish it.
+         Do NOT reject for duplicate headings (handled elsewhere). Do NOT reject just because the fields could be "better" or "more creative". Good enough is good enough — publish it.
       3. If everything looks acceptable, publish it.
 
       AI-SOUNDING LANGUAGE CHECK:
@@ -37,7 +36,7 @@ class ValidateTestimonialJob < ApplicationJob
       - Superficial -ing tack-ons ("ensuring...", "highlighting...", "fostering...")
       If the quote itself is fine but the generated text sounds like AI wrote it, set reject_reason to "generation" and explain which phrases sound artificial.
 
-      Existing published testimonials (avoid duplicate headings/themes):
+      Existing published testimonials (for context):
       #{existing.presence || "None yet."}
 
       Respond with valid JSON only: {"publish": true/false, "reject_reason": "quote" or "generation" or null, "feedback": "..."}

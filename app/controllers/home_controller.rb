@@ -13,6 +13,8 @@ class HomeController < ApplicationController
                            .published
                            .includes(:user)
                            .order(created_at: :desc)
-    @testimonials = Testimonial.published.includes(:user).order(Arel.sql("RANDOM()")).limit(20)
+    @testimonials = Testimonial.published.includes(:user)
+                        .where(id: Testimonial.published.group(:heading).select("MIN(id)"))
+                        .order(Arel.sql("RANDOM()")).limit(10)
   end
 end

@@ -124,10 +124,10 @@
             <% else %>
               <% Category.with_posts.ordered.each do |category| %>
                 <% if category.is_success_story? && has_success_stories? %>
-                  <%= link_to category.name, category_path(category),
+                  <%= link_to category.name, main_site_url(category_path(category)),
                       class: "#{category_menu_active?(category) ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
                 <% elsif !category.is_success_story? %>
-                  <%= link_to category.name, category_path(category),
+                  <%= link_to category.name, main_site_url(category_path(category)),
                       class: "#{category_menu_active?(category) ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap" %>
                 <% end %>
               <% end %>
@@ -202,10 +202,10 @@
               <% else %>
                 <% Category.with_posts.ordered.limit(7).each do |category| %>
                   <% if category.is_success_story? && has_success_stories? %>
-                    <%= link_to category.name, category_path(category),
+                    <%= link_to category.name, main_site_url(category_path(category)),
                         class: "#{category_menu_active?(category) ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} block px-3 py-2 rounded-md text-base font-medium" %>
                   <% elsif !category.is_success_story? %>
-                    <%= link_to category.name, category_path(category),
+                    <%= link_to category.name, main_site_url(category_path(category)),
                         class: "#{category_menu_active?(category) ? 'bg-red-100 text-red-700' : 'text-gray-600 hover:bg-gray-100'} block px-3 py-2 rounded-md text-base font-medium" %>
                   <% end %>
                 <% end %>

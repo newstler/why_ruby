@@ -3,7 +3,6 @@ class Testimonial < ApplicationRecord
 
   validates :quote, length: { minimum: 140, maximum: 320 }, allow_blank: true
   validates :user_id, uniqueness: true
-  validates :heading, uniqueness: true, allow_nil: true
 
   scope :published, -> { where(published: true) }
   scope :ordered, -> { order(Arel.sql("position ASC NULLS LAST, created_at DESC")) }
