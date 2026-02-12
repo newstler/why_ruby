@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_02_12_134515) do
+ActiveRecord::Schema[8.2].define(version: 2026_02_12_163246) do
   create_table "_litestream_lock", id: false, force: :cascade do |t|
     t.integer "id"
   end
@@ -212,7 +212,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_02_12_134515) do
     t.datetime "created_at", null: false
     t.string "cross_domain_token"
     t.datetime "cross_domain_token_expires_at"
-    t.string "email", null: false
+    t.string "email"
     t.datetime "github_data_updated_at"
     t.integer "github_id", null: false
     t.integer "github_repos_count"
