@@ -32,7 +32,7 @@ class User < ApplicationRecord
   validates :github_id, presence: true, uniqueness: true
   validates :username, presence: true, uniqueness: true
   validates :slug, uniqueness: true, allow_blank: true
-  validates :email, presence: true, uniqueness: true
+  validates :email, uniqueness: true, allow_blank: true
 
   # Scopes
   scope :trusted, -> {

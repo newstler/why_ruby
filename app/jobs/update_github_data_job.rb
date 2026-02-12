@@ -30,13 +30,5 @@ class UpdateGithubDataJob < ApplicationJob
     if all_errors.any?
       Rails.logger.warn "Errors encountered: #{all_errors.first(10).join(', ')}#{all_errors.size > 10 ? '...' : ''}"
     end
-
-    # Notify admin if there were significant failures
-    if total_failed > 5 && defined?(NotifyAdminJob)
-      NotifyAdminJob.perform_later(
-        subject: "GitHub Data Update Report",
-        message: "GitHub data update completed with #{total_failed} failures out of #{total_updated + total_failed} total users."
-      )
-    end
   end
 end
