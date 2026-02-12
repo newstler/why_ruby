@@ -13,8 +13,13 @@ class HomeController < ApplicationController
                            .published
                            .includes(:user)
                            .order(created_at: :desc)
-    @testimonials = Testimonial.published.includes(:user)
-                        .where(id: Testimonial.published.group(:heading).select("MIN(id)"))
-                        .order(Arel.sql("RANDOM()")).limit(10)
+    subquery = Testimonial.published
+      .select("testimonials.*", "ROW_NUMBER() OVER (PARTITION BY LOWER(heading) ORDER BY RANDOM()) AS rn")
+    @testimonials = Testimonial
+      .from(subquery, :testimonials)
+      .where("rn = 1")
+      .order(Arel.sql("RANDOM()"))
+      .limit(10)
+      .includes(:user)
   end
 end
