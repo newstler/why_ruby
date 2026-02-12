@@ -98,7 +98,6 @@ class Post < ApplicationRecord
   def auto_hide_if_needed!
     if reports_count >= 3
       update!(needs_admin_review: true, published: false)
-      NotifyAdminJob.perform_later(self)
     end
   end
 

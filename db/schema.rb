@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_02_10_151849) do
+ActiveRecord::Schema[8.2].define(version: 2026_02_12_025116) do
   create_table "_litestream_lock", id: false, force: :cascade do |t|
     t.integer "id"
   end
@@ -240,7 +240,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_02_10_151849) do
     t.string "username", null: false
     t.string "website"
     t.index ["cross_domain_token"], name: "index_users_on_cross_domain_token", unique: true
-    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["email"], name: "index_users_on_email"
     t.index ["github_id"], name: "index_users_on_github_id", unique: true
     t.index ["latitude", "longitude"], name: "index_users_on_coordinates"
     t.index ["normalized_location"], name: "index_users_on_normalized_location"
