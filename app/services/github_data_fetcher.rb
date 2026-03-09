@@ -102,7 +102,7 @@ class GithubDataFetcher
           Rails.logger.error "GraphQL request failed: #{response.code} - #{response.body}"
           return { errors: [ "HTTP #{response.code}: #{response.message}" ] }
         end
-      rescue Net::OpenTimeout, Net::ReadTimeout => e
+      rescue Net::OpenTimeout, Net::ReadTimeout, EOFError => e
         if attempt < retries - 1
           sleep_time = 2 ** (attempt + 1)
           Rails.logger.warn "GraphQL request timed out, retrying in #{sleep_time}s (attempt #{attempt + 1}/#{retries})"
