@@ -47,9 +47,52 @@ class MaliciousPathBlockerTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
   end
 
+  # Dotfiles (scanner probes)
+  test "blocks dotfile requests like .rbenv-vars" do
+    get "/.rbenv-vars"
+    assert_response :forbidden
+  end
+
+  test "blocks dotfile requests like .yarnrc" do
+    get "/.yarnrc"
+    assert_response :forbidden
+  end
+
+  # File extension probes (not in public/)
+  test "blocks unknown file extensions like delete.sql" do
+    get "/delete.sql"
+    assert_response :not_found
+  end
+
+  test "blocks unknown file extensions like secrets.txt" do
+    get "/secrets.txt"
+    assert_response :not_found
+  end
+
+  test "blocks unknown file extensions like remove.sh" do
+    get "/remove.sh"
+    assert_response :not_found
+  end
+
+  test "blocks unknown file extensions like sitemap.xml" do
+    get "/sitemap.xml"
+    assert_response :not_found
+  end
+
   # Apple touch icon — legitimate iOS request, served as static file
   test "allows apple-touch-icon-precomposed requests" do
     get "/apple-touch-icon-precomposed.png"
+    assert_response :success
+  end
+
+  # Known public files should pass through
+  test "allows robots.txt" do
+    get "/robots.txt"
+    assert_response :success
+  end
+
+  test "allows favicon.ico" do
+    get "/favicon.ico"
     assert_response :success
   end
 
