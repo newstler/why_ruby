@@ -15,7 +15,7 @@ Rails.application.routes.draw do
     # Redirect /community paths that may linger from old links or crawlers
     get "community", to: redirect("/", status: 301)
     get "community/:id", to: redirect("/%{id}", status: 301), constraints: { id: /[^\/]+/ }
-    get ":id", to: "users#show", as: :rubycommunity_user, constraints: { id: /[^\/]+/ }
+    get ":id", to: "users#show", as: :rubycommunity_user, constraints: { id: /[^\/\.]+/ }
   end
 
   # Add sign out route for OmniAuth-only authentication
@@ -104,10 +104,11 @@ Rails.application.routes.draw do
   get "legal", to: "legal#show", defaults: { page: "legal_notice" }, as: :legal_notice
 
   # Category routes (must be at the end due to catch-all nature)
-  get ":id", to: "categories#show", as: :category, constraints: { id: /[^\/]+/ }
+  # Exclude paths with dots so file requests (sitemap.xml, robots.txt) fall through to public/
+  get ":id", to: "categories#show", as: :category, constraints: { id: /[^\/\.]+/ }
 
   # Post routes (must be after category)
-  get ":category_id/:id", to: "posts#show", as: :post, constraints: { category_id: /[^\/]+/, id: /[^\/]+/ }
+  get ":category_id/:id", to: "posts#show", as: :post, constraints: { category_id: /[^\/\.]+/, id: /[^\/\.]+/ }
   get ":category_id/:id/og-image.webp", to: "posts#image", as: :post_image, constraints: { category_id: /[^\/]+/, id: /[^\/]+/ }
 
   # Defines the root path route ("/")
