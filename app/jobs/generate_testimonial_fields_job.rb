@@ -1,7 +1,7 @@
 class GenerateTestimonialFieldsJob < ApplicationJob
   queue_as :default
 
-  MAX_HEADING_RETRIES = 3
+  MAX_HEADING_RETRIES = 5
 
   def perform(testimonial)
     existing_headings = Testimonial.where.not(id: testimonial.id).where.not(heading: nil).pluck(:heading)
@@ -41,6 +41,10 @@ class GenerateTestimonialFieldsJob < ApplicationJob
       return
     end
 
+    if heading_taken?(parsed["heading"], testimonial.id)
+      Rails.logger.warn "Testimonial #{testimonial.id}: heading '#{parsed["heading"]}' still collides after #{MAX_HEADING_RETRIES} retries, saving anyway"
+    end
+
     testimonial.update!(
       heading: parsed["heading"],
       subheading: parsed["subheading"],
@@ -66,10 +70,13 @@ class GenerateTestimonialFieldsJob < ApplicationJob
       You generate structured testimonial content for a Ruby programming language advocacy site.
       Given a user's quote about why they love Ruby, generate:
 
-      1. heading: A single unique 1-2 word heading that captures the THEME of the quote (e.g., "Elegance", "Joy", "Craft").
+      1. heading: A unique 1-3 word heading that captures the THEME or FEELING of the quote.
+         Be creative and specific. Go beyond generic words. Think of evocative nouns, metaphors, compound phrases, or poetic concepts.
+         The heading must make sense as an answer to "Why Ruby?" — e.g. "Why Ruby?" → "Flow State", "Clarity", "Pure Joy".
+         Good examples: "Spark", "Flow State", "Quiet Power", "Warm Glow", "First Love", "Playground", "Second Nature", "Deep Roots", "Readable Code", "Clean Slate", "Smooth Sailing", "Expressiveness", "Old Friend", "Sharp Tools", "Creative Freedom", "Solid Ground", "Calm Waters", "Poetic Logic", "Builder's Joy", "Sweet Spot", "Hidden Gem", "Fresh Start", "True North", "Clarity", "Belonging", "Empowerment", "Momentum", "Simplicity", "Trust", "Confidence"
          #{taken}
       2. subheading: A short tagline under 10 words.
-      3. body_text: 2-3 sentences that EXTEND and DEEPEN the user's idea — add new angles, examples, or implications.
+      3. body_text: 2-3 sentences that EXTEND and DEEPEN the user's idea. Add new angles, examples, or implications.
          Do NOT repeat or paraphrase what the user already said. Build on top of it.
 
       WRITING STYLE — sound like a real person, not an AI:
@@ -136,7 +143,7 @@ class GenerateTestimonialFieldsJob < ApplicationJob
       parameters: {
         model: "claude-3-haiku-20240307",
         max_tokens: 300,
-        temperature: 0.7,
+        temperature: 0.8,
         system: system_prompt,
         messages: [ { role: "user", content: user_prompt } ]
       }
@@ -161,7 +168,7 @@ class GenerateTestimonialFieldsJob < ApplicationJob
           { role: "system", content: system_prompt },
           { role: "user", content: user_prompt }
         ],
-        temperature: 0.7,
+        temperature: 0.8,
         max_tokens: 300
       }
     )
