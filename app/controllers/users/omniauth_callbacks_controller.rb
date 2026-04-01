@@ -1,16 +1,15 @@
-class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
+class Users::OmniauthCallbacksController < ApplicationController
   skip_before_action :verify_authenticity_token, only: :github
 
   def github
-    @user = User.from_omniauth(request.env["omniauth.auth"])
+    auth = request.env["omniauth.auth"]
+    @user = User.from_omniauth(auth)
 
     if @user.persisted?
-      sign_in @user, event: :authentication
-      set_flash_message(:notice, :success, kind: "GitHub") if is_navigational_format?
+      sign_in @user
       redirect_to after_sign_in_path, allow_other_host: true
     else
-      session["devise.github_data"] = request.env["omniauth.auth"].except(:extra)
-      redirect_to new_user_registration_url
+      redirect_to root_path, alert: "Authentication failed."
     end
   end
 
@@ -23,10 +22,8 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   def after_sign_in_path
     # Get the original page user was on (stored in session before OAuth)
     return_to = session.delete(:return_to)
-    session.delete(:from_community) # Clean up, not used anymore
 
     # Determine final destination
-    # If specific return_to is set, use it; otherwise go to user profile
     final_destination = return_to.presence || user_profile_path
 
     # In production, sync session to other domain first, then return to original page
@@ -36,11 +33,8 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
       current_host = request.host
       token = @user.generate_cross_domain_token!
 
-      # Build full URL for final destination
-      # If final_destination is already a full URL (from user_profile_path), use it directly
       final_url = final_destination.start_with?("https://") ? final_destination : "https://#{current_host}#{final_destination}"
 
-      # Redirect to other domain to sync session, passing final destination
       "https://#{other_host}/auth/receive?token=#{token}&return_to=#{CGI.escape(final_url)}"
     else
       final_destination
@@ -48,8 +42,6 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   end
 
   def user_profile_path
-    # In development: /community/:username
-    # In production: always go to rubycommunity.org/:username
     domains = Rails.application.config.x.domains
     if Rails.env.production?
       "https://#{domains.community}/#{@user.to_param}"

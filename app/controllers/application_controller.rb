@@ -8,38 +8,55 @@ class ApplicationController < ActionController::Base
   before_action :set_locale
   before_action :set_current_team, if: :team_scoped_request?
 
-  protected
+  private
 
-  def after_sign_in_path_for(resource)
-    # Check if there's a stored return path
-    return_to = session.delete(:return_to)
-    return return_to if return_to.present?
+  # ── Session-based authentication ──
 
-    # Otherwise redirect to user's profile after sign in
-    if resource.is_a?(User)
-      user_path(resource)
-    else
-      super
+  def current_user
+    @current_user ||= User.find_by(id: session[:user_id]) if session[:user_id]
+  end
+  helper_method :current_user
+
+  def user_signed_in?
+    current_user.present?
+  end
+  helper_method :user_signed_in?
+
+  def sign_in(user)
+    reset_session
+    session[:user_id] = user.id
+    @current_user = user
+  end
+
+  def sign_out(_user = nil)
+    reset_session
+    @current_user = nil
+  end
+
+  def authenticate_user!
+    unless user_signed_in?
+      session[:return_to] = request.original_url if request.get?
+      redirect_to github_auth_with_return_path, alert: "Please sign in with GitHub to continue."
     end
   end
 
-  private
+  # ── Current attributes ──
 
   def set_current_user
     Current.user = current_user if defined?(Current) && Current.respond_to?(:user=)
   end
+
+  # ── Locale ──
 
   def set_locale
     I18n.locale = detect_locale
   end
 
   def detect_locale
-    # 1. User's stored preference
     if current_user&.respond_to?(:locale) && current_user.locale.present?
       return current_user.locale.to_sym
     end
 
-    # 2. Accept-Language header
     if request.headers["Accept-Language"] && defined?(Language)
       accepted = parse_accept_language(request.headers["Accept-Language"])
       enabled = Language.enabled_codes
@@ -49,7 +66,6 @@ class ApplicationController < ActionController::Base
       end
     end
 
-    # 3. Default
     I18n.default_locale
   end
 
@@ -57,6 +73,8 @@ class ApplicationController < ActionController::Base
     I18n.locale
   end
   helper_method :detected_locale
+
+  # ── Team scoping ──
 
   def set_current_team
     return unless current_user

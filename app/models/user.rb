@@ -59,9 +59,6 @@ class User < ApplicationRecord
     where("normalized_location LIKE ? OR normalized_location = ?", "%, #{country_code}", country_code)
   }
 
-  # Devise modules for GitHub OAuth
-  devise :omniauthable, omniauth_providers: [ :github ]
-
   # Instance methods
   def trusted?
     published_posts_count >= 3 && published_comments_count >= 10
@@ -195,14 +192,6 @@ class User < ApplicationRecord
     GithubDataFetcher.new(user, auth).fetch_and_update!
 
     user
-  end
-
-  def self.new_with_session(params, session)
-    super.tap do |user|
-      if data = session["devise.github_data"] && session["devise.github_data"]["extra"]["raw_info"]
-        user.email = data["email"] if user.email.blank?
-      end
-    end
   end
 
   # Cross-domain session sync methods

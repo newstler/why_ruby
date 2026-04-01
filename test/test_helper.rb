@@ -2,18 +2,28 @@ ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
 
+# Configure OmniAuth for testing
+OmniAuth.config.test_mode = true
+
 module ActiveSupport
   class TestCase
-    # Run tests in parallel with specified workers
     parallelize(workers: :number_of_processors)
-
-    # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
+  end
+end
 
-    # Add more helper methods to be used by all tests here...
+module SignInHelper
+  # Sign in by directly setting the session via a test-only endpoint
+  def sign_in(user)
+    # Open a session so we can set user_id directly
+    post "/_test_sign_in", params: { user_id: user.id }
+  end
+
+  def sign_out(_user = nil)
+    delete destroy_user_session_path
   end
 end
 
 class ActionDispatch::IntegrationTest
-  include Devise::Test::IntegrationHelpers
+  include SignInHelper
 end

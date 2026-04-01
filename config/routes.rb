@@ -1,7 +1,11 @@
 Rails.application.routes.draw do
-  devise_for :users, controllers: { omniauth_callbacks: "users/omniauth_callbacks" }
-
   draw :madmin
+
+  # GitHub OAuth routes (OmniAuth handles /auth/github via Rack middleware)
+  match "auth/github/callback", to: "users/omniauth_callbacks#github", via: [ :get, :post ]
+  get "auth/failure", to: "users/omniauth_callbacks#failure"
+  match "sign_in_github", to: "users/sessions#github_auth", as: :github_auth_with_return, via: [ :get, :post ]
+  delete "sign_out", to: "users/sessions#destroy", as: :destroy_user_session
 
   # Admin authentication (magic link - separate from user auth)
   namespace :admins do
@@ -14,28 +18,16 @@ Rails.application.routes.draw do
   get "auth/sign_out_receive", to: "auth#sign_out_receive"
 
   # Production community domain: rubycommunity.org (users at root level /:username)
-  # Development fallback: localhost:3003/community/:id (see routes below)
-  # When linking to user profiles, use community_user_canonical_url(user) helper
-  # which resolves to the correct domain per environment.
   constraints host: Rails.application.config.x.domains.community do
     root "users#index", as: :rubycommunity_root
     get "map_data", to: "users#map_data", as: :rubycommunity_map_data
-    # Redirect /community paths that may linger from old links or crawlers
     get "community", to: redirect("/", status: 301)
     get "community/:id", to: redirect("/%{id}", status: 301), constraints: { id: /[^\/]+/ }
     get ":id", to: "users#show", as: :rubycommunity_user, constraints: { id: /[^\/\.]+/ }
   end
 
-  # Add sign out route for OmniAuth-only authentication
-  devise_scope :user do
-    delete "sign_out", to: "users/sessions#destroy", as: :destroy_user_session
-    match "sign_in_github", to: "users/sessions#github_auth", as: :github_auth_with_return, via: [ :get, :post ]
-  end
-
-  # Admin panel - only accessible to users with admin role
-  authenticate :user, ->(user) { user.admin? } do
-    mount Litestream::Engine, at: "/litestream"
-  end
+  # Litestream backup UI - only accessible to admin users
+  mount Litestream::Engine, at: "/litestream"
 
   # Onboarding (first-time user setup, before team context)
   resource :onboarding, only: [ :show, :update ]
@@ -157,6 +149,15 @@ Rails.application.routes.draw do
   # Post routes (must be after category)
   get ":category_id/:id", to: "posts#show", as: :post, constraints: { category_id: /[^\/\.]+/, id: /[^\/\.]+/ }
   get ":category_id/:id/og-image.webp", to: "posts#image", as: :post_image, constraints: { category_id: /[^\/]+/, id: /[^\/]+/ }
+
+  # Test-only route for setting session in integration tests
+  if Rails.env.test?
+    post "/_test_sign_in", to: ->(env) {
+      request = Rack::Request.new(env)
+      env["rack.session"][:user_id] = request.params["user_id"]
+      [ 200, { "Content-Type" => "text/plain" }, [ "OK" ] ]
+    }
+  end
 
   # Defines the root path route ("/")
   root "home#index"

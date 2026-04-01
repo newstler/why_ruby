@@ -1,8 +1,25 @@
 Rails.application.config.middleware.use OmniAuth::Builder do
-  # This is needed to fix the "Authentication passthru" error
-  # The actual provider config is in devise.rb
+  provider :github,
+    nil, # Set dynamically via setup
+    nil, # Set dynamically via setup
+    scope: "user:email,read:user",
+    callback_path: "/auth/github/callback",
+    setup: lambda { |env|
+      request = Rack::Request.new(env)
+      strategy = env["omniauth.strategy"]
+
+      domains = Rails.application.config.x.domains
+      if Rails.env.production? && request.host == domains.community
+        strategy.options[:client_id] = Rails.application.credentials.dig(:github, :rubycommunity, :client_id)
+        strategy.options[:client_secret] = Rails.application.credentials.dig(:github, :rubycommunity, :client_secret)
+        strategy.options[:callback_url] = "https://#{domains.community}/auth/github/callback"
+      else
+        strategy.options[:client_id] = Rails.application.credentials.dig(:github, :whyruby, :client_id)
+        strategy.options[:client_secret] = Rails.application.credentials.dig(:github, :whyruby, :client_secret)
+        strategy.options[:callback_url] = Rails.env.production? ? "https://#{domains.primary}/auth/github/callback" : nil
+      end
+    }
 end
 
-# Fix for Omniauth POST requests
 OmniAuth.config.allowed_request_methods = [ :post, :get ]
 OmniAuth.config.silence_get_warning = true
