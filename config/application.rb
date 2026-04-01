@@ -14,8 +14,9 @@ module WhyRuby
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
-    config.autoload_lib(ignore: %w[assets tasks middleware])
+    config.autoload_lib(ignore: %w[assets tasks middleware generators])
 
+    # Block malicious requests (WordPress exploits, PHP files, etc.) early
     require_relative "../lib/middleware/malicious_path_blocker"
     config.middleware.insert_before Rails::Rack::Logger, Middleware::MaliciousPathBlocker
 
@@ -26,6 +27,9 @@ module WhyRuby
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # Load locale files from nested directories
+    config.i18n.load_path += Dir[Rails.root.join("config/locales/**/*.yml")]
 
     # Allow requests from different ports in development
     config.hosts.clear if Rails.env.development?

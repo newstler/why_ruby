@@ -2,8 +2,8 @@
 # check=error=true
 
 # This Dockerfile is designed for production, not development. Use with Kamal or build'n'run by hand:
-# docker build -t template .
-# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name template template
+# docker build -t why_ruby .
+# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value> --name why_ruby why_ruby
 
 # For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 
@@ -16,29 +16,30 @@ WORKDIR /rails
 
 RUN echo 'Acquire::http::Pipeline-Depth 0;\nAcquire::http::No-Cache true;\nAcquire::BrokenProxy true;\n' > /etc/apt/apt.conf.d/99fixbadproxy
 
-
-# Install base packages
+# Install base packages and set up jemalloc
 RUN rm -rf /var/lib/apt/lists/* && \
     apt-get update -qq --fix-missing && \
-    apt-get install --no-install-recommends -y curl libjemalloc2 libvips sqlite3 imagemagick librsvg2-bin && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install --no-install-recommends -y curl libjemalloc2 libssl-dev libvips sqlite3 imagemagick librsvg2-bin && \
+    rm -rf /var/lib/apt/lists /var/cache/apt/archives && \
+    ln -s /usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2 /usr/lib/libjemalloc.so.2
 
 # Set production environment
 ENV RAILS_ENV="production" \
     BUNDLE_DEPLOYMENT="1" \
     BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_WITHOUT="development"
+    BUNDLE_WITHOUT="development:test" \
+    LD_PRELOAD="/usr/lib/libjemalloc.so.2"
 
 # Throw-away build stage to reduce size of final image
 FROM base AS build
 
 # Install packages needed to build gems
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git pkg-config libyaml-dev zlib1g-dev && \
+    apt-get install --no-install-recommends -y build-essential git libyaml-dev pkg-config zlib1g-dev && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Install application gems
-COPY Gemfile Gemfile.lock ./
+COPY Gemfile Gemfile.lock vendor ./
 RUN bundle install && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
     bundle exec bootsnap precompile --gemfile
@@ -46,8 +47,7 @@ RUN bundle install && \
 # Copy application code
 COPY . .
 
-# Download MaxMind GeoLite2 database for IP geolocation (requires account ID and license key)
-# MaxMind API changed in May 2024 to require Basic Auth with account_id:license_key
+# Download MaxMind GeoLite2 database for IP geolocation (optional)
 RUN --mount=type=secret,id=MAXMIND_ACCOUNT_ID \
     --mount=type=secret,id=MAXMIND_LICENSE_KEY \
     if [ -f /run/secrets/MAXMIND_ACCOUNT_ID ] && [ -f /run/secrets/MAXMIND_LICENSE_KEY ]; then \
@@ -61,8 +61,8 @@ RUN --mount=type=secret,id=MAXMIND_ACCOUNT_ID \
       echo "MAXMIND credentials not provided, skipping GeoLite2 download"; \
     fi
 
-# Precompile bootsnap code for faster boot times
-RUN bundle exec bootsnap precompile app/ lib/
+# Precompile bootsnap code for faster boot times (use -j 1 for QEMU compatibility)
+RUN bundle exec bootsnap precompile -j 1 app/ lib/
 
 # Precompiling assets for production with RAILS_MASTER_KEY from secrets
 RUN --mount=type=secret,id=RAILS_MASTER_KEY \
@@ -70,19 +70,20 @@ RUN --mount=type=secret,id=RAILS_MASTER_KEY \
     ./bin/rails assets:precompile
 
 
-
-
 # Final stage for app image
 FROM base
 
-# Copy built artifacts: gems, application
-COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
-COPY --from=build /rails /rails
+# OCI labels
+LABEL org.opencontainers.image.source="https://github.com/newstler/why_ruby"
 
 # Run and own only the runtime files as a non-root user for security
 RUN groupadd --system --gid 1000 rails && \
-    useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash && \
-    chown -R rails:rails db log storage tmp
+    useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash
+
+# Copy built artifacts: gems, application
+COPY --from=build --chown=rails:rails "${BUNDLE_PATH}" "${BUNDLE_PATH}"
+COPY --from=build --chown=rails:rails /rails /rails
+
 USER 1000:1000
 
 # Entrypoint prepares the database.

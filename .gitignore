@@ -7,9 +7,6 @@
 # Ignore bundler config.
 /.bundle
 
-# Ignore all environment files.
-/.env*
-
 # Ignore all logfiles and tempfiles.
 /log/*
 /tmp/*
@@ -33,19 +30,19 @@
 # Ignore master key for decrypting credentials and more.
 /config/master.key
 /config/credentials/*.key
+/config/*.key
+
+# Ignore configuration marker
+/.configured
 
 /app/assets/builds/*
 !/app/assets/builds/.keep
 
-# Ignoe macOS files
+# Ignore macOS files
 .DS_Store
 
 # Ignore Rubymine files
 .idea/
 
-/config/credentials/development.key
-
-/config/credentials/production.key
-
-# MaxMind GeoLite2 database (download separately - not redistributable)
-/db/*.mmdb
+# MaxMind GeoLite2 database (not redistributable)
+db/*.mmdb

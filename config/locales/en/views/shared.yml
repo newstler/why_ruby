@@ -1,0 +1,17 @@
+---
+en:
+  shared:
+    image_upload:
+      drop_image: Drop image
+      uploading: Uploading…
+    sidebar:
+      articles: Articles
+      billing: Billing
+      chats: Chats
+      collapse: Collapse sidebar
+      home: Home
+      languages: Languages
+      members: Members
+      new_chat: New Chat
+      settings: Settings
+      user: User

@@ -40,5 +40,7 @@ plugin :solid_queue if ENV["SOLID_QUEUE_IN_PUMA"]
 # In other environments, only set the PID file if requested.
 pidfile ENV["PIDFILE"] if ENV["PIDFILE"]
 
-# Run litestream only in production.
-plugin :litestream if ENV.fetch("RAILS_ENV", "production") == "production"
+# Run litestream only in production when explicitly enabled via env var.
+if ENV.fetch("RAILS_ENV", "production") == "production" && ENV["LITESTREAM_ENABLED"].present?
+  plugin :litestream
+end

@@ -2,6 +2,8 @@ class User < ApplicationRecord
   extend FriendlyId
   friendly_id :username, use: [ :slugged, :history, :finders ]
 
+  include Costable if defined?(Costable)
+
   # Associations
   has_many :posts, dependent: :destroy
   has_many :comments, dependent: :destroy
@@ -12,6 +14,11 @@ class User < ApplicationRecord
   has_many :projects, dependent: :destroy
   has_many :visible_projects, -> { visible.by_pushed_at }, class_name: "Project"
   has_many :hidden_projects, -> { hidden.active.by_pushed_at }, class_name: "Project"
+  has_many :chats, dependent: :destroy
+  has_many :memberships, dependent: :destroy
+  has_many :teams, through: :memberships
+
+  has_one_attached :avatar
 
   # Enums
   enum :role, { member: 0, admin: 1 }
@@ -22,17 +29,22 @@ class User < ApplicationRecord
   # Callbacks
   before_save :precompute_bio_html, if: :will_save_change_to_bio?
   after_save :enqueue_location_normalization, if: :saved_change_to_location?
+  after_save :purge_avatar, if: :remove_avatar
   after_commit :invalidate_map_cache, if: -> {
     saved_change_to_latitude? || saved_change_to_longitude? ||
     saved_change_to_public? || saved_change_to_avatar_url? ||
     saved_change_to_open_to_work?
   }
 
+  attribute :remove_avatar, :boolean, default: false
+
   # Validations
   validates :github_id, presence: true, uniqueness: true
   validates :username, presence: true, uniqueness: true
   validates :slug, uniqueness: true, allow_blank: true
   validates :email, uniqueness: true, allow_blank: true
+
+  before_validation :nilify_blank_locale
 
   # Scopes
   scope :trusted, -> {
@@ -57,6 +69,12 @@ class User < ApplicationRecord
 
   def can_report?
     trusted?
+  end
+
+  def onboarded? = name.present?
+
+  def effective_locale(fallback: :en)
+    locale&.to_sym || fallback
   end
 
   def visible_ruby_repositories
@@ -209,6 +227,28 @@ class User < ApplicationRecord
     user
   end
 
+  # Team membership methods
+  def membership_for(team)
+    memberships.find_by(team: team)
+  end
+
+  def member_of?(team)
+    memberships.exists?(team: team)
+  end
+
+  def admin_of?(team)
+    memberships.exists?(team: team, role: %w[admin owner])
+  end
+
+  def owner_of?(team)
+    memberships.exists?(team: team, role: "owner")
+  end
+
+  # Recalculate total cost from all chats
+  def recalculate_total_cost!
+    update_column(:total_cost, chats.sum(:total_cost))
+  end
+
   # Linkify URLs and GitHub @mentions in bio text
   # Returns precomputed HTML for display
   def self.linkify_bio(text)
@@ -263,5 +303,13 @@ class User < ApplicationRecord
 
   def invalidate_map_cache
     Rails.cache.delete("community_map_data")
+  end
+
+  def purge_avatar
+    avatar.purge_later
+  end
+
+  def nilify_blank_locale
+    self.locale = nil if locale.blank?
   end
 end
