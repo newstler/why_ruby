@@ -27,7 +27,7 @@ export default class extends Controller {
     const postId = form ? (form.dataset.postId || form.getAttribute('data-post-id')) : null
     
     try {
-      const response = await fetch('/posts/fetch_metadata', {
+      const response = await fetch('/posts/metadata', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -170,7 +170,7 @@ export default class extends Controller {
     const postId = form ? (form.dataset.postId || form.getAttribute('data-post-id')) : null
     
     try {
-      const response = await fetch('/posts/check_duplicate_url', {
+      const response = await fetch('/posts/duplicate_check', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

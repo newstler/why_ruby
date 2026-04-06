@@ -1,36 +1,11 @@
 class PostsController < ApplicationController
-  before_action :authenticate_user!, except: [ :show, :image ]
-  before_action :set_post, only: [ :show, :edit, :update, :destroy, :image ]
+  before_action :authenticate_user!, except: [ :show ]
+  before_action :set_post, only: [ :show, :edit, :update, :destroy ]
   before_action :authorize_user!, only: [ :edit, :update, :destroy ]
 
   def show
     @comments = @post.comments.published.includes(:user).order(created_at: :asc)
   end
-
-  # Serve images directly for posts with stable URLs for social media
-  def image
-    if @post.featured_image.attached?
-      # Serve the og variant (1200x630 WebP) for social media
-      og_blob = @post.image_variant(:og)
-
-      if og_blob
-        send_data og_blob.download,
-                  type: "image/webp",
-                  disposition: "inline"
-      else
-        # Fallback to original if og variant not available yet
-        send_data @post.featured_image.download,
-                  type: "image/webp",
-                  disposition: "inline"
-      end
-    else
-      # Serve default OG image (should also be WebP)
-      send_file Rails.root.join("public", "og-image.webp"),
-                type: "image/webp",
-                disposition: "inline"
-    end
-  end
-
 
 
   def new
@@ -124,77 +99,6 @@ class PostsController < ApplicationController
     end
   end
 
-  def preview
-    html = helpers.markdown_to_html(params[:content])
-    render json: { html: html }
-  end
-
-  def fetch_metadata
-    url = params[:url]
-    exclude_id = params[:exclude_id] || request.request_parameters[:exclude_id]
-
-    # Normalize URL for duplicate checking
-    normalized_url = normalize_url_for_checking(url)
-
-    # Check for existing post (excluding current post if editing)
-    existing_post = Post.where(url: normalized_url)
-    existing_post = existing_post.where.not(id: exclude_id) if exclude_id.present?
-    existing_post = existing_post.first
-
-    if existing_post
-      render json: {
-        success: false,
-        duplicate: true,
-        existing_post: {
-          id: existing_post.id,
-          title: existing_post.title,
-          url: post_path_for(existing_post)
-        }
-      }
-      return
-    end
-
-    begin
-      post = Post.new(url: url)
-      result = post.fetch_metadata!
-
-      metadata = {
-        title: result[:title],
-        summary: result[:description],
-        image_url: result[:image_url]
-      }
-
-      render json: { success: true, metadata: metadata }
-    rescue => e
-      render json: { success: false, error: e.message }
-    end
-  end
-
-  def check_duplicate_url
-    url = params[:url]
-    normalized_url = normalize_url_for_checking(url)
-
-    # Handle exclude_id from both regular params and JSON body
-    exclude_id = params[:exclude_id] || request.request_parameters[:exclude_id]
-
-    existing_post = Post.where(url: normalized_url)
-    existing_post = existing_post.where.not(id: exclude_id) if exclude_id.present?
-    existing_post = existing_post.first
-
-    if existing_post
-      render json: {
-        duplicate: true,
-        existing_post: {
-          id: existing_post.id,
-          title: existing_post.title,
-          url: post_path_for(existing_post)
-        }
-      }
-    else
-      render json: { duplicate: false }
-    end
-  end
-
   private
 
   def fetch_and_attach_image_from_url(url)
@@ -219,20 +123,6 @@ class PostsController < ApplicationController
   end
 
 
-
-  def normalize_url_for_checking(url)
-    return nil unless url.present?
-
-    # Strip and remove trailing slashes
-    normalized = url.strip.gsub(/\/+$/, "")
-
-    # Convert http to https for common domains
-    if normalized.match?(/^http:\/\/(www\.)?(github\.com|twitter\.com|youtube\.com|linkedin\.com|stackoverflow\.com)/i)
-      normalized = normalized.sub(/^http:/, "https:")
-    end
-
-    normalized
-  end
 
   def authorize_user!
     unless @post.user == current_user || current_user.admin?
