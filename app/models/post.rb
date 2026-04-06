@@ -106,8 +106,6 @@ class Post < ApplicationRecord
     end
   end
 
-
-
   private
 
   def enqueue_og_image_generation
