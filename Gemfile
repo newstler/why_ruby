@@ -45,7 +45,7 @@ gem "image_processing", "~> 1.2"
 
 # Authentication (GitHub OAuth only, no Devise)
 gem "omniauth-github", "~> 2.0"
-gem "omniauth-rails_csrf_protection", "~> 1.0"
+gem "omniauth-rails_csrf_protection", "~> 2.0"
 
 # Admin
 gem "madmin", "~> 2.1"
