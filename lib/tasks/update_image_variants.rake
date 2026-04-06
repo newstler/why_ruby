@@ -23,11 +23,9 @@ namespace :images do
       print "Processing post #{index + 1}/#{total} (#{post.title[0..30]}...)... "
 
       # Reprocess the image with new variants
-      processor = ImageProcessor.new(post.featured_image)
-      result = processor.process!
+      result = post.process_image_variants!
 
       if result[:success]
-        post.update_columns(image_variants: result[:variants])
         puts "✓"
       else
         puts "✗ (#{result[:error]})"
@@ -51,11 +49,9 @@ namespace :images do
 
       print "Processing post #{index + 1}/#{total} (#{post.title[0..30]}...)... "
 
-      processor = ImageProcessor.new(post.featured_image)
-      result = processor.process!
+      result = post.process_image_variants!
 
       if result[:success]
-        post.update_columns(image_variants: result[:variants])
         puts "✓"
       else
         puts "✗ (#{result[:error]})"

@@ -17,17 +17,10 @@ namespace :images do
           next
         end
 
-        blob = post.featured_image.blob
-
         # Process the image to generate variants
-        processor = ImageProcessor.new(blob)
-        result = processor.process!
+        result = post.process_image_variants!
 
         if result[:success]
-          post.update_columns(
-            image_blur_data: result[:blur_data],
-            image_variants: result[:variants]
-          )
           processed_count += 1
           print "." # Progress indicator
         else
@@ -70,14 +63,9 @@ namespace :images do
         end
 
         # Reprocess with new settings
-        processor = ImageProcessor.new(post.featured_image)
-        result = processor.process!
+        result = post.process_image_variants!
 
         if result[:success]
-          post.update_columns(
-            image_blur_data: result[:blur_data],
-            image_variants: result[:variants]
-          )
           processed += 1
           puts "✓"
         else

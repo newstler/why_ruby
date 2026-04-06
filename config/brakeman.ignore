@@ -1,10 +1,10 @@
 {
   "ignored_warnings": [
     {
-      "fingerprint": "09be3afbde20d9ac08a0d7c169e26aad44e50e0ef7491d0a7d8e4542f9a74a75",
-      "note": "False positive: source_path comes from ActiveStorage temporary files, not user input. The command uses the safe array form of system(*cmd) which prevents shell injection. Each argument is passed separately to the command without shell interpretation. The path originates from @blob.open which creates managed temporary files from our storage system."
+      "fingerprint": "f742e0768c098181ee00fce564852affc16a270d4c42c73fb3b249f551a300b4",
+      "note": "False positive: source_path comes from ActiveStorage temporary files, not user input. The command uses the safe array form of system(*cmd) which prevents shell injection. Each argument is passed separately to the command without shell interpretation. The path originates from featured_image.blob.open which creates managed temporary files from our storage system."
     }
   ],
-  "updated": "2025-08-14 16:56:00 +0200",
-  "brakeman_version": "7.1.0"
+  "updated": "2026-04-06 19:48:09 +0200",
+  "brakeman_version": "8.0.4"
 }

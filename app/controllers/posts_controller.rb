@@ -199,9 +199,7 @@ class PostsController < ApplicationController
 
   def fetch_and_attach_image_from_url(url)
     return if url.blank?
-
-    # Use ImageProcessor to fetch and process the image
-    ImageProcessor.process_from_url(url, @post)
+    @post.attach_image_from_url!(url)
   end
 
   def set_post

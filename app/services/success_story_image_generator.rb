@@ -40,16 +40,7 @@ class SuccessStoryImageGenerator
       )
 
       # Also process variants for the success story image
-      if @post.featured_image.attached?
-        processor = ImageProcessor.new(@post.featured_image)
-        result = processor.process!
-
-        if result[:success]
-          @post.update_columns(
-            image_variants: result[:variants]
-          )
-        end
-      end
+      @post.process_image_variants! if @post.featured_image.attached?
     end
   end
 

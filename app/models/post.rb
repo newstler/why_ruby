@@ -1,6 +1,7 @@
 class Post < ApplicationRecord
   include Post::SvgSanitizable
   include Post::MetadataFetchable
+  include Post::ImageVariantable
 
   extend FriendlyId
   friendly_id :title, use: [ :slugged, :history, :finders ]
@@ -10,7 +11,6 @@ class Post < ApplicationRecord
 
   # Constants
   POST_TYPES = %w[article link success_story].freeze
-  MAX_IMAGE_SIZE = 20.megabytes # 20MB limit for uploaded images
 
   # Associations
   belongs_to :user
@@ -231,95 +231,5 @@ class Post < ApplicationRecord
     if url.match?(/^http:\/\/(www\.)?(github\.com|twitter\.com|youtube\.com|linkedin\.com|stackoverflow\.com)/i)
       self.url = url.sub(/^http:/, "https:")
     end
-  end
-
-  def featured_image_validation
-    return unless featured_image.attached?
-
-    # Check file size
-    if featured_image.blob.byte_size > MAX_IMAGE_SIZE
-      errors.add(:featured_image, "is too large (maximum is #{MAX_IMAGE_SIZE / 1.megabyte}MB)")
-    end
-
-    # Check allowed content types
-    unless ImageProcessor::ALLOWED_CONTENT_TYPES.include?(featured_image.blob.content_type)
-      errors.add(:featured_image, "must be a JPEG, PNG, WebP, or TIFF image")
-    end
-  end
-
-  def process_featured_image_if_needed
-    # Check if we have a new image attachment that needs processing
-    return unless featured_image.attached?
-
-    # Process if:
-    # 1. No variants exist yet (new upload or migration)
-    # 2. Featured image was just attached/changed
-    should_process = !has_processed_images? ||
-                    (previous_changes.key?("updated_at") && featured_image.blob.created_at > 1.minute.ago)
-
-    return unless should_process
-
-    Rails.logger.info "Processing image for Post ##{id}"
-    processor = ImageProcessor.new(featured_image)
-    result = processor.process!
-
-    if result[:success]
-      update_columns(
-        image_variants: result[:variants]
-      )
-      Rails.logger.info "Successfully processed image for Post ##{id}"
-    else
-      Rails.logger.error "Failed to process image for Post ##{id}: #{result[:error]}"
-    end
-  end
-
-  public
-
-  # Image variant methods (public so they can be used in views/helpers)
-  def image_variant(size = :medium)
-    return nil unless featured_image.attached? && image_variants.present?
-
-    variant_id = image_variants[size.to_s]
-    return featured_image.blob unless variant_id
-
-    ActiveStorage::Blob.find_by(id: variant_id) || featured_image.blob
-  end
-
-  def image_url_for_size(size = :medium)
-    blob = image_variant(size)
-    return nil unless blob
-
-    Rails.application.routes.url_helpers.rails_blob_path(blob, only_path: true)
-  end
-
-  def has_processed_images?
-    image_variants.present?
-  end
-
-  def reprocess_image!
-    return unless featured_image.attached?
-
-    processor = ImageProcessor.new(featured_image)
-    result = processor.process!
-
-    if result[:success]
-      update_columns(
-        image_variants: result[:variants]
-      )
-    end
-
-    result
-  end
-
-  def clear_image_variants!
-    # Clear variant blobs if they exist
-    if image_variants.present?
-      image_variants.each do |_size, blob_id|
-        ActiveStorage::Blob.find_by(id: blob_id)&.purge_later
-      end
-    end
-
-    # Clear image processing fields
-    update_columns(image_variants: nil)
   end
 end
