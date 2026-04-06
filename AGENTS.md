@@ -68,6 +68,8 @@ rails generate migration MigrationName
 
 ## Architecture & Key Patterns
 
+The codebase follows **37signals vanilla Rails style**: fat models with concerns, thin controllers, no service objects. All domain logic lives in models and model concerns. There is no `app/services/` directory.
+
 ### Data Model Structure
 
 The application uses a **Universal Content Model** where the `Post` model handles three distinct content types via the `post_type` enum:
@@ -84,20 +86,76 @@ The application uses a **Universal Content Model** where the `Post` model handle
 - `Comment`: User feedback on posts with published flag
 - `Report`: Content moderation by trusted users, auto-hides after 3+ reports
 - `Testimonial`: User testimonials ("why I love Ruby") with AI-generated headline, subheadline, and quote. Validated by LLM for appropriateness
-- `Project`: GitHub repositories for users with star counts, language, description. Replaces the old `github_repos` JSON column
+- `Project`: GitHub repositories for users with star counts, language, description
 - `StarSnapshot`: Daily star count snapshots per project, used to compute trending/stars gained
+- `Chat`: RubyLLM chat records (`acts_as_chat`). Has a `purpose` column: `"conversation"` (default), `"summary"`, `"testimonial_generation"`, `"testimonial_validation"`. System chats (non-conversation) track AI operations for cost accounting
+- `Model`: RubyLLM model records (`acts_as_model`). Tracks available AI models and their cumulative costs
 
-### Primary Keys & IDs
+### Concern Catalog
 
-**All tables use UUIDv7 string primary keys** (migrated from ULID):
+All domain logic that was previously in service objects now lives in model concerns, following the 37signals naming convention (adjective-named, namespaced to the model they belong to).
+
+**User concerns** (`app/models/concerns/user/`):
+- `User::Geocodable` — geocodes free-text locations into structured data (city, country, coordinates) via Photon API, resolves timezone from coordinates
+- `User::GithubSyncable` — syncs GitHub profile data and repositories via GraphQL API on sign-in, supports batch fetching for bulk updates
+
+**Post concerns** (`app/models/concerns/post/`):
+- `Post::SvgSanitizable` — sanitizes SVG content to prevent XSS attacks in success story logos
+- `Post::MetadataFetchable` — fetches OpenGraph metadata and external content from URLs for link posts
+- `Post::ImageVariantable` — processes featured images into WebP variants (small, medium, large, og) via ActiveStorage
+- `Post::OgImageGeneratable` — generates OG images for success stories from SVG logos
+- `Post::AiSummarizable` — generates AI summary teasers via RubyLLM, creates a system chat with `purpose: "summary"`
+
+**Testimonial concerns** (`app/models/concerns/testimonial/`):
+- `Testimonial::AiGeneratable` — AI-generates headline, subheadline, and body text from user testimonial quote via RubyLLM
+- `Testimonial::AiValidatable` — validates testimonial content for appropriateness via RubyLLM
+
+**Shared concerns** (`app/models/concerns/`):
+- `Costable` — cost formatting and calculation for models with a `total_cost` column (used by User, Chat, Model)
+
+### AI Operations (RubyLLM)
+
+All AI operations use the **RubyLLM** gem (~> 1.9), configured with `default_model: "gpt-4.1-nano"` in `config/initializers/ruby_llm.rb`.
+
+**How AI operations work:**
+1. A concern method (e.g., `Post#generate_summary!`) creates a system `Chat` record with a specific `purpose`
+2. It calls `chat.ask(prompt)` which uses RubyLLM to send the request and record the response as messages
+3. Message costs are tracked automatically via RubyLLM's `acts_as_chat` / `acts_as_model`
+4. Per-user spending is available via the `Costable` concern on `User`
+
+**Chat purposes:**
+- `"conversation"` — default, for user-facing chats (not currently used in this app)
+- `"summary"` — AI summary generation for posts
+- `"testimonial_generation"` — AI headline/subheadline/body generation for testimonials
+- `"testimonial_validation"` — AI content validation for testimonials
+
+**Key pattern:** Jobs are thin delegators that call model methods. The model concern owns all the logic:
 ```ruby
-create_table :table_name, id: false do |t|
-  t.primary_key :id, :string, default: -> { "uuid_generate_v7()" }
-  # ...
+# Job (thin delegator)
+class GenerateSummaryJob < ApplicationJob
+  def perform(post, force: false)
+    post.generate_summary!(force: force)
+  end
+end
+
+# Concern (owns the logic)
+module Post::AiSummarizable
+  def generate_summary!(force: false)
+    chat = user.chats.create!(purpose: "summary", model: Model.find_by(...))
+    response = chat.ask(prompt)
+    update!(summary: clean_ai_summary(response.content))
+  end
 end
 ```
 
-UUIDv7 provides time-ordered, universally unique IDs without requiring the `sqlite-ulid` extension.
+### Primary Keys & IDs
+
+**All tables use UUIDv7 string primary keys** via the `uuid7()` SQLite function:
+```ruby
+create_table :table_name, force: true, id: { type: :string, default: -> { "uuid7()" } } do |t|
+  # ...
+end
+```
 
 ### Authentication & Authorization
 
@@ -117,18 +175,20 @@ UUIDv7 provides time-ordered, universally unique IDs without requiring the `sqli
 
 ### Background Jobs (SolidQueue)
 
-- `GenerateSummaryJob`: Creates AI summaries for new/updated posts using OpenAI or Anthropic APIs
-- `GenerateSuccessStoryImageJob`: Generates OG images for success stories from SVG logos
-- `GenerateTestimonialFieldsJob`: AI-generates headline, subheadline, and quote from user testimonial text
-- `ValidateTestimonialJob`: LLM-validates testimonial content for appropriateness
+All jobs are thin delegators that call model methods. The logic lives in model concerns, not in jobs.
+
+- `GenerateSummaryJob`: Calls `post.generate_summary!` (AI summary via `Post::AiSummarizable`)
+- `GenerateSuccessStoryImageJob`: Calls `post.generate_og_image!` (OG image via `Post::OgImageGeneratable`)
+- `GenerateTestimonialJob`: Calls `testimonial.generate_ai_fields!` (AI fields via `Testimonial::AiGeneratable`)
+- `ValidateTestimonialJob`: Calls `testimonial.validate_with_ai!` (AI validation via `Testimonial::AiValidatable`)
 - `NotifyAdminJob`: Sends notifications when content is auto-hidden
-- `UpdateGithubDataJob`: Refreshes user GitHub data via GraphQL API (repositories, stars, etc.)
-- `NormalizeLocationJob`: Geocodes user locations via OpenAI for map display
+- `UpdateGithubDataJob`: Batch-syncs GitHub data via `User.batch_sync_github_data!` (from `User::GithubSyncable`)
+- `NormalizeLocationJob`: Calls `user.geocode!` (geocoding via `User::Geocodable`)
 - `ScheduledNewsletterJob`: Sends newsletter emails at timezone-appropriate times
 
 ### Image Processing
 
-Posts support `featured_image` attachments via ActiveStorage. Images are processed into multiple variants (small, medium, large, og) and stored as separate blobs with metadata in `image_variants` JSON column. Processing uses the `ImageProcessor` service.
+Posts support `featured_image` attachments via ActiveStorage. Images are processed into multiple WebP variants (small, medium, large, og) and stored as separate blobs with metadata in `image_variants` JSON column. Processing is handled by the `Post::ImageVariantable` concern.
 
 ### URL Routing Pattern
 
@@ -154,17 +214,6 @@ Domain config lives in `config/initializers/domains.rb`. In development, communi
 **Cross-domain authentication**: OAuth goes through the primary domain. A cross-domain token system (`AuthController`) syncs sessions between domains. Tokens are single-use and expire in 30 seconds. The `safe_return_to` method validates redirect URLs against allowed domains.
 
 **Footer legal links**: Use `main_site_url(path)` helper to ensure legal page links resolve to the primary domain when viewed on the community domain.
-
-### Services Layer
-
-Service objects in `app/services/` handle complex operations:
-- `GithubDataFetcher`: Fetches and updates user GitHub profile data and repositories via GraphQL API on sign-in
-- `ImageProcessor`: Processes featured images into multiple variants (small, medium, large, og)
-- `SuccessStoryImageGenerator`: Generates OG images for success stories from SVG logos
-- `SvgSanitizer`: Sanitizes SVG content to prevent XSS attacks
-- `LocationNormalizer`: Geocodes free-text user locations into structured data (city, country, coordinates) using OpenAI
-- `TimezoneResolver`: Resolves timezone from coordinates, normalizes legacy timezone identifiers
-- `MetadataFetcher`: Fetches OpenGraph metadata from URLs for link posts
 
 ### FriendlyId Implementation
 
@@ -192,11 +241,10 @@ Both models implement `create_slug_history` to manually save old slugs when chan
 
 ### Migrations
 
-Always use UUIDv7 string primary keys. Never use auto-increment integers:
+Always use UUIDv7 string primary keys via the `uuid7()` SQLite function. Never use auto-increment integers:
 
 ```ruby
-create_table :posts, id: false do |t|
-  t.primary_key :id, :string, default: -> { "uuid_generate_v7()" }
+create_table :posts, force: true, id: { type: :string, default: -> { "uuid7()" } } do |t|
   t.string :title, null: false
   # ...
 end
@@ -240,7 +288,7 @@ github:
   client_secret: your_github_oauth_app_client_secret
 
 openai:
-  api_key: your_openai_api_key  # Optional - for AI summaries
+  api_key: your_openai_api_key  # Used by RubyLLM for AI operations
 ```
 
 ### GitHub OAuth Setup
