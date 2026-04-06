@@ -2,6 +2,7 @@ class Post < ApplicationRecord
   include Post::SvgSanitizable
   include Post::MetadataFetchable
   include Post::ImageVariantable
+  include Post::OgImageGeneratable
 
   extend FriendlyId
   friendly_id :title, use: [ :slugged, :history, :finders ]
@@ -60,7 +61,7 @@ class Post < ApplicationRecord
   before_validation :clean_logo_svg
   after_create :generate_summary_job
   after_update :regenerate_summary_if_needed
-  after_save :generate_success_story_image, if: -> { success_story? && saved_change_to_logo_svg? }
+  after_save :enqueue_og_image_generation, if: -> { success_story? && saved_change_to_logo_svg? }
   after_commit :process_featured_image_if_needed
   after_update :check_reports_threshold
   after_create :update_user_counter_caches
@@ -108,16 +109,9 @@ class Post < ApplicationRecord
 
   private
 
-  def generate_success_story_image
-    # Force regeneration when logo changes on an existing record
-    # saved_change_to_logo_svg? returns true if logo_svg changed in the last save
-    # For new records, we don't need to force (no existing image)
-    # For existing records with logo changes, we need to force regeneration
-    force_regenerate = saved_change_to_logo_svg? && !saved_change_to_id?
-
-    Rails.logger.info "GenerateSuccessStoryImageJob triggered for post #{id}: force=#{force_regenerate}, logo_changed=#{saved_change_to_logo_svg?}, new_record=#{saved_change_to_id?}"
-
-    GenerateSuccessStoryImageJob.perform_later(self, force: force_regenerate)
+  def enqueue_og_image_generation
+    force = saved_change_to_logo_svg? && !saved_change_to_id?
+    GenerateSuccessStoryImageJob.perform_later(self, force: force)
   end
 
   def content_or_url_or_logo_present
