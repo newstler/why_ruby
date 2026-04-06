@@ -3,6 +3,7 @@ class Post < ApplicationRecord
   include Post::MetadataFetchable
   include Post::ImageVariantable
   include Post::OgImageGeneratable
+  include Post::AiSummarizable
 
   extend FriendlyId
   friendly_id :title, use: [ :slugged, :history, :finders ]
