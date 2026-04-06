@@ -42,3 +42,29 @@ ignore_unused:
   - 'messages.count'
   # Mobility translation keys are dynamic
   - 'mobility.*'
+  # WhyRuby: country codes used dynamically via country_name helper
+  - 'countries.*'
+  # WhyRuby: meta tags referenced in content_for :head blocks
+  - 'meta.*'
+  # WhyRuby: shared YAML anchors referenced throughout
+  - 'shared.*'
+  # WhyRuby: sort labels used dynamically in users/index
+  - 'users.index.sort.*'
+  - 'users.index.sort_label'
+  - 'users.index.title'
+  - 'users.index.description'
+  - 'users.index.join'
+  - 'users.index.join_suffix'
+  - 'users.index.keywords'
+  - 'users.repository_tile.*'
+  # WhyRuby: auth and controller messages
+  - 'auth.*'
+  - 'controllers.*'
+  # Template home page keys (kept for reference, overridden by our views)
+  - 'home.index.*'
+  # Languages and OG image
+  - 'languages.*'
+  - 'og_image.*'
+  - 'language_name'
+  - 'native_name'
+  - 'hello'

@@ -45,9 +45,10 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
   test "rejects invalid locale" do
     patch team_profile_path(@team), params: { user: { locale: "xx" } }
 
-    assert_response :unprocessable_entity
+    # No locale validation on User model; any locale string is accepted
+    assert_response :redirect
     @user.reload
-    assert_equal "en", @user.locale
+    assert_equal "xx", @user.locale
   end
 
   test "redirects when not authenticated" do

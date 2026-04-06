@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_02_12_163246) do
+ActiveRecord::Schema[8.2].define(version: 2026_04_01_205319) do
   create_table "_litestream_lock", id: false, force: :cascade do |t|
     t.integer "id"
   end
@@ -58,7 +58,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_02_12_163246) do
     t.text "body"
     t.datetime "created_at", null: false
     t.string "team_id", null: false
-    t.string "title", null: false
+    t.string "title"
     t.datetime "updated_at", null: false
     t.string "user_id", null: false
     t.index ["team_id"], name: "index_articles_on_team_id"

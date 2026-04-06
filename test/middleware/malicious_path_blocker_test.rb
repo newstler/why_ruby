@@ -102,6 +102,12 @@ class MaliciousPathBlockerTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
   end
 
+  # ActiveStorage paths should not be blocked
+  test "allows ActiveStorage blob paths with file extensions" do
+    get "/rails/active_storage/blobs/redirect/abc123/photo.jpg"
+    assert_response :not_found # 404 from Rails (invalid blob), not from middleware
+  end
+
   # Legitimate paths should not be blocked
   test "allows root path" do
     get "/"

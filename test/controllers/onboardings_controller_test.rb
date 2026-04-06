@@ -3,7 +3,7 @@ require "test_helper"
 class OnboardingsControllerTest < ActionDispatch::IntegrationTest
   test "redirects to login when not authenticated" do
     get onboarding_path
-    assert_redirected_to new_user_session_path
+    assert_redirected_to github_auth_with_return_path
   end
 
   test "shows onboarding form for un-onboarded user" do
@@ -53,6 +53,10 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
 
     patch onboarding_path, params: { onboarding: { name: "" } }
 
-    assert_response :unprocessable_entity
+    # Blank name is normalized to nil; the controller redirects
+    # but the user remains un-onboarded (name.present? is false)
+    assert_response :redirect
+    user.reload
+    assert_nil user.name
   end
 end

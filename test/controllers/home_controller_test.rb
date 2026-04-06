@@ -1,9 +1,9 @@
 require "test_helper"
 
 class HomeControllerTest < ActionDispatch::IntegrationTest
-  test "redirects to login when not authenticated" do
+  test "shows home page when not authenticated" do
     get root_path
-    assert_redirected_to new_user_session_path
+    assert_response :success
   end
 
   test "shows team home page when authenticated with team" do

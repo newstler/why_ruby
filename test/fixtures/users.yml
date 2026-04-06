@@ -38,6 +38,6 @@ user_no_testimonial:
   github_id: "900004"
   role: 0
   avatar_url: "https://avatars.githubusercontent.com/u/4"
-  name: "No Testimonial"
+  name:
   published_posts_count: 0
   published_comments_count: 0

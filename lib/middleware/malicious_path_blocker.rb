@@ -54,6 +54,7 @@ module Middleware
 
     def unknown_file_request?(path)
       return false unless path.match?(FILE_EXTENSION_PATTERN)
+      return false if path.start_with?("/rails/active_storage/")
 
       # Allow if a real file exists in public/
       !File.exist?(File.join(@public_path, path))

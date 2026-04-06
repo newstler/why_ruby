@@ -8,7 +8,7 @@ class TeamsControllerTest < ActionDispatch::IntegrationTest
 
   test "index redirects to login when not authenticated" do
     get teams_path
-    assert_redirected_to new_user_session_path
+    assert_redirected_to github_auth_with_return_path
   end
 
   test "index redirects to team root when user has single team" do
