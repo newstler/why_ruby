@@ -20,7 +20,7 @@ Rails.application.routes.draw do
   # Production community domain: rubycommunity.org (users at root level /:username)
   constraints host: Rails.application.config.x.domains.community do
     root "users#index", as: :rubycommunity_root
-    get "map_data", to: "users#map_data", as: :rubycommunity_map_data
+    get "map_data", to: "users/map_data#show", as: :rubycommunity_map_data
     get "community", to: redirect("/", status: 301)
     get "community/:id", to: redirect("/%{id}", status: 301), constraints: { id: /[^\/]+/ }
     get ":id", to: "users#show", as: :rubycommunity_user, constraints: { id: /[^\/\.]+/ }
@@ -89,7 +89,7 @@ Rails.application.routes.draw do
 
   # Community routes — local development fallback for rubycommunity.org (see domain constraint above)
   get "community", to: "users#index", as: :users
-  get "community/map_data", to: "users#map_data", as: :community_map_data
+  get "community/map_data", to: "users/map_data#show", as: :community_map_data
   get "community/:id", to: "users#show", as: :user
 
   # Tags route (keeping as resources for now)
@@ -99,10 +99,12 @@ Rails.application.routes.draw do
     end
   end
 
-  # Post collection actions (preview, metadata, etc)
-  post "posts/preview", to: "posts#preview", as: :preview_posts
-  post "posts/fetch_metadata", to: "posts#fetch_metadata", as: :fetch_metadata_posts
-  post "posts/check_duplicate_url", to: "posts#check_duplicate_url", as: :check_duplicate_url_posts
+  # Post resource actions (nested)
+  namespace :posts do
+    resource :preview, only: [ :create ]
+    resource :metadata, only: [ :create ]
+    resource :duplicate_check, only: [ :create ]
+  end
 
   # New and edit routes for posts (need to be defined before dynamic routes)
   get "posts/new", to: "posts#new", as: :new_post
@@ -120,13 +122,12 @@ Rails.application.routes.draw do
   # Testimonials (singular resource - one per user)
   resource :testimonial, only: [ :create, :update ]
 
-  # User settings routes
-  resource :user_settings, only: [], controller: "user_settings" do
-    post :toggle_public, on: :collection
-    post :toggle_open_to_work, on: :collection
-    post :toggle_newsletter, on: :collection
-    post :hide_repo, on: :collection
-    post :unhide_repo, on: :collection
+  # User settings (nested singular resources for each toggle)
+  namespace :user_settings do
+    resource :visibility, only: [ :update ]
+    resource :open_to_work, only: [ :update ]
+    resource :newsletter, only: [ :update ]
+    resource :repository_hide, only: [ :create, :destroy ]
   end
 
   # Newsletter unsubscribe
@@ -134,7 +135,7 @@ Rails.application.routes.draw do
   get "newsletter/open/:token", to: "newsletter_opens#show", as: :newsletter_open
 
   # OG image preview pages (for screenshotting)
-  get "og-image-community", to: "users#og_image"
+  get "og-image-community", to: "users/og_images#show"
 
   # Legal pages (must be before catch-all routes)
   get "legal/privacy", to: "legal#show", defaults: { page: "privacy_policy" }, as: :privacy_policy
@@ -148,7 +149,7 @@ Rails.application.routes.draw do
 
   # Post routes (must be after category)
   get ":category_id/:id", to: "posts#show", as: :post, constraints: { category_id: /[^\/\.]+/, id: /[^\/\.]+/ }
-  get ":category_id/:id/og-image.webp", to: "posts#image", as: :post_image, constraints: { category_id: /[^\/]+/, id: /[^\/]+/ }
+  get ":category_id/:id/og-image.webp", to: "posts/images#show", as: :post_image, constraints: { category_id: /[^\/]+/, id: /[^\/]+/ }
 
   # Test-only route for setting session in integration tests
   if Rails.env.test?

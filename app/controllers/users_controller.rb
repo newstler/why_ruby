@@ -82,38 +82,6 @@ class UsersController < ApplicationController
     @users = @users.page(params[:page]).per(20)
   end
 
-  def map_data
-    data = Rails.cache.fetch("community_map_data", expires_in: 1.hour) do
-      User.visible
-          .where.not(latitude: nil, longitude: nil)
-          .select(:id, :slug, :username, :name, :avatar_url, :latitude, :longitude, :open_to_work, :company, :normalized_location)
-          .map { |u|
-            {
-              id: u.id,
-              name: u.display_name,
-              username: u.username,
-              avatar_url: u.avatar_url,
-              lat: u.latitude,
-              lng: u.longitude,
-              open_to_work: u.open_to_work,
-              company: u.company,
-              normalized_location: u.normalized_location,
-              profile_url: helpers.community_user_url(u)
-            }
-          }
-    end
-
-    render json: data
-  end
-
-  def og_image
-    @users = User.where(public: true)
-                 .where.not(avatar_url: [ nil, "" ])
-                 .order(Arel.sql("COALESCE(github_stars_sum, 0) + COALESCE(published_posts_count, 0) * 10 + COALESCE(published_comments_count, 0) DESC"))
-    @total_users_count = User.visible.count
-    render layout: false
-  end
-
   def show
     @user = User.friendly.find(params[:id])
 
