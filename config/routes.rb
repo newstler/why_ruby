@@ -7,10 +7,13 @@ Rails.application.routes.draw do
   match "sign_in_github", to: "users/sessions#github_auth", as: :github_auth_with_return, via: [ :get, :post ]
   delete "sign_out", to: "users/sessions#destroy", as: :destroy_user_session
 
+  # User magic link verification
+  get "auth/:token", to: "sessions/verifications#show", as: :verify_magic_link
+
   # Admin authentication (magic link - separate from user auth)
   namespace :admins do
     resource :session, only: [ :new, :create, :destroy ]
-    get "auth/:token", to: "sessions#verify", as: :verify_magic_link
+    get "auth/:token", to: "sessions/verifications#show", as: :verify_magic_link
   end
 
   # Cross-domain auth routes (must be early)
@@ -46,7 +49,7 @@ Rails.application.routes.draw do
 
     # Team settings (multi-tenant only)
     resource :settings, only: [ :show, :edit, :update ], controller: "teams/settings" do
-      patch :regenerate_api_key
+      resource :api_key_regeneration, only: [ :create ], controller: "teams/settings/api_key_regenerations"
     end
     resource :name_check, only: [ :show ], controller: "teams/name_checks"
     resources :members, only: [ :index, :show, :new, :create, :destroy ], controller: "teams/members"
@@ -92,11 +95,10 @@ Rails.application.routes.draw do
   get "community/map_data", to: "users/map_data#show", as: :community_map_data
   get "community/:id", to: "users#show", as: :user
 
-  # Tags route (keeping as resources for now)
-  resources :tags, only: [ :show ] do
-    collection do
-      get :search
-    end
+  # Tags routes
+  resources :tags, only: [ :show ]
+  namespace :tags do
+    resource :search, only: [ :show ]
   end
 
   # Post resource actions (nested)

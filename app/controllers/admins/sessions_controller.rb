@@ -7,9 +7,6 @@ class Admins::SessionsController < ApplicationController
     with: -> { redirect_to new_admins_session_path, alert: t("controllers.admins.sessions.rate_limit.short") }
   rate_limit to: 10, within: 1.hour, name: "admin_sessions/long", only: :create,
     with: -> { redirect_to new_admins_session_path, alert: t("controllers.admins.sessions.rate_limit.long") }
-  rate_limit to: 5, within: 5.minutes, name: "admin_sessions/verify", only: :verify,
-    with: -> { redirect_to new_admins_session_path, alert: t("controllers.admins.sessions.rate_limit.verify") }
-
   layout "admin_auth", only: [ :new, :create ]
 
   def new
@@ -27,15 +24,6 @@ class Admins::SessionsController < ApplicationController
     else
       redirect_to new_admins_session_path, alert: t("controllers.admins.sessions.create.alert")
     end
-  end
-
-  def verify
-    admin = Admin.find_signed!(params[:token], purpose: :magic_link)
-    session[:admin_id] = admin.id
-
-    redirect_to "/madmin", notice: t("controllers.admins.sessions.verify.notice")
-  rescue ActiveSupport::MessageVerifier::InvalidSignature
-    redirect_to new_admins_session_path, alert: t("controllers.admins.sessions.verify.alert")
   end
 
   def destroy
