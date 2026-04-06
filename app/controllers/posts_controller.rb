@@ -155,8 +155,8 @@ class PostsController < ApplicationController
     end
 
     begin
-      fetcher = MetadataFetcher.new(url)
-      result = fetcher.fetch!
+      post = Post.new(url: url)
+      result = post.fetch_metadata!
 
       metadata = {
         title: result[:title],

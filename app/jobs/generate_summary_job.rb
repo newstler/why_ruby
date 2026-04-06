@@ -43,7 +43,7 @@ class GenerateSummaryJob < ApplicationJob
   def prepare_text_with_context(post)
     if post.link?
       # For external links, fetch the actual content
-      text = fetch_external_content(post.url)
+      text = post.fetch_external_content
 
       # If fetching failed, try to at least use title
       if text.blank?
@@ -72,71 +72,6 @@ class GenerateSummaryJob < ApplicationJob
     text = text.to_s.truncate(6000)
 
     [ text, context ]
-  end
-
-  def fetch_external_content(url)
-    begin
-      Rails.logger.info "Fetching content from: #{url}"
-
-      fetcher = MetadataFetcher.new(url,
-        connection_timeout: 5,
-        read_timeout: 5,
-        retries: 1,
-        allow_redirections: :safe
-      )
-
-      result = fetcher.fetch!
-      return nil if result.blank? || result[:parsed].blank?
-
-      # Try to get the main content
-      content_parts = []
-
-      # Add title
-      content_parts << "Title: #{result[:title]}" if result[:title].present?
-
-      # Add description
-      content_parts << "Description: #{result[:description]}" if result[:description].present?
-
-      # Get the main text content
-      if result[:parsed].present?
-        # Try to extract main content, removing navigation, ads, etc.
-        main_content = extract_main_content(result[:parsed])
-        content_parts << main_content if main_content.present?
-      end
-
-      # Fallback to meta description and raw text if needed
-      if content_parts.length <= 2
-        raw_text = result[:parsed].css("body").text.squish rescue nil
-        content_parts << raw_text if raw_text.present?
-      end
-
-      content_parts.join("\n\n")
-    rescue => e
-      Rails.logger.error "Failed to fetch external content from #{url}: #{e.message}"
-      nil
-    end
-  end
-
-  def extract_main_content(parsed_doc)
-    # Try common content selectors
-    content_selectors = [
-      "main", "article", '[role="main"]', ".content", "#content",
-      ".post-content", ".entry-content", ".article-body"
-    ]
-
-    content_selectors.each do |selector|
-      element = parsed_doc.at_css(selector)
-      if element
-        text = element.text.squish
-        return text if text.length > 100
-      end
-    end
-
-    # If no main content found, try paragraphs
-    paragraphs = parsed_doc.css("p").map(&:text).reject(&:blank?)
-    return paragraphs.join(" ") if paragraphs.any?
-
-    nil
   end
 
   def anthropic_configured?

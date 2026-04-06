@@ -1,5 +1,6 @@
 class Post < ApplicationRecord
   include Post::SvgSanitizable
+  include Post::MetadataFetchable
 
   extend FriendlyId
   friendly_id :title, use: [ :slugged, :history, :finders ]
