@@ -1,4 +1,6 @@
 class Post < ApplicationRecord
+  include Post::SvgSanitizable
+
   extend FriendlyId
   friendly_id :title, use: [ :slugged, :history, :finders ]
 
@@ -175,10 +177,7 @@ class Post < ApplicationRecord
   end
 
   def clean_logo_svg
-    return unless logo_svg.present?
-
-    # Sanitize the SVG content to prevent XSS attacks
-    self.logo_svg = SvgSanitizer.sanitize(logo_svg)
+    sanitize_logo_svg!
   end
 
   def generate_summary_job
