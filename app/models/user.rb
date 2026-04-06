@@ -4,6 +4,7 @@ class User < ApplicationRecord
 
   include Costable if defined?(Costable)
   include User::Geocodable
+  include User::GithubSyncable
 
   # Associations
   has_many :posts, dependent: :destroy
@@ -190,7 +191,7 @@ class User < ApplicationRecord
     end
 
     # Fetch and update GitHub data on every sign in
-    GithubDataFetcher.new(user, auth).fetch_and_update!
+    user.sync_github_data_from_oauth!(auth)
 
     user
   end
