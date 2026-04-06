@@ -7,7 +7,7 @@ rails_project:
   github_url: "https://github.com/rubyist1/awesome-rails-gem"
   forks_count: 20
   size: 5000
-  topics: '["rails", "ruby"]'
+  topics: "[]"
   pushed_at: <%= 1.day.ago.to_fs(:db) %>
   hidden: false
   archived: false
@@ -21,7 +21,7 @@ hidden_project:
   github_url: "https://github.com/rubyist1/secret-project"
   forks_count: 0
   size: 1000
-  topics: '["ruby"]'
+  topics: "[]"
   pushed_at: <%= 3.days.ago.to_fs(:db) %>
   hidden: true
   archived: false
@@ -35,7 +35,7 @@ archived_project:
   github_url: "https://github.com/rubyist1/old-project"
   forks_count: 1
   size: 500
-  topics: '[]'
+  topics: "[]"
   pushed_at: <%= 30.days.ago.to_fs(:db) %>
   hidden: false
   archived: true
@@ -49,7 +49,7 @@ admin_project:
   github_url: "https://github.com/admin_test/admin-tool"
   forks_count: 50
   size: 10000
-  topics: '["ruby", "cli"]'
+  topics: "[]"
   pushed_at: <%= 2.hours.ago.to_fs(:db) %>
   hidden: false
   archived: false
