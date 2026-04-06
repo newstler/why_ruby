@@ -3,6 +3,7 @@ class User < ApplicationRecord
   friendly_id :username, use: [ :slugged, :history, :finders ]
 
   include Costable if defined?(Costable)
+  include User::Geocodable
 
   # Associations
   has_many :posts, dependent: :destroy
