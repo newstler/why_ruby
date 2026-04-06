@@ -1,5 +1,6 @@
 class Testimonial < ApplicationRecord
   include Testimonial::AiGeneratable
+  include Testimonial::AiValidatable
 
   belongs_to :user
 
