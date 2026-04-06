@@ -2,8 +2,8 @@
   <%# Public Profile Toggle %>
   <div class="flex items-center justify-between gap-4 py-3">
     <span class="text-sm font-medium text-gray-500">Public profile</span>
-    <%= button_to toggle_public_user_settings_path,
-        method: :post,
+    <%= button_to user_settings_visibility_path,
+        method: :patch,
         class: "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 #{user.public? ? 'bg-red-600' : 'bg-gray-400'}",
         data: { turbo_stream: true } do %>
       <span class="sr-only">Toggle public profile</span>
@@ -15,8 +15,8 @@
   <%# Newsletter Toggle %>
   <div class="flex items-center justify-between gap-4 py-3 border-t border-gray-100">
     <span class="text-sm font-medium text-gray-500">Receive news</span>
-    <%= button_to toggle_newsletter_user_settings_path,
-        method: :post,
+    <%= button_to user_settings_newsletter_path,
+        method: :patch,
         class: "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 #{user.unsubscribed_from_newsletter? ? 'bg-gray-400' : 'bg-red-600'}",
         data: { turbo_stream: true } do %>
       <span class="sr-only">Toggle newsletter subscription</span>
@@ -28,8 +28,8 @@
   <%# Open to Work Toggle %>
   <div class="flex items-center justify-between gap-4 py-3 border-t border-gray-100">
     <span class="text-sm font-medium text-gray-500">Open to work</span>
-    <%= button_to toggle_open_to_work_user_settings_path,
-        method: :post,
+    <%= button_to user_settings_open_to_work_path,
+        method: :patch,
         class: "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 #{user.open_to_work? ? 'bg-red-600' : 'bg-gray-400'}",
         data: { turbo_stream: true } do %>
       <span class="sr-only">Toggle open to work</span>
