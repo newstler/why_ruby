@@ -1,4 +1,6 @@
 class Testimonial < ApplicationRecord
+  include Testimonial::AiGeneratable
+
   belongs_to :user
 
   validates :quote, length: { minimum: 140, maximum: 320 }, allow_blank: true
@@ -26,7 +28,16 @@ class Testimonial < ApplicationRecord
     else
       # Non-empty quote - process with AI
       update_columns(ai_attempts: 0, published: false, ai_feedback: nil, reject_reason: nil)
-      GenerateTestimonialFieldsJob.perform_later(self)
+      GenerateTestimonialJob.perform_later(self)
     end
+  end
+
+  def broadcast_testimonial_update
+    Turbo::StreamsChannel.broadcast_replace_to(
+      "testimonial_#{id}",
+      target: "testimonial_section",
+      partial: "testimonials/section",
+      locals: { testimonial: self, user: user }
+    )
   end
 end
