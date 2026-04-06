@@ -55,8 +55,6 @@ gem "redcarpet"
 gem "rouge"
 
 # AI integration
-gem "ruby-openai", "~> 8.2"
-gem "anthropic", "~> 1.6.0"
 gem "ruby_llm", "~> 1.9"
 
 # Pagination
