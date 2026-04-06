@@ -8,6 +8,8 @@ class Chat < ApplicationRecord
 
   scope :chronologically, -> { order(created_at: :asc) }
   scope :recent, -> { order(created_at: :desc) }
+  scope :conversations, -> { where(purpose: "conversation") }
+  scope :system, -> { where.not(purpose: "conversation") }
 
   after_destroy :update_costs_on_destroy
 

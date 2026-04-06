@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_04_01_205319) do
+ActiveRecord::Schema[8.2].define(version: 2026_04_06_182149) do
   create_table "_litestream_lock", id: false, force: :cascade do |t|
     t.integer "id"
   end
@@ -83,11 +83,13 @@ ActiveRecord::Schema[8.2].define(version: 2026_04_01_205319) do
     t.datetime "created_at", null: false
     t.integer "messages_count", default: 0, null: false
     t.string "model_id"
+    t.string "purpose", default: "conversation"
     t.string "team_id"
     t.decimal "total_cost", precision: 12, scale: 6, default: "0.0", null: false
     t.datetime "updated_at", null: false
     t.string "user_id", null: false
     t.index ["model_id"], name: "index_chats_on_model_id"
+    t.index ["purpose"], name: "index_chats_on_purpose"
     t.index ["team_id"], name: "index_chats_on_team_id"
     t.index ["user_id"], name: "index_chats_on_user_id"
   end
