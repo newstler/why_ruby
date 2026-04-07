@@ -1,0 +1,76 @@
+<%= content_for :title, "Comments" %>
+
+<header class="header">
+  <h1>Comments</h1>
+</header>
+
+<div class="filters mb-4 p-4 card-bg">
+  <%= form_with url: resource.index_path, method: :get, class: "flex gap-3 items-end flex-wrap" do |f| %>
+    <div>
+      <%= f.label :q, "Search", class: "block text-sm font-medium text-dark-300 mb-1" %>
+      <%= f.search_field :q, value: params[:q], placeholder: "Search comments...", class: "form-input" %>
+    </div>
+
+    <div>
+      <%= f.label :published, "Status", class: "block text-sm font-medium text-dark-300 mb-1" %>
+      <%= f.select :published, options_for_select([["All", ""], ["Published", "true"], ["Hidden", "false"]], params[:published]), {}, class: "form-input" %>
+    </div>
+
+    <div class="flex gap-2">
+      <%= f.submit "Filter", class: "btn btn-primary" %>
+      <% if params[:q].present? || params[:published].present? %>
+        <%= link_to "Clear", resource.index_path, class: "btn btn-secondary" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<div class="table-scroll">
+  <table>
+    <thead>
+      <tr>
+        <th>Comment</th>
+        <th>Author</th>
+        <th>Post</th>
+        <th><%= sortable :published, "Status" %></th>
+        <th><%= sortable :created_at, "Date" %></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% @records.each do |record| %>
+        <tr>
+          <td class="max-w-sm">
+            <%= link_to resource.show_path(record), class: "block truncate" do %>
+              <span class="font-medium"><%= record.body.truncate(80) %></span>
+            <% end %>
+          </td>
+          <td class="whitespace-nowrap">
+            <%= link_to record.user.display_name, "/madmin/users/#{record.user.id}", class: "text-accent-400 hover:text-accent-300" %>
+          </td>
+          <td class="max-w-xs">
+            <%= link_to record.post.title.truncate(40), "/madmin/posts/#{record.post.id}", class: "truncate block text-accent-400 hover:text-accent-300" %>
+          </td>
+          <td>
+            <% if record.published? %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-400">Published</span>
+            <% else %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-dark-600 text-dark-400">Hidden</span>
+            <% end %>
+          </td>
+          <td class="text-sm whitespace-nowrap"><%= record.created_at.strftime("%-d %b %Y") %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="pagination">
+  <% if @pagy.respond_to?(:series_nav) %>
+    <%== @pagy.series_nav if @pagy.last > 1 %>
+    <%== @pagy.info_tag %>
+  <% else %>
+    <%== pagy_nav @pagy if @pagy.last > 1 %>
+    <%== pagy_info @pagy %>
+  <% end %>
+</div>

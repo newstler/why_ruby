@@ -1,30 +1,29 @@
 class UserResource < Madmin::Resource
-  # Users can be viewed and edited, but not deleted or created
   def self.actions
     [ :index, :show, :edit, :update ]
   end
 
-  # Attributes
   attribute :id, form: false, index: false
-  attribute :email, field: GravatarField, index: true, show: true, form: false
-  attribute :email  # Regular field for editing
+  attribute :username
   attribute :name
-  attribute :locale
+  attribute :email
+  attribute :role
+  attribute :location
+  attribute :published_posts_count, form: false
+  attribute :published_comments_count, form: false
+  attribute :github_stars_sum, form: false
   attribute :created_at, form: false
   attribute :updated_at, form: false
 
-  # Associations
-  attribute :chats
-
   def self.sortable_columns
-    super + %w[teams_count chats_count]
+    super + %w[published_posts_count published_comments_count github_stars_sum]
   end
 
   def self.searchable_attributes
-    [ :email, :name ]
+    [ :username, :name, :email ]
   end
 
   def self.display_name(record)
-    record.name.present? ? record.name : record.email
+    record.display_name
   end
 end

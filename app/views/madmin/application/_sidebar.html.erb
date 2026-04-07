@@ -28,13 +28,32 @@
     <%# Separator %>
     <div class="my-4 border-t border-dark-700"></div>
 
-    <%# App Data %>
+    <% counts = madmin_sidebar_counts %>
+
+    <%# Content %>
     <div class="mb-2 px-3">
-      <span class="text-xs font-semibold text-dark-500 uppercase tracking-wider">Data</span>
+      <span class="text-xs font-semibold text-dark-500 uppercase tracking-wider">Content</span>
     </div>
     <div class="space-y-1">
-      <%= render "shared/sidebar_link", path: "/madmin/teams", icon: "users", label: "Teams" %>
-      <%= render "shared/sidebar_link", path: "/madmin/users", icon: "user", label: "Users" %>
+      <%= render "shared/sidebar_link", path: "/madmin/posts", icon: "file", label: "Posts", count: counts[:posts] %>
+      <%= render "shared/sidebar_link", path: "/madmin/categories", icon: "folder", label: "Categories", count: counts[:categories] %>
+      <%= render "shared/sidebar_link", path: "/madmin/tags", icon: "lightning", label: "Tags", count: counts[:tags] %>
+      <%= render "shared/sidebar_link", path: "/madmin/comments", icon: "chat", label: "Comments", count: counts[:comments] %>
+      <%= render "shared/sidebar_link", path: "/madmin/reports", icon: "shield", label: "Reports", count: counts[:reports] %>
+      <%= render "shared/sidebar_link", path: "/madmin/testimonials", icon: "check-circle", label: "Testimonials", count: counts[:testimonials] %>
+    </div>
+
+    <%# Separator %>
+    <div class="my-4 border-t border-dark-700"></div>
+
+    <%# Community %>
+    <div class="mb-2 px-3">
+      <span class="text-xs font-semibold text-dark-500 uppercase tracking-wider">Community</span>
+    </div>
+    <div class="space-y-1">
+      <%= render "shared/sidebar_link", path: "/madmin/users", icon: "user", label: "Users", count: counts[:users] %>
+      <%= render "shared/sidebar_link", path: "/madmin/teams", icon: "users", label: "Teams", count: counts[:teams] %>
+      <%= render "shared/sidebar_link", path: "/madmin/projects", icon: "github", label: "Projects", count: counts[:projects] %>
     </div>
 
     <%# Spacer to push System to bottom %>

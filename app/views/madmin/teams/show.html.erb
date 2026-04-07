@@ -136,11 +136,17 @@
         <% members.sort_by { |m| -(Membership::ROLES.index(m.role) || -1) }.each do |membership| %>
           <tr>
             <td>
-              <%= link_to "/madmin/users/#{membership.user.id}", class: "flex items-center gap-3" do %>
-                <img src="https://www.gravatar.com/avatar/<%= Digest::MD5.hexdigest(membership.user.email.downcase.strip) %>?s=32&d=mp" class="w-8 h-8 rounded-full" alt="">
+              <%= link_to "/madmin/users/#{membership.user.slug || membership.user.id}", class: "flex items-center gap-3" do %>
+                <% if membership.user.avatar_url.present? %>
+                  <img src="<%= membership.user.avatar_url %>" class="w-8 h-8 rounded-full" alt="" loading="lazy">
+                <% else %>
+                  <div class="w-8 h-8 rounded-full bg-dark-700 flex items-center justify-center text-dark-400 text-xs font-medium">
+                    <%= membership.user.display_name.first(2).upcase %>
+                  </div>
+                <% end %>
                 <div>
-                  <div class="font-medium"><%= membership.user.name.presence || "Unnamed" %></div>
-                  <div class="text-xs text-dark-500"><%= membership.user.email %></div>
+                  <div class="font-medium"><%= membership.user.display_name %></div>
+                  <div class="text-xs text-dark-500">@<%= membership.user.username %></div>
                 </div>
               <% end %>
             </td>

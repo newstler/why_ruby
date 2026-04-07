@@ -7,6 +7,7 @@
     nested: Boolean, if true applies nested styling (optional)
     truncate: Boolean, if true truncates with CSS ellipsis (optional)
     image: Active Storage attachment or image URL to show instead of icon (optional)
+    count: Integer, if present shows a counter badge on the right (optional)
 %>
 <%
   path_str = path.to_s.split('?').first
@@ -30,5 +31,8 @@
   <% else %>
     <%= inline_svg "icons/#{icon}.svg", class: "w-5 h-5 flex-shrink-0" %>
   <% end %>
-  <span data-sidebar-target="label" class="<%= truncate_classes %> transition-[opacity,width] duration-300 opacity-100 whitespace-nowrap"><%= label %></span>
+  <span data-sidebar-target="label" class="<%= truncate_classes %> transition-[opacity,width] duration-300 opacity-100 whitespace-nowrap flex-1"><%= label %></span>
+  <% if local_assigns[:count] && count.to_i > 0 %>
+    <span class="ml-auto text-xs font-medium tabular-nums px-1.5 py-0.5 rounded-md bg-white/5 text-dark-500"><%= number_with_delimiter(count) %></span>
+  <% end %>
 <% end %>

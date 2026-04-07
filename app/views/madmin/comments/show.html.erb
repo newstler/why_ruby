@@ -1,0 +1,52 @@
+<%= content_for :title, "Comment" %>
+
+<header class="header">
+  <h1>
+    <%= link_to "Comments", resource.index_path %>
+    /
+    Comment
+  </h1>
+  <div class="actions">
+    <%= link_to "Edit", resource.edit_path(@record), class: "btn btn-secondary" %>
+  </div>
+</header>
+
+<div class="card-bg p-6 mb-6">
+  <div class="flex items-start gap-4">
+    <div class="flex-1">
+      <div class="text-dark-300 leading-relaxed text-lg"><%= @record.body %></div>
+      <div class="mt-4 flex items-center gap-3">
+        <% if @record.published? %>
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-400">Published</span>
+        <% else %>
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-dark-600 text-dark-400">Hidden</span>
+        <% end %>
+        <span class="text-sm text-dark-500"><%= @record.created_at.strftime("%-d %B %Y at %H:%M") %></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card-bg overflow-hidden">
+  <div class="px-5 py-4 border-b border-dark-700">
+    <h2 class="text-lg font-semibold text-dark-100">Details</h2>
+  </div>
+  <div class="table-scroll">
+    <table>
+      <tbody>
+        <tr><th class="label">ID</th><td class="font-mono text-sm"><%= @record.id %></td></tr>
+        <tr>
+          <th class="label">Author</th>
+          <td><%= link_to @record.user.display_name, "/madmin/users/#{@record.user.id}", class: "text-accent-400 hover:text-accent-300" %></td>
+        </tr>
+        <tr>
+          <th class="label">Post</th>
+          <td><%= link_to @record.post.title, "/madmin/posts/#{@record.post.id}", class: "text-accent-400 hover:text-accent-300" %></td>
+        </tr>
+        <tr><th class="label">Published</th><td><%= @record.published? ? "Yes" : "No" %></td></tr>
+        <tr><th class="label">Created</th><td><%= @record.created_at.strftime("%-d %B %Y at %H:%M") %></td></tr>
+        <tr><th class="label">Updated</th><td><%= @record.updated_at.strftime("%-d %B %Y at %H:%M") %></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -37,6 +37,23 @@ module Madmin
       end
     end
 
+    # Sidebar entity counts, memoized per request
+    def madmin_sidebar_counts
+      @madmin_sidebar_counts ||= Rails.cache.fetch("madmin_sidebar_counts", expires_in: 2.minutes) do
+        {
+          posts: Post.unscoped.count,
+          categories: Category.count,
+          tags: Tag.count,
+          comments: Comment.count,
+          reports: Report.count,
+          testimonials: Testimonial.count,
+          users: User.count,
+          teams: Team.count,
+          projects: Project.count
+        }
+      end
+    end
+
     class MarkdownRenderer < Redcarpet::Render::HTML
       include Rouge::Plugins::Redcarpet
 

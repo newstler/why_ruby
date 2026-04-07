@@ -1,0 +1,64 @@
+<%= content_for :title, "Categories" %>
+
+<header class="header">
+  <h1>Categories</h1>
+</header>
+
+<div class="table-scroll">
+  <table>
+    <thead>
+      <tr>
+        <th><%= sortable :position, "#" %></th>
+        <th><%= sortable :name, "Category" %></th>
+        <th>Posts</th>
+        <th>Type</th>
+        <th><%= sortable :created_at, "Created" %></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% @records.each do |record| %>
+        <tr>
+          <td>
+            <span class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-dark-700 text-dark-300 text-xs font-mono font-medium">
+              <%= record.position %>
+            </span>
+          </td>
+          <td>
+            <%= link_to resource.show_path(record), class: "block" do %>
+              <div class="font-medium"><%= record.name %></div>
+              <% if record.description.present? %>
+                <div class="text-xs text-dark-500 mt-0.5 truncate max-w-xs"><%= record.description.truncate(80) %></div>
+              <% end %>
+            <% end %>
+          </td>
+          <td>
+            <span class="text-dark-300"><%= record.posts.size %></span>
+          </td>
+          <td>
+            <% if record.is_success_story? %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-500/15 text-amber-400">
+                Success Stories
+              </span>
+            <% else %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-dark-600 text-dark-400">
+                Regular
+              </span>
+            <% end %>
+          </td>
+          <td class="text-sm whitespace-nowrap"><%= record.created_at.strftime("%-d %b %Y") %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="pagination">
+  <% if @pagy.respond_to?(:series_nav) %>
+    <%== @pagy.series_nav if @pagy.last > 1 %>
+    <%== @pagy.info_tag %>
+  <% else %>
+    <%== pagy_nav @pagy if @pagy.last > 1 %>
+    <%== pagy_info @pagy %>
+  <% end %>
+</div>

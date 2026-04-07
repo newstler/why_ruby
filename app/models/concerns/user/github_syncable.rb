@@ -35,6 +35,9 @@ module User::GithubSyncable
     end
 
     update!(github_data_updated_at: Time.current)
+
+    # Assign to company team based on GitHub company field
+    Team.find_or_create_for_user!(self)
   rescue => e
     Rails.logger.error "Failed to sync GitHub data for #{username}: #{e.message}"
   end
@@ -86,6 +89,7 @@ module User::GithubSyncable
 
         begin
           update_user_from_graphql(user, user_data, repos_data || [])
+          Team.find_or_create_for_user!(user)
           updated += 1
         rescue => e
           failed += 1

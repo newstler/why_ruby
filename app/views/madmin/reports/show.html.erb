@@ -1,0 +1,78 @@
+<%= content_for :title, "Report" %>
+
+<header class="header">
+  <h1>
+    <%= link_to "Reports", resource.index_path %>
+    /
+    <%= @record.reason.titleize %> Report
+  </h1>
+</header>
+
+<div class="card-bg p-6 mb-6">
+  <div class="flex items-start gap-4">
+    <div class="flex-1">
+      <% reason_class = case @record.reason
+        when "spam" then "bg-amber-500/15 text-amber-400"
+        when "inappropriate", "harassment" then "bg-red-500/15 text-red-400"
+        when "off_topic" then "bg-blue-500/15 text-blue-400"
+        when "misinformation" then "bg-orange-500/15 text-orange-400"
+        else "bg-dark-600 text-dark-400"
+      end %>
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium <%= reason_class %>">
+        <%= @record.reason.titleize %>
+      </span>
+      <% if @record.description.present? %>
+        <p class="text-dark-300 mt-4 leading-relaxed"><%= @record.description %></p>
+      <% end %>
+      <div class="mt-4 text-sm text-dark-500">
+        Reported by <span class="text-dark-300"><%= @record.user.display_name %></span>
+        on <%= @record.created_at.strftime("%-d %B %Y at %H:%M") %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card-bg overflow-hidden mb-6">
+  <div class="px-5 py-4 border-b border-dark-700">
+    <h2 class="text-lg font-semibold text-dark-100">Reported Post</h2>
+  </div>
+  <div class="p-5">
+    <div class="flex items-start gap-4">
+      <div class="flex-1">
+        <%= link_to "/madmin/posts/#{@record.post.id}", class: "text-lg font-medium text-accent-400 hover:text-accent-300" do %>
+          <%= @record.post.title %>
+        <% end %>
+        <div class="mt-2 text-sm text-dark-500">
+          by <%= @record.post.user.display_name %>
+          &middot; <%= @record.post.reports_count %> total report(s)
+          <% if @record.post.needs_admin_review? %>
+            &middot; <span class="text-red-400">Needs review</span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card-bg overflow-hidden">
+  <div class="px-5 py-4 border-b border-dark-700">
+    <h2 class="text-lg font-semibold text-dark-100">Details</h2>
+  </div>
+  <div class="table-scroll">
+    <table>
+      <tbody>
+        <tr><th class="label">ID</th><td class="font-mono text-sm"><%= @record.id %></td></tr>
+        <tr>
+          <th class="label">Reporter</th>
+          <td><%= link_to @record.user.display_name, "/madmin/users/#{@record.user.id}", class: "text-accent-400 hover:text-accent-300" %></td>
+        </tr>
+        <tr>
+          <th class="label">Post</th>
+          <td><%= link_to @record.post.title, "/madmin/posts/#{@record.post.id}", class: "text-accent-400 hover:text-accent-300" %></td>
+        </tr>
+        <tr><th class="label">Reason</th><td><%= @record.reason.titleize %></td></tr>
+        <tr><th class="label">Created</th><td><%= @record.created_at.strftime("%-d %B %Y at %H:%M") %></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>

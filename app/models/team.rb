@@ -23,6 +23,30 @@ class Team < ApplicationRecord
   before_create :start_trial
   after_create :setup_default_language
 
+  # Find or create a team for the given company name.
+  # If company is blank, creates a personal team for the user.
+  def self.find_or_create_for_user!(user)
+    company = user.company.presence
+
+    if company
+      team = Team.find_by(name: company)
+      unless team
+        team = Team.create!(name: company)
+      end
+
+      unless user.member_of?(team)
+        team.memberships.create!(user: user, role: "member")
+      end
+
+      team
+    else
+      # No company — create a personal team
+      team = Team.create!(name: "#{user.display_name}'s Team")
+      team.memberships.create!(user: user, role: "owner")
+      team
+    end
+  end
+
   def total_chat_cost
     chats.sum(:total_cost)
   end

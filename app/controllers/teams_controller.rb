@@ -34,8 +34,6 @@ class TeamsController < ApplicationController
   end
 
   def create_personal_team(user)
-    team = Team.create!(name: "#{user.name || user.email.split('@').first}'s Team")
-    team.memberships.create!(user: user, role: "owner")
-    team
+    Team.find_or_create_for_user!(user)
   end
 end

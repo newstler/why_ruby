@@ -28,6 +28,16 @@ namespace :madmin do
   resources :tool_calls
   resources :users
   resources :teams
+
+  # Content management
+  resources :posts
+  resources :categories
+  resources :comments
+  resources :reports
+  resources :tags
+  resources :testimonials
+  resources :projects
+
   resources :languages do
     collection do
       post :sync

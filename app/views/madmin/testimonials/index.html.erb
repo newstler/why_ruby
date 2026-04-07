@@ -1,0 +1,95 @@
+<%= content_for :title, "Testimonials" %>
+
+<header class="header">
+  <h1>Testimonials</h1>
+</header>
+
+<div class="filters mb-4 p-4 card-bg">
+  <%= form_with url: resource.index_path, method: :get, class: "flex gap-3 items-end flex-wrap" do |f| %>
+    <div>
+      <%= f.label :q, "Search", class: "block text-sm font-medium text-dark-300 mb-1" %>
+      <%= f.search_field :q, value: params[:q], placeholder: "Search testimonials...", class: "form-input" %>
+    </div>
+
+    <div>
+      <%= f.label :published, "Status", class: "block text-sm font-medium text-dark-300 mb-1" %>
+      <%= f.select :published, options_for_select([["All", ""], ["Published", "true"], ["Unpublished", "false"]], params[:published]), {}, class: "form-input" %>
+    </div>
+
+    <div class="flex gap-2">
+      <%= f.submit "Filter", class: "btn btn-primary" %>
+      <% if params[:q].present? || params[:published].present? %>
+        <%= link_to "Clear", resource.index_path, class: "btn btn-secondary" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<div class="table-scroll">
+  <table>
+    <thead>
+      <tr>
+        <th>Testimonial</th>
+        <th>User</th>
+        <th><%= sortable :published, "Status" %></th>
+        <th><%= sortable :position, "Position" %></th>
+        <th>AI</th>
+        <th><%= sortable :created_at, "Date" %></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% @records.each do |record| %>
+        <tr>
+          <td class="max-w-sm">
+            <%= link_to resource.show_path(record), class: "block" do %>
+              <% if record.heading.present? %>
+                <div class="font-medium"><%= record.heading %></div>
+                <div class="text-xs text-dark-500 mt-0.5 truncate"><%= record.quote&.truncate(60) %></div>
+              <% else %>
+                <div class="font-medium truncate"><%= record.quote&.truncate(80) || "No quote" %></div>
+              <% end %>
+            <% end %>
+          </td>
+          <td class="whitespace-nowrap">
+            <%= link_to record.user.display_name, "/madmin/users/#{record.user.id}", class: "text-accent-400 hover:text-accent-300" %>
+          </td>
+          <td>
+            <% if record.published? %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-400">Published</span>
+            <% elsif record.reject_reason.present? %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-500/15 text-red-400">Rejected</span>
+            <% else %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-dark-600 text-dark-400">Pending</span>
+            <% end %>
+          </td>
+          <td>
+            <% if record.position.present? %>
+              <span class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-dark-700 text-dark-300 text-xs font-mono font-medium"><%= record.position %></span>
+            <% else %>
+              <span class="text-dark-600">-</span>
+            <% end %>
+          </td>
+          <td>
+            <% if record.ai_attempts > 0 %>
+              <span class="text-xs text-dark-400"><%= record.ai_attempts %> attempt(s)</span>
+            <% else %>
+              <span class="text-dark-600">-</span>
+            <% end %>
+          </td>
+          <td class="text-sm whitespace-nowrap"><%= record.created_at.strftime("%-d %b %Y") %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="pagination">
+  <% if @pagy.respond_to?(:series_nav) %>
+    <%== @pagy.series_nav if @pagy.last > 1 %>
+    <%== @pagy.info_tag %>
+  <% else %>
+    <%== pagy_nav @pagy if @pagy.last > 1 %>
+    <%== pagy_info @pagy %>
+  <% end %>
+</div>

@@ -1,0 +1,142 @@
+<%= content_for :title, @record.name %>
+
+<header class="header">
+  <h1>
+    <%= link_to "Projects", resource.index_path %>
+    /
+    <%= @record.name %>
+  </h1>
+</header>
+
+<div class="card-bg p-6 mb-6">
+  <div class="flex items-start gap-4">
+    <div class="flex-1">
+      <h2 class="text-2xl font-bold text-dark-100"><%= @record.name %></h2>
+      <% if @record.description.present? %>
+        <p class="text-dark-400 mt-2"><%= @record.description %></p>
+      <% end %>
+      <div class="flex items-center gap-3 mt-3">
+        <a href="<%= @record.github_url %>" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-sm text-accent-400 hover:text-accent-300">
+          <%= inline_svg "icons/github.svg", class: "w-4 h-4" %>
+          View on GitHub
+          <%= inline_svg "icons/external-link.svg", class: "w-3 h-3" %>
+        </a>
+        <% if @record.archived? %>
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-500/15 text-red-400">Archived</span>
+        <% elsif @record.hidden? %>
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/15 text-amber-400">Hidden</span>
+        <% else %>
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-400">Visible</span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+  <div class="card-bg p-5">
+    <div class="text-dark-500 text-sm mb-1">Stars</div>
+    <div class="text-3xl font-bold text-amber-400"><%= number_with_delimiter(@record.stars) %></div>
+  </div>
+  <div class="card-bg p-5">
+    <div class="text-dark-500 text-sm mb-1">Stars Gained</div>
+    <div class="text-3xl font-bold text-emerald-400">+<%= @record.stars_gained %></div>
+  </div>
+  <div class="card-bg p-5">
+    <div class="text-dark-500 text-sm mb-1">Forks</div>
+    <div class="text-3xl font-bold text-dark-100"><%= @record.forks_count %></div>
+  </div>
+  <div class="card-bg p-5">
+    <div class="text-dark-500 text-sm mb-1">Size</div>
+    <div class="text-xl font-bold text-dark-100"><%= number_to_human_size(@record.size * 1024) %></div>
+  </div>
+</div>
+
+<%# Topics %>
+<% if @record.topics.any? %>
+  <div class="card-bg p-5 mb-6">
+    <div class="text-dark-500 text-sm mb-3">Topics</div>
+    <div class="flex flex-wrap gap-2">
+      <% @record.topics.each do |topic| %>
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
+          <%= topic %>
+        </span>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<%# Details %>
+<div class="card-bg overflow-hidden mb-6">
+  <div class="px-5 py-4 border-b border-dark-700">
+    <h2 class="text-lg font-semibold text-dark-100">Details</h2>
+  </div>
+  <div class="table-scroll">
+    <table>
+      <tbody>
+        <tr><th class="label">ID</th><td class="font-mono text-sm"><%= @record.id %></td></tr>
+        <tr>
+          <th class="label">Owner</th>
+          <td><%= link_to @record.user.display_name, "/madmin/users/#{@record.user.id}", class: "text-accent-400 hover:text-accent-300" %></td>
+        </tr>
+        <tr>
+          <th class="label">GitHub URL</th>
+          <td>
+            <a href="<%= @record.github_url %>" target="_blank" rel="noopener" class="text-accent-400 hover:text-accent-300">
+              <%= @record.github_url %>
+            </a>
+          </td>
+        </tr>
+        <tr><th class="label">Hidden</th><td><%= @record.hidden? ? "Yes" : "No" %></td></tr>
+        <tr><th class="label">Archived</th><td><%= @record.archived? ? "Yes" : "No" %></td></tr>
+        <tr><th class="label">Last Push</th><td><%= @record.pushed_at&.strftime("%-d %B %Y at %H:%M") || "-" %></td></tr>
+        <tr><th class="label">Created</th><td><%= @record.created_at.strftime("%-d %B %Y at %H:%M") %></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%# Star snapshots %>
+<% snapshots = @record.star_snapshots.order(recorded_on: :desc).limit(14) %>
+<% if snapshots.any? %>
+  <div class="card-bg overflow-hidden">
+    <div class="px-5 py-4 border-b border-dark-700">
+      <h2 class="text-lg font-semibold text-dark-100">Star History (last 14 days)</h2>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Stars</th>
+            <th>Change</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% prev_stars = nil %>
+          <% snapshots.reverse.each do |snapshot| %>
+            <tr>
+              <td class="whitespace-nowrap"><%= snapshot.recorded_on.strftime("%-d %b %Y") %></td>
+              <td class="font-medium"><%= number_with_delimiter(snapshot.stars) %></td>
+              <td>
+                <% if prev_stars %>
+                  <% diff = snapshot.stars - prev_stars %>
+                  <% if diff > 0 %>
+                    <span class="text-emerald-400">+<%= diff %></span>
+                  <% elsif diff < 0 %>
+                    <span class="text-red-400"><%= diff %></span>
+                  <% else %>
+                    <span class="text-dark-600">0</span>
+                  <% end %>
+                <% else %>
+                  <span class="text-dark-600">-</span>
+                <% end %>
+              </td>
+            </tr>
+            <% prev_stars = snapshot.stars %>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% end %>
