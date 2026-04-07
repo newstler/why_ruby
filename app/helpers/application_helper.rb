@@ -294,10 +294,12 @@ module ApplicationHelper
 
   # URL helpers for the new routing structure
   def post_url_for(post)
+    return root_url unless post.category
     post_url(post.category, post)
   end
 
   def post_path_for(post)
+    return root_path unless post.category
     post_path(post.category, post)
   end
 

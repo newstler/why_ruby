@@ -39,6 +39,7 @@ class Posts::DuplicateChecksController < ApplicationController
   end
 
   def post_path_for(post)
+    return root_path unless post.category
     post_path(post.category, post)
   end
 end
