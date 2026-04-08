@@ -1,6 +1,6 @@
 class Sessions::VerificationsController < ApplicationController
   rate_limit to: 10, within: 5.minutes, name: "sessions/verify",
-    with: -> { redirect_to new_session_path, alert: t("controllers.sessions.rate_limit.verify") }
+    with: -> { redirect_to root_path, alert: t("controllers.sessions.rate_limit.verify") }
 
   def show
     user = User.find_signed!(params[:token], purpose: :magic_link)
@@ -19,7 +19,7 @@ class Sessions::VerificationsController < ApplicationController
       redirect_to onboarding_path
     end
   rescue ActiveSupport::MessageVerifier::InvalidSignature
-    redirect_to new_session_path, alert: t("controllers.sessions.verify.alert")
+    redirect_to root_path, alert: t("controllers.sessions.verify.alert")
   end
 
   private

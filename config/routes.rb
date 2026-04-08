@@ -7,6 +7,10 @@ Rails.application.routes.draw do
   match "sign_in_github", to: "users/sessions#github_auth", as: :github_auth_with_return, via: [ :get, :post ]
   delete "sign_out", to: "users/sessions#destroy", as: :destroy_user_session
 
+  # Cross-domain auth routes (must be before wildcard auth/:token)
+  get "auth/receive", to: "auth#receive"
+  get "auth/sign_out_receive", to: "auth#sign_out_receive"
+
   # User magic link verification
   get "auth/:token", to: "sessions/verifications#show", as: :verify_magic_link
 
@@ -15,10 +19,6 @@ Rails.application.routes.draw do
     resource :session, only: [ :new, :create, :destroy ]
     get "auth/:token", to: "sessions/verifications#show", as: :verify_magic_link
   end
-
-  # Cross-domain auth routes (must be early)
-  get "auth/receive", to: "auth#receive"
-  get "auth/sign_out_receive", to: "auth#sign_out_receive"
 
   # Production community domain: rubycommunity.org (users at root level /:username)
   constraints host: Rails.application.config.x.domains.community do
