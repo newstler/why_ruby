@@ -17,24 +17,12 @@
 
     <div class="card-bg p-6 hover:shadow-xl hover:shadow-black/30 transition-all">
       <div class="flex items-center justify-between mb-4">
-        <div class="p-3 bg-blue-500/20 rounded-lg">
-          <%= inline_svg "icons/users.svg", class: "w-6 h-6 text-blue-400" %>
+        <div class="p-3 bg-amber-500/20 rounded-lg">
+          <%= inline_svg "icons/lightning.svg", class: "w-6 h-6 text-amber-400" %>
         </div>
-        <span class="text-xs font-medium text-green-400 bg-green-500/20 px-2 py-1 rounded-full">+<%= @metrics[:recent_users] %></span>
       </div>
-      <p class="text-3xl font-bold text-dark-50"><%= number_with_delimiter(@metrics[:total_users]) %></p>
-      <p class="text-sm text-dark-400 mt-1">Total Users</p>
-    </div>
-
-    <div class="card-bg p-6 hover:shadow-xl hover:shadow-black/30 transition-all">
-      <div class="flex items-center justify-between mb-4">
-        <div class="p-3 bg-indigo-500/20 rounded-lg">
-          <%= inline_svg "icons/users.svg", class: "w-6 h-6 text-indigo-400" %>
-        </div>
-        <span class="text-xs font-medium text-green-400 bg-green-500/20 px-2 py-1 rounded-full">+<%= @metrics[:recent_teams] %></span>
-      </div>
-      <p class="text-3xl font-bold text-dark-50"><%= number_with_delimiter(@metrics[:total_teams]) %></p>
-      <p class="text-sm text-dark-400 mt-1">Total Teams</p>
+      <p class="text-3xl font-bold text-dark-50"><%= number_with_delimiter(@metrics[:total_tokens]) %></p>
+      <p class="text-sm text-dark-400 mt-1">AI Tokens</p>
     </div>
 
     <div class="card-bg p-6 hover:shadow-xl hover:shadow-black/30 transition-all">
@@ -50,23 +38,34 @@
 
     <div class="card-bg p-6 hover:shadow-xl hover:shadow-black/30 transition-all">
       <div class="flex items-center justify-between mb-4">
-        <div class="p-3 bg-green-500/20 rounded-lg">
-          <%= inline_svg "icons/messages.svg", class: "w-6 h-6 text-green-400" %>
+        <div class="p-3 bg-blue-500/20 rounded-lg">
+          <%= inline_svg "icons/users.svg", class: "w-6 h-6 text-blue-400" %>
         </div>
-        <span class="text-xs font-medium text-green-400 bg-green-500/20 px-2 py-1 rounded-full">+<%= @metrics[:recent_messages] %></span>
+        <span class="text-xs font-medium text-green-400 bg-green-500/20 px-2 py-1 rounded-full">+<%= @metrics[:recent_users] %></span>
       </div>
-      <p class="text-3xl font-bold text-dark-50"><%= number_with_delimiter(@metrics[:total_messages]) %></p>
-      <p class="text-sm text-dark-400 mt-1">Total Messages</p>
+      <p class="text-3xl font-bold text-dark-50"><%= number_with_delimiter(@metrics[:total_users]) %></p>
+      <p class="text-sm text-dark-400 mt-1">Total Users</p>
     </div>
 
     <div class="card-bg p-6 hover:shadow-xl hover:shadow-black/30 transition-all">
       <div class="flex items-center justify-between mb-4">
-        <div class="p-3 bg-amber-500/20 rounded-lg">
-          <%= inline_svg "icons/lightning.svg", class: "w-6 h-6 text-amber-400" %>
+        <div class="p-3 bg-indigo-500/20 rounded-lg">
+          <%= inline_svg "icons/github.svg", class: "w-6 h-6 text-indigo-400" %>
         </div>
       </div>
-      <p class="text-3xl font-bold text-dark-50"><%= number_with_delimiter(@metrics[:total_tokens]) %></p>
-      <p class="text-sm text-dark-400 mt-1">AI Tokens</p>
+      <p class="text-3xl font-bold text-dark-50"><%= number_with_delimiter(@metrics[:total_projects]) %></p>
+      <p class="text-sm text-dark-400 mt-1">Projects</p>
+    </div>
+
+    <div class="card-bg p-6 hover:shadow-xl hover:shadow-black/30 transition-all">
+      <div class="flex items-center justify-between mb-4">
+        <div class="p-3 bg-pink-500/20 rounded-lg">
+          <%= inline_svg "icons/check-circle.svg", class: "w-6 h-6 text-pink-400" %>
+        </div>
+        <span class="text-xs font-medium text-emerald-400 bg-emerald-500/20 px-2 py-1 rounded-full"><%= @metrics[:published_testimonials] %> pub</span>
+      </div>
+      <p class="text-3xl font-bold text-dark-50"><%= number_with_delimiter(@metrics[:total_testimonials]) %></p>
+      <p class="text-sm text-dark-400 mt-1">Testimonials</p>
     </div>
   </div>
 

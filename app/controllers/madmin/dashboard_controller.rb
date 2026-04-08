@@ -14,7 +14,10 @@ module Madmin
         recent_messages: Message.where("created_at >= ?", 7.days.ago).count,
         recent_users: User.where("created_at >= ?", 7.days.ago).count,
         recent_teams: Team.where("created_at >= ?", 7.days.ago).count,
-        total_models: Model.enabled.count
+        total_models: Model.enabled.count,
+        total_projects: Project.count,
+        total_testimonials: Testimonial.count,
+        published_testimonials: Testimonial.published.count
       }
 
       @subscription_stats = {
