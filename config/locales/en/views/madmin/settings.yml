@@ -2,8 +2,39 @@
 en:
   madmin:
     settings:
+      ai_models:
+        edit:
+          ai_models_hint: Per-task models override the default. Leave blank to use
+            the default (%{default_model}).
+          cancel: Cancel
+          default_ai_model: Default Model
+          default_ai_model_hint: Fallback model for all AI tasks when no per-task
+            model is set.
+          heading: Edit AI Models
+          save: Save AI Models
+          summary_model: Summary Model
+          testimonial_model: Testimonial Model
+          translation_model: Translation Model
+          uses_default: Uses default
+          validation_model: Validation Model
+        show:
+          default_ai_model: Default Model
+          edit_button: Edit AI Models
+          heading: AI Models
+          summary_model: Summary Model
+          testimonial_model: Testimonial Model
+          translation_model: Translation Model
+          uses_default: Uses default
+          validation_model: Validation Model
       edit:
         cancel: Cancel
+        github: GitHub
+        github_api_token: API Token
+        github_api_token_hint: Used for batch syncing GitHub profile data and repositories.
+        github_rubycommunity_client_id: RubyCommunity.org Client ID
+        github_rubycommunity_client_secret: RubyCommunity.org Client Secret
+        github_whyruby_client_id: WhyRuby.info Client ID
+        github_whyruby_client_secret: WhyRuby.info Client Secret
         heading: Edit Settings
         key_placeholder: Enter key...
         litestream: Litestream
@@ -21,6 +52,12 @@ en:
           disable.
       show:
         edit_button: Edit Settings
+        github: GitHub
+        github_api_token: API Token
+        github_rubycommunity_client_id: RubyCommunity.org Client ID
+        github_rubycommunity_client_secret: RubyCommunity.org Client Secret
+        github_whyruby_client_id: WhyRuby.info Client ID
+        github_whyruby_client_secret: WhyRuby.info Client Secret
         heading: Settings
         litestream: Litestream
         litestream_replica_access_key: Secret Access Key

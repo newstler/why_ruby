@@ -29,7 +29,7 @@ class TranslateContentJob < ApplicationJob
     prompt = build_prompt(source_content, target_language)
 
     # Call LLM for translation
-    response = RubyLLM.chat(model: "gpt-4.1-nano").ask(prompt)
+    response = RubyLLM.chat(model: Setting.get(:translation_model, default: Setting::DEFAULT_AI_MODEL)).ask(prompt)
     translated = parse_response(response.content, source_content.keys)
 
     return unless translated

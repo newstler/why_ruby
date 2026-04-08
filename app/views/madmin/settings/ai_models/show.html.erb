@@ -1,0 +1,46 @@
+<div class="max-w-3xl mx-auto">
+  <div class="flex items-center justify-between mb-8">
+    <h1 class="text-3xl font-bold text-dark-50"><%= t(".heading") %></h1>
+    <%= link_to t(".edit_button"), main_app.edit_madmin_settings_ai_models_path, class: "inline-flex items-center gap-2 px-4 py-2 bg-dark-700 hover:bg-dark-600 text-dark-200 rounded-lg transition-colors" %>
+  </div>
+
+  <div class="card-bg p-6">
+    <dl class="space-y-4">
+      <div class="flex items-center justify-between">
+        <dt class="text-sm font-medium text-dark-400"><%= t(".default_ai_model") %></dt>
+        <dd class="flex items-center gap-2">
+          <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+          <code class="text-sm text-dark-200 font-mono"><%= @setting.default_ai_model.presence || Setting::DEFAULT_AI_MODEL %></code>
+        </dd>
+      </div>
+      <div class="flex items-center justify-between">
+        <dt class="text-sm font-medium text-dark-400"><%= t(".summary_model") %></dt>
+        <dd class="flex items-center gap-2">
+          <span class="w-2 h-2 <%= @setting.summary_model.present? ? 'bg-green-400' : 'bg-dark-500' %> rounded-full"></span>
+          <code class="text-sm text-dark-200 font-mono"><%= @setting.summary_model.presence || t(".uses_default") %></code>
+        </dd>
+      </div>
+      <div class="flex items-center justify-between">
+        <dt class="text-sm font-medium text-dark-400"><%= t(".testimonial_model") %></dt>
+        <dd class="flex items-center gap-2">
+          <span class="w-2 h-2 <%= @setting.testimonial_model.present? ? 'bg-green-400' : 'bg-dark-500' %> rounded-full"></span>
+          <code class="text-sm text-dark-200 font-mono"><%= @setting.testimonial_model.presence || t(".uses_default") %></code>
+        </dd>
+      </div>
+      <div class="flex items-center justify-between">
+        <dt class="text-sm font-medium text-dark-400"><%= t(".validation_model") %></dt>
+        <dd class="flex items-center gap-2">
+          <span class="w-2 h-2 <%= @setting.validation_model.present? ? 'bg-green-400' : 'bg-dark-500' %> rounded-full"></span>
+          <code class="text-sm text-dark-200 font-mono"><%= @setting.validation_model.presence || t(".uses_default") %></code>
+        </dd>
+      </div>
+      <div class="flex items-center justify-between">
+        <dt class="text-sm font-medium text-dark-400"><%= t(".translation_model") %></dt>
+        <dd class="flex items-center gap-2">
+          <span class="w-2 h-2 <%= @setting.translation_model.present? ? 'bg-green-400' : 'bg-dark-500' %> rounded-full"></span>
+          <code class="text-sm text-dark-200 font-mono"><%= @setting.translation_model.presence || t(".uses_default") %></code>
+        </dd>
+      </div>
+    </dl>
+  </div>
+</div>

@@ -10,12 +10,12 @@ Rails.application.config.middleware.use OmniAuth::Builder do
 
       domains = Rails.application.config.x.domains
       if Rails.env.production? && request.host == domains.community
-        strategy.options[:client_id] = Rails.application.credentials.dig(:github, :rubycommunity, :client_id)
-        strategy.options[:client_secret] = Rails.application.credentials.dig(:github, :rubycommunity, :client_secret)
+        strategy.options[:client_id] = Setting.get(:github_rubycommunity_client_id)
+        strategy.options[:client_secret] = Setting.get(:github_rubycommunity_client_secret)
         strategy.options[:callback_url] = "https://#{domains.community}/auth/github/callback"
       else
-        strategy.options[:client_id] = Rails.application.credentials.dig(:github, :whyruby, :client_id)
-        strategy.options[:client_secret] = Rails.application.credentials.dig(:github, :whyruby, :client_secret)
+        strategy.options[:client_id] = Setting.get(:github_whyruby_client_id)
+        strategy.options[:client_secret] = Setting.get(:github_whyruby_client_secret)
         strategy.options[:callback_url] = Rails.env.production? ? "https://#{domains.primary}/auth/github/callback" : nil
       end
     }

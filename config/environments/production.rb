@@ -60,16 +60,8 @@ Rails.application.configure do
 
   # Set host to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "whyruby.info" }
-  config.action_mailer.default_options = { from: "hey@yurisidorov.com" }
 
-  # Specify outgoing SMTP server.
-  config.action_mailer.smtp_settings = {
-    user_name: Rails.application.credentials.dig(:smtp, :username),
-    password: Rails.application.credentials.dig(:smtp, :password),
-    address: Rails.application.credentials.dig(:smtp, :address) || "smtp.example.com",
-    port: 587,
-    authentication: :plain
-  }
+  # SMTP settings are configured dynamically via Setting model (Madmin admin panel)
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

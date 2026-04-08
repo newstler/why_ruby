@@ -20,7 +20,7 @@ module Testimonial::AiValidatable
 
     chat = user.chats.create!(
       purpose: "testimonial_validation",
-      model: Model.find_by(model_id: RubyLLM.configuration.default_model)
+      model: Model.find_by(model_id: Setting.get(:validation_model, default: Setting::DEFAULT_AI_MODEL))
     )
 
     response = chat.ask("#{system_prompt}\n\n#{user_prompt}")

@@ -37,6 +37,12 @@ module Madmin
       end
     end
 
+    def mask_secret(value)
+      return nil if value.blank?
+
+      "***#{value.last(4)}"
+    end
+
     # Sidebar entity counts, memoized per request
     def madmin_sidebar_counts
       @madmin_sidebar_counts ||= Rails.cache.fetch("madmin_sidebar_counts", expires_in: 2.minutes) do

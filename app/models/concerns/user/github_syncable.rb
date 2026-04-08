@@ -45,7 +45,7 @@ module User::GithubSyncable
   class_methods do
     # Batch GraphQL fetch for multiple users
     def batch_sync_github_data!(users, api_token: nil)
-      api_token ||= Rails.application.credentials.dig(:github, :api_token)
+      api_token ||= Setting.get(:github_api_token)
       return { updated: 0, failed: users.size, errors: [ "No API token configured" ] } unless api_token.present?
 
       users_with_usernames = users.select { |u| u.username.present? }

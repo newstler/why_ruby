@@ -16,7 +16,7 @@ module Testimonial::AiGeneratable
 
     chat = user.chats.create!(
       purpose: "testimonial_generation",
-      model: Model.find_by(model_id: RubyLLM.configuration.default_model)
+      model: Model.find_by(model_id: Setting.get(:testimonial_model, default: Setting::DEFAULT_AI_MODEL))
     )
 
     parsed = ask_and_parse(chat, system_prompt, user_prompt)

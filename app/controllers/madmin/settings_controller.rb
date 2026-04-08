@@ -22,14 +22,19 @@ module Madmin
 
     def setting_params
       params.require(:setting).permit(
+        :github_api_token,
+        :github_rubycommunity_client_id,
+        :github_rubycommunity_client_secret,
+        :github_whyruby_client_id,
+        :github_whyruby_client_secret,
+        :litestream_replica_bucket,
+        :litestream_replica_key_id,
+        :litestream_replica_access_key,
         :public_chats,
         :stripe_secret_key,
         :stripe_publishable_key,
         :stripe_webhook_secret,
         :trial_days,
-        :litestream_replica_bucket,
-        :litestream_replica_key_id,
-        :litestream_replica_access_key,
       )
     end
   end

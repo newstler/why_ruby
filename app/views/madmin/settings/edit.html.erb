@@ -4,6 +4,47 @@
   </div>
 
   <%= form_with model: @setting, url: main_app.madmin_settings_path, method: :patch, class: "space-y-6" do |form| %>
+    <%# GitHub OAuth %>
+    <div class="bg-dark-900 py-8 px-6 rounded-xl border border-dark-700">
+      <h2 class="text-xl font-semibold text-dark-100 mb-6"><%= t(".github") %></h2>
+      <div class="space-y-4">
+        <div>
+          <%= form.label :github_whyruby_client_id, t(".github_whyruby_client_id"), class: "block text-sm font-medium text-dark-200 mb-2" %>
+          <%= form.text_field :github_whyruby_client_id,
+            placeholder: t(".key_placeholder"),
+            class: "w-full px-4 py-3 border border-dark-600 bg-dark-800 text-dark-100 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none transition-all placeholder-dark-500 font-mono text-sm" %>
+        </div>
+        <div>
+          <%= form.label :github_whyruby_client_secret, t(".github_whyruby_client_secret"), class: "block text-sm font-medium text-dark-200 mb-2" %>
+          <%= form.password_field :github_whyruby_client_secret,
+            value: @setting.github_whyruby_client_secret,
+            placeholder: t(".key_placeholder"),
+            class: "w-full px-4 py-3 border border-dark-600 bg-dark-800 text-dark-100 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none transition-all placeholder-dark-500 font-mono text-sm" %>
+        </div>
+        <div>
+          <%= form.label :github_rubycommunity_client_id, t(".github_rubycommunity_client_id"), class: "block text-sm font-medium text-dark-200 mb-2" %>
+          <%= form.text_field :github_rubycommunity_client_id,
+            placeholder: t(".key_placeholder"),
+            class: "w-full px-4 py-3 border border-dark-600 bg-dark-800 text-dark-100 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none transition-all placeholder-dark-500 font-mono text-sm" %>
+        </div>
+        <div>
+          <%= form.label :github_rubycommunity_client_secret, t(".github_rubycommunity_client_secret"), class: "block text-sm font-medium text-dark-200 mb-2" %>
+          <%= form.password_field :github_rubycommunity_client_secret,
+            value: @setting.github_rubycommunity_client_secret,
+            placeholder: t(".key_placeholder"),
+            class: "w-full px-4 py-3 border border-dark-600 bg-dark-800 text-dark-100 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none transition-all placeholder-dark-500 font-mono text-sm" %>
+        </div>
+        <div>
+          <%= form.label :github_api_token, t(".github_api_token"), class: "block text-sm font-medium text-dark-200 mb-2" %>
+          <%= form.password_field :github_api_token,
+            value: @setting.github_api_token,
+            placeholder: t(".key_placeholder"),
+            class: "w-full px-4 py-3 border border-dark-600 bg-dark-800 text-dark-100 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none transition-all placeholder-dark-500 font-mono text-sm" %>
+          <p class="mt-1 text-xs text-dark-500"><%= t(".github_api_token_hint") %></p>
+        </div>
+      </div>
+    </div>
+
     <%# Stripe %>
     <div class="bg-dark-900 py-8 px-6 rounded-xl border border-dark-700">
       <h2 class="text-xl font-semibold text-dark-100 mb-6"><%= t(".stripe") %></h2>

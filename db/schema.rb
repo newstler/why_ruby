@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_04_06_182149) do
+ActiveRecord::Schema[8.2].define(version: 2026_04_08_170000) do
   create_table "_litestream_lock", id: false, force: :cascade do |t|
     t.integer "id"
   end
@@ -291,6 +291,12 @@ ActiveRecord::Schema[8.2].define(version: 2026_04_06_182149) do
 
   create_table "settings", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.string "default_ai_model"
+    t.string "github_api_token"
+    t.string "github_rubycommunity_client_id"
+    t.string "github_rubycommunity_client_secret"
+    t.string "github_whyruby_client_id"
+    t.string "github_whyruby_client_secret"
     t.string "litestream_replica_access_key"
     t.string "litestream_replica_bucket"
     t.string "litestream_replica_key_id"
@@ -302,8 +308,12 @@ ActiveRecord::Schema[8.2].define(version: 2026_04_06_182149) do
     t.string "stripe_publishable_key"
     t.string "stripe_secret_key"
     t.string "stripe_webhook_secret"
+    t.string "summary_model"
+    t.string "testimonial_model"
+    t.string "translation_model"
     t.integer "trial_days", default: 30
     t.datetime "updated_at", null: false
+    t.string "validation_model"
   end
 
   create_table "star_snapshots", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|

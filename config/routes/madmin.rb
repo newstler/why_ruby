@@ -46,7 +46,9 @@ namespace :madmin do
       patch :toggle
     end
   end
-  resource :settings, only: [ :show, :edit, :update ]
+  resource :settings, only: [ :show, :edit, :update ] do
+    resource :ai_models, only: [ :show, :edit, :update ], controller: "settings/ai_models"
+  end
   resources :providers, only: [ :index ] do
     collection do
       patch :update

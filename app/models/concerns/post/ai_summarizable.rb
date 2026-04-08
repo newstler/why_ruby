@@ -10,7 +10,7 @@ module Post::AiSummarizable
 
     chat = user.chats.create!(
       purpose: "summary",
-      model: Model.find_by(model_id: RubyLLM.configuration.default_model)
+      model: Model.find_by(model_id: Setting.get(:summary_model, default: Setting::DEFAULT_AI_MODEL))
     )
 
     prompt = "Output ONLY a single teaser sentence. No preamble. Maximum 200 characters. Hook the reader with the most intriguing aspect.\n\nTeaser:\n\n#{text_to_summarize}"

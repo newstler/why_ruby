@@ -37,6 +37,9 @@ en:
         update:
           notice: Provider credentials saved successfully
       settings:
+        ai_models:
+          update:
+            notice: AI model settings saved successfully
         update:
           notice: Settings saved successfully
     models:
