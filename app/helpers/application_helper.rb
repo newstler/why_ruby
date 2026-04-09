@@ -236,7 +236,7 @@ module ApplicationHelper
       (?:www\.)?                        # Optional www
       [a-zA-Z0-9][a-zA-Z0-9\-]*         # Domain name
       \.[a-zA-Z]{2,}                    # TLD
-      (?:/[^\s,.<>]*)?                  # Optional path
+      (?:/[^\s,<>]*[^\s,.<>])?          # Optional path (allow dots mid-path, not trailing)
     }x
 
     result = escaped.gsub(github_pattern) do |match|
