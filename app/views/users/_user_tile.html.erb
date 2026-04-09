@@ -32,7 +32,7 @@
       <div class="mt-1 space-y-0.5">
         <% unless local_assigns[:minimal] %>
           <% if user.bio.present? %>
-            <p class="<%= local_assigns[:compact] ? 'text-xs md:text-sm' : 'text-sm' %> text-gray-500 leading-tight mb-1 break-all"><%= user.bio %></p>
+            <p class="<%= local_assigns[:compact] ? 'text-xs md:text-sm' : 'text-sm' %> text-gray-500 leading-tight mb-1 break-words"><%= user.bio %></p>
           <% end %>
         <% end %>
 
