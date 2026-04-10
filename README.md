@@ -138,7 +138,7 @@ Access the admin panel at `/admin`
 
 ### Background Jobs
 - `GenerateSummaryJob`: Creates AI summaries for new content
-- `GenerateTestimonialFieldsJob`: AI-generates headline, subheadline, and quote from testimonials
+- `GenerateTestimonialJob`: AI-generates headline, subheadline, and quote from testimonials
 - `ValidateTestimonialJob`: LLM-validates testimonial content
 - `UpdateGithubDataJob`: Refreshes user GitHub data via GraphQL API
 - `NormalizeLocationJob`: Geocodes user locations for the community map

@@ -6,7 +6,7 @@ gem "rails", github: "rails/rails", branch: "main"
 gem "propshaft"
 # Use sqlite3 as the database for Active Record
 gem "sqlite3", ">= 2.1"
-gem "sqlean", "~> 0.2"
+gem "sqlean", "~> 0.2" # SQLite extensions including uuid7()
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
@@ -37,37 +37,57 @@ gem "kamal", require: false
 # Add HTTP asset caching/compression and X-Sendfile acceleration to Puma [https://github.com/basecamp/thruster/]
 gem "thruster", require: false
 
-# Authentication
-gem "devise", "~> 4.9"
+# Litestream for SQLite replication [https://github.com/fractaledmind/litestream-ruby]
+gem "litestream"
+
+# Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
+gem "image_processing", "~> 1.2"
+
+# Authentication (GitHub OAuth only, no Devise)
 gem "omniauth-github", "~> 2.0"
-gem "omniauth-rails_csrf_protection", "~> 1.0"
+gem "omniauth-rails_csrf_protection", "~> 2.0"
 
 # Admin
-gem "avo", ">= 3.2"
+gem "madmin", "~> 2.1"
 
 # Markdown and code syntax highlighting
-gem "redcarpet", "~> 3.6"
-gem "rouge", "~> 4.0"
+gem "redcarpet"
+gem "rouge"
 
-# AI integration for summaries
-gem "ruby-openai", "~> 8.2"
-gem "anthropic", "~> 1.6.0"
+# AI integration
+gem "ruby_llm", "~> 1.9"
 
 # Pagination
 gem "kaminari", "~> 1.2"
 
 # IP Geolocation (for analytics country code)
-gem "geocoder", "~> 1.8"
-gem "maxminddb", "~> 0.1"
+gem "geocoder"
+gem "maxminddb"
 
 # Friendly URLs
-gem "friendly_id", "~> 5.5"
+gem "friendly_id"
+gem "babosa"
 
 # Timezone lookup from coordinates (offline, pure Ruby)
 gem "wheretz"
 
 # HTML/XML parsing
 gem "nokogiri", "~> 1.16"
+
+# Icons
+gem "inline_svg"
+
+# MCP: Model Context Protocol
+gem "fast-mcp", "~> 1.6"
+
+# Billing
+gem "stripe"
+
+# Multilingual content
+gem "mobility", "~> 1.3"
+
+# Monitor performance
+gem "rorvswild", "~> 1.9"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
@@ -83,6 +103,9 @@ group :development, :test do
 
   # Git hooks manager - automatically runs RuboCop before commits
   gem "lefthook", require: false
+
+  # i18n tasks for managing translations [https://github.com/glebm/i18n-tasks]
+  gem "i18n-tasks", "~> 1.0"
 end
 
 group :development do
@@ -96,11 +119,5 @@ group :test do
   gem "selenium-webdriver"
   gem "webmock"
 end
-
-# Backup data to S3
-gem "litestream", "~> 0.14.0"
-
-# Monitor performance
-gem "rorvswild", "~> 1.9"
 
 gem "tidewave", "~> 0.4.1", group: :development

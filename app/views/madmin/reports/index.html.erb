@@ -1,0 +1,77 @@
+<%= content_for :title, "Reports" %>
+
+<header class="header">
+  <h1>Reports</h1>
+</header>
+
+<div class="filters mb-4 p-4 card-bg">
+  <%= form_with url: resource.index_path, method: :get, class: "flex gap-3 items-end flex-wrap" do |f| %>
+    <div>
+      <%= f.label :q, "Search", class: "block text-sm font-medium text-dark-300 mb-1" %>
+      <%= f.search_field :q, value: params[:q], placeholder: "Search reports...", class: "form-input" %>
+    </div>
+
+    <div>
+      <%= f.label :reason, "Reason", class: "block text-sm font-medium text-dark-300 mb-1" %>
+      <%= f.select :reason, options_for_select([["All reasons", ""], ["Spam", "spam"], ["Inappropriate", "inappropriate"], ["Off Topic", "off_topic"], ["Harassment", "harassment"], ["Misinformation", "misinformation"], ["Other", "other"]], params[:reason]), {}, class: "form-input" %>
+    </div>
+
+    <div class="flex gap-2">
+      <%= f.submit "Filter", class: "btn btn-primary" %>
+      <% if params[:q].present? || params[:reason].present? %>
+        <%= link_to "Clear", resource.index_path, class: "btn btn-secondary" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<div class="table-scroll">
+  <table>
+    <thead>
+      <tr>
+        <th>Post</th>
+        <th>Reporter</th>
+        <th><%= sortable :reason, "Reason" %></th>
+        <th>Description</th>
+        <th><%= sortable :created_at, "Date" %></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% @records.each do |record| %>
+        <tr>
+          <td class="max-w-xs">
+            <%= link_to record.post.title.truncate(50), "/madmin/posts/#{record.post.id}", class: "truncate block text-accent-400 hover:text-accent-300 font-medium" %>
+          </td>
+          <td class="whitespace-nowrap">
+            <%= link_to record.user.display_name, "/madmin/users/#{record.user.id}", class: "text-accent-400 hover:text-accent-300" %>
+          </td>
+          <td>
+            <% reason_class = case record.reason
+              when "spam" then "bg-amber-500/15 text-amber-400"
+              when "inappropriate", "harassment" then "bg-red-500/15 text-red-400"
+              when "off_topic" then "bg-blue-500/15 text-blue-400"
+              when "misinformation" then "bg-orange-500/15 text-orange-400"
+              else "bg-dark-600 text-dark-400"
+            end %>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium <%= reason_class %>">
+              <%= record.reason.titleize %>
+            </span>
+          </td>
+          <td class="max-w-xs truncate text-dark-400"><%= record.description.presence || "-" %></td>
+          <td class="text-sm whitespace-nowrap"><%= record.created_at.strftime("%-d %b %Y") %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="pagination">
+  <% if @pagy.respond_to?(:series_nav) %>
+    <%== @pagy.series_nav if @pagy.last > 1 %>
+    <%== @pagy.info_tag %>
+  <% else %>
+    <%== pagy_nav @pagy if @pagy.last > 1 %>
+    <%== pagy_info @pagy %>
+  <% end %>
+</div>

@@ -79,8 +79,8 @@
   <% if user && user_signed_in? && current_user == user %>
     <div class="absolute top-2 right-2 z-10">
       <% if hidden %>
-        <%= button_to unhide_repo_user_settings_path,
-            method: :post,
+        <%= button_to user_settings_repository_hide_path,
+            method: :delete,
             params: { repo_url: repository.github_url },
             class: "p-1.5 rounded-full bg-gray-100 hover:bg-red-100 text-gray-500 hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer",
             title: "Show repository",
@@ -92,7 +92,7 @@
           </svg>
         <% end %>
       <% else %>
-        <%= button_to hide_repo_user_settings_path,
+        <%= button_to user_settings_repository_hide_path,
             method: :post,
             params: { repo_url: repository.github_url },
             class: "p-1.5 rounded-full bg-gray-100 hover:bg-red-100 text-gray-500 hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer",

@@ -18,71 +18,48 @@ namespace :oauth do
     puts "   Homepage URL:        https://your-domain.com"
     puts "   Callback URL:        https://your-domain.com/users/auth/github/callback"
 
-    puts "\n4. Add credentials to Rails:"
-    puts "   For development: rails credentials:edit --environment development"
-    puts "   For production:  rails credentials:edit --environment production"
-    puts "   For test:        rails credentials:edit --environment test"
+    puts "\n4. Add credentials via Madmin admin panel:"
+    puts "   Go to /madmin/settings and fill in the GitHub section"
 
-    puts "\n   Add this structure:"
-    puts "   github:"
-    puts "     client_id: your_client_id"
-    puts "     client_secret: your_client_secret"
-    puts "   openai:"
-    puts "     api_key: your_openai_key (optional)"
-
-    puts "\n✅ Done! Start your server with 'rails server'\n"
+    puts "\n✅ Done! Start your server with 'bin/dev'\n"
   end
 
   desc "Test OAuth configuration"
   task test: :environment do
     puts "\n🔍 Testing OAuth Configuration...\n"
 
-    client_id = Rails.application.credentials.dig(:github, :client_id)
-    client_secret = Rails.application.credentials.dig(:github, :client_secret)
-    openai_key = Rails.application.credentials.dig(:openai, :api_key)
+    client_id = Setting.get(:github_whyruby_client_id)
+    client_secret = Setting.get(:github_whyruby_client_secret)
+    api_token = Setting.get(:github_api_token)
 
     puts "Environment: #{Rails.env}"
-    puts "Credentials file: config/credentials/#{Rails.env}.yml.enc"
 
     if client_id.present? && client_secret.present?
-      puts "✅ GitHub OAuth is configured!"
-      puts "   Client ID: #{client_id[0..7]}..." if client_id
+      puts "✅ GitHub OAuth (WhyRuby) is configured!"
+      puts "   Client ID: #{client_id[0..7]}..."
     else
-      puts "❌ GitHub OAuth is NOT configured!"
+      puts "❌ GitHub OAuth (WhyRuby) is NOT configured!"
       puts "   Missing: #{'Client ID' unless client_id.present?} #{'Client Secret' unless client_secret.present?}"
-      puts "\n   Run 'rails oauth:setup' for instructions"
+      puts "\n   Configure at /madmin/settings"
     end
 
-    if openai_key.present?
-      puts "✅ OpenAI API is configured!"
-      puts "   API Key: #{openai_key[0..7]}..."
+    community_id = Setting.get(:github_rubycommunity_client_id)
+    community_secret = Setting.get(:github_rubycommunity_client_secret)
+
+    if community_id.present? && community_secret.present?
+      puts "✅ GitHub OAuth (RubyCommunity) is configured!"
+      puts "   Client ID: #{community_id[0..7]}..."
     else
-      puts "⚠️  OpenAI API is NOT configured (optional)"
+      puts "⚠️  GitHub OAuth (RubyCommunity) is NOT configured (optional for development)"
     end
 
-    puts "\nTo edit credentials:"
-    puts "  rails credentials:edit --environment #{Rails.env}"
-  end
+    if api_token.present?
+      puts "✅ GitHub API Token is configured!"
+      puts "   Token: #{api_token[0..7]}..."
+    else
+      puts "⚠️  GitHub API Token is NOT configured (needed for batch sync)"
+    end
 
-  desc "Show example credentials structure"
-  task example: :environment do
-    puts "\n📝 Example Rails Credentials Structure\n"
-    puts "="*50
-    puts <<~YAML
-      # config/credentials/development.yml.enc
-      # (or production.yml.enc, test.yml.enc)
-
-      github:
-        client_id: your_github_oauth_client_id_here
-        client_secret: your_github_oauth_client_secret_here
-
-      openai:
-        api_key: sk-your_openai_api_key_here
-
-      # You can also add other credentials here:
-      secret_key_base: generated_secret_key_base
-    YAML
-
-    puts "\nTo edit: rails credentials:edit --environment #{Rails.env}"
+    puts "\nTo edit: /madmin/settings"
   end
 end

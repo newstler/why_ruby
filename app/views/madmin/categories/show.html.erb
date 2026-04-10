@@ -1,0 +1,107 @@
+<%= content_for :title, @record.name %>
+
+<header class="header">
+  <h1>
+    <%= link_to "Categories", resource.index_path %>
+    /
+    <%= @record.name %>
+  </h1>
+  <div class="actions">
+    <%= link_to "Edit", resource.edit_path(@record), class: "btn btn-secondary" %>
+  </div>
+</header>
+
+<div class="card-bg p-6 mb-6">
+  <div class="flex items-start gap-4">
+    <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-dark-700 text-dark-300 text-lg font-mono font-bold">
+      <%= @record.position %>
+    </div>
+    <div class="flex-1">
+      <h2 class="text-2xl font-bold text-dark-100"><%= @record.name %></h2>
+      <% if @record.description.present? %>
+        <p class="text-dark-400 mt-2"><%= @record.description %></p>
+      <% end %>
+      <div class="flex items-center gap-3 mt-3">
+        <% if @record.is_success_story? %>
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/15 text-amber-400">Success Story Category</span>
+        <% end %>
+        <span class="text-sm text-dark-500">Slug: <span class="font-mono text-dark-400"><%= @record.slug %></span></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+  <div class="card-bg p-5">
+    <div class="text-dark-500 text-sm mb-1">Total Posts</div>
+    <div class="text-3xl font-bold text-dark-100"><%= @record.posts.size %></div>
+  </div>
+  <div class="card-bg p-5">
+    <div class="text-dark-500 text-sm mb-1">Published</div>
+    <div class="text-3xl font-bold text-emerald-400"><%= @record.posts.published.size %></div>
+  </div>
+  <div class="card-bg p-5">
+    <div class="text-dark-500 text-sm mb-1">Drafts</div>
+    <div class="text-3xl font-bold text-dark-400"><%= @record.posts.size - @record.posts.published.size %></div>
+  </div>
+</div>
+
+<%# Details %>
+<div class="card-bg overflow-hidden mb-6">
+  <div class="px-5 py-4 border-b border-dark-700">
+    <h2 class="text-lg font-semibold text-dark-100">Details</h2>
+  </div>
+  <div class="table-scroll">
+    <table>
+      <tbody>
+        <tr><th class="label">ID</th><td class="font-mono text-sm"><%= @record.id %></td></tr>
+        <tr><th class="label">Name</th><td><%= @record.name %></td></tr>
+        <tr><th class="label">Slug</th><td class="font-mono text-sm"><%= @record.slug %></td></tr>
+        <tr><th class="label">Position</th><td><%= @record.position %></td></tr>
+        <tr><th class="label">Success Story</th><td><%= @record.is_success_story? ? "Yes" : "No" %></td></tr>
+        <tr><th class="label">Created</th><td><%= @record.created_at.strftime("%-d %B %Y at %H:%M") %></td></tr>
+        <tr><th class="label">Updated</th><td><%= @record.updated_at.strftime("%-d %B %Y at %H:%M") %></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%# Recent posts %>
+<% recent_posts = @record.posts.includes(:user).order(created_at: :desc).limit(10) %>
+<% if recent_posts.any? %>
+  <div class="card-bg overflow-hidden">
+    <div class="px-5 py-4 border-b border-dark-700">
+      <h2 class="text-lg font-semibold text-dark-100">Recent Posts</h2>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% recent_posts.each do |post| %>
+            <tr>
+              <td class="max-w-sm">
+                <%= link_to post.title.truncate(60), "/madmin/posts/#{post.id}", class: "truncate block text-accent-400 hover:text-accent-300" %>
+              </td>
+              <td class="whitespace-nowrap"><%= post.user.display_name %></td>
+              <td>
+                <% if post.published? %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-400">Published</span>
+                <% else %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-dark-600 text-dark-400">Draft</span>
+                <% end %>
+              </td>
+              <td class="text-sm whitespace-nowrap"><%= post.created_at.strftime("%-d %b %Y") %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% end %>

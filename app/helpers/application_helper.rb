@@ -1,6 +1,24 @@
 module ApplicationHelper
   include ImageHelper
 
+  # ── Open Graph helpers ──
+  def og_title
+    content_for(:og_title).presence || content_for(:title).presence || t("app_name", default: "Why Ruby?")
+  end
+
+  def og_description
+    content_for(:og_description).presence || t("meta.default.summary", default: "")
+  end
+
+  def og_image
+    if content_for?(:og_image)
+      src = content_for(:og_image)
+      src.start_with?("http") ? src : "#{request.base_url}#{src}"
+    else
+      versioned_og_image_url
+    end
+  end
+
   # Convert ISO country code to full name via i18n
   def country_name(code)
     return nil if code.blank?
@@ -19,6 +37,12 @@ module ApplicationHelper
     country_name(code)
   end
 
+  # ── Analytics ──
+
+  def nullitics_enabled?
+    Rails.configuration.x.nullitics rescue true
+  end
+
   # Get client country code for analytics (ISO 3166-1 alpha-2, e.g., "US", "DE", "CA")
   def client_country_code
     return @client_country_code if defined?(@client_country_code)
@@ -31,13 +55,32 @@ module ApplicationHelper
       nil
     end
   end
+
+  # ── Markdown ──
+
+  class MarkdownRenderer < Redcarpet::Render::HTML
+    include Rouge::Plugins::Redcarpet
+
+    def block_code(code, language)
+      language ||= "text"
+      formatter = Rouge::Formatters::HTMLLegacy.new(css_class: "highlight")
+      lexer = Rouge::Lexer.find_fancy(language, code) || Rouge::Lexers::PlainText.new
+      formatter.format(lexer.lex(code))
+    end
+  end
+
   # Class-level memoized markdown renderer for performance
   def self.markdown_renderer
     @markdown_renderer ||= begin
-      renderer = Redcarpet::Render::HTML.new(
+      renderer = MarkdownRenderer.new(
         filter_html: true,
         hard_wrap: true,
-        link_attributes: { rel: "nofollow", target: "_blank" }
+        link_attributes: { rel: "nofollow", target: "_blank" },
+        fenced_code_blocks: true,
+        prettify: true,
+        tables: true,
+        with_toc_data: true,
+        no_intra_emphasis: true
       )
 
       Redcarpet::Markdown.new(renderer,
@@ -57,37 +100,13 @@ module ApplicationHelper
     end
   end
 
+  def markdown(text)
+    return "" if text.blank?
+    ApplicationHelper.markdown_renderer.render(text).html_safe
+  end
+
   def markdown_to_html(markdown_text)
-    return "" if markdown_text.blank?
-
-    # Render markdown and apply syntax highlighting
-    html = ApplicationHelper.markdown_renderer.render(markdown_text)
-
-    # Apply syntax highlighting to code blocks
-    doc = Nokogiri::HTML::DocumentFragment.parse(html)
-    doc.css("pre code").each do |code_block|
-      # Extract language from class attribute (e.g., "ruby" from class="ruby" or "language-ruby")
-      language_class = code_block["class"] || ""
-      language = language_class.gsub(/^(language-)?/, "") || "text"
-
-      begin
-        lexer = Rouge::Lexer.find(language) || Rouge::Lexers::PlainText.new
-        formatter = Rouge::Formatters::HTML.new
-        highlighted_code = formatter.format(lexer.lex(code_block.text))
-
-        # Create a new pre element with the highlight class
-        pre_element = code_block.parent
-        pre_element["class"] = "highlight highlight-#{language}"
-
-        # Replace the code block's content with the highlighted version
-        code_block.inner_html = highlighted_code
-      rescue => e
-        # If highlighting fails, keep the original code block
-        Rails.logger.error "Syntax highlighting failed for language '#{language}': #{e.message}"
-      end
-    end
-
-    doc.to_html
+    markdown(markdown_text)
   end
 
   def format_post_date(date)
@@ -124,14 +143,12 @@ module ApplicationHelper
   end
 
   # Generate full URL to post on primary domain (whyruby.info)
-  # Used to ensure posts always link to the content domain, not the community domain
   def primary_domain_post_url(post)
     domain = Rails.application.config.x.domains.primary
     "https://#{domain}/#{post.category.to_param}/#{post.to_param}"
   end
 
   # Generate edit post URL on primary domain
-  # Used to ensure edit links always go to whyruby.info, not the community domain
   def primary_domain_edit_post_url(post)
     if Rails.env.production?
       domain = Rails.application.config.x.domains.primary
@@ -142,7 +159,6 @@ module ApplicationHelper
   end
 
   # Generate delete post URL on primary domain
-  # Used to ensure delete actions always go to whyruby.info, not the community domain
   def primary_domain_destroy_post_url(post)
     if Rails.env.production?
       domain = Rails.application.config.x.domains.primary
@@ -181,79 +197,53 @@ module ApplicationHelper
     false
   end
 
-  # Since success stories now work like regular categories, we can remove this method
-  # and just use category_menu_active? for success stories too
-
   def community_menu_active?
-    # Highlight if on the users index page
     return true if current_page?(users_path)
-
-    # Highlight if viewing a user profile
     controller_name == "users" && action_name == "show"
   end
 
   def safe_external_url(url)
     return "#" if url.blank?
 
-    # Parse the URL and validate it
     begin
       uri = URI.parse(url)
-
-      # Only allow http, https, and mailto schemes
       allowed_schemes = %w[http https mailto]
       return "#" unless allowed_schemes.include?(uri.scheme&.downcase)
-
-      # Return the original URL if it's safe
       url
     rescue URI::InvalidURIError
-      # If the URL is invalid, return a safe fallback
       "#"
     end
   end
 
   def safe_svg_content(svg_content)
-    # This helper makes it explicit that SVG content has been sanitized
-    # The actual sanitization happens in the model via SvgSanitizer
-    # The SVG is already sanitized, so we can safely mark it as html_safe
     return "" if svg_content.blank?
     svg_content.html_safe
   end
 
   def safe_markdown_content(markdown_text)
-    # This helper makes it explicit that markdown has been safely rendered
-    # with HTML filtering enabled
     markdown_to_html(markdown_text).html_safe
   end
 
   # Linkify URLs and GitHub @mentions in user bio text
-  # - URLs like "example.com" become clickable links
-  # - @username becomes a link to https://github.com/username
   def linkify_bio(text)
     return "" if text.blank?
 
-    # Escape HTML to prevent XSS
     escaped = ERB::Util.html_escape(text)
 
-    # Pattern for GitHub @mentions
     github_pattern = /(?<=\s|^)@([a-zA-Z0-9](?:[a-zA-Z0-9\-]*[a-zA-Z0-9])?)/
-
-    # Pattern for URLs (with or without protocol)
-    # Excludes trailing punctuation like commas and periods used in prose
     url_pattern = %r{
       (?:https?://)?                    # Optional protocol
       (?:www\.)?                        # Optional www
       [a-zA-Z0-9][a-zA-Z0-9\-]*         # Domain name
       \.[a-zA-Z]{2,}                    # TLD
-      (?:/[^\s,.<>]*)?                  # Optional path (stops at whitespace, comma, period, angle brackets)
+      (?:/[^\s,<>]*[^\s,.<>])?          # Optional path (allow dots mid-path, not trailing)
     }x
 
-    # Replace GitHub @mentions first
     result = escaped.gsub(github_pattern) do |match|
       username = Regexp.last_match(1)
       %(<a href="https://github.com/#{username}" target="_blank" rel="noopener" class="underline hover:text-red-600 transition-colors">#{match}</a>)
     end
 
-    # Replace URLs (skip github.com since @mentions already handled)
     result = result.gsub(url_pattern) do |match|
       next match if match.include?("github.com")
       url = match.start_with?("http") ? match : "https://#{match}"
@@ -264,7 +254,6 @@ module ApplicationHelper
   end
 
   def has_success_stories?
-    # Cache the result for the request to avoid multiple DB queries
     if Category.success_story_category
       @has_success_stories ||= Category.success_story_category.posts.published.exists?
     else
@@ -273,15 +262,10 @@ module ApplicationHelper
   end
 
   def should_show_mobile_cta?
-    # Show CTA when nav is collapsed (below lg) if user is not signed in
-    # or if their testimonial is not published
     return true unless user_signed_in?
-
-    # Check if user has a published testimonial
     !current_user.testimonial&.published?
   end
 
-  # Generate the full formatted page title that matches the <title> tag format
   def full_page_title(page_title = nil)
     if page_title.present?
       "Why Ruby? — #{page_title}"
@@ -296,13 +280,10 @@ module ApplicationHelper
     hash[filename] = File.exist?(path) ? File.mtime(path).to_i.to_s : Time.current.to_i.to_s
   end
 
-  # Generate versioned URL for OG image to bust social media caches
-  # Pass a filename to use a different image (e.g., "og-image-community.png")
   def versioned_og_image_url(filename = "og-image.png")
     "#{request.base_url}/#{filename}?v=#{OG_IMAGE_VERSIONS[filename]}"
   end
 
-  # Generate the full page title for community pages (Ruby Community branding)
   def community_page_title(page_title = nil)
     if page_title.present?
       "Ruby Community — #{page_title}"
@@ -313,10 +294,12 @@ module ApplicationHelper
 
   # URL helpers for the new routing structure
   def post_url_for(post)
+    return root_url unless post.category
     post_url(post.category, post)
   end
 
   def post_path_for(post)
+    return root_path unless post.category
     post_path(post.category, post)
   end
 
@@ -324,17 +307,14 @@ module ApplicationHelper
   def cross_domain_url(domain_type, path = "/")
     return path unless Rails.env.production?
 
-    # No Warden context (e.g. rendering from a background job broadcast)
-    return path unless respond_to?(:request) && request.present? && request.env["warden"].present?
+    return path unless respond_to?(:request) && request.present?
 
     domains = Rails.application.config.x.domains
     host = (domain_type == :primary) ? domains.primary : domains.community
 
-    # If already on target domain, just return the path
     return path if request.host == host
 
     if user_signed_in?
-      # Sync session to target domain (memoize token for this request)
       token = cross_domain_token_for_request
       "https://#{host}/auth/receive?token=#{token}&return_to=#{path}"
     else
@@ -342,21 +322,16 @@ module ApplicationHelper
     end
   end
 
-  # Memoize token per request so multiple links use the same token
   def cross_domain_token_for_request
     @cross_domain_token ||= current_user.generate_cross_domain_token!
   end
 
-  # Helper for community index URL (works in dev and prod)
   def community_index_url
     return users_path unless Rails.env.production?
 
     domain = Rails.application.config.x.domains.community
-
-    # In production on community domain, just go to root
     return "/" if request.host == domain
 
-    # On primary domain, cross-domain to community
     if user_signed_in?
       token = current_user.generate_cross_domain_token!
       "https://#{domain}/auth/receive?token=#{token}&return_to=/"
@@ -365,8 +340,6 @@ module ApplicationHelper
     end
   end
 
-  # Helper for community index path with query params (for pagination/filtering)
-  # On community domain in production, uses root path. Otherwise uses /community.
   def community_index_path(params = {})
     base_path = if Rails.env.production? && request.host == Rails.application.config.x.domains.community
       "/"
@@ -380,7 +353,6 @@ module ApplicationHelper
     query.present? ? "#{base_path}?#{query}" : base_path
   end
 
-  # Helper for community user profile URLs (for navigation links)
   def community_user_url(user)
     if Rails.env.production?
       "https://#{Rails.application.config.x.domains.community}/#{user.to_param}"
@@ -389,8 +361,6 @@ module ApplicationHelper
     end
   end
 
-  # Helper for community user path with query params (for sorting/filtering links)
-  # On community domain in production, uses /:id. Otherwise uses /community/:id.
   def community_user_path(user, params = {})
     base_path = if Rails.env.production? && request.host == Rails.application.config.x.domains.community
       "/#{user.to_param}"
@@ -404,7 +374,6 @@ module ApplicationHelper
     query.present? ? "#{base_path}?#{query}" : base_path
   end
 
-  # URL for community map data endpoint (works across domains)
   def community_map_data_url
     if Rails.env.production? && request.host == Rails.application.config.x.domains.community
       "/map_data"
@@ -413,8 +382,6 @@ module ApplicationHelper
     end
   end
 
-  # Generate a full URL on the primary domain (whyruby.info) for a given path.
-  # Used for footer legal links that must resolve on both domains.
   def main_site_url(path)
     if Rails.env.production? && request.host == Rails.application.config.x.domains.community
       "https://#{Rails.application.config.x.domains.primary}#{path}"
@@ -423,9 +390,6 @@ module ApplicationHelper
     end
   end
 
-  # Canonical URL for community root (for meta tags)
-  # Production: https://rubycommunity.org/
-  # Development: http://localhost:3003/community
   def community_root_canonical_url
     if Rails.env.production?
       "https://#{Rails.application.config.x.domains.community}/"
@@ -434,9 +398,6 @@ module ApplicationHelper
     end
   end
 
-  # Canonical URL for community user profile (for meta tags)
-  # Production: https://rubycommunity.org/username
-  # Development: http://localhost:3003/community/username
   def community_user_canonical_url(user)
     if Rails.env.production?
       "https://#{Rails.application.config.x.domains.community}/#{user.to_param}"

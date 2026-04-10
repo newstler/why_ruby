@@ -1,0 +1,13 @@
+general:
+  id: "01961a2a-c0de-7000-8000-000000000201"
+  name: "General"
+  slug: "general"
+  position: 1
+  is_success_story: false
+
+success_stories:
+  id: "01961a2a-c0de-7000-8000-000000000202"
+  name: "Success Stories"
+  slug: "success-stories"
+  position: 2
+  is_success_story: true

@@ -1,0 +1,129 @@
+<%= content_for :title, "Users" %>
+
+<header class="header">
+  <h1>Users</h1>
+</header>
+
+<div class="filters mb-4 p-4 card-bg">
+  <%= form_with url: resource.index_path, method: :get, class: "flex gap-3 items-end flex-wrap" do |f| %>
+    <div>
+      <%= f.label :q, "Search", class: "block text-sm font-medium text-dark-300 mb-1" %>
+      <%= f.search_field :q, value: params[:q], placeholder: "Search users...", class: "form-input" %>
+    </div>
+
+    <div>
+      <%= f.label :role, "Role", class: "block text-sm font-medium text-dark-300 mb-1" %>
+      <%= f.select :role, options_for_select([["All roles", ""], ["Member", "0"], ["Admin", "1"]], params[:role]), {}, class: "form-input" %>
+    </div>
+
+    <div class="flex items-center gap-2 pb-0.5">
+      <label class="flex items-center gap-2 cursor-pointer">
+        <%= f.check_box :trusted, { checked: params[:trusted] == "true", class: "form-checkbox rounded border-dark-600 bg-dark-700 text-emerald-500 focus:ring-emerald-500/25" }, "true", "" %>
+        <span class="text-sm text-emerald-400 font-medium">Trusted only</span>
+      </label>
+    </div>
+
+    <div class="flex gap-2">
+      <%= f.submit "Filter", class: "btn btn-primary" %>
+      <% if params[:q].present? || params[:role].present? || params[:trusted].present? %>
+        <%= link_to "Clear", resource.index_path, class: "btn btn-secondary" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<div class="table-scroll">
+  <table>
+    <thead>
+      <tr>
+        <th><%= sortable :username, "User" %></th>
+        <th><%= sortable :role, "Role" %></th>
+        <th><%= sortable :company, "Company" %></th>
+        <th><%= sortable :published_posts_count, "Posts" %></th>
+        <th><%= sortable :published_comments_count, "Comments" %></th>
+        <th><%= sortable :github_stars_sum, "Stars" %></th>
+        <th><%= sortable :created_at, "Joined" %></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% @records.each do |record| %>
+        <tr>
+          <td>
+            <%= link_to resource.show_path(record), class: "flex items-center gap-3" do %>
+              <% if record.avatar_url.present? %>
+                <img src="<%= record.avatar_url %>" class="w-8 h-8 rounded-full" alt="" loading="lazy">
+              <% else %>
+                <div class="w-8 h-8 rounded-full bg-dark-700 flex items-center justify-center text-dark-400 text-xs font-medium">
+                  <%= record.display_name.first(2).upcase %>
+                </div>
+              <% end %>
+              <div>
+                <div class="font-medium"><%= record.display_name %></div>
+                <div class="text-xs text-dark-500">@<%= record.username %></div>
+              </div>
+            <% end %>
+          </td>
+          <td>
+            <% if record.admin? %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-500/15 text-purple-400">Admin</span>
+            <% elsif record.trusted? %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-400">Trusted</span>
+            <% else %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-dark-600 text-dark-400">Member</span>
+            <% end %>
+          </td>
+          <td class="whitespace-nowrap">
+            <% if record.company.present? %>
+              <% team = @company_teams&.dig(record.company) %>
+              <% if team %>
+                <%= link_to "/madmin/teams/#{team.slug}", class: "text-accent-400 hover:text-accent-300 text-sm" do %>
+                  <%= record.company %>
+                <% end %>
+              <% else %>
+                <span class="text-sm text-dark-400"><%= record.company %></span>
+              <% end %>
+            <% else %>
+              <span class="text-dark-600">-</span>
+            <% end %>
+          </td>
+          <td>
+            <% if record.published_posts_count > 0 %>
+              <span class="text-dark-200"><%= record.published_posts_count %></span>
+            <% else %>
+              <span class="text-dark-600">0</span>
+            <% end %>
+          </td>
+          <td>
+            <% if record.published_comments_count > 0 %>
+              <span class="text-dark-200"><%= record.published_comments_count %></span>
+            <% else %>
+              <span class="text-dark-600">0</span>
+            <% end %>
+          </td>
+          <td>
+            <% if record.github_stars_sum.to_i > 0 %>
+              <div class="flex items-center gap-1">
+                <span class="text-amber-400 text-xs">&#9733;</span>
+                <span class="text-dark-200"><%= number_with_delimiter(record.github_stars_sum) %></span>
+              </div>
+            <% else %>
+              <span class="text-dark-600">0</span>
+            <% end %>
+          </td>
+          <td class="text-sm whitespace-nowrap"><%= record.created_at.strftime("%-d %b %Y") %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="pagination">
+  <% if @pagy.respond_to?(:series_nav) %>
+    <%== @pagy.series_nav if @pagy.last > 1 %>
+    <%== @pagy.info_tag %>
+  <% else %>
+    <%== pagy_nav @pagy if @pagy.last > 1 %>
+    <%== pagy_info @pagy %>
+  <% end %>
+</div>

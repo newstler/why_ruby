@@ -1,0 +1,65 @@
+published_article:
+  id: "01961a2a-c0de-7000-8000-000000000301"
+  title: "Why Ruby Rocks"
+  content: "Ruby is an amazing language that makes developers happy."
+  post_type: "article"
+  published: true
+  user_id: "01961a2a-c0de-7000-8000-000000000101"
+  category_id: "01961a2a-c0de-7000-8000-000000000201"
+  reports_count: 0
+  needs_admin_review: false
+
+unpublished_article:
+  id: "01961a2a-c0de-7000-8000-000000000302"
+  title: "Draft Article"
+  content: "This is still a draft."
+  post_type: "article"
+  published: false
+  user_id: "01961a2a-c0de-7000-8000-000000000101"
+  category_id: "01961a2a-c0de-7000-8000-000000000201"
+  reports_count: 0
+  needs_admin_review: false
+
+published_link:
+  id: "01961a2a-c0de-7000-8000-000000000303"
+  title: "Ruby on Rails"
+  url: "https://rubyonrails.org"
+  post_type: "link"
+  published: true
+  user_id: "01961a2a-c0de-7000-8000-000000000101"
+  category_id: "01961a2a-c0de-7000-8000-000000000201"
+  reports_count: 0
+  needs_admin_review: false
+
+other_users_post:
+  id: "01961a2a-c0de-7000-8000-000000000304"
+  title: "Another User Post"
+  content: "Content by another user."
+  post_type: "article"
+  published: true
+  user_id: "01961a2a-c0de-7000-8000-000000000102"
+  category_id: "01961a2a-c0de-7000-8000-000000000201"
+  reports_count: 0
+  needs_admin_review: false
+
+near_threshold_post:
+  id: "01961a2a-c0de-7000-8000-000000000305"
+  title: "Almost Hidden Post"
+  content: "This post has 2 reports so far."
+  post_type: "article"
+  published: true
+  user_id: "01961a2a-c0de-7000-8000-000000000102"
+  category_id: "01961a2a-c0de-7000-8000-000000000201"
+  reports_count: 2
+  needs_admin_review: false
+
+at_threshold_post:
+  id: "01961a2a-c0de-7000-8000-000000000306"
+  title: "Hidden Post"
+  content: "This post has 3 reports."
+  post_type: "article"
+  published: true
+  user_id: "01961a2a-c0de-7000-8000-000000000102"
+  category_id: "01961a2a-c0de-7000-8000-000000000201"
+  reports_count: 3
+  needs_admin_review: false

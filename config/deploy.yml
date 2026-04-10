@@ -43,7 +43,6 @@ env:
     # WEB_CONCURRENCY: 2
 
     # Match this to any external database server to configure Active Record correctly
-    # Use template-db for a db accessory server on same machine via local kamal docker network.
     # DB_HOST: 192.168.0.2
 
     # Log everything from Rails
@@ -75,7 +74,6 @@ asset_path: /rails/public/assets
 # Configure the image builder.
 builder:
   arch: amd64
-  # Pass secrets to the Docker build process
   secrets:
     - RAILS_MASTER_KEY
     - MAXMIND_ACCOUNT_ID

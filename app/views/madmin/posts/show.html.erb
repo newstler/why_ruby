@@ -1,0 +1,263 @@
+<%= content_for :title, @record.title.truncate(40) %>
+
+<header class="header">
+  <h1>
+    <%= link_to "Posts", resource.index_path %>
+    /
+    <%= @record.title.truncate(50) %>
+  </h1>
+  <div class="actions">
+    <%= link_to "Edit", resource.edit_path(@record), class: "btn btn-secondary" %>
+  </div>
+</header>
+
+<%# Status banner for posts needing review %>
+<% if @record.needs_admin_review? %>
+  <div class="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+    <div class="flex items-center gap-3">
+      <%= inline_svg "icons/shield.svg", class: "w-5 h-5 text-red-400 flex-shrink-0" %>
+      <div>
+        <div class="font-medium text-red-300">This post needs admin review</div>
+        <div class="text-sm text-red-400/70 mt-0.5">Auto-hidden after receiving <%= @record.reports_count %> report(s). Review and restore or archive.</div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<%# Post header card %>
+<div class="card-bg p-6 mb-6">
+  <div class="flex items-start gap-4">
+    <div class="flex-1">
+      <h2 class="text-2xl font-bold text-dark-100"><%= @record.title %></h2>
+      <div class="flex items-center gap-3 mt-3">
+        <% type_class = case @record.post_type
+          when "article" then "bg-blue-500/15 text-blue-400"
+          when "link" then "bg-emerald-500/15 text-emerald-400"
+          when "success_story" then "bg-amber-500/15 text-amber-400"
+        end %>
+        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium <%= type_class %>">
+          <%= @record.post_type.titleize %>
+        </span>
+        <% if @record.published? %>
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-400">Published</span>
+        <% else %>
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-dark-600 text-dark-400">Draft</span>
+        <% end %>
+        <% if @record.pin_position.present? %>
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-500/15 text-purple-400">Pinned #<%= @record.pin_position %></span>
+        <% end %>
+      </div>
+      <div class="mt-3 text-sm text-dark-500">
+        by <span class="text-dark-300"><%= @record.user.display_name %></span>
+        <% if @record.category %>
+          in <span class="text-dark-300"><%= @record.category.name %></span>
+        <% end %>
+        &middot; <%= @record.created_at.strftime("%-d %B %Y at %H:%M") %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%# Stats row %>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+  <div class="card-bg p-5">
+    <div class="text-dark-500 text-sm mb-1">Comments</div>
+    <div class="text-3xl font-bold text-dark-100"><%= @record.comments_count %></div>
+  </div>
+  <div class="card-bg p-5">
+    <div class="text-dark-500 text-sm mb-1">Reports</div>
+    <div class="text-3xl font-bold <%= @record.reports_count > 0 ? 'text-red-400' : 'text-dark-100' %>"><%= @record.reports_count %></div>
+  </div>
+  <div class="card-bg p-5">
+    <div class="text-dark-500 text-sm mb-1">Type</div>
+    <div class="text-xl font-bold text-dark-100"><%= @record.post_type.titleize %></div>
+  </div>
+  <div class="card-bg p-5">
+    <div class="text-dark-500 text-sm mb-1">Slug</div>
+    <div class="text-sm font-mono text-dark-300 truncate"><%= @record.slug %></div>
+  </div>
+</div>
+
+<%# URL for links %>
+<% if @record.url.present? %>
+  <div class="card-bg p-5 mb-6">
+    <div class="text-dark-500 text-sm mb-2">URL</div>
+    <a href="<%= @record.url %>" target="_blank" rel="noopener" class="text-accent-400 hover:text-accent-300 break-all">
+      <%= @record.url %>
+      <%= inline_svg "icons/external-link.svg", class: "w-4 h-4 inline ml-1" %>
+    </a>
+  </div>
+<% end %>
+
+<%# Summary %>
+<% if @record.summary.present? %>
+  <div class="card-bg overflow-hidden mb-6">
+    <div class="px-5 py-4 border-b border-dark-700">
+      <h2 class="text-lg font-semibold text-dark-100">AI Summary</h2>
+    </div>
+    <div class="p-5 text-dark-300 leading-relaxed"><%= @record.summary %></div>
+  </div>
+<% end %>
+
+<%# Content %>
+<% if @record.content.present? %>
+  <div class="card-bg overflow-hidden mb-6">
+    <div class="px-5 py-4 border-b border-dark-700">
+      <h2 class="text-lg font-semibold text-dark-100">Content</h2>
+    </div>
+    <div class="p-5 prose prose-invert max-w-none text-dark-300">
+      <%= simple_format(@record.content.truncate(2000)) %>
+    </div>
+  </div>
+<% end %>
+
+<%# Details table %>
+<div class="card-bg overflow-hidden mb-6">
+  <div class="px-5 py-4 border-b border-dark-700">
+    <h2 class="text-lg font-semibold text-dark-100">Details</h2>
+  </div>
+  <div class="table-scroll">
+    <table>
+      <tbody>
+        <tr>
+          <th class="label">ID</th>
+          <td class="font-mono text-sm"><%= @record.id %></td>
+        </tr>
+        <tr>
+          <th class="label">Author</th>
+          <td>
+            <%= link_to "/madmin/users/#{@record.user.id}", class: "text-accent-400 hover:text-accent-300" do %>
+              <%= @record.user.display_name %>
+            <% end %>
+          </td>
+        </tr>
+        <tr>
+          <th class="label">Category</th>
+          <td>
+            <% if @record.category %>
+              <%= link_to @record.category.name, "/madmin/categories/#{@record.category.id}", class: "text-accent-400 hover:text-accent-300" %>
+            <% else %>
+              <span class="text-dark-500">None</span>
+            <% end %>
+          </td>
+        </tr>
+        <tr>
+          <th class="label">Tags</th>
+          <td>
+            <% if @record.tags.any? %>
+              <div class="flex flex-wrap gap-1">
+                <% @record.tags.each do |tag| %>
+                  <%= link_to tag.name, "/madmin/tags/#{tag.id}", class: "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-dark-600 text-dark-300 hover:text-dark-100" %>
+                <% end %>
+              </div>
+            <% else %>
+              <span class="text-dark-500">No tags</span>
+            <% end %>
+          </td>
+        </tr>
+        <tr>
+          <th class="label">Created</th>
+          <td><%= @record.created_at.strftime("%-d %B %Y at %H:%M") %></td>
+        </tr>
+        <tr>
+          <th class="label">Updated</th>
+          <td><%= @record.updated_at.strftime("%-d %B %Y at %H:%M") %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%# Comments %>
+<% comments = @record.comments.includes(:user).order(created_at: :desc) %>
+<% if comments.any? %>
+  <div class="card-bg overflow-hidden mb-6">
+    <div class="px-5 py-4 border-b border-dark-700">
+      <h2 class="text-lg font-semibold text-dark-100">Comments (<%= comments.size %>)</h2>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Comment</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% comments.first(10).each do |comment| %>
+            <tr>
+              <td class="whitespace-nowrap">
+                <%= link_to comment.user.display_name, "/madmin/users/#{comment.user.id}", class: "text-accent-400 hover:text-accent-300" %>
+              </td>
+              <td class="max-w-md">
+                <%= link_to "/madmin/comments/#{comment.id}", class: "block truncate" do %>
+                  <%= comment.body.truncate(80) %>
+                <% end %>
+              </td>
+              <td>
+                <% if comment.published? %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-400">Published</span>
+                <% else %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-dark-600 text-dark-400">Hidden</span>
+                <% end %>
+              </td>
+              <td class="text-sm whitespace-nowrap"><%= comment.created_at.strftime("%-d %b %Y") %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <% if comments.size > 10 %>
+      <div class="px-5 py-3 border-t border-dark-700">
+        <%= link_to "View all #{comments.size} comments", "/madmin/comments?q=#{@record.title.first(20)}", class: "text-sm text-accent-400 hover:text-accent-300" %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
+<%# Reports %>
+<% reports = @record.reports.includes(:user).order(created_at: :desc) %>
+<% if reports.any? %>
+  <div class="card-bg overflow-hidden">
+    <div class="px-5 py-4 border-b border-dark-700">
+      <h2 class="text-lg font-semibold text-dark-100">Reports (<%= reports.size %>)</h2>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Reporter</th>
+            <th>Reason</th>
+            <th>Description</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% reports.each do |report| %>
+            <tr>
+              <td class="whitespace-nowrap">
+                <%= link_to report.user.display_name, "/madmin/users/#{report.user.id}", class: "text-accent-400 hover:text-accent-300" %>
+              </td>
+              <td>
+                <% reason_class = case report.reason
+                  when "spam" then "bg-amber-500/15 text-amber-400"
+                  when "inappropriate", "harassment" then "bg-red-500/15 text-red-400"
+                  when "off_topic" then "bg-blue-500/15 text-blue-400"
+                  when "misinformation" then "bg-orange-500/15 text-orange-400"
+                  else "bg-dark-600 text-dark-400"
+                end %>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium <%= reason_class %>">
+                  <%= report.reason.titleize %>
+                </span>
+              </td>
+              <td class="max-w-xs truncate text-dark-400"><%= report.description.presence || "-" %></td>
+              <td class="text-sm whitespace-nowrap"><%= report.created_at.strftime("%-d %b %Y") %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% end %>

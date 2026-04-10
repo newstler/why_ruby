@@ -1,0 +1,98 @@
+<%= content_for :title, @record.name %>
+
+<header class="header">
+  <h1>
+    <%= link_to "Tags", resource.index_path %>
+    /
+    <%= @record.name %>
+  </h1>
+  <div class="actions">
+    <%= link_to "Edit", resource.edit_path(@record), class: "btn btn-secondary" %>
+  </div>
+</header>
+
+<div class="card-bg p-6 mb-6">
+  <div class="flex items-center gap-4">
+    <span class="inline-flex items-center px-4 py-2 rounded-full text-lg font-medium bg-dark-700 text-dark-100">
+      <%= @record.name %>
+    </span>
+    <span class="text-dark-500">Slug: <span class="font-mono text-dark-400"><%= @record.slug %></span></span>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+  <div class="card-bg p-5">
+    <div class="text-dark-500 text-sm mb-1">Total Posts</div>
+    <div class="text-3xl font-bold text-dark-100"><%= @record.posts.size %></div>
+  </div>
+  <div class="card-bg p-5">
+    <div class="text-dark-500 text-sm mb-1">Published Posts</div>
+    <div class="text-3xl font-bold text-emerald-400"><%= @record.published_posts_count %></div>
+  </div>
+</div>
+
+<div class="card-bg overflow-hidden mb-6">
+  <div class="px-5 py-4 border-b border-dark-700">
+    <h2 class="text-lg font-semibold text-dark-100">Details</h2>
+  </div>
+  <div class="table-scroll">
+    <table>
+      <tbody>
+        <tr><th class="label">ID</th><td class="font-mono text-sm"><%= @record.id %></td></tr>
+        <tr><th class="label">Name</th><td><%= @record.name %></td></tr>
+        <tr><th class="label">Slug</th><td class="font-mono text-sm"><%= @record.slug %></td></tr>
+        <tr><th class="label">Created</th><td><%= @record.created_at.strftime("%-d %B %Y at %H:%M") %></td></tr>
+        <tr><th class="label">Updated</th><td><%= @record.updated_at.strftime("%-d %B %Y at %H:%M") %></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%# Posts with this tag %>
+<% tagged_posts = @record.posts.includes(:user, :category).order(created_at: :desc).limit(10) %>
+<% if tagged_posts.any? %>
+  <div class="card-bg overflow-hidden">
+    <div class="px-5 py-4 border-b border-dark-700">
+      <h2 class="text-lg font-semibold text-dark-100">Posts with this Tag</h2>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% tagged_posts.each do |post| %>
+            <tr>
+              <td class="max-w-sm">
+                <%= link_to post.title.truncate(60), "/madmin/posts/#{post.id}", class: "truncate block text-accent-400 hover:text-accent-300" %>
+              </td>
+              <td class="whitespace-nowrap"><%= post.user.display_name %></td>
+              <td>
+                <% type_class = case post.post_type
+                  when "article" then "bg-blue-500/15 text-blue-400"
+                  when "link" then "bg-emerald-500/15 text-emerald-400"
+                  when "success_story" then "bg-amber-500/15 text-amber-400"
+                end %>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium <%= type_class %>"><%= post.post_type.titleize %></span>
+              </td>
+              <td>
+                <% if post.published? %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-400">Published</span>
+                <% else %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-dark-600 text-dark-400">Draft</span>
+                <% end %>
+              </td>
+              <td class="text-sm whitespace-nowrap"><%= post.created_at.strftime("%-d %b %Y") %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% end %>

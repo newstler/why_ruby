@@ -77,4 +77,26 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 1, @user.github_repos_count
     assert_equal 150, @user.github_stars_sum
   end
+
+  # -------------------------------------------------------------------------
+  # Trusted user threshold
+  # -------------------------------------------------------------------------
+
+  test "user is trusted with 3+ published posts and 10+ published comments" do
+    @user.update_columns(published_posts_count: 3, published_comments_count: 10)
+    assert @user.trusted?
+    assert User.trusted.exists?(@user.id)
+  end
+
+  test "user is not trusted with fewer than 3 published posts" do
+    @user.update_columns(published_posts_count: 2, published_comments_count: 10)
+    assert_not @user.trusted?
+    assert_not User.trusted.exists?(@user.id)
+  end
+
+  test "user is not trusted with fewer than 10 published comments" do
+    @user.update_columns(published_posts_count: 3, published_comments_count: 9)
+    assert_not @user.trusted?
+    assert_not User.trusted.exists?(@user.id)
+  end
 end

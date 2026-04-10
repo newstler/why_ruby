@@ -1,7 +1,7 @@
 class UpdateGithubDataJob < ApplicationJob
   queue_as :default
 
-  BATCH_SIZE = 5 # Server-side Ruby filtering means fewer repos returned
+  BATCH_SIZE = 5
 
   def perform
     Rails.logger.info "Starting GitHub data update using GraphQL batch fetching..."
@@ -11,17 +11,12 @@ class UpdateGithubDataJob < ApplicationJob
     all_errors = []
 
     User.where.not(username: [ nil, "" ]).find_in_batches(batch_size: BATCH_SIZE) do |batch|
-      Rails.logger.info "Processing batch of #{batch.size} users..."
-
-      results = GithubDataFetcher.batch_fetch_and_update!(batch)
+      results = User.batch_sync_github_data!(batch)
 
       total_updated += results[:updated]
       total_failed += results[:failed]
       all_errors.concat(results[:errors]) if results[:errors].present?
 
-      Rails.logger.info "Batch complete: #{results[:updated]} updated, #{results[:failed]} failed"
-
-      # Brief pause between batches to be respectful of API
       sleep 0.5
     end
 

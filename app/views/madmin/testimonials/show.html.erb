@@ -1,0 +1,98 @@
+<%= content_for :title, @record.heading.presence || "Testimonial" %>
+
+<header class="header">
+  <h1>
+    <%= link_to "Testimonials", resource.index_path %>
+    /
+    <%= @record.heading.presence || "Testimonial" %>
+  </h1>
+  <div class="actions">
+    <%= link_to "Edit", resource.edit_path(@record), class: "btn btn-secondary" %>
+  </div>
+</header>
+
+<%# Testimonial preview card %>
+<div class="card-bg p-6 mb-6">
+  <div class="flex items-start gap-4">
+    <div class="flex-1">
+      <% if @record.heading.present? %>
+        <h2 class="text-2xl font-bold text-dark-100"><%= @record.heading %></h2>
+        <% if @record.subheading.present? %>
+          <p class="text-dark-400 mt-1 text-lg"><%= @record.subheading %></p>
+        <% end %>
+      <% end %>
+      <blockquote class="mt-4 pl-4 border-l-2 border-dark-600 text-dark-300 italic leading-relaxed">
+        <%= @record.quote %>
+      </blockquote>
+      <div class="mt-4 flex items-center gap-3">
+        <% if @record.published? %>
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-400">Published</span>
+        <% elsif @record.reject_reason.present? %>
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-500/15 text-red-400">Rejected</span>
+        <% else %>
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-dark-600 text-dark-400">Pending</span>
+        <% end %>
+        <span class="text-sm text-dark-500">
+          by <%= link_to @record.user.display_name, "/madmin/users/#{@record.user.id}", class: "text-accent-400 hover:text-accent-300" %>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%# AI-generated body text %>
+<% if @record.body_text.present? %>
+  <div class="card-bg overflow-hidden mb-6">
+    <div class="px-5 py-4 border-b border-dark-700">
+      <h2 class="text-lg font-semibold text-dark-100">AI-Generated Body</h2>
+    </div>
+    <div class="p-5 text-dark-300 leading-relaxed"><%= @record.body_text %></div>
+  </div>
+<% end %>
+
+<%# AI feedback / rejection %>
+<% if @record.ai_feedback.present? || @record.reject_reason.present? %>
+  <div class="card-bg overflow-hidden mb-6">
+    <div class="px-5 py-4 border-b border-dark-700">
+      <h2 class="text-lg font-semibold text-dark-100">AI Processing</h2>
+    </div>
+    <div class="p-5 space-y-3">
+      <% if @record.reject_reason.present? %>
+        <div class="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+          <div class="text-sm font-medium text-red-300">Rejection Reason</div>
+          <div class="text-dark-400 mt-1"><%= @record.reject_reason %></div>
+        </div>
+      <% end %>
+      <% if @record.ai_feedback.present? %>
+        <div>
+          <div class="text-sm font-medium text-dark-400">AI Feedback</div>
+          <div class="text-dark-300 mt-1"><%= @record.ai_feedback %></div>
+        </div>
+      <% end %>
+      <div class="text-sm text-dark-500">AI Attempts: <%= @record.ai_attempts %></div>
+    </div>
+  </div>
+<% end %>
+
+<%# Details %>
+<div class="card-bg overflow-hidden">
+  <div class="px-5 py-4 border-b border-dark-700">
+    <h2 class="text-lg font-semibold text-dark-100">Details</h2>
+  </div>
+  <div class="table-scroll">
+    <table>
+      <tbody>
+        <tr><th class="label">ID</th><td class="font-mono text-sm"><%= @record.id %></td></tr>
+        <tr>
+          <th class="label">User</th>
+          <td><%= link_to @record.user.display_name, "/madmin/users/#{@record.user.id}", class: "text-accent-400 hover:text-accent-300" %></td>
+        </tr>
+        <tr><th class="label">Published</th><td><%= @record.published? ? "Yes" : "No" %></td></tr>
+        <tr><th class="label">Position</th><td><%= @record.position.presence || "-" %></td></tr>
+        <tr><th class="label">AI Attempts</th><td><%= @record.ai_attempts %></td></tr>
+        <tr><th class="label">Created</th><td><%= @record.created_at.strftime("%-d %B %Y at %H:%M") %></td></tr>
+        <tr><th class="label">Updated</th><td><%= @record.updated_at.strftime("%-d %B %Y at %H:%M") %></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,8 +1,6 @@
 require "test_helper"
 
 class TestimonialsControllerTest < ActionDispatch::IntegrationTest
-  include Devise::Test::IntegrationHelpers
-
   test "unauthenticated user cannot create testimonial" do
     post testimonial_path, params: { testimonial: { quote: "I love Ruby!" } }
     assert_response :redirect

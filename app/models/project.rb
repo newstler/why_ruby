@@ -12,6 +12,12 @@ class Project < ApplicationRecord
   scope :by_stars, -> { order(stars: :desc) }
   scope :by_pushed_at, -> { order(Arel.sql("CASE WHEN pushed_at IS NULL THEN 1 ELSE 0 END, pushed_at DESC")) }
 
+  # Ensure topics is always an Array (fixtures/raw DB values may be Strings)
+  def topics
+    val = super
+    val.is_a?(Array) ? val : (JSON.parse(val.to_s) rescue [])
+  end
+
   def stars_gained
     snapshots = star_snapshots.recent.limit(2).pluck(:stars)
     return 0 if snapshots.size < 2

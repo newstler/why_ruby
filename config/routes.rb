@@ -1,36 +1,78 @@
 Rails.application.routes.draw do
-  devise_for :users, controllers: { omniauth_callbacks: "users/omniauth_callbacks" }
+  draw :madmin
 
-  # Cross-domain auth routes (must be early)
+  # GitHub OAuth routes (OmniAuth handles /auth/github via Rack middleware)
+  match "auth/github/callback", to: "users/omniauth_callbacks#github", via: [ :get, :post ]
+  get "auth/failure", to: "users/omniauth_callbacks#failure"
+  match "sign_in_github", to: "users/sessions#github_auth", as: :github_auth_with_return, via: [ :get, :post ]
+  delete "sign_out", to: "users/sessions#destroy", as: :destroy_user_session
+
+  # Cross-domain auth routes (must be before wildcard auth/:token)
   get "auth/receive", to: "auth#receive"
   get "auth/sign_out_receive", to: "auth#sign_out_receive"
 
+  # User magic link verification
+  get "auth/:token", to: "sessions/verifications#show", as: :verify_magic_link
+
+  # Admin authentication (magic link - separate from user auth)
+  namespace :admins do
+    resource :session, only: [ :new, :create, :destroy ]
+    get "auth/:token", to: "sessions/verifications#show", as: :verify_magic_link
+  end
+
   # Production community domain: rubycommunity.org (users at root level /:username)
-  # Development fallback: localhost:3003/community/:id (see routes below)
-  # When linking to user profiles, use community_user_canonical_url(user) helper
-  # which resolves to the correct domain per environment.
   constraints host: Rails.application.config.x.domains.community do
     root "users#index", as: :rubycommunity_root
-    get "map_data", to: "users#map_data", as: :rubycommunity_map_data
-    # Redirect /community paths that may linger from old links or crawlers
+    get "map_data", to: "users/map_data#show", as: :rubycommunity_map_data
     get "community", to: redirect("/", status: 301)
     get "community/:id", to: redirect("/%{id}", status: 301), constraints: { id: /[^\/]+/ }
     get ":id", to: "users#show", as: :rubycommunity_user, constraints: { id: /[^\/\.]+/ }
   end
 
-  # Add sign out route for OmniAuth-only authentication
-  devise_scope :user do
-    delete "sign_out", to: "users/sessions#destroy", as: :destroy_user_session
-    match "sign_in_github", to: "users/sessions#github_auth", as: :github_auth_with_return, via: [ :get, :post ]
+  # Litestream backup UI - only accessible to admin users
+  mount Litestream::Engine, at: "/litestream"
+
+  # Onboarding (first-time user setup, before team context)
+  resource :onboarding, only: [ :show, :update ]
+
+  # Team management (multi-tenant only routes for listing/creating teams)
+  resources :teams, only: [ :index, :new, :create ], param: :slug
+
+  # Team-scoped routes
+  scope "/t/:team_slug", as: :team do
+    root "home#index", as: :root
+    resources :chats do
+      resources :messages, only: [ :create ]
+    end
+    resources :models, only: [ :index, :show ]
+    resource :models_refresh, only: [ :create ], controller: "models/refreshes"
+
+    # Team settings (multi-tenant only)
+    resource :settings, only: [ :show, :edit, :update ], controller: "teams/settings" do
+      resource :api_key_regeneration, only: [ :create ], controller: "teams/settings/api_key_regenerations"
+    end
+    resource :name_check, only: [ :show ], controller: "teams/name_checks"
+    resources :members, only: [ :index, :show, :new, :create, :destroy ], controller: "teams/members"
+    resource :profile, only: [ :show, :edit, :update ], controller: "profiles"
+
+    # Content
+    resources :articles
+    resources :languages, only: [ :index, :create, :destroy ], controller: "teams/languages"
+
+    # Billing
+    resource :pricing, only: [ :show ], controller: "teams/pricing"
+    resource :billing, only: [ :show ], controller: "teams/billing"
+    resource :checkout, only: [ :create ], controller: "teams/checkouts"
+    resource :subscription_cancellation, only: [ :create, :destroy ], controller: "teams/subscription_cancellations"
   end
 
-  # Admin panel - only accessible to users with admin role
-  authenticate :user, ->(user) { user.admin? } do
-    mount Avo::Engine, at: Avo.configuration.root_path
-    mount Litestream::Engine, at: "/litestream"
+  # Webhooks
+  namespace :webhooks do
+    resource :stripe, only: [ :create ], controller: "stripe"
   end
 
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  # OG Image preview page (screenshot at 1200x630 for social sharing)
+  get "og-image", to: "og_images#show"
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
@@ -50,20 +92,21 @@ Rails.application.routes.draw do
 
   # Community routes — local development fallback for rubycommunity.org (see domain constraint above)
   get "community", to: "users#index", as: :users
-  get "community/map_data", to: "users#map_data", as: :community_map_data
+  get "community/map_data", to: "users/map_data#show", as: :community_map_data
   get "community/:id", to: "users#show", as: :user
 
-  # Tags route (keeping as resources for now)
-  resources :tags, only: [ :show ] do
-    collection do
-      get :search
-    end
+  # Tags routes
+  resources :tags, only: [ :show ]
+  namespace :tags do
+    resource :search, only: [ :show ]
   end
 
-  # Post collection actions (preview, metadata, etc)
-  post "posts/preview", to: "posts#preview", as: :preview_posts
-  post "posts/fetch_metadata", to: "posts#fetch_metadata", as: :fetch_metadata_posts
-  post "posts/check_duplicate_url", to: "posts#check_duplicate_url", as: :check_duplicate_url_posts
+  # Post resource actions (nested)
+  namespace :posts do
+    resource :preview, only: [ :create ]
+    resource :metadata, only: [ :create ]
+    resource :duplicate_check, only: [ :create ]
+  end
 
   # New and edit routes for posts (need to be defined before dynamic routes)
   get "posts/new", to: "posts#new", as: :new_post
@@ -81,13 +124,12 @@ Rails.application.routes.draw do
   # Testimonials (singular resource - one per user)
   resource :testimonial, only: [ :create, :update ]
 
-  # User settings routes
-  resource :user_settings, only: [], controller: "user_settings" do
-    post :toggle_public, on: :collection
-    post :toggle_open_to_work, on: :collection
-    post :toggle_newsletter, on: :collection
-    post :hide_repo, on: :collection
-    post :unhide_repo, on: :collection
+  # User settings (nested singular resources for each toggle)
+  namespace :user_settings do
+    resource :visibility, only: [ :update ]
+    resource :open_to_work, only: [ :update ]
+    resource :newsletter, only: [ :update ]
+    resource :repository_hide, only: [ :create, :destroy ]
   end
 
   # Newsletter unsubscribe
@@ -95,7 +137,7 @@ Rails.application.routes.draw do
   get "newsletter/open/:token", to: "newsletter_opens#show", as: :newsletter_open
 
   # OG image preview pages (for screenshotting)
-  get "og-image-community", to: "users#og_image"
+  get "og-image-community", to: "users/og_images#show"
 
   # Legal pages (must be before catch-all routes)
   get "legal/privacy", to: "legal#show", defaults: { page: "privacy_policy" }, as: :privacy_policy
@@ -109,7 +151,16 @@ Rails.application.routes.draw do
 
   # Post routes (must be after category)
   get ":category_id/:id", to: "posts#show", as: :post, constraints: { category_id: /[^\/\.]+/, id: /[^\/\.]+/ }
-  get ":category_id/:id/og-image.webp", to: "posts#image", as: :post_image, constraints: { category_id: /[^\/]+/, id: /[^\/]+/ }
+  get ":category_id/:id/og-image.webp", to: "posts/images#show", as: :post_image, constraints: { category_id: /[^\/]+/, id: /[^\/]+/ }
+
+  # Test-only route for setting session in integration tests
+  if Rails.env.test?
+    post "/_test_sign_in", to: ->(env) {
+      request = Rack::Request.new(env)
+      env["rack.session"][:user_id] = request.params["user_id"]
+      [ 200, { "Content-Type" => "text/plain" }, [ "OK" ] ]
+    }
+  end
 
   # Defines the root path route ("/")
   root "home#index"

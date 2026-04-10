@@ -1,0 +1,92 @@
+<%= content_for :title, "Projects" %>
+
+<header class="header">
+  <h1>Projects</h1>
+</header>
+
+<div class="filters mb-4 p-4 card-bg">
+  <%= form_with url: resource.index_path, method: :get, class: "flex gap-3 items-end flex-wrap" do |f| %>
+    <div>
+      <%= f.label :q, "Search", class: "block text-sm font-medium text-dark-300 mb-1" %>
+      <%= f.search_field :q, value: params[:q], placeholder: "Search projects...", class: "form-input" %>
+    </div>
+
+    <div class="flex items-center gap-4 pb-0.5">
+      <label class="flex items-center gap-2 cursor-pointer">
+        <%= f.check_box :hidden, { checked: params[:hidden] == "true", class: "form-checkbox rounded border-dark-600 bg-dark-700 text-amber-500 focus:ring-amber-500/25" }, "true", "" %>
+        <span class="text-sm text-dark-400">Hidden only</span>
+      </label>
+      <label class="flex items-center gap-2 cursor-pointer">
+        <%= f.check_box :archived, { checked: params[:archived] == "true", class: "form-checkbox rounded border-dark-600 bg-dark-700 text-red-500 focus:ring-red-500/25" }, "true", "" %>
+        <span class="text-sm text-dark-400">Archived only</span>
+      </label>
+    </div>
+
+    <div class="flex gap-2">
+      <%= f.submit "Filter", class: "btn btn-primary" %>
+      <% if params[:q].present? || params[:hidden].present? || params[:archived].present? %>
+        <%= link_to "Clear", resource.index_path, class: "btn btn-secondary" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<div class="table-scroll">
+  <table>
+    <thead>
+      <tr>
+        <th><%= sortable :name, "Project" %></th>
+        <th>Owner</th>
+        <th><%= sortable :stars, "Stars" %></th>
+        <th><%= sortable :forks_count, "Forks" %></th>
+        <th>Status</th>
+        <th><%= sortable :pushed_at, "Last Push" %></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% @records.each do |record| %>
+        <tr>
+          <td class="max-w-sm">
+            <%= link_to resource.show_path(record), class: "block" do %>
+              <div class="font-medium"><%= record.name %></div>
+              <% if record.description.present? %>
+                <div class="text-xs text-dark-500 mt-0.5 truncate"><%= record.description.truncate(80) %></div>
+              <% end %>
+            <% end %>
+          </td>
+          <td class="whitespace-nowrap">
+            <%= link_to record.user.display_name, "/madmin/users/#{record.user.id}", class: "text-accent-400 hover:text-accent-300" %>
+          </td>
+          <td>
+            <div class="flex items-center gap-1">
+              <span class="text-amber-400 text-xs">&#9733;</span>
+              <span class="font-medium text-dark-200"><%= number_with_delimiter(record.stars) %></span>
+            </div>
+          </td>
+          <td><%= record.forks_count %></td>
+          <td>
+            <% if record.archived? %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-500/15 text-red-400">Archived</span>
+            <% elsif record.hidden? %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-500/15 text-amber-400">Hidden</span>
+            <% else %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-400">Visible</span>
+            <% end %>
+          </td>
+          <td class="text-sm whitespace-nowrap"><%= record.pushed_at&.strftime("%-d %b %Y") || "-" %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="pagination">
+  <% if @pagy.respond_to?(:series_nav) %>
+    <%== @pagy.series_nav if @pagy.last > 1 %>
+    <%== @pagy.info_tag %>
+  <% else %>
+    <%== pagy_nav @pagy if @pagy.last > 1 %>
+    <%== pagy_info @pagy %>
+  <% end %>
+</div>

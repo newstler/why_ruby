@@ -1,0 +1,121 @@
+<%= content_for :title, "Posts" %>
+
+<header class="header">
+  <h1>Posts</h1>
+</header>
+
+<div class="filters mb-4 p-4 card-bg">
+  <%= form_with url: resource.index_path, method: :get, class: "flex gap-3 items-end flex-wrap" do |f| %>
+    <div>
+      <%= f.label :q, "Search", class: "block text-sm font-medium text-dark-300 mb-1" %>
+      <%= f.search_field :q, value: params[:q], placeholder: "Search posts...", class: "form-input" %>
+    </div>
+
+    <div>
+      <%= f.label :post_type, "Type", class: "block text-sm font-medium text-dark-300 mb-1" %>
+      <%= f.select :post_type, options_for_select([["All types", ""], ["Article", "article"], ["Link", "link"], ["Success Story", "success_story"]], params[:post_type]), {}, class: "form-input" %>
+    </div>
+
+    <div>
+      <%= f.label :published, "Status", class: "block text-sm font-medium text-dark-300 mb-1" %>
+      <%= f.select :published, options_for_select([["All", ""], ["Published", "true"], ["Draft", "false"]], params[:published]), {}, class: "form-input" %>
+    </div>
+
+    <div class="flex items-center gap-2 pb-0.5">
+      <label class="flex items-center gap-2 cursor-pointer">
+        <%= f.check_box :needs_review, { checked: params[:needs_review] == "true", class: "form-checkbox rounded border-dark-600 bg-dark-700 text-red-500 focus:ring-red-500/25" }, "true", "" %>
+        <span class="text-sm text-red-400 font-medium">Needs review</span>
+      </label>
+    </div>
+
+    <div class="flex gap-2">
+      <%= f.submit "Filter", class: "btn btn-primary" %>
+      <% if params[:q].present? || params[:post_type].present? || params[:published].present? || params[:needs_review].present? %>
+        <%= link_to "Clear", resource.index_path, class: "btn btn-secondary" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<div class="table-scroll">
+  <table>
+    <thead>
+      <tr>
+        <th><%= sortable :title, "Post" %></th>
+        <th><%= sortable :post_type, "Type" %></th>
+        <th><%= sortable :published, "Status" %></th>
+        <th><%= sortable :comments_count, "Comments" %></th>
+        <th><%= sortable :reports_count, "Reports" %></th>
+        <th><%= sortable :created_at, "Created" %></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% @records.each do |record| %>
+        <tr>
+          <td class="max-w-sm">
+            <%= link_to resource.show_path(record), class: "block" do %>
+              <div class="font-medium truncate"><%= record.title %></div>
+              <div class="text-xs text-dark-500 mt-0.5">
+                by <%= record.user.display_name %>
+                <% if record.category %>
+                  in <span class="text-dark-400"><%= record.category.name %></span>
+                <% end %>
+              </div>
+            <% end %>
+          </td>
+          <td>
+            <% type_class = case record.post_type
+              when "article" then "bg-blue-500/15 text-blue-400"
+              when "link" then "bg-emerald-500/15 text-emerald-400"
+              when "success_story" then "bg-amber-500/15 text-amber-400"
+            end %>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium <%= type_class %>">
+              <%= record.post_type.titleize %>
+            </span>
+          </td>
+          <td>
+            <% if record.needs_admin_review? %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-500/15 text-red-400">
+                Needs Review
+              </span>
+            <% elsif record.published? %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-400">
+                Published
+              </span>
+            <% else %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-dark-600 text-dark-400">
+                Draft
+              </span>
+            <% end %>
+          </td>
+          <td>
+            <% if record.comments_count > 0 %>
+              <span class="text-dark-200"><%= record.comments_count %></span>
+            <% else %>
+              <span class="text-dark-600">0</span>
+            <% end %>
+          </td>
+          <td>
+            <% if record.reports_count > 0 %>
+              <span class="text-red-400 font-medium"><%= record.reports_count %></span>
+            <% else %>
+              <span class="text-dark-600">0</span>
+            <% end %>
+          </td>
+          <td class="text-sm whitespace-nowrap"><%= record.created_at.strftime("%-d %b %Y") %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="pagination">
+  <% if @pagy.respond_to?(:series_nav) %>
+    <%== @pagy.series_nav if @pagy.last > 1 %>
+    <%== @pagy.info_tag %>
+  <% else %>
+    <%== pagy_nav @pagy if @pagy.last > 1 %>
+    <%== pagy_info @pagy %>
+  <% end %>
+</div>
