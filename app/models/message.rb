@@ -1,7 +1,7 @@
 class Message < ApplicationRecord
   acts_as_message tool_calls_foreign_key: :message_id
   has_many_attached :attachments
-  broadcasts_to ->(message) { "chat_#{message.chat_id}" }, inserts_by: :append, target: "messages"
+  broadcasts_to ->(message) { "chat_#{message.chat_id}" }, inserts_by: :append, target: "messages", partial: "messages/message"
 
   after_update_commit :broadcast_message_replacement, if: :assistant?
   before_save :calculate_cost, if: :should_calculate_cost?
