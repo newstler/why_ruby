@@ -1,6 +1,8 @@
 require "test_helper"
 
 class MessageTest < ActiveSupport::TestCase
+  include ActiveJob::TestHelper
+
   test "calculates cost based on token usage" do
     message = Message.new(
       chat: chats(:one),
@@ -14,5 +16,15 @@ class MessageTest < ActiveSupport::TestCase
     message.save!
 
     assert message.cost > 0
+  end
+
+  test "broadcasts create using messages/message partial regardless of role" do
+    %w[user assistant system tool].each do |role|
+      message = Message.new(chat: chats(:one), role: role, content: "hi")
+
+      assert_nothing_raised do
+        perform_enqueued_jobs { message.save! }
+      end
+    end
   end
 end
