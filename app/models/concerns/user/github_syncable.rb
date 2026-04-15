@@ -1,10 +1,25 @@
 require "net/http"
 require "json"
+require "openssl"
+require "socket"
 
 module User::GithubSyncable
   extend ActiveSupport::Concern
 
   GITHUB_GRAPHQL_ENDPOINT = "https://api.github.com/graphql"
+
+  TRANSIENT_NETWORK_ERRORS = [
+    Net::OpenTimeout,
+    Net::ReadTimeout,
+    Net::WriteTimeout,
+    EOFError,
+    IOError,
+    SocketError,
+    Errno::ECONNRESET,
+    Errno::ECONNREFUSED,
+    Errno::EPIPE,
+    OpenSSL::SSL::SSLError
+  ].freeze
 
   # Sync from OAuth callback data
   def sync_github_data_from_oauth!(auth_data)
@@ -155,12 +170,12 @@ module User::GithubSyncable
           else
             return { errors: [ "HTTP #{response.code}: #{response.message}" ] }
           end
-        rescue Net::OpenTimeout, Net::ReadTimeout => e
+        rescue *TRANSIENT_NETWORK_ERRORS => e
           if attempt < retries - 1
             sleep(2 ** (attempt + 1))
             next
           else
-            return { errors: [ "Request timed out: #{e.message}" ] }
+            return { errors: [ "Network error: #{e.class}: #{e.message}" ] }
           end
         end
       end
