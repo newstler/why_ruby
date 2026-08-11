@@ -63,7 +63,13 @@ module Testimonial::AiValidatable
       - Hate speech, slurs, personal attacks, or targeted insults toward individuals or groups are NEVER allowed.
       - Casual expletives used positively (e.g., "Damn, Ruby is amazing!" or "Fuck, I love this language!") are ALLOWED.
       - The key distinction: profanity expressing enthusiasm = OK. Profanity attacking or demeaning people/groups = NOT OK.
-      - The quote MUST express genuine love or appreciation for Ruby. This is an advocacy site — negative, dismissive, sarcastic, or trolling sentiments about Ruby are NOT allowed.
+      - The quote MUST express genuine love or appreciation for Ruby (or Ruby's ecosystem, community, tooling, or the developer experience it enables). This is an advocacy site — negative, dismissive, sarcastic, or trolling sentiments about Ruby are NOT allowed.
+      - The quote MUST be a first-person testimonial ABOUT Ruby. It is NOT a place for:
+          * user bios, résumés, or "about me" text (e.g., "Rails developer from South Korea, RFID specialist")
+          * lists of the user's projects, employers, job titles, contact info, links, or credentials
+          * generic descriptions of what Ruby is used for, with no personal sentiment attached
+          * off-topic content (other languages, unrelated announcements, self-promotion)
+        If the quote reads like a profile blurb, CV bullet, or product pitch rather than "here is why I love Ruby", reject it with reject_reason "quote".
 
       VALIDATION RULES:
       1. First check the user's QUOTE against the content policy. If it violates (including being negative about Ruby), reject immediately with reject_reason "quote".
