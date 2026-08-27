@@ -17,10 +17,14 @@ namespace :book do
   PAGE_WIDTH_MM = TRIM_WIDTH_MM + BLEED_MM * 2   # 176
   PAGE_HEIGHT_MM = TRIM_HEIGHT_MM + BLEED_MM * 2 # 246
 
-  # We look for a Fogra39-family ICC profile (the European coated standard)
-  # inside vendor/icc/. The ECI profiles aren't redistributable, so users must
-  # drop the file in themselves; we fall back to Ghostscript's default CMYK.
+  # We look for a European coated CMYK profile inside vendor/icc/. Fogra51
+  # (PSO Coated v3) is preferred — it's ECI's current recommended default and
+  # models OBA-brightened stocks accurately. Fogra39 (ISO Coated v2) is kept
+  # as a fallback since a lot of shops still calibrate against it. The ECI
+  # files aren't redistributable, so users drop them in themselves.
   PREFERRED_ICC_NAMES = %w[
+    PSOcoated_v3.icc
+    PSOcoated_v3_FOGRA51.icc
     ISOcoated_v2_eci.icc
     ISOcoated_v2_300_eci.icc
     Coated_Fogra39L_VIGC_300.icc
@@ -119,13 +123,14 @@ namespace :book do
     end
     pdfx_def_path = write_pdfx_def(icc_path)
 
+    intent = output_intent_metadata(icc_path)
     puts "Post-processing PDF via Ghostscript"
     if icc_source == :fogra
-      puts "  Output intent: #{File.basename(icc_path)}"
+      puts "  Output intent: #{File.basename(icc_path)} (#{intent[:identifier]})"
     else
-      puts "  Output intent: Ghostscript default CMYK (drop a Fogra39 profile at"
-      puts "                 vendor/icc/ISOcoated_v2_eci.icc from https://www.eci.org for a"
-      puts "                 fully spec-compliant PDF/X-1a; download is free)."
+      puts "  Output intent: Ghostscript default CMYK (drop PSOcoated_v3.icc into"
+      puts "                 vendor/icc/ from https://www.eci.org for a fully"
+      puts "                 spec-compliant Fogra51 PDF/X-1a; download is free)."
     end
 
     # Ghostscript 9.28+ SAFER mode needs an explicit allowlist for anything
@@ -200,12 +205,14 @@ namespace :book do
     default_cmyk ? [ default_cmyk, :default ] : [ nil, :missing ]
   end
 
-  # Adapted from Ghostscript's stock PDFX_def.ps, hard-coded for PDF/X-1a with
-  # a Fogra39-family CMYK output intent (safe default even when we fall back to
-  # gs's own default_cmyk.icc — the printshop will resolve against their own
-  # calibration either way).
+  # Adapted from Ghostscript's stock PDFX_def.ps, hard-coded for PDF/X-1a. The
+  # OutputConditionIdentifier / Info are derived from the actual embedded ICC
+  # so metadata stays consistent (Fogra51 profile → FOGRA51 tag, etc.). If we
+  # fall back to gs's default CMYK, we tag it Fogra51 as the safest modern
+  # default — the printshop will resolve against their own calibration anyway.
   def write_pdfx_def(icc_path)
     escaped_icc = icc_path.to_s.gsub("(", '\\(').gsub(")", '\\)')
+    intent = output_intent_metadata(icc_path)
 
     body = <<~PS
       %!
@@ -235,8 +242,8 @@ namespace :book do
         /Type /OutputIntent
         /S /GTS_PDFX
         /OutputCondition (Commercial offset printing, Europe)
-        /Info (Coated FOGRA39 \\(ISO 12647-2:2004\\))
-        /OutputConditionIdentifier (FOGRA39)
+        /Info (#{intent[:info]})
+        /OutputConditionIdentifier (#{intent[:identifier]})
         /RegistryName (http://www.color.org)
         /DestOutputProfile {icc_PDFX}
       >> /PUT pdfmark
@@ -246,6 +253,18 @@ namespace :book do
     path = Rails.root.join("tmp", "why_ruby_pdfx_def.ps")
     File.write(path, body)
     path
+  end
+
+  def output_intent_metadata(icc_path)
+    name = File.basename(icc_path.to_s).downcase
+    if name.include?("psocoated_v3") || name.include?("fogra51")
+      { identifier: "FOGRA51", info: "Coated FOGRA51 \\(PSO Coated v3, ISO 12647-2:2013\\)" }
+    elsif name.include?("isocoated_v2") || name.include?("fogra39")
+      { identifier: "FOGRA39", info: "Coated FOGRA39 \\(ISO Coated v2, ISO 12647-2:2004\\)" }
+    else
+      # Unknown/default profile — tag as Fogra51 (current ECI recommendation).
+      { identifier: "FOGRA51", info: "Coated FOGRA51 \\(PSO Coated v3, ISO 12647-2:2013\\)" }
+    end
   end
 
   # Front matter is 2 pages (title + colophon), back matter is 1 page.
