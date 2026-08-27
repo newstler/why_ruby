@@ -10,7 +10,24 @@ namespace :book do
   # Kept here (rather than unpublished in the DB) so authors can still edit/resubmit on the site.
   EXCLUDED_USERNAMES = %w[rubyon].freeze
 
-  desc "Generate 'Why Ruby?' book as a single HTML file, then render to PDF via headless Chrome"
+  # Print specs (European printshop, per whyruby.info book contract).
+  TRIM_WIDTH_MM = 170
+  TRIM_HEIGHT_MM = 240
+  BLEED_MM = 3
+  PAGE_WIDTH_MM = TRIM_WIDTH_MM + BLEED_MM * 2   # 176
+  PAGE_HEIGHT_MM = TRIM_HEIGHT_MM + BLEED_MM * 2 # 246
+
+  # We look for a Fogra39-family ICC profile (the European coated standard)
+  # inside vendor/icc/. The ECI profiles aren't redistributable, so users must
+  # drop the file in themselves; we fall back to Ghostscript's default CMYK.
+  PREFERRED_ICC_NAMES = %w[
+    ISOcoated_v2_eci.icc
+    ISOcoated_v2_300_eci.icc
+    Coated_Fogra39L_VIGC_300.icc
+    FOGRA39.icc
+  ].freeze
+
+  desc "Generate 'Why Ruby?' as HTML + print-ready PDF (176×246mm, CMYK, text-to-curves, PDF/X-1a)"
   task generate: :environment do
     testimonials = ordered_testimonials_for_book
 
@@ -23,11 +40,25 @@ namespace :book do
     html_path = Rails.root.join("tmp", "why_ruby_book.html")
     File.write(html_path, html)
 
-    puts "Generated book with #{testimonials.size} testimonials"
+    puts "Generated book with #{testimonials.size} testimonials (#{book_page_count(testimonials)} pages, even-padded)"
     puts "HTML: #{html_path}"
 
-    pdf_path = Rails.root.join("tmp", "why_ruby_book.pdf")
-    render_book_pdf(html_path, pdf_path)
+    raw_pdf_path = Rails.root.join("tmp", "why_ruby_book_raw.pdf")
+    final_pdf_path = Rails.root.join("tmp", "why_ruby_book.pdf")
+
+    unless render_chrome_pdf(html_path, raw_pdf_path)
+      puts "Chrome PDF step failed — skipping post-processing."
+      next
+    end
+
+    if postprocess_pdf_for_print(raw_pdf_path, final_pdf_path)
+      File.delete(raw_pdf_path) if File.exist?(raw_pdf_path)
+      puts "PDF:  #{final_pdf_path}"
+      puts "      → CMYK · text outlined to curves · PDF/X-1a · 176×246mm (170×240 trim + 3mm bleed)"
+    else
+      File.rename(raw_pdf_path, final_pdf_path) if File.exist?(raw_pdf_path)
+      puts "PDF:  #{final_pdf_path}  (raw Chrome output — post-processing skipped/failed)"
+    end
   end
 
   private
@@ -43,12 +74,12 @@ namespace :book do
     featured + rest
   end
 
-  def render_book_pdf(html_path, pdf_path)
+  def render_chrome_pdf(html_path, pdf_path)
     chrome = detect_chrome_binary
     unless chrome
-      puts "Chrome/Chromium not found — skipping PDF step."
+      puts "Chrome/Chromium not found — cannot generate PDF."
       puts "Install Chrome, or open the HTML in your browser and use File → Print → Save as PDF."
-      return
+      return false
     end
 
     ok = system(
@@ -62,11 +93,75 @@ namespace :book do
       "file://#{html_path}"
     )
 
-    if ok && File.exist?(pdf_path)
-      puts "PDF:  #{pdf_path}"
-    else
-      puts "PDF generation failed. Try opening the HTML in Chrome and printing manually."
+    ok && File.exist?(pdf_path)
+  end
+
+  # Post-process Chrome's PDF into a print-ready PDF/X-1a:
+  #   • All glyphs outlined to curves (-dNoOutputFonts) — kills Affinity's
+  #     "broken font" import problem since there are no fonts in the file
+  #     to break in the first place.
+  #   • RGB → CMYK conversion with a Fogra39-family output intent when the
+  #     ECI ICC profile is available under vendor/icc/, otherwise Ghostscript's
+  #     default CMYK profile (US-SWOP-ish; visually close for proofing).
+  #   • /prepress preset keeps images at 300 DPI and honors overprint.
+  def postprocess_pdf_for_print(input_path, output_path)
+    gs = detect_ghostscript
+    unless gs
+      puts "Ghostscript not found — skipping print-ready post-processing."
+      puts "Install with: brew install ghostscript  (macOS)  or  apt install ghostscript  (Debian/Ubuntu)"
+      return false
     end
+
+    icc_path, icc_source = resolve_output_icc_profile
+    unless icc_path
+      puts "No CMYK ICC profile available — skipping post-processing."
+      return false
+    end
+    pdfx_def_path = write_pdfx_def(icc_path)
+
+    puts "Post-processing PDF via Ghostscript"
+    if icc_source == :fogra
+      puts "  Output intent: #{File.basename(icc_path)}"
+    else
+      puts "  Output intent: Ghostscript default CMYK (drop a Fogra39 profile at"
+      puts "                 vendor/icc/ISOcoated_v2_eci.icc from https://www.eci.org for a"
+      puts "                 fully spec-compliant PDF/X-1a; download is free)."
+    end
+
+    # Ghostscript 9.28+ SAFER mode needs an explicit allowlist for anything
+    # outside the working dir — the ICC profile especially, since it typically
+    # lives under /opt/homebrew or /usr/share.
+    ok = system(
+      gs,
+      "-dNOPAUSE", "-dBATCH", "-dSAFER", "-dQUIET",
+      "--permit-file-read=#{icc_path}",
+      "--permit-file-read=#{pdfx_def_path}",
+      "--permit-file-read=#{input_path}",
+      "--permit-file-write=#{output_path}",
+      "-sDEVICE=pdfwrite",
+      "-dCompatibilityLevel=1.6",
+      "-dPDFX=1",
+      "-dNoOutputFonts",
+      "-sProcessColorModel=DeviceCMYK",
+      "-sColorConversionStrategy=CMYK",
+      "-dPDFSETTINGS=/prepress",
+      "-dEmbedAllFonts=true",
+      "-dSubsetFonts=true",
+      "-dDetectDuplicateImages=true",
+      "-sOutputICCProfile=#{icc_path}",
+      "-sOutputFile=#{output_path}",
+      pdfx_def_path.to_s,
+      input_path.to_s
+    )
+
+    File.delete(pdfx_def_path) if File.exist?(pdfx_def_path)
+
+    unless ok && File.exist?(output_path)
+      puts "  Ghostscript post-processing failed — see errors above."
+      return false
+    end
+
+    true
   end
 
   def detect_chrome_binary
@@ -81,7 +176,90 @@ namespace :book do
     ].find { |path| File.executable?(path) }
   end
 
+  def detect_ghostscript
+    return ENV["GS_BIN"] if ENV["GS_BIN"] && File.executable?(ENV["GS_BIN"])
+
+    %w[
+      /opt/homebrew/bin/gs
+      /usr/local/bin/gs
+      /usr/bin/gs
+    ].find { |path| File.executable?(path) }
+  end
+
+  def resolve_output_icc_profile
+    vendor_icc = Rails.root.join("vendor", "icc")
+    preferred = PREFERRED_ICC_NAMES.map { |name| vendor_icc.join(name) }.find { |p| File.exist?(p) }
+    return [ preferred.to_s, :fogra ] if preferred
+
+    default_cmyk = Dir.glob([
+      "/opt/homebrew/share/ghostscript/*/iccprofiles/default_cmyk.icc",
+      "/usr/local/share/ghostscript/*/iccprofiles/default_cmyk.icc",
+      "/usr/share/ghostscript/*/iccprofiles/default_cmyk.icc"
+    ]).first
+
+    default_cmyk ? [ default_cmyk, :default ] : [ nil, :missing ]
+  end
+
+  # Adapted from Ghostscript's stock PDFX_def.ps, hard-coded for PDF/X-1a with
+  # a Fogra39-family CMYK output intent (safe default even when we fall back to
+  # gs's own default_cmyk.icc — the printshop will resolve against their own
+  # calibration either way).
+  def write_pdfx_def(icc_path)
+    escaped_icc = icc_path.to_s.gsub("(", '\\(').gsub(")", '\\)')
+
+    body = <<~PS
+      %!
+      % Generated PDF/X-1a header for the 'Why Ruby?' book.
+
+      systemdict /ColorConversionStrategy known {
+        systemdict /ColorConversionStrategy get cvn dup /Gray ne exch /CMYK ne and
+      } {
+        true
+      } ifelse
+      { /ColorConversionStrategy cvx /rangecheck signalerror
+      } if
+
+      [ /GTS_PDFXVersion (PDF/X-1a:2001)
+        /Title (Why Ruby?)
+        /Trapped /False
+      /DOCINFO pdfmark
+
+      /ICCProfile (#{escaped_icc}) def
+
+      [/_objdef {icc_PDFX} /type /stream /OBJ pdfmark
+      [{icc_PDFX} << /N 4 >> /PUT pdfmark
+      [{icc_PDFX} ICCProfile (r) file /PUT pdfmark
+
+      [/_objdef {OutputIntent_PDFX} /type /dict /OBJ pdfmark
+      [{OutputIntent_PDFX} <<
+        /Type /OutputIntent
+        /S /GTS_PDFX
+        /OutputCondition (Commercial offset printing, Europe)
+        /Info (Coated FOGRA39 \\(ISO 12647-2:2004\\))
+        /OutputConditionIdentifier (FOGRA39)
+        /RegistryName (http://www.color.org)
+        /DestOutputProfile {icc_PDFX}
+      >> /PUT pdfmark
+      [{Catalog} <</OutputIntents [ {OutputIntent_PDFX} ]>> /PUT pdfmark
+    PS
+
+    path = Rails.root.join("tmp", "why_ruby_pdfx_def.ps")
+    File.write(path, body)
+    path
+  end
+
+  # Front matter is 2 pages (title + colophon), back matter is 1 page.
+  # Printshops need an even total, so we drop a blank leaf before the back
+  # cover if the count comes out odd.
+  def book_page_count(testimonials)
+    base = 2 + testimonials.size + 1
+    base.odd? ? base + 1 : base
+  end
+
   def build_book_html(testimonials)
+    base_pages = 2 + testimonials.size + 1
+    padding_page = base_pages.odd? ? blank_page : ""
+
     <<~HTML
       <!DOCTYPE html>
       <html lang="en">
@@ -100,10 +278,15 @@ namespace :book do
         #{title_page}
         #{colophon_page}
         #{testimonials.map { |t| testimonial_page(t) }.join("\n")}
+        #{padding_page}
         #{back_page}
       </body>
       </html>
     HTML
+  end
+
+  def blank_page
+    %(<div class="page blank-page"></div>)
   end
 
   def book_css
@@ -129,7 +312,7 @@ namespace :book do
 
       body {
         font-family: "Inter", system-ui, -apple-system, sans-serif;
-        color: #111827;
+        color: #000;
         line-height: 1.5;
       }
 
@@ -236,7 +419,7 @@ namespace :book do
       .testimonial__subheading {
         font-size: 18pt;
         font-weight: 700;
-        color: #111827;
+        color: #000;
         line-height: 1.3;
         margin-bottom: 3mm;
       }
@@ -333,7 +516,7 @@ namespace :book do
       .user-tile__name {
         font-size: 16pt;
         font-weight: 700;
-        color: #111827;
+        color: #000;
         line-height: 1.15;
       }
 
