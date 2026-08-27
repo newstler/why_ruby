@@ -74,7 +74,7 @@ namespace :book do
       acc[t.user.username] = t if FEATURED_USERNAMES.include?(t.user.username)
     end
     featured = FEATURED_USERNAMES.map { |u| featured_by_username[u] }.compact
-    rest = all - featured
+    rest = (all - featured).shuffle
     featured + rest
   end
 
