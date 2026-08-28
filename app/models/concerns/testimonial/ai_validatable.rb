@@ -20,7 +20,7 @@ module Testimonial::AiValidatable
 
     chat = user.chats.create!(
       purpose: "testimonial_validation",
-      model: Model.find_by(model_id: Setting.get(:validation_model, default: Setting::DEFAULT_AI_MODEL))
+      model: Model.resolve(Setting.get(:validation_model, default: Setting::DEFAULT_AI_MODEL))
     )
 
     response = chat.ask("#{system_prompt}\n\n#{user_prompt}")
@@ -70,6 +70,24 @@ module Testimonial::AiValidatable
           * generic descriptions of what Ruby is used for, with no personal sentiment attached
           * off-topic content (other languages, unrelated announcements, self-promotion)
         If the quote reads like a profile blurb, CV bullet, or product pitch rather than "here is why I love Ruby", reject it with reject_reason "quote".
+      - The quote MUST be primarily about Ruby. Reject if Ruby is a passing mention and the real subject is another language or the author's own project.
+      - The quote MUST be coherent, readable prose. Reject text that is garbled, unfinished, or impossible to follow.
+      - The quote MUST NOT sell anything. Reject agency pitches, availability-for-hire notes, growth claims used as marketing ("we ship at 30x speed"), or any call to action.
+
+      REJECTION EXAMPLES — these are all reject_reason "quote". Judge new quotes at this standard:
+        * "800+ apps. All Rails. Ruby's clean syntax makes it the best for AI development. We ship at 30x speed. I help founders and teams build, scale, and ship Rails apps fast. Let's build something. Visit example.com"
+          → REJECT: lead-generation advertising with a call to action, not a testimonial.
+        * "Using Ruby and Rails to help UK heritage get funding. Read my blog here: https://example.com/@me"
+          → REJECT: a link dump. States what the author does, never says anything about loving Ruby.
+        * "Simplicity, elegance and happiness. Like where on earth do you see unless being used."
+          → REJECT: incoherent, the second sentence does not parse.
+        * "It's very convenient for small build scripts. I usually use Rake for tiny tasks. This is because why there is Rakefile in my Rust project."
+          → REJECT: broken grammar, and the subject is the author's Rust project rather than a love of Ruby.
+
+      ACCEPTANCE EXAMPLES — publish quotes of this kind even when short or plainly worded:
+        * "I love Ruby because I can build my MVP in a few days." → ACCEPT: brief, but a genuine first-person reason.
+        * "Ruby was my first love... It's a joy to work with. User-friendly, versatile and productive." → ACCEPT.
+        * "I came to Ruby from Perl and PHP years ago and still can't leave. I also love Elixir." → ACCEPT: mentions other languages but the sentiment is clearly for Ruby.
 
       VALIDATION RULES:
       1. First check the user's QUOTE against the content policy. If it violates (including being negative about Ruby), reject immediately with reject_reason "quote".

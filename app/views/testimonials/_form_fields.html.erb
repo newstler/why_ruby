@@ -3,7 +3,6 @@
 
 <%= f.text_area :quote,
     rows: 4,
-    maxlength: 320,
     disabled: processing,
     placeholder: "I love Ruby because... (140-320 characters, or leave empty to unpublish)",
     data: { controller: controllers, char_counter_target: "input", action: "input->char-counter#update input->auto-resize#resize" },

@@ -484,6 +484,16 @@ namespace :book do
         line-height: 1.6;
       }
 
+      /* Quotes have no length cap, so the type steps down to fit the page
+         rather than the text ever being cut. */
+      .quote-block__text--long   { font-size: 11pt; line-height: 1.55; }
+      .quote-block__text--longer { font-size: 10pt; line-height: 1.5; }
+      .quote-block__text--xlong  { font-size: 9pt;  line-height: 1.45; }
+
+      .quote-block__box--long   { padding: 7mm; }
+      .quote-block__box--longer { padding: 6mm; }
+      .quote-block__box--xlong  { padding: 5mm; }
+
       /* Speech-bubble tail: outer red triangle + inner white triangle, pointing down toward avatar. */
       .quote-block__box::before,
       .quote-block__box::after {
@@ -618,14 +628,22 @@ namespace :book do
     HTML
   end
 
+  # Step the quote type down as the text grows. Never truncates — the full quote
+  # is always printed, the page just gives it more room.
+  QUOTE_FIT_STEPS = [ [ 560, "xlong" ], [ 460, "longer" ], [ 360, "long" ] ].freeze
+
   def quote_block(testimonial)
     return "" if testimonial.quote.blank?
+
+    step = QUOTE_FIT_STEPS.find { |threshold, _| testimonial.quote.length > threshold }&.last
+    text_class = [ "quote-block__text", ("quote-block__text--#{step}" if step) ].compact.join(" ")
+    box_class = [ "quote-block__box", ("quote-block__box--#{step}" if step) ].compact.join(" ")
 
     <<~HTML
       <div class="quote-block">
         <span class="quote-block__mark">&ldquo;</span>
-        <div class="quote-block__box">
-          <div class="quote-block__text">#{escape(testimonial.quote)}</div>
+        <div class="#{box_class}">
+          <div class="#{text_class}">#{escape(testimonial.quote)}</div>
         </div>
       </div>
     HTML
