@@ -11,6 +11,12 @@ class Model < ApplicationRecord
     update_column(:total_cost, chats.sum(:total_cost))
   end
 
+  # The same model_id exists once per provider, so pick a provider that is
+  # actually configured — otherwise the call fails at request time.
+  def self.resolve(model_id)
+    enabled.find_by(model_id: model_id) || find_by(model_id: model_id)
+  end
+
   def self.configured_providers
     distinct.pluck(:provider).select do |provider|
       Setting.provider_configured?(provider)

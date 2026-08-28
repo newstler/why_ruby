@@ -48,4 +48,51 @@ class User::GithubSyncableTest < ActiveSupport::TestCase
     assert_equal 1, result[:failed]
     assert_match(/EOFError/, result[:errors].first.to_s)
   end
+
+  test "batch_sync_github_data! preserves existing bio when GitHub returns nil" do
+    @user.update_columns(bio: "Loves Ruby since 2005")
+
+    stub_graphql_user(bio: nil)
+
+    result = User.batch_sync_github_data!([ @user ], api_token: "token")
+
+    assert_equal 1, result[:updated], result[:errors].inspect
+    assert_equal "Loves Ruby since 2005", @user.reload.bio
+  end
+
+  test "batch_sync_github_data! preserves existing bio when GitHub returns empty string" do
+    @user.update_columns(bio: "Loves Ruby since 2005")
+
+    stub_graphql_user(bio: "")
+
+    result = User.batch_sync_github_data!([ @user ], api_token: "token")
+
+    assert_equal 1, result[:updated], result[:errors].inspect
+    assert_equal "Loves Ruby since 2005", @user.reload.bio
+  end
+
+  test "batch_sync_github_data! updates bio when GitHub returns a non-blank value" do
+    @user.update_columns(bio: "Old bio")
+
+    stub_graphql_user(bio: "Fresh bio from GitHub")
+
+    result = User.batch_sync_github_data!([ @user ], api_token: "token")
+
+    assert_equal 1, result[:updated], result[:errors].inspect
+    assert_equal "Fresh bio from GitHub", @user.reload.bio
+  end
+
+  private
+
+  def stub_graphql_user(bio:)
+    stub_request(:post, User::GithubSyncable::GITHUB_GRAPHQL_ENDPOINT).to_return(
+      status: 200,
+      body: {
+        data: {
+          user_0: { login: "octocat", name: "The Octocat", email: nil, bio: bio, company: nil, websiteUrl: nil, twitterUsername: nil, location: nil, avatarUrl: "https://example.com/a.png" },
+          repos_0: { nodes: [] }
+        }
+      }.to_json
+    )
+  end
 end
