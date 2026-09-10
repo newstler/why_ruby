@@ -22,6 +22,7 @@ module Madmin
 
     def setting_params
       params.require(:setting).permit(
+        :carto_api_key,
         :github_api_token,
         :github_rubycommunity_client_id,
         :github_rubycommunity_client_secret,

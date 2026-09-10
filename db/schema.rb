@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_08_28_174730) do
+ActiveRecord::Schema[8.2].define(version: 2026_09_09_214500) do
   create_table "_litestream_lock", id: false, force: :cascade do |t|
     t.integer "id"
   end
@@ -466,6 +466,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_08_28_174730) do
   end
 
   create_table "settings", id: :string, default: -> { "uuid7()" }, force: :cascade do |t|
+    t.string "carto_api_key"
     t.datetime "created_at", null: false
     t.string "default_ai_model"
     t.string "github_api_token"

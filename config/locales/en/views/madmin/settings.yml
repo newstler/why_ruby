@@ -28,6 +28,10 @@ en:
           validation_model: Validation Model
       edit:
         cancel: Cancel
+        carto_api_key: CARTO API Key
+        carto_api_key_hint: Basemap tiles for the community map. Without a key CARTO
+          watermarks every tile. Get one at carto.com/basemaps/apikey and restrict
+          it to your domains.
         github: GitHub
         github_api_token: API Token
         github_api_token_hint: Used for batch syncing GitHub profile data and repositories.
@@ -42,6 +46,7 @@ en:
         litestream_replica_bucket: Replica Bucket
         litestream_replica_key_id: Access Key ID
         litestream_restart_note: Changes to Litestream settings require a server restart.
+        map: Map
         save: Save Settings
         stripe: Stripe
         stripe_publishable_key: Publishable Key
@@ -51,6 +56,7 @@ en:
         trial_days_hint: Number of days new teams get as a free trial. Set to 0 to
           disable.
       show:
+        carto_api_key: CARTO API Key
         edit_button: Edit Settings
         github: GitHub
         github_api_token: API Token
@@ -64,6 +70,7 @@ en:
         litestream_replica_bucket: Replica Bucket
         litestream_replica_key_id: Access Key ID
         litestream_restart_note: Changes to Litestream settings require a server restart.
+        map: Map
         not_configured: Not configured
         stripe: Stripe
         stripe_publishable_key: Publishable Key

@@ -382,6 +382,10 @@ module ApplicationHelper
     end
   end
 
+  def carto_basemap_api_key
+    Setting.get(:carto_api_key).to_s
+  end
+
   def main_site_url(path)
     if Rails.env.production? && request.host == Rails.application.config.x.domains.community
       "https://#{Rails.application.config.x.domains.primary}#{path}"

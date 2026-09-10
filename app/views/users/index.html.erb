@@ -4,6 +4,7 @@
 <div class="-mt-8 -mx-4 sm:-mx-6 lg:-mx-8 mb-10"
      data-controller="community-map"
      data-community-map-data-url-value="<%= community_map_data_url %>"
+     data-community-map-carto-api-key-value="<%= carto_basemap_api_key %>"
      <% if @filter_geo_bounds.present? %>data-community-map-fit-bounds-value="<%= @filter_geo_bounds.to_json %>"<% end %>>
   <div data-community-map-target="container"
        class="w-full h-[250px] sm:h-[350px] md:h-[400px] lg:h-[450px] community-map-landscape bg-gray-100 overflow-hidden">
