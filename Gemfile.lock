@@ -271,7 +271,7 @@ GEM
       kaminari-core (= 1.2.2)
     kaminari-core (1.2.2)
     language_server-protocol (3.17.0.5)
-    lefthook (2.1.5)
+    lefthook (2.1.14)
     lint_roller (1.1.0)
     litestream (0.14.0-aarch64-linux)
       actionpack (>= 7.0)
@@ -714,7 +714,7 @@ CHECKSUMS
   kaminari-activerecord (1.2.2) sha256=0dd3a67bab356a356f36b3b7236bcb81cef313095365befe8e98057dd2472430
   kaminari-core (1.2.2) sha256=3bd26fec7370645af40ca73b9426a448d09b8a8ba7afa9ba3c3e0d39cdbb83ff
   language_server-protocol (3.17.0.5) sha256=fd1e39a51a28bf3eec959379985a72e296e9f9acfce46f6a79d31ca8760803cc
-  lefthook (2.1.5) sha256=24bd602992e1ec36057bcc667bb74f23918ed05c715050a44e5a156f0b7a4312
+  lefthook (2.1.14) sha256=f162a0938c925237031dc8a01c3094ebd62e3300b47c4ad0b21a1df18b1d2936
   lint_roller (1.1.0) sha256=2c0c845b632a7d172cb849cc90c1bce937a28c5c8ccccb50dfd46a485003cc87
   litestream (0.14.0-aarch64-linux) sha256=bcf9199a665e673e27f929a0941011e50fb8ebf441d9754247686b514fba60d5
   litestream (0.14.0-arm64-darwin) sha256=507bbb7ee99b3398304c5ef4a9bae835761359ffc72850f25708477805313d07
