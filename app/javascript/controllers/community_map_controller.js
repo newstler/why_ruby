@@ -6,6 +6,7 @@ export default class extends Controller {
   static targets = ["container", "loading"]
   static values = {
     dataUrl: String,
+    cartoApiKey: { type: String, default: "" },
     fitBounds: { type: Object, default: {} }
   }
 
@@ -92,6 +93,11 @@ export default class extends Controller {
     document.head.appendChild(script)
   }
 
+  get basemapUrl() {
+    const base = "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+    return this.cartoApiKeyValue ? `${base}?key=${encodeURIComponent(this.cartoApiKeyValue)}` : base
+  }
+
   initMap() {
     this.readyForBoundsUpdate = false
 
@@ -108,7 +114,7 @@ export default class extends Controller {
       attributionControl: true
     })
 
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+    L.tileLayer(this.basemapUrl, {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
       subdomains: "abcd",
       maxZoom: 20

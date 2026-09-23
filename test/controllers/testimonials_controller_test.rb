@@ -51,4 +51,22 @@ class TestimonialsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to user_path(user)
   end
+
+  test "an over-long quote is rejected with the full text preserved, never trimmed" do
+    sign_in users(:user_no_testimonial)
+    long = "I love Ruby because " + ("it reads like plain English and gets out of my way. " * 12)
+
+    assert_no_difference -> { Testimonial.count } do
+      post testimonial_path, params: { testimonial: { quote: long } }
+    end
+  end
+
+  test "a self-promotional quote is refused" do
+    sign_in users(:user_no_testimonial)
+    promo = "I love Ruby because it lets me ship fast for my clients every single week of the year without fail. Visit rubygrowthlabs.com"
+
+    assert_no_difference -> { Testimonial.count } do
+      post testimonial_path, params: { testimonial: { quote: promo } }
+    end
+  end
 end

@@ -16,7 +16,7 @@ module Testimonial::AiGeneratable
 
     chat = user.chats.create!(
       purpose: "testimonial_generation",
-      model: Model.find_by(model_id: Setting.get(:testimonial_model, default: Setting::DEFAULT_AI_MODEL))
+      model: Model.resolve(Setting.get(:testimonial_model, default: Setting::DEFAULT_AI_MODEL))
     )
 
     parsed = ask_and_parse(chat, system_prompt, user_prompt)
@@ -102,6 +102,9 @@ module Testimonial::AiGeneratable
       - USE simple verbs: "is", "has", "does" — not "serves as", "boasts", "features"
       - BE specific and concrete. Say what Ruby actually does, not how significant it is.
       - Write like a developer talking to a friend, not a press release.
+      - NEVER name the author or refer to them in the third person. Do not write "Michael's journey",
+        "developers like Joe", "for Igor" or "Pavlo's favourite framework". The user's name and bio are
+        context for you only. Write about Ruby, not about the person.
 
       Respond with valid JSON only: {"heading": "...", "subheading": "...", "body_text": "..."}
     PROMPT

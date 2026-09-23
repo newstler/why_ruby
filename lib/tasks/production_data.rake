@@ -26,8 +26,8 @@ class ProductionPullConfig
   attr_reader :server_ip, :volume_name, :ssh_user, :dev_db_path, :storage_root
 
   def initialize
-    deploy = YAML.safe_load_file(Rails.root.join("config/deploy.yml"), permitted_classes: [ Symbol ])
-    db_config = YAML.safe_load(ERB.new(File.read(Rails.root.join("config/database.yml"))).result, permitted_classes: [ Symbol ])
+    deploy = YAML.safe_load_file(Rails.root.join("config/deploy.yml"), permitted_classes: [ Symbol ], aliases: true)
+    db_config = YAML.safe_load(ERB.new(File.read(Rails.root.join("config/database.yml"))).result, permitted_classes: [ Symbol ], aliases: true)
 
     @server_ip = extract_server_ip(deploy)
     @volume_name = extract_volume_name(deploy)

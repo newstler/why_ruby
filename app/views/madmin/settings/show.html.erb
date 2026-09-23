@@ -71,6 +71,25 @@
     </dl>
   </div>
 
+  <%# Map %>
+  <div class="card-bg p-6 mb-6">
+    <h2 class="text-xl font-semibold text-dark-100 mb-4"><%= t(".map") %></h2>
+    <dl class="space-y-3">
+      <div class="flex items-center justify-between">
+        <dt class="text-sm font-medium text-dark-400"><%= t(".carto_api_key") %></dt>
+        <dd class="flex items-center gap-2">
+          <% if @setting.carto_api_key.present? %>
+            <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+            <code class="text-sm text-dark-200 font-mono"><%= mask_secret(@setting.carto_api_key) %></code>
+          <% else %>
+            <span class="w-2 h-2 bg-dark-500 rounded-full"></span>
+            <span class="text-sm text-dark-500"><%= t(".not_configured") %></span>
+          <% end %>
+        </dd>
+      </div>
+    </dl>
+  </div>
+
   <%# Stripe %>
   <div class="card-bg p-6 mb-6">
     <h2 class="text-xl font-semibold text-dark-100 mb-4"><%= t(".stripe") %></h2>

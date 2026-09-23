@@ -2,6 +2,7 @@ class Setting < ApplicationRecord
   DEFAULT_AI_MODEL = "gpt-4.1-nano"
 
   ALLOWED_KEYS = %i[
+    carto_api_key
     default_ai_model
     github_api_token
     github_rubycommunity_client_id github_rubycommunity_client_secret
