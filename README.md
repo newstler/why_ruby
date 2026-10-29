@@ -1,6 +1,6 @@
 # WhyRuby.info & RubyCommunity.org
 
-Ruby advocacy site and developer community. Built with Ruby 4.0.1 and Rails 8.2 on the Solid Stack (SQLite, SolidQueue, SolidCache, SolidCable).
+Ruby advocacy site and developer community. Built with Ruby 4.0.9 and Rails 8.2 on the Solid Stack (SQLite, SolidQueue, SolidCache, SolidCable).
 
 ## Features
 
@@ -36,7 +36,7 @@ Ruby advocacy site and developer community. Built with Ruby 4.0.1 and Rails 8.2 
 ## Setup
 
 ### Prerequisites
-- Ruby 4.0.1
+- Ruby 4.0.9
 - SQLite 3
 - Node.js (for JavaScript runtime)
 
@@ -126,7 +126,7 @@ Access the admin panel at `/admin`
 - **StarSnapshot**: Daily star count snapshots for trend tracking
 
 ### Key Technologies
-- **Ruby 4.0.1 / Rails 8.2**: Latest Rails with Solid Stack
+- **Ruby 4.0.9 / Rails 8.2**: Latest Rails with Solid Stack
 - **SQLite with UUIDv7**: String primary keys for time-ordered uniqueness
 - **Tailwind CSS 4**: Utility-first CSS via `tailwindcss-rails`
 - **Hotwire (Turbo + Stimulus)**: Frontend interactivity, infinite scroll, interactive map
