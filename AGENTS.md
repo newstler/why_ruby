@@ -4,7 +4,7 @@ This file provides guidance to AI coding agents working with this repository.
 
 ## Project Overview
 
-WhyRuby.info is a Ruby advocacy community website built with Ruby 4.0.1 and Rails 8.2 (edge/main branch) using the Solid Stack (SQLite, SolidQueue, SolidCache, SolidCable). It features a universal content model supporting articles, links, and success stories with AI-generated summaries, GitHub OAuth authentication, community-driven content moderation, user testimonials, an interactive developer map, GitHub project tracking with star trends, and a timezone-aware newsletter system.
+WhyRuby.info is a Ruby advocacy community website built with Ruby 4.0.9 and Rails 8.2 (edge/main branch) using the Solid Stack (SQLite, SolidQueue, SolidCache, SolidCable). It features a universal content model supporting articles, links, and success stories with AI-generated summaries, GitHub OAuth authentication, community-driven content moderation, user testimonials, an interactive developer map, GitHub project tracking with star trends, and a timezone-aware newsletter system.
 
 The app runs on two domains:
 - **whyruby.info** — advocacy content and testimonials
