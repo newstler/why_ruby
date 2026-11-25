@@ -89,7 +89,7 @@ gem "stripe"
 gem "mobility", "~> 1.3"
 
 # Monitor performance
-gem "rorvswild", "~> 1.9"
+gem "rorvswild", "~> 1.12"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
