@@ -120,4 +120,4 @@ group :test do
   gem "webmock"
 end
 
-gem "tidewave", "~> 0.4.1", group: :development
+gem "tidewave", "~> 0.9.0", group: :development
