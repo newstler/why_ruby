@@ -48,7 +48,7 @@ gem "omniauth-github", "~> 2.0"
 gem "omniauth-rails_csrf_protection", "~> 2.0"
 
 # Admin
-gem "madmin", "~> 2.1"
+gem "madmin", "~> 2.6"
 
 # Markdown and code syntax highlighting
 gem "redcarpet"
@@ -120,4 +120,4 @@ group :test do
   gem "webmock"
 end
 
-gem "tidewave", "~> 0.4.1", group: :development
+gem "tidewave", "~> 0.9.0", group: :development
