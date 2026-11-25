@@ -41,7 +41,9 @@ gem "thruster", require: false
 gem "litestream"
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-gem "image_processing", "~> 1.2"
+gem "image_processing", "~> 2.1"
+# image_processing 2.x no longer bundles an image backend; Active Storage defaults to libvips
+gem "ruby-vips", "~> 2.0"
 
 # Authentication (GitHub OAuth only, no Devise)
 gem "omniauth-github", "~> 2.0"
