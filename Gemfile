@@ -74,7 +74,7 @@ gem "babosa"
 gem "wheretz"
 
 # HTML/XML parsing
-gem "nokogiri", "~> 1.16"
+gem "nokogiri", "~> 1.19"
 
 # Icons
 gem "inline_svg"
