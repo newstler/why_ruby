@@ -16,7 +16,7 @@ gem "turbo-rails"
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
 gem "stimulus-rails"
 # Use Tailwind CSS [https://github.com/rails/tailwindcss-rails]
-gem "tailwindcss-rails", "~> 4.0"
+gem "tailwindcss-rails", "~> 4.6"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
@@ -41,14 +41,16 @@ gem "thruster", require: false
 gem "litestream"
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-gem "image_processing", "~> 1.2"
+gem "image_processing", "~> 2.1"
+# image_processing 2.x no longer bundles an image backend; Active Storage defaults to libvips
+gem "ruby-vips", "~> 2.0"
 
 # Authentication (GitHub OAuth only, no Devise)
 gem "omniauth-github", "~> 2.0"
 gem "omniauth-rails_csrf_protection", "~> 2.0"
 
 # Admin
-gem "madmin", "~> 2.1"
+gem "madmin", "~> 2.6"
 
 # Markdown and code syntax highlighting
 gem "redcarpet"
@@ -120,4 +122,4 @@ group :test do
   gem "webmock"
 end
 
-gem "tidewave", "~> 0.4.1", group: :development
+gem "tidewave", "~> 0.9.0", group: :development
